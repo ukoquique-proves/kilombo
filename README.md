@@ -124,48 +124,48 @@ El sitio es **100% estático** — no requiere build step, dependencias ni backe
 
 ---
 
-## Mostrar avances al cliente (sitio preview público)
+## Sitio público permanente (GitHub Pages)
 
-Como no se puede compartir `localhost` directamente con el cliente, usamos un **túnel HTTPS público** que apunta 1:1 a tu carpeta `./site`. Cualquier cambio que guardes en local se ve **instantáneamente** en la URL pública (misma estructura, mismos archivos).
+El portal está publicado de forma permanente en GitHub Pages:
 
-### Script automático: `./start-preview.sh`
+**🌍 https://ukoquique-proves.github.io/kilombo/**
+
+- Se actualiza **automáticamente** con cada `git push origin main` — no requiere acción manual.
+- El workflow que lo gestiona está en `.github/workflows/deploy.yml`.
+- URL estable y permanente — válida para compartir con el cliente en cualquier momento.
+
+---
+
+## Desarrollo local
+
+Levantar un servidor HTTP desde la carpeta `site/` para trabajar en local:
+
+```bash
+cd site
+python3 -m http.server 8080
+```
+
+Abrir `http://localhost:8080` en el navegador.
+
+El sitio es **100% estático** — no requiere build step, dependencias ni backend.
+
+---
+
+## Preview temporal (Serveo) — solo para sesiones de trabajo
+
+Si necesitas compartir cambios locales **antes de hacer push** (por ejemplo para validar algo rápido con el cliente), puedes usar el túnel Serveo:
 
 ```bash
 ./start-preview.sh
 ```
 
-Hace todo por ti:
-1.  Levanta (o reinicia) el servidor local `http://localhost:8080`
-2.  Abre un túnel HTTPS en **Serveo**
-3.  Imprime dos URLs:
-    - 🏠 `http://localhost:8080` → tú, para trabajar
-    - 🌍 `https://....serveousercontent.com` → **ésta se la mandas al cliente**
-
-> **URL pública actual (túnel ya abierto en esta sesión):**
-> **https://466a3ac5cf0f9d90-190-132-104-107.serveousercontent.com**
-> *(válida mientras el túnel siga abierto. Si se cae, volver a ejecutar `./start-preview.sh` te da una nueva. Si quieres URL fija, crea cuenta en serveo.net y usa un subdominio reservado).*
-
-### Modo manual (sin script)
-
-```bash
-# Terminal 1: servidor local
-cd site && python3 -m http.server 8080
-
-# Terminal 2: túnel público
-ssh -R 80:localhost:8080 serveo.net
-```
-
-Serveo imprime la URL `https://...` que puedes compartir.
+Levanta el servidor local y abre un túnel HTTPS temporal. La URL cambia en cada sesión y muere cuando se cierra la terminal — **no es apta para compartir con el cliente como referencia permanente**. Para eso, usar la URL de GitHub Pages.
 
 ---
 
 ## Subida a producción real (kilombo.top)
 
-Cuando el cliente apruebe los cambios, pasar **TODO el contenido de `./site/` TAL CUAL** al servidor de `kilombo.top`.
-
-Estructura **1:1** → lo que está en `site/index.html` acaba en `/var/www/kilombo.top/index.html`.
-
-### Script: `./sync-to-production.sh`
+Cuando el cliente apruebe los cambios y se resuelva el acceso SSH (ver `TROUBLESHOOTING.md`), usar:
 
 ```bash
 ./sync-to-production.sh
@@ -174,7 +174,6 @@ Estructura **1:1** → lo que está en `site/index.html` acaba en `/var/www/kilo
 1.  Lee las credenciales del `.env` (host, usuario, puerto, ruta remota).
 2.  Pide escribir la palabra `PROD` como medida de seguridad.
 3.  Usa **rsync** (con `--delete` para que quede idéntico) o scp si rsync no existe.
-4.  El sitio publicado queda **exactamente igual** que el preview que viste el cliente.
 
 ### A mano (si prefieres)
 
