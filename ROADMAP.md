@@ -14,11 +14,9 @@ Definir y documentar cómo pasar de cambios en local (`/site`) a producción en 
   - Opción B: Repositorio GitHub + Action de despliegue automático (rsync/SFTP)
   - Opción C: Script `deploy.sh` local con rsync + credenciales SSH
 - [x] **1.2 Implementar la opción elegida**
+  - GitHub Pages via GitHub Actions (`gh-pages` branch → luego `main` + workflow). URL permanente: `https://ukoquique-proves.github.io/kilombo/`
 - [x] **1.3 Documentar paso a paso en `README.md` sección "Despliegue"**
-  - Qué comando ejecutar
-  - Qué credenciales se necesitan
-  - Qué carpeta del servidor se sobreescribe
-- [ ] **1.4 Prueba de despliegue con un cambio mínimo** (ej: ajustar un texto) para validar que el flujo funciona — *bloqueado hasta resolver acceso SSH (ver TROUBLESHOOTING.md)*
+- [ ] **1.4 Prueba de despliegue en `kilombo.top`** — *bloqueado hasta resolver acceso SSH (ver TROUBLESHOOTING.md)*
 
 ---
 
