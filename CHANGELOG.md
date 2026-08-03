@@ -5,6 +5,24 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.10.0] — 2026-08-03
+
+### Added (nuevo)
+- **`site/js/render.mjs`**: módulo ES puro con `escapeHtml`, `buildLangs`, `buildKeypoints`, `renderCard` y tipos JSDoc (`VideoEntry`, `LangChip`). Importable tanto desde el navegador (`plandemismo.js`) como desde Node (`test/render.test.mjs`) sin duplicación.
+- **`test/render.test.mjs`**: 32 tests unitarios con `node:test` + `happy-dom` (sin Jest, sin build step). Cubre: 7 casos de `escapeHtml` (payloads XSS, tipos no-string, null/undefined), 5 de `buildLangs`, 4 de `buildKeypoints`, 16 de `renderCard` (estructura DOM, atributos data-*, clases, seguridad). Todos pasan.
+- **`scripts/validate-data.mjs`**: validador de esquema para los JSON de vídeos en `site/assets/data/`. Comprueba campos obligatorios, tipos, URLs válidas y valores no vacíos. Falla con `exit 1` y mensaje claro si alguna entrada es inválida — evita que un JSON mal editado se despliegue silenciosamente con cards en blanco.
+- **`scripts/check-urls.mjs`**: comprueba que las 7 URLs de la red Kilombo sean consistentes entre `.env.example`, `site/index.html` y `README.md`. Falla con `exit 1` y muestra tabla de presencia si hay drift entre fuentes. Normaliza trailing slashes y puntuación Markdown en la extracción.
+- **`happy-dom`** añadido como dev dependency (necesario para el shim de DOM en los tests unitarios de `renderCard`).
+
+### Changed (cambiado)
+- **`site/js/plandemismo.js`**: las funciones de render (`escapeHtml`, `buildLangs`, etc.) eliminadas del archivo; ahora importa `renderCard` desde `render.mjs`. El script usa `type="module"` en `plandemismo.html`.
+- **`site/plandemismo.html`**: `<script src="js/plandemismo.js">` → `<script src="js/plandemismo.js" type="module">` para soportar el `import` de ES modules.
+
+### Security (seguridad)
+- **XSS fix verificado con tests**: `escapeHtml` cubre los 5 caracteres peligrosos (`& < > " '`). El test de attribute breakout en `ctaUrl` confirma que `" onmouseover="bad` no produce un atributo real en el DOM — validado con `happy-dom`.
+
+---
+
 ## [0.9.0] — 2026-08-03
 
 ### Added (nuevo)

@@ -1,6 +1,12 @@
 // @ts-check
 // plandemismo.js — behaviour and rendering for plandemismo.html only.
 // Guard: this script self-limits to pages with data-page="plandemismo".
+//
+// Rendering helpers (escapeHtml, buildLangs, buildKeypoints, renderCard)
+// live in render.mjs so they can be unit-tested independently via
+// test/render.test.mjs without pulling in the tab/DOM init logic.
+
+import { renderCard } from './render.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (document.body.dataset.page !== 'plandemismo') return;
@@ -97,110 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ================================================================
   // VIDEO CARD RENDERER
-  // Reads JSON from assets/data/ and builds card DOM dynamically.
-  // Adding a new video = edit the JSON. No HTML changes needed.
+  // Data lives in assets/data/*.json — edit JSON to add/update videos.
+  // renderCard() is defined in render.mjs (imported above).
   // ================================================================
-
-  /**
-   * Escape a string for safe interpolation into HTML text content or
-   * attribute values. Covers the five characters that can break markup
-   * or allow attribute injection: & < > " '
-   * Run every JSON-sourced value through this before placing it in
-   * innerHTML, including href values (guards against " onmouseover=... escapes).
-   * @param {unknown} s
-   * @returns {string}
-   */
-  const escapeHtml = (s) =>
-    String(s === null || s === undefined ? '' : s).replace(
-      /[&<>"']/g,
-      (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c)
-    );
-
-  /**
-   * Build the lang chips HTML for a video card.
-   * @param {Array<{chip: string, label: string, title?: string}>} langs
-   * @returns {string}
-   */
-  const buildLangs = (langs) =>
-    langs
-      .map((l) => {
-        const titleAttr = l.title ? ` title="${escapeHtml(l.title)}"` : '';
-        return `<span class="lang-chip lang-chip--${escapeHtml(l.chip)}"${titleAttr}>${escapeHtml(l.label)}</span>`;
-      })
-      .join('\n            ');
-
-  /**
-   * Build the keypoints list HTML (only for featured cards).
-   * @param {string[] | undefined} keypoints
-   * @returns {string}
-   */
-  const buildKeypoints = (keypoints) => {
-    if (!keypoints || keypoints.length === 0) return '';
-    const items = keypoints.map((kp) => `<li>${escapeHtml(kp)}</li>`).join('\n            ');
-    return `
-          <ul class="video-card__keypoints">
-            ${items}
-          </ul>`;
-  };
-
-  /**
-   * Render a single video card article element.
-   * @param {Object} v - video data object from JSON
-   * @returns {HTMLElement}
-   */
-  const renderCard = (v) => {
-    const isFeatured = !!v.featured;
-    const cardClass = isFeatured ? 'video-card video-card--featured' : 'video-card';
-    const thumbClass = isFeatured
-      ? 'video-card__thumb video-card__thumb--featured video-card__thumb--placeholder'
-      : 'video-card__thumb video-card__thumb--placeholder';
-    const playClass = isFeatured ? 'play-icon play-icon--big' : 'play-icon';
-    const codeClass = isFeatured ? 'thumb-code thumb-code--big' : 'thumb-code';
-    const codeLabel = v.idAlt ? `${escapeHtml(v.id)} · ${escapeHtml(v.idAlt)}` : escapeHtml(v.id);
-    const titleClass = isFeatured ? 'video-card__title video-card__title--big' : 'video-card__title';
-    const ctaClass = isFeatured ? 'video-card__cta video-card__cta--big' : 'video-card__cta';
-    const cornerHtml = v.cornerLabel
-      ? `<span class="thumb-corner">${escapeHtml(v.cornerLabel)}</span>`
-      : '';
-    const todoComment = v.ctaPlaceholder
-      ? `<!-- TODO (A-2): reemplazar href por URL real del vídeo ${escapeHtml(v.id)} en tv.canal7salta.com -->`
-      : '';
-
-    const article = document.createElement('article');
-    article.className = cardClass;
-    article.dataset.videoId = v.id;
-    article.dataset.country = v.country;
-    article.dataset.year = String(v.year);
-    article.dataset.tags = v.tags.join(', ');
-    if (v.subtitlesFr) article.dataset.subtitlesFr = v.subtitlesFr;
-
-    article.innerHTML = `
-        <div class="video-card__media">
-          <div class="${thumbClass}" aria-hidden="true">
-            <span class="${playClass}">&#9654;</span>
-            <span class="${codeClass}">${codeLabel}</span>
-            ${cornerHtml}
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">${escapeHtml(v.countryLabel)}</span>
-            <span class="meta-fecha">${escapeHtml(v.year)}</span>
-            <span class="meta-cat">${escapeHtml(v.category)}</span>
-          </div>
-          <h3 class="${titleClass}">${escapeHtml(v.title)}</h3>
-          <p class="video-card__desc">${escapeHtml(v.desc)}</p>
-          ${buildKeypoints(v.keypoints)}
-          <div class="video-card__langs">
-            ${buildLangs(v.langs)}
-          </div>
-          ${todoComment}
-          <a href="${escapeHtml(v.ctaUrl)}" target="_blank" rel="noopener"
-             class="${ctaClass}"${v.ctaPlaceholder ? ' data-cta-placeholder="true"' : ''}>${escapeHtml(v.ctaLabel)}</a>
-        </div>`;
-
-    return article;
-  };
 
   /**
    * Fetch a JSON file and render its video cards into a grid container.
@@ -218,12 +123,15 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then((videos) => {
         const fragment = document.createDocumentFragment();
-        videos.forEach((/** @type {Object} */ v) => fragment.appendChild(renderCard(v)));
+        videos.forEach((/** @type {import('./render.mjs').VideoEntry} */ v) =>
+          fragment.appendChild(renderCard(v))
+        );
         grid.appendChild(fragment);
       })
       .catch((err) => {
         console.error('[plandemismo]', err);
-        grid.innerHTML = `<p class="tab-footer"><em>Error cargando el inventario de vídeos. Intenta recargar la página.</em></p>`;
+        grid.innerHTML =
+          '<p class="tab-footer"><em>Error cargando el inventario de vídeos. Intenta recargar la página.</em></p>';
       });
   };
 

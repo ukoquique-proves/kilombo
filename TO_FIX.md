@@ -1,11 +1,11 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-03.
+Última actualización: 2026-08-03 (v0.10.0).
 
 ---
 
-## � Pendiente de confirmación del cliente
+## 🟡 Pendiente de confirmación del cliente
 
 - [ ] **6. Ambas tarjetas de P.I. apuntan a la misma URL** — `index.html`
   - Tarjeta ES y FR enlazan ambas a `https://proletariosinternacionalistas.kilombo.top/`.
