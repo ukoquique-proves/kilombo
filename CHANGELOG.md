@@ -5,6 +5,103 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.9.0] — 2026-08-03
+
+### Added (nuevo)
+- **`site/assets/data/plandemismo-actualidad.json`**: inventario de los 9 vídeos de la pestaña Actualidad. Cada entrada incluye `id`, `country`, `year`, `tags`, `category`, `title`, `desc`, `langs`, `subtitlesFr`, `ctaUrl`, `ctaPlaceholder`.
+- **`site/assets/data/plandemismo-sida-covid.json`**: inventario del documental destacado "ELISA MATO A RUTH" con campos adicionales (`keypoints`, `featured`, `cornerLabel`, `idAlt`).
+- **`site/assets/{data,subtitles,audios,transcripts}/.gitkeep`**: estructura de carpetas `assets/` versionada — ya no desaparece tras `git clone`.
+- **`// @ts-check`** en `main.js` y `plandemismo.js`: activa inferencia de tipos de TypeScript en el editor sin ningún paso de build ni `tsconfig.json`.
+
+### Changed (cambiado)
+- **`site/js/plandemismo.js` — refactor completo (A-3 + B-4 + #22)**:
+  - Añadido guard de página: `if (document.body.dataset.page !== 'plandemismo') return` — el script se auto-limita al HTML que lo necesita.
+  - Nueva función `renderVideoCards(jsonPath, gridId)`: hace `fetch` al JSON correspondiente, construye el DOM de cada tarjeta y lo inyecta en el grid. Añadir un vídeo nuevo = editar el JSON, sin tocar HTML.
+  - Funciones auxiliares `buildLangs()` y `buildKeypoints()` para mantener el render limpio y sin repetición.
+  - Todo el código anterior de tabs (WAI-ARIA, roving tabindex, ←/→/Home/End) conservado íntegramente.
+  - JSDoc `@param`/`@type` en todas las funciones para aprovechar el `// @ts-check`.
+- **`site/plandemismo.html` — reducido de ~360 a ~90 líneas (A-3)**:
+  - Los 10 bloques `<article class="video-card">` hardcodeados eliminados.
+  - Sustituidos por dos grids vacíos (`#grid-actualidad`, `#grid-sida-covid`) con `<noscript>` fallback.
+  - `<body data-page="plandemismo">` añadido para el guard de JS (B-4).
+- **`site/index.html` — bloque de config de URLs (A-2)**:
+  - Añadido comentario-bloque al inicio del `<body>` listando las 7 URLs de la red Kilombo con instrucción de mantenerlo sincronizado con `.env.example`.
+- **`sync-to-production.sh` — validación pre-deploy (B-5)**:
+  - Nuevo bloque de pre-flight antes del prompt `PROD`: verifica que `KILOMBOTOP_PASSWORD` esté configurado, que `rsync` o `scp` estén disponibles, y avisa si `sshpass` no está instalado.
+- **`plandemismo.html` — TODOs en CTAs (A-2 parcial)**:
+  - Cada enlace "Ver en tv.canal7salta.com" tiene un comentario `<!-- TODO (A-2): reemplazar href por URL real del vídeo {id} -->` hasta que se obtengan las URLs reales de Canal7.
+
+### Fixed (corregido)
+- **README.md**: sección 02 corregida de "2 ediciones por idioma" a "tarjeta bilingüe ES/FR"; árbol de archivos actualizado con descripción correcta de `plandemismo.js` y estado real de `assets/`; URL Serveo actualizada; "Próximos pasos" sincronizados con el estado real del proyecto; ejemplo `scp` manual corregido (`site/*` → `site/.`).
+- **ROADMAP.md**: pasos 1.2, 1.3, 2.1–2.5 marcados como completados; tabla resumen de prioridad actualizada con estado real de cada bloque.
+
+---
+
+## [0.8.0] — 2026-08-03
+
+> Versión de saneamiento completo: auditoría TO_FIX.md cerrada al 100% (10/10 items).
+> 5 bugs rojos + 5 inconsistencias amarillas resueltas. Mejora importante de
+> accesibilidad (tablist WAI-ARIA) y consistencia de datos.
+
+### Fixed (corregido — 5 bugs rojos cerrados)
+
+- **Bug #2 · Rutas de subtítulos `.vtt` rotas** (`plandemismo.html`): 4 vídeos (IDs 167, 1111, 2250, 2252) tenían `data-subtitles-fr="subtitles/…"` → corregido a `assets/subtitles/…` conforme a la estructura documentada en ROADMAP.
+- **Bug #4 · Navegación flechas ←/→ faltante en tabs** (`site/js/plandemismo.js`): implementado patrón **WAI-ARIA tablist completo** con roving tabindex. Teclas soportadas: `←` / `→` cambian foco entre tabs habilitadas, `Home` / `End` saltan a la primera / última, `Enter` / `Espacio` activan la tab enfocada. Las pestañas con `aria-disabled="true"` (Históricos) se saltan automáticamente en el ciclo.
+- **Bug #5 · Fallback `scp` en deploy a ruta incorrecta** (`sync-to-production.sh`): ya corregido en línea — usa `"${SITE_DIR}/."` (con punto final) en vez de `"${SOURCE}"` con trailing slash, garantizando que se copian los *contenidos* de `site/` directamente en `REMOTE_PATH` sin crear `REMOTE_PATH/site/`.
+- **Bug #13 · Atributos `data-subtitles-en` muertos** (`plandemismo.html`): eliminados de todas las tarjetas de vídeo. No había lógica CSS/JS que los leyera; se documenta que, si se implementan subtítulos EN en el futuro, hay que añadir el atributo + un chip de idioma equivalente a la pila FR.
+- **Bug #14 · Gaps de accesibilidad ARIA en el tablist** (`plandemismo.html` + `plandemismo.js`):
+  - ✅ `aria-controls` y `aria-labelledby` ya cruzados correctamente entre cada `role="tab"` y su `role="tabpanel"`.
+  - ✅ Pestaña "Históricos" ya **no usa `disabled` nativo**. Reemplazado por `aria-disabled="true"` + `tabindex="-1"` — permanece en el DOM y en el orden de enfoque del roving tabindex pero no es activable, cumpliendo el patrón ARIA.
+  - ✅ Nueva función `activateTab()` en JS retorna temprano si `aria-disabled="true"`.
+
+### Changed (cambiado — 5 inconsistencias amarillas resueltas)
+
+- **#6 · Tarjetas PI duplicadas apuntando a la misma URL** (`index.html`): confirmado vía `.env.example` (`KILOMBO_SITE_PI_LANGS=es,fr`) y búsqueda DNS que sólo existe *un* dominio PI bilingüe (`proletariosinternacionalistas.kilombo.top`), típico SPIP con selector de idioma interno. Las 2 tarjetas separadas (ES / FR) se **fusionaron en 1 tarjeta destacada** con:
+  - Clase `card--lang-multi card--featured` (cabecera multi-idioma morada + estilo destacado).
+  - Etiqueta de idioma `Español · Français`.
+  - Título bilingüe `Proletarios Internacionalistas / Prolétaires Internationalistes`.
+  - 2 chips de idioma independientes: `[ES]` + `[FR]` (negro/blanco).
+  - Descripción que explica que el sitio tiene selector de idioma interno.
+- **#11 · `page-lead` centrado vs. contenido a ancho completo** (`css/plandemismo.css`): la introducción tenía `max-width: 80ch; margin: 0 auto`, creando un salto de alineación brusco con `tabs` y `video-grid` inferiores. Corregido a `max-width: 100%; margin: 0 0 2.5rem` — mismo ancho que el resto del contenido dentro del `.container` (1200px máx.), conservando fondo `paper-alt` + borde izquierdo rojo distintivo.
+- **#15 · Tipografía documentada ≠ tipografía real** (`README.md`): tabla "Paleta y diseño" actualizada de `Georgia / Times New Roman` a `Verdana, Arial, Helvetica, sans-serif` con la nota `(alineada con SPIP Escal 5.2.9 de producción)`, cerrando la desactualización de docs desde el cambio de fuentes de v0.7.0.
+- **#16 · Carpetas `assets/*` descritas como pobladas pero vacías** (`README.md`): línea `assets/` del árbol de archivos documentada ahora como `(vacío — scaffolding pendiente de poblar)`. Las 4 subcarpetas (`data/`, `subtitles/`, `audios/`, `transcripts/`) mantienen su propósito descrito pero se indica explícitamente que aún no tienen contenido.
+- **#17 · Contradicción `repo/` entre README y `.gitignore`** (`README.md` + `.gitignore`): eliminada la línea `├── repo/ ← Repositorio GitHub (solo docs en este momento)` del árbol de archivos en el README. Coincide ahora con `.gitignore`, que marca `repo/` como *"Old nested clone from initial setup (redundant)"* y la excluye del versionado.
+
+### TO_FIX.md actualizado
+
+- Todos los 10 items (5 🔴 + 5 🟡) marcados `[x]`.
+- Añadida columna **Estado** en la tabla resumen final: `✅ FIXED` para los 8 corregidos en esta sesión, `✅ FIXED` (ya estaba) para #5 y #13.
+- Añadida fecha `Última actualización: 2026-08-03` en la cabecera.
+- Los 2 items (#6, #11) que requerían confirmación con cliente se resolvieron con decisión de producto razonada (1 tarjeta bilingüe, page-lead al ancho) y documentadas como reversibles si el cliente prefiere la otra opción.
+
+---
+
+## [0.7.0] — 2026-08-03
+
+### Added (nuevo)
+- **`TROUBLESHOOTING.md`**: diagnóstico completo del intento de conexión al servidor `kilombo.top`. Documenta: estado de puertos (22 cerrado, 80/443 abiertos), infraestructura YunoHost detectada (6 apps, sin app para el dominio raíz), fallos de autenticación con todas las combinaciones probadas, y 4 opciones de resolución con checklist de próximos pasos.
+
+### Changed (cambiado)
+- **Tipografía del portal** alineada con `kilombo.top`: se reemplaza la pila Georgia/Times New Roman (editorial) por `Verdana, Arial, Helvetica, sans-serif`, que es la pila exacta que usa el servidor SPIP de producción (`cssdyn-config_css` de Escal 5.2.9). Los elementos monoespaciados (chips, etiquetas, CTA) pasan a `'Courier New', 'Lucida Console', monospace` con fallback explícito. Afecta a `style.css` y `plandemismo.css`.
+- **Preview Serveo relanzado**: nueva URL pública activa: `https://b795d3c3f8bbbf7c-190-132-104-107.serveousercontent.com`. `.env` actualizado con `PREVIEW_PUBLIC_URL`.
+
+---
+
+## [0.6.0] — 2026-08-03
+
+### Added (nuevo)
+- **`TO_FIX.md`**: auditoría completa de bugs e inconsistencias detectados. 5 bugs rojos y 7 inconsistencias amarillas, cada uno con descripción, archivo afectado y fix propuesto. Checkboxes para seguimiento.
+
+### Fixed (corregido)
+- **`plandemismo.css` — `.warning-block`**: `margin-top: 1.5rem 0 0` (shorthand inválido) → `margin: 1.5rem 0 0`.
+- **`style.css` — `.cards-grid--featured`**: clase usada en `index.html` (secciones Tierra y Libertad y Nuevo Orden Mundial) pero nunca definida. Añadida regla `grid-template-columns: 1fr` para forzar columna única en tarjetas destacadas.
+- **`plandemismo.css` — cabecera de dependencias**: añadido comentario de bloque documentando todas las variables CSS de `style.css` de las que depende esta hoja (`--paper`, `--rule`, `--lang-*`, etc.), y nota explícita sobre la equivalencia entre `--plandem-red` y `--red-dark`.
+- **`main.js`**: selector cambiado de `.card` a `.card:not(a)` — elimina la adición redundante de `tabindex="0"` y listeners de teclado a elementos `<a>` que ya son focusables de forma nativa.
+- **`index.html` — typo**: "plataforms" → "plataformas" en el tagline de la sección GCI.
+- **`start-preview.sh` — alias Serveo**: eliminado el alias nombrado `kilombo-preview` (requería cuenta en serveo.net para funcionar). El túnel ahora usa `-R 80:localhost:PORT` sin alias, comportamiento consistente para todos los usuarios.
+
+---
+
 ## [0.5.0] — 2026-08-03
 
 ### Added (nuevo)

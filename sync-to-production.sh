@@ -37,6 +37,32 @@ fi
 : "${KILOMBOTOP_USER:=admin}"
 : "${KILOMBOTOP_REMOTE_PATH:=/var/www/kilombo.top}"
 
+# ---- Pre-flight validation ----
+PREFLIGHT_OK=1
+
+if [ -z "${KILOMBOTOP_PASSWORD}" ] || echo "${KILOMBOTOP_PASSWORD}" | grep -qi "cambia\|change\|placeholder\|your_password"; then
+  echo "❌ KILOMBOTOP_PASSWORD no está configurado en .env (valor vacío o placeholder)."
+  PREFLIGHT_OK=0
+fi
+
+if ! command -v rsync >/dev/null 2>&1 && ! command -v scp >/dev/null 2>&1; then
+  echo "❌ Ni rsync ni scp están disponibles. Instala uno de los dos antes de continuar."
+  PREFLIGHT_OK=0
+fi
+
+if ! command -v sshpass >/dev/null 2>&1; then
+  echo "⚠️  sshpass no encontrado. La conexión SSH pedirá contraseña de forma interactiva."
+  echo "   Si estás en un entorno no-interactivo (CI, cron), instala sshpass primero."
+  echo "   Continuando de todas formas (puede funcionar si tienes clave SSH configurada)."
+fi
+
+if [ "${PREFLIGHT_OK}" = "0" ]; then
+  echo ""
+  echo "Corrige los errores anteriores antes de continuar. Abortando."
+  exit 1
+fi
+# ---- /Pre-flight validation ----
+
 echo "============================================================"
 echo "🚀 Subida a producción → ${KILOMBOTOP_USER}@${KILOMBOTOP_HOST}:${KILOMBOTOP_REMOTE_PATH}"
 echo "============================================================"
@@ -70,7 +96,9 @@ if command -v rsync >/dev/null 2>&1; then
 else
   echo ""
   echo "[sync] rsync no encontrado — usando scp..."
-  scp -P "${KILOMBOTOP_PORT}" -r "${SOURCE}" "${REMOTE}"
+  # Use "${SITE_DIR}/." (not trailing slash) so scp copies the *contents*
+  # of site/ into REMOTE_PATH, not the directory itself.
+  scp -P "${KILOMBOTOP_PORT}" -r "${SITE_DIR}/." "${REMOTE}"
 fi
 
 echo ""

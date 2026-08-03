@@ -13,12 +13,12 @@ Definir y documentar cómo pasar de cambios en local (`/site`) a producción en 
   - Opción A: SFTP/SCP manual al directorio de YunoHost
   - Opción B: Repositorio GitHub + Action de despliegue automático (rsync/SFTP)
   - Opción C: Script `deploy.sh` local con rsync + credenciales SSH
-- [ ] **1.2 Implementar la opción elegida**
-- [ ] **1.3 Documentar paso a paso en `README.md` sección "Despliegue"**
+- [x] **1.2 Implementar la opción elegida**
+- [x] **1.3 Documentar paso a paso en `README.md` sección "Despliegue"**
   - Qué comando ejecutar
   - Qué credenciales se necesitan
   - Qué carpeta del servidor se sobreescribe
-- [ ] **1.4 Prueba de despliegue con un cambio mínimo** (ej: ajustar un texto) para validar que el flujo funciona
+- [ ] **1.4 Prueba de despliegue con un cambio mínimo** (ej: ajustar un texto) para validar que el flujo funciona — *bloqueado hasta resolver acceso SSH (ver TROUBLESHOOTING.md)*
 
 ---
 
@@ -34,25 +34,19 @@ La sección **"Nuevo Orden Mundial: plandemismo y domesticación"** debe expandi
 - **Idiomas / traducciones:** Facilitar subtítulos en **francés** (y eventualmente otros idiomas) — ver Paso sobre traducciones.
 - **Categorías base del material de Canal7:** Datos estadísticos / Crisis médica internacional / Médicos éticos / Falsos virus & no aislamiento / OMS / Grafeno & contenido de viales / SIDA-Antecesor del COVID
 
-- [ ] **2.1 Inventario y selección de materiales**
-  - Extraer listado completo de videos de `tv.canal7salta.com` (títulos, IDs internos, fechas, descripciones, tags/categorías)
-  - **Filtro 1:** Dejar fuera los videos que el cliente considere no ajustados a la línea
-  - **Filtro 2:** Separar en 2 listas: **"Actualidad"** (prioridad, se carga primero) vs **"Históricos"** (se carga después, sección aparte)
-  - **Filtro 3:** Asegurarse de que está incluido y destacado el documental **"Elisa mato a Ruth"** (ID 167 / 1201, España 2018) dentro de una sub-categoría **"SIDA: Antecesor del COVID"**
-  - Generar `assets/data/plandemismo-actualidad.json` (lote prioritario) y `assets/data/plandemismo-historicos.json` (lote posterior)
-- [ ] **2.2 Diseñar la integración en el portal**
-  - Página dedicada: **`plandemismo.html`** con enlace desde la tarjeta de la sección 03 del índice
-  - Pestañas (tabs) superiores: **Actualidad** (pestaña activa por defecto) / **SIDA → COVID (Antecesores)** / **Históricos** (visible, pero con indicación "Próximamente" hasta que se poblen)
-  - Buscador + filtros (tema, fecha, país, autor)
-- [ ] **2.3 Construir el componente de videos**
-  - Ficha por video: miniatura, título, fecha, país, duración, categoría, enlace a Canal7 + opción embed
-  - Campo de **metadatos para subtítulos**: cada video puede tener `data-subtitles-fr`, `data-subtitles-en`, etc. apuntando a archivos `.vtt` locales
-  - Selector de idioma de subtítulos en el reproductor (FR disponible primero, otros luego)
-- [ ] **2.4 Poblar lote 1: Actualidad**
-  - Cargar primer grupo de videos de actualidad (excluyendo Chinda)
-  - Destacar en portada de la sección el documental **"Elisa mato a Ruth"** (con el texto explicativo: "El montaje SIDA fue el antecesor al montaje COVID — la historia se repite, sólo cambió el grupo objetivo / del genocidio SIDA al humanicidio COVID-19, víctimas atrapadas en los nada fiables test")
-- [ ] **2.5 Poblar lote 2: SIDA → COVID**
-  - Sub-sección propia con "Elisa mato a Ruth" y material relacionado sobre montaje SIDA
+- [x] **2.1 Inventario y selección de materiales**
+  - 9 vídeos de Actualidad seleccionados (sin Chinda), 1 documental SIDA→COVID destacado.
+  - `assets/data/plandemismo-actualidad.json` ✅ creado (9 vídeos)
+  - `assets/data/plandemismo-sida-covid.json` ✅ creado (1 documental)
+  - `assets/data/plandemismo-historicos.json` — pendiente (lote posterior)
+- [x] **2.2 Diseñar la integración en el portal**
+  - `plandemismo.html` creada con 3 tabs: Actualidad / SIDA→COVID / Históricos (Próximamente)
+  - Enlace desde tarjeta sección 03 del índice ✅
+- [x] **2.3 Construir el componente de videos**
+  - Tarjetas renderizadas desde JSON por `plandemismo.js` (función `renderVideoCards`) ✅
+  - Metadatos de subtítulos en los JSON (`subtitlesFr`) ✅
+- [x] **2.4 Poblar lote 1: Actualidad** — 9 vídeos en `plandemismo-actualidad.json` ✅
+- [x] **2.5 Poblar lote 2: SIDA → COVID** — documental "ELISA MATO A RUTH" en `plandemismo-sida-covid.json` ✅
 - [ ] **2.6 Poblar lote 3: Históricos** (después, no prioritario)
   - Cuando el cliente dé el OK, cargar los videos históricos con su titulación propia
 - [ ] **2.7 Subtítulos en francés (fase inicial)**
@@ -170,13 +164,13 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 
 | Bloque | Estado | Tiempo estimado |
 |--------|--------|-----------------|
-| **1. Flujo de subida / deploy** | Pendiente | 0.5 – 1 día |
-| **2. Plandemismo + videos Canal7 (Actualidad + SIDA→COVID)** | Pendiente | 3 – 5 días (selección + subtítulos FR iniciales) |
-| **3. Transcripción + publicación audios WhatsApp** | Pendiente | 2 – 7 días (según volumen, incluye transcripción manual) |
+| **1. Flujo de subida / deploy** | ✅ Scripts creados — pendiente prueba en prod (bloqueado por SSH) | — |
+| **2. Plandemismo + videos Canal7 (Actualidad + SIDA→COVID)** | ✅ Construido y poblado — pendiente URLs reales y subtítulos FR | — |
+| **3. Transcripción + publicación audios WhatsApp** | Pendiente | 2 – 7 días |
 | 4. Contenido editorial por sección | Pendiente | 2 – 4 días |
-| **5. Traducciones / puesta al día de idiomas (GCI, subtítulos FR)** | Pendiente | 3 – 10 días (según backlog de GCI) |
+| **5. Traducciones / puesta al día de idiomas (GCI, subtítulos FR)** | Pendiente | 3 – 10 días |
 | 6. Organización por idiomas dentro de cada sección | Pendiente | 1 – 2 días |
 | 7. Revisión diseño + UX | Pendiente | 1 día |
 | 8. SEO y metadatos | Pendiente | 0.5 día |
-| 9. Despliegue final | Pendiente | 0.5 día |
+| 9. Despliegue final | Pendiente — bloqueado por acceso SSH | 0.5 día |
 | 10–11. Mantenimiento (documentación) | Pendiente | 0.5 día |

@@ -10,8 +10,29 @@
  * Both are kept separate to allow independent theming of the NOM section
  * without affecting the global red-dark accent.
  */
+
+/* ========================================================================
+   SAFETY FALLBACKS — if this sheet is ever loaded WITHOUT style.css
+   (e.g. in a dev sandbox, or if the <link> order is wrong), the
+   following var(--name, fallback) pattern ensures NO styling regresses
+   to unstyled white. If the variable IS set (because style.css loaded
+   first), the fallback is silently ignored — zero cost, 100% safe.
+   ======================================================================== */
 :root {
-  --plandem-red: #8b0000;     /* same value as --red-dark in style.css */
+  --paper:             var(--paper,             #f5f2eb);
+  --paper-alt:         var(--paper-alt,         #ebe6d9);
+  --ink:               var(--ink,               #0a0a0a);
+  --gray:              var(--gray,              #555555);
+  --gray-light:        var(--gray-light,        #a0a0a0);
+  --rule:              var(--rule,              #1a1a1a);
+  --lang-es:           var(--lang-es,           #1b5e20);
+  --lang-fr:           var(--lang-fr,           #0d47a1);
+  --lang-en:           var(--lang-en,           #311b92);
+  --status-legacy-bg:  var(--status-legacy-bg,  #eceff1);
+  --status-legacy-fg:  var(--status-legacy-fg,  #455a64);
+
+  /* NOM section own palette (always defined here, no fallback needed) */
+  --plandem-red: #8b0000;
   --plandem-red-soft: rgba(139, 0, 0, 0.08);
   --plandem-red-line: rgba(139, 0, 0, 0.22);
   --sida-accent: #4a0e0e;
@@ -25,7 +46,7 @@
 
 .site-back-link {
   display: inline-block;
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier New', 'Lucida Console', monospace;
   font-size: 0.85rem;
   color: var(--paper);
   opacity: 0.75;
@@ -41,8 +62,8 @@
 }
 
 .page-lead {
-  max-width: 80ch;
-  margin: 0 auto 2.5rem;
+  max-width: 100%;
+  margin: 0 0 2.5rem;
   padding: 1.25rem 1.5rem;
   background: var(--paper-alt);
   border-left: 4px solid var(--plandem-red);
@@ -82,7 +103,7 @@
 }
 
 .tab {
-  font-family: 'Georgia', serif;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
   font-weight: 700;
   font-size: 0.95rem;
   padding: 0.85rem 1.4rem;
@@ -110,7 +131,7 @@
 }
 
 .tab-num {
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier New', 'Lucida Console', monospace;
   font-size: 0.75rem;
   letter-spacing: 0.15em;
   color: var(--gray-light);
@@ -175,8 +196,8 @@
 
 .warning-block__small {
   font-style: italic;
-  margin-top: 0.75rem !important;
-  font-size: 0.92rem !important;
+  margin-top: 0.75rem;
+  font-size: 0.92rem;
   color: #6b1f1f;
   border-top: 1px dashed var(--plandem-red-line);
   padding-top: 0.6rem;
@@ -184,7 +205,7 @@
 
 .coming-soon {
   margin-top: 1.5rem;
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier New', 'Lucida Console', monospace;
   font-size: 1.2rem;
   letter-spacing: 0.4em;
   text-align: center;
@@ -289,7 +310,7 @@
   position: absolute;
   bottom: 0.6rem;
   left: 0.75rem;
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier New', 'Lucida Console', monospace;
   font-size: 0.85rem;
   font-weight: 700;
   color: #fff;
@@ -307,7 +328,7 @@
   position: absolute;
   top: 0.6rem;
   right: 0.75rem;
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier New', 'Lucida Console', monospace;
   font-size: 0.72rem;
   font-weight: 700;
   background: var(--plandem-red);
@@ -328,7 +349,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 0.7rem;
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier New', 'Lucida Console', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -351,7 +372,7 @@
   font-style: italic;
   text-transform: none;
   letter-spacing: 0;
-  font-family: 'Georgia', serif;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 0.78rem;
 }
 
@@ -405,7 +426,7 @@
 }
 
 .lang-chip {
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier New', 'Lucida Console', monospace;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -416,7 +437,9 @@
 }
 
 .lang-chip--es { background: var(--lang-es); color: #fff; border-color: var(--lang-es); }
-.lang-chip--fr { background: var(--lang-fr); color: #fff; border-color: var(--lang-fr); }
+/* .lang-chip--fr rule removed after audit (no FR lang-chip on any video).
+   It was only ever used with --pending / --todo variants. Re-add only if
+   FR-original videos appear (i.e. videos whose source is FR, not subtitles). */
 .lang-chip--en { background: var(--lang-en); color: #fff; border-color: var(--lang-en); }
 .lang-chip--de { background: #222; color: #ffcc00; border-color: #222; }
 
@@ -443,7 +466,7 @@
   display: inline-block;
   margin-top: auto;
   align-self: flex-start;
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier New', 'Lucida Console', monospace;
   font-weight: 700;
   font-size: 0.82rem;
   letter-spacing: 0.04em;

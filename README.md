@@ -35,7 +35,7 @@ El sitio se organiza en **cuatro secciones**, en el siguiente orden de prioridad
 |---|---------|-------------|
 | ⭐ | **Espacio Tierra y Libertad** | Sección destacada (primera posición, fondo tintado, barra superior roja, etiqueta de "destacada") |
 | 01 | **GCI — Grupo Comunista Internacionalista** | División principal con 4 sub-plataformas: Sitio Oficial, International Global Revolution (EN), CD-Rom (archivo), ICG Histórico (legado) |
-| 02 | **Proletarios Internacionalistas** | División principal con 2 ediciones por idioma: Español + Francés |
+| 02 | **Proletarios Internacionalistas** | Una tarjeta bilingüe ES/FR (el sitio tiene selector de idioma interno) |
 | 03 | **Nuevo Orden Mundial: plandemismo y domesticación** | División temática (dossieres y artículos sobre NOM, controles sociales y confinamiento) |
 
 Dentro de cada sección, las tarjetas indican el **idioma** del sitio mediante una etiqueta con código de color, y el **estado** (Activo / Archivo / Legado) mediante una insignia.
@@ -80,20 +80,19 @@ KILOMBO/
 │   │   ├── style.css      ← Estilos generales (paleta papel+tinta+rojo, tipografía editorial)
 │   │   └── plandemismo.css ← Estilos específicos de la sección Plandemismo (videos, tabs)
 │   ├── js/
-│   │   ├── main.js        ← Accesibilidad global (teclado Enter/Espacio en tarjetas)
-│   │   └── plandemismo.js ← Navegación por pestañas de Plandemismo + accesibilidad
-│   └── assets/
-│       ├── data/          ← Inventarios JSON (videos por categoría, traducciones pendientes)
-│       ├── subtitles/     ← Archivos .vtt de subtítulos (FR prioritario)
-│       ├── audios/        ← Audios WhatsApp en MP3 estandarizado
-│       └── transcripts/   ← Transcripciones MD/HTML con timestamps
+│   │   ├── main.js        ← Accesibilidad global (teclado Enter/Espacio en tarjetas no-anchor)
+│   │   └── plandemismo.js ← Tabs WAI-ARIA, fetch+render de tarjetas desde JSON, page guard
+│   └── assets/            ← Scaffolding versionado con .gitkeep (contenido pendiente de poblar)
+│       ├── data/          ← Inventarios JSON — plandemismo-actualidad.json, plandemismo-sida-covid.json (ya creados)
+│       ├── subtitles/     ← Archivos .vtt de subtítulos (FR prioritario — pendiente)
+│       ├── audios/        ← Audios WhatsApp en MP3 estandarizado (pendiente)
+│       └── transcripts/   ← Transcripciones MD/HTML con timestamps (pendiente)
 │
 ├── INICIO/                ← Documentación de fase de diagnóstico
 │   ├── ROADMAP.md         ← Hoja de ruta de 5 fases
 │   ├── inventario-inicial-kilombo.md   ← Inventario de sitios detectados
 │   └── pasos-trabajo-kilombo.md        ← Flujos de trabajo con/sin credenciales
 │
-├── repo/                  ← Repositorio GitHub (solo docs en este momento)
 ├── .env                   ← Credenciales y referencias externas (NO SUBIR A REPO PÚBLICO)
 ├── .env.example           ← Plantilla de .env (segura, para subir al repo)
 ├── README.md              ← Este archivo
@@ -143,7 +142,7 @@ Hace todo por ti:
     - 🌍 `https://....serveousercontent.com` → **ésta se la mandas al cliente**
 
 > **URL pública actual (túnel ya abierto en esta sesión):**
-> **https://3e52f2a4e4aae552-179-29-35-153.serveousercontent.com**
+> **https://466a3ac5cf0f9d90-190-132-104-107.serveousercontent.com**
 > *(válida mientras el túnel siga abierto. Si se cae, volver a ejecutar `./start-preview.sh` te da una nueva. Si quieres URL fija, crea cuenta en serveo.net y usa un subdominio reservado).*
 
 ### Modo manual (sin script)
@@ -183,8 +182,8 @@ Estructura **1:1** → lo que está en `site/index.html` acaba en `/var/www/kilo
 # Con rsync (recomendado)
 rsync -avz --delete -e 'ssh -p 22' site/ admin@kilombo.top:/var/www/kilombo.top/
 
-# Con scp
-scp -P 22 -r site/* admin@kilombo.top:/var/www/kilombo.top/
+# Con scp — usar punto final para copiar contenidos, no el directorio
+scp -P 22 -r site/. admin@kilombo.top:/var/www/kilombo.top/
 ```
 
 ---
@@ -201,7 +200,7 @@ scp -P 22 -r site/* admin@kilombo.top:/var/www/kilombo.top/
 | Idioma FR | Azul `#0d47a1` |
 | Idioma EN | Púrpura `#311b92` |
 | Multilingüe | Morado `#4a148c` |
-| Tipografía editorial | Georgia / Times New Roman |
+| Tipografía general | Verdana, Arial, Helvetica, sans-serif (alineada con SPIP Escal 5.2.9 de producción) |
 | Tipografía metadata (etiquetas) | Courier New (monoespacio) |
 
 ---
@@ -211,6 +210,7 @@ scp -P 22 -r site/* admin@kilombo.top:/var/www/kilombo.top/
 - [ ] Revisar estilos visuales con el cliente (paleta, tipografía, sensación general)
 - [ ] Incorporar logos o imágenes de cabecera (`assets/`)
 - [ ] Ajustar los textos descriptivos de cada tarjeta al tono editorial definitivo
-- [ ] Decidir si las ediciones por idioma (ES/FR) van como tarjetas separadas o como pestañas dentro de una misma tarjeta
+- [ ] Obtener URLs reales de cada vídeo en Canal7 y actualizar `assets/data/plandemismo-actualidad.json`
 - [ ] Validar enlaces y URLs con el cliente antes de publicar
-- [ ] Subir el contenido de `site/` al servidor de `kilombo.top`
+- [ ] Resolver acceso SSH/SFTP al servidor (ver `TROUBLESHOOTING.md`) y subir `site/` a `kilombo.top`
+- [ ] Generar archivos `.vtt` de subtítulos FR para los vídeos prioritarios (IDs 167, 1111, 2250, 2252)

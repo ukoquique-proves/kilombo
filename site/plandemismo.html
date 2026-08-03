@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/plandemismo.css">
 </head>
-<body>
+<body data-page="plandemismo">
 
 <header class="site-header">
   <div class="container">
@@ -25,244 +25,37 @@
   </section>
 
   <nav class="tabs" role="tablist">
-    <button class="tab tab--active" role="tab" aria-selected="true" data-tab="actualidad">
+    <button class="tab tab--active" role="tab" id="tab-btn-actualidad" aria-selected="true" aria-controls="tab-actualidad" data-tab="actualidad">
       <span class="tab-num">01</span> Actualidad
     </button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="sida-covid">
+    <button class="tab" role="tab" id="tab-btn-sida-covid" aria-selected="false" aria-controls="tab-sida-covid" tabindex="-1" data-tab="sida-covid">
       <span class="tab-num">02</span> SIDA &rarr; COVID (Antecesores)
     </button>
-    <button class="tab tab--disabled" role="tab" aria-selected="false" data-tab="historicos" disabled>
+    <button class="tab tab--disabled" role="tab" id="tab-btn-historicos" aria-selected="false" aria-controls="tab-historicos" aria-disabled="true" tabindex="-1" data-tab="historicos">
       <span class="tab-num">03</span> Históricos &mdash; Próximamente
     </button>
   </nav>
 
   <!-- ===================== TAB: ACTUALIDAD ===================== -->
-  <section class="tab-panel" id="tab-actualidad" role="tabpanel">
+  <section class="tab-panel" id="tab-actualidad" role="tabpanel" aria-labelledby="tab-btn-actualidad">
 
     <div class="section-subheader">
       <h2>Videos de actualidad</h2>
       <p>Material reciente y de relevancia inmediata. Carga progresiva — se irán añadiendo más entradas.</p>
     </div>
 
-    <div class="video-grid">
-
-      <article class="video-card" data-video-id="1641" data-country="ARG" data-year="2020" data-tags="miedo, fabricacion, pandemia" data-subtitles-fr="" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon">&#9654;</span>
-            <span class="thumb-code">1641</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">Argentina</span>
-            <span class="meta-fecha">2020</span>
-            <span class="meta-cat">Plandemia · Datos estadísticos</span>
-          </div>
-          <h3 class="video-card__title">2020: El año del miedo fabricado</h3>
-          <p class="video-card__desc">Análisis de la primera etapa del montaje pandémico en Argentina y sus coordenadas internacionales de producción del miedo.</p>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--es">ES original</span>
-            <span class="lang-chip lang-chip--pending" title="En espera de subtítulos">FR: pendiente</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta">Ver en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
-      <article class="video-card" data-video-id="1642" data-country="ARG" data-year="2022" data-tags="estadisticas, covid19, lic-analia-alvarez" data-subtitles-fr="" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon">&#9654;</span>
-            <span class="thumb-code">1642</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">Argentina</span>
-            <span class="meta-fecha">2022</span>
-            <span class="meta-cat">Plandemia · Datos estadísticos</span>
-          </div>
-          <h3 class="video-card__title">Lic. Analía Álvarez — Datos estadísticos COVID-19 2020-2021</h3>
-          <p class="video-card__desc">Exposición pormenorizada de cifras oficiales cruzadas y su desviación frente a la narrativa mediática.</p>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--es">ES original</span>
-            <span class="lang-chip lang-chip--pending">FR: pendiente</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta">Ver en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
-      <article class="video-card" data-video-id="1651" data-country="CHL" data-year="2022" data-tags="apsiin, vacunas, arnm, crisis-medica" data-subtitles-fr="" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon">&#9654;</span>
-            <span class="thumb-code">1651</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">Chile</span>
-            <span class="meta-fecha">2022</span>
-            <span class="meta-cat">Crisis médica internacional · Vacunas</span>
-          </div>
-          <h3 class="video-card__title">APSIIN Chile — Crisis médica internacional con vacunas ARNm COVID</h3>
-          <p class="video-card__desc">Testimonios y datos clínicos chilenos sobre eventos adversos post-vacunales ARNm.</p>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--es">ES original</span>
-            <span class="lang-chip lang-chip--pending">FR: pendiente</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta">Ver en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
-      <article class="video-card" data-video-id="2200" data-country="USA" data-year="2020" data-tags="100000-medicos, vacunas, medicos-eticos" data-subtitles-fr="" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon">&#9654;</span>
-            <span class="thumb-code">2200</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">Estados Unidos</span>
-            <span class="meta-fecha">2020</span>
-            <span class="meta-cat">Médicos éticos y valientes · Vacunas</span>
-          </div>
-          <h3 class="video-card__title">100.000 médicos contra las vacunas COVID-19</h3>
-          <p class="video-card__desc">Declaración colectiva de profesionales de la salud cuestionando la narrativa oficial.</p>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--es">ES subtitulado</span>
-            <span class="lang-chip lang-chip--pending">FR: pendiente</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta">Ver en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
-      <article class="video-card" data-video-id="2202" data-country="ARG" data-year="2020" data-tags="dr-luis-marcelo-martinez, genetista, ataque-planificado" data-subtitles-fr="" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon">&#9654;</span>
-            <span class="thumb-code">2202</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">Argentina</span>
-            <span class="meta-fecha">2020</span>
-            <span class="meta-cat">Médicos éticos y valientes</span>
-          </div>
-          <h3 class="video-card__title">Dr. Luis Marcelo Martínez (genetista) — Ataque planificado COVID-19</h3>
-          <p class="video-card__desc">Análisis genético-molecular del "virus" y lectura política del operativo sanitario.</p>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--es">ES original</span>
-            <span class="lang-chip lang-chip--pending">FR: pendiente</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta">Ver en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
-      <article class="video-card" data-video-id="2206" data-country="ARG" data-year="2022" data-tags="dr-martin-monteverde, ninos, afectados, vacunas" data-subtitles-fr="" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon">&#9654;</span>
-            <span class="thumb-code">2206</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">Argentina</span>
-            <span class="meta-fecha">2022</span>
-            <span class="meta-cat">Médicos éticos y valientes · Niños</span>
-          </div>
-          <h3 class="video-card__title">Dr. Martín Monteverde — Niños afectados gravemente por las vacunas COVID-19</h3>
-          <p class="video-card__desc">Casos clínicos pediátricos post-vacunación expuestos por el médico argentino.</p>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--es">ES original</span>
-            <span class="lang-chip lang-chip--pending">FR: pendiente</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta">Ver en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
-      <article class="video-card" data-video-id="1111" data-country="EU" data-year="2023" data-tags="dr-david-martin, parlamento-europeo, oms, cartel-criminal" data-subtitles-fr="subtitles/1111-fr.vtt" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon">&#9654;</span>
-            <span class="thumb-code">1111</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">Unión Europea / EEUU</span>
-            <span class="meta-fecha">2023</span>
-            <span class="meta-cat">OMS · Documental parlamentario</span>
-          </div>
-          <h3 class="video-card__title">Dr. David Martin (PhD) ante el Parlamento Europeo — La OMS es un cartel criminal desde su base fundacional</h3>
-          <p class="video-card__desc">Intervención subtitulada en español. Demostración documental de la trayectoria criminal de la Organización Mundial de la Salud.</p>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--en">EN original</span>
-            <span class="lang-chip lang-chip--es">ES subt.</span>
-            <span class="lang-chip lang-chip--todo" title="Subtítulos en francés a realizar">FR: a subtitular ★</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta">Ver en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
-      <article class="video-card" data-video-id="2250" data-country="CHE" data-year="2021" data-tags="dra-astrid-stuckelberger, biologa-oms, vacuna-arma-biologica" data-subtitles-fr="subtitles/2250-fr.vtt" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon">&#9654;</span>
-            <span class="thumb-code">2250</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">Suiza</span>
-            <span class="meta-fecha">2021</span>
-            <span class="meta-cat">OMS · Vacunas como arma biológica</span>
-          </div>
-          <h3 class="video-card__title">Dra. Astrid Stückelberger (bióloga OMS) — La vacuna es un arma biológica mortal</h3>
-          <p class="video-card__desc">Testimonio insider de una profesional que trabajó en el seno de la Organización Mundial de la Salud.</p>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--de">DE original</span>
-            <span class="lang-chip lang-chip--es">ES subt.</span>
-            <span class="lang-chip lang-chip--todo">FR: a subtitular ★</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta">Ver en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
-      <article class="video-card" data-video-id="2252" data-country="GBR" data-year="2023" data-tags="dr-mike-yeadon, ex-pfizer, pandemia-ataque" data-subtitles-fr="subtitles/2252-fr.vtt" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon">&#9654;</span>
-            <span class="thumb-code">2252</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">Reino Unido</span>
-            <span class="meta-fecha">2023</span>
-            <span class="meta-cat">Insiders · Ex-Pfizer</span>
-          </div>
-          <h3 class="video-card__title">Dr. Mike Yeadon (ex vicepresidente Pfizer) — La pandemia es un ataque asesino contra la humanidad</h3>
-          <p class="video-card__desc">Análisis desde la perspectiva de un alto directivo que abandonó la industria y denuncia el operativo completo.</p>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--en">EN original</span>
-            <span class="lang-chip lang-chip--es">ES subt.</span>
-            <span class="lang-chip lang-chip--todo">FR: a subtitular ★</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta">Ver en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
+    <!-- Cards rendered by plandemismo.js from assets/data/plandemismo-actualidad.json -->
+    <div class="video-grid" id="grid-actualidad">
+      <noscript>
+        <p>Los vídeos de esta sección requieren JavaScript para mostrarse. Activa JS en tu navegador o visita directamente <a href="https://tv.canal7salta.com/">tv.canal7salta.com</a>.</p>
+      </noscript>
     </div>
 
     <p class="tab-footer"><em>+ se irán añadiendo más entradas de Actualidad desde el inventario de Canal7.</em></p>
   </section>
 
   <!-- ===================== TAB: SIDA → COVID ===================== -->
-  <section class="tab-panel tab-panel--hidden" id="tab-sida-covid" role="tabpanel">
+  <section class="tab-panel tab-panel--hidden" id="tab-sida-covid" role="tabpanel" aria-labelledby="tab-btn-sida-covid">
 
     <div class="section-subheader">
       <h2>SIDA &rarr; COVID — Los montajes se repiten</h2>
@@ -273,50 +66,18 @@
       </blockquote>
     </div>
 
-    <div class="video-grid video-grid--featured">
-
-      <article class="video-card video-card--featured" data-video-id="167" data-country="ESP" data-year="2018" data-tags="elisa-mato-a-ruth, documental, sida, test-elisa, antecesor-covid" data-subtitles-fr="subtitles/167-fr.vtt" data-subtitles-en="">
-        <div class="video-card__media">
-          <div class="video-card__thumb video-card__thumb--featured video-card__thumb--placeholder" aria-hidden="true">
-            <span class="play-icon play-icon--big">&#9654;</span>
-            <span class="thumb-code thumb-code--big">167 · 1201</span>
-            <span class="thumb-corner">Documental · Prioridad</span>
-          </div>
-        </div>
-        <div class="video-card__body">
-          <div class="video-card__meta">
-            <span class="meta-pais">España</span>
-            <span class="meta-fecha">2018</span>
-            <span class="meta-cat">SIDA → COVID · Montaje de tests</span>
-          </div>
-          <h3 class="video-card__title video-card__title--big">ELISA MATO A RUTH — Documental de una muerte anunciada</h3>
-          <p class="video-card__desc">
-            Historia del test ELISA y cómo su falsa fiabilidad sirvió de base para construir el genocidio SIDA.
-            Documental fundacional para entender que el mismo <em>modus operandi</em> se repitió con los tests PCR
-            y el montaje COVID-19. Pionero en denunciar la industria del miedo, el negocio de los tests y la
-            criminalización de poblaciones-objetivo.
-          </p>
-          <ul class="video-card__keypoints">
-            <li>Fiabilidad nula del test ELISA de anticuerpos</li>
-            <li>Mecanismo político del "grupo de riesgo"</li>
-            <li>Paralelos estructurales: SIDA → COVID</li>
-            <li>Caso concreto: Ruth, víctima del diagnóstico</li>
-          </ul>
-          <div class="video-card__langs">
-            <span class="lang-chip lang-chip--es">ES original</span>
-            <span class="lang-chip lang-chip--todo" title="Subtítulos en frances prioritarios para este documental">FR: subtítulos prioritarios ★★★</span>
-          </div>
-          <a href="https://tv.canal7salta.com/" target="_blank" rel="noopener" class="video-card__cta video-card__cta--big">Ver documental completo en tv.canal7salta.com &rarr;</a>
-        </div>
-      </article>
-
+    <!-- Card rendered by plandemismo.js from assets/data/plandemismo-sida-covid.json -->
+    <div class="video-grid video-grid--featured" id="grid-sida-covid">
+      <noscript>
+        <p>Los vídeos de esta sección requieren JavaScript para mostrarse. Activa JS en tu navegador o visita directamente <a href="https://tv.canal7salta.com/">tv.canal7salta.com</a>.</p>
+      </noscript>
     </div>
 
     <p class="tab-footer"><em>+ se añadirán más materiales sobre el montaje SIDA y otros montajes predecesores.</em></p>
   </section>
 
   <!-- ===================== TAB: HISTÓRICOS ===================== -->
-  <section class="tab-panel tab-panel--hidden" id="tab-historicos" role="tabpanel">
+  <section class="tab-panel tab-panel--hidden" id="tab-historicos" role="tabpanel" aria-labelledby="tab-btn-historicos">
     <div class="section-subheader">
       <h2>Históricos</h2>
       <p>Material de archivo y cronología histórica. Se publicarán más adelante, con una titulación propia diferenciada de los videos de Actualidad.</p>

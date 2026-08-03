@@ -1,3 +1,4 @@
+// @ts-check
 document.addEventListener('DOMContentLoaded', () => {
   // Only add keyboard handling to non-anchor cards (e.g. <article>, <div>).
   // Native <a> elements are already focusable and respond to Enter natively.
