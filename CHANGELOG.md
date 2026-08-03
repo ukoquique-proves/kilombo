@@ -5,6 +5,18 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.11.0] — 2026-08-03
+
+### Added (nuevo)
+- **GitHub Pages deploy** (`https://ukoquique-proves.github.io/kilombo/`): sitio publicado de forma permanente, actualización automática en cada push a `main`.
+- **`.github/workflows/deploy.yml`**: workflow de GitHub Actions que publica `site/` en GitHub Pages en cada push a `main` o ejecución manual (`workflow_dispatch`). Usa `actions/checkout@v4`, `actions/configure-pages@v5`, `actions/upload-pages-artifact@v3`, `actions/deploy-pages@v4`.
+
+### Changed (cambiado)
+- **README.md — sección de despliegue renovada**: la sección "Mostrar avances al cliente" reemplazada por "Sitio público permanente (GitHub Pages)" como primer método. Serveo pasa a ser mencionado solo como herramienta de preview local antes de hacer push. `.env` actualizado con la URL permanente de GitHub Pages.
+- **ROADMAP.md**: paso 1.2 actualizado para reflejar GitHub Pages + Actions como implementación elegida.
+
+---
+
 ## [0.10.0] — 2026-08-03
 
 ### Added (nuevo)
