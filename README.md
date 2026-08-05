@@ -2,7 +2,7 @@
 
 Portal central de acceso a la red de sitios de Kilombo. Construido como página estática (HTML, CSS, JS) para ser alojado en la infraestructura YunoHost de `kilombo.top`.
 
-> **Este portal y `kilombo.top` son sitios arquitectónicamente distintos.** El portal es una propuesta nueva que se construye gradualmente como referencia de cómo quedará `kilombo.top` tras la migración. Ver [`MIGRATION.md`](MIGRATION.md) para entender la relación entre ambos sitios y las fases del proceso.
+> **Este portal es el nuevo diseño de `kilombo.top`, construido en paralelo para que el cliente pueda comparar original y nuevo sin tocar el sitio en producción.** Cuando el cliente apruebe el espejo, reemplaza a `kilombo.top` con un solo deploy. Ver [`MIGRATION.md`](MIGRATION.md).
 
 ---
 
@@ -201,4 +201,4 @@ Si el puerto SSH (22) no está accesible en ese momento, el script lo detecta, a
 - [ ] Validar enlaces y URLs con el cliente antes de publicar
 - [ ] Resolver acceso SSH/SFTP al servidor (ver `TROUBLESHOOTING.md` sección 4) — necesario para `./end-of-session.sh` paso 2
 - [ ] Generar archivos `.vtt` de subtítulos FR para los vídeos prioritarios (IDs 167, 1111, 2250, 2252)
-- [ ] Continuar migración gradual de `kilombo.top` al nuevo portal (ver `MIGRATION.md`)
+- [ ] Continuar construyendo el espejo hasta que el cliente apruebe el reemplazo de `kilombo.top` (ver `MIGRATION.md`)
