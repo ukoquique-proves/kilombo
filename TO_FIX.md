@@ -5,6 +5,17 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ---
 
+## 🔴 Acción pendiente urgente
+
+- [ ] **23. Cambiar `KILOMBOTOP_PASSWORD` por `KILOMBOTOP_FUTURE_PASSWORD` en `.env`**
+  - En cuanto el cliente confirme que el nuevo password está activo en el servidor, ejecutar:
+    1. Copiar el valor de `KILOMBOTOP_FUTURE_PASSWORD` a `KILOMBOTOP_PASSWORD` en `.env`
+    2. Eliminar la línea `KILOMBOTOP_FUTURE_PASSWORD` del `.env`
+    3. Verificar acceso: `./sync-to-production.sh` (o el test de login de TROUBLESHOOTING.md)
+  - El valor actual del password futuro está en `.env` entre comillas simples para preservar los caracteres especiales (`$$`, `&&`).
+
+---
+
 ## 🟡 Pendiente de confirmación del cliente
 
 - [ ] **6. Ambas tarjetas de P.I. apuntan a la misma URL** — `index.html`
@@ -34,11 +45,26 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ---
 
+## ⏸ Aplazado — fase YunoHost / migración a `kilombo.top`
+
+Pendiente de coordinación con el equipo que gestiona el servidor. No bloquea el trabajo actual.
+
+- [ ] **YunoHost-A. Abrir puerto 22 para SSH/SFTP** — necesario para `sync-to-production.sh`
+- [ ] **YunoHost-B. Registrar `kilombo` como administrador SPIP** en `www.kilombo.top/ecrire/`
+- [ ] **YunoHost-C. Crear app `my_webapp` para `kilombo.top` raíz** desde el panel YunoHost
+- [ ] **YunoHost-D. Ejecutar `sync-to-production.sh`** y verificar deploy en `kilombo.top`
+
+Ver opciones concretas en `TROUBLESHOOTING.md` secciones 4 y 5.
+
+---
+
 ## Resumen
 
 | # | Archivo | Problema | Estado |
 |---|---------|----------|--------|
+| 23 | `.env` | Cambiar PASSWORD por FUTURE_PASSWORD cuando el cliente confirme | 🔴 Acción pendiente |
 | 6 | `index.html` | Tarjetas P.I. — confirmar si URL única es correcta | 🟡 Esperando cliente |
 | 11 | `plandemismo.html` + `.css` | `page-lead` centrado — confirmar intención visual | 🟡 Esperando cliente |
 | A-2 | JSON data files | CTAs con URL raíz Canal7 — necesitan URLs reales por vídeo | 🟡 Esperando datos |
 | 21 | `main.js` | `.card:not(a)` sin coincidencias hoy (intencionado) | 🟡 Sin acción |
+| YunoHost-A/B/C/D | servidor | SSH, SPIP admin, app `kilombo.top`, deploy final | ⏸ Aplazado |
