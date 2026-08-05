@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-03 (v0.10.0).
+Última actualización: 2026-08-03 (v0.12.0).
 
 ---
 
