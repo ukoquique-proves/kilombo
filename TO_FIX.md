@@ -45,16 +45,13 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ---
 
-## ⏸ Aplazado — fase YunoHost / migración a `kilombo.top`
+## ⏸ Aplazado — fase YunoHost / deploy a `kilombo.top`
 
-Pendiente de coordinación con el equipo que gestiona el servidor. No bloquea el trabajo actual.
+Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede hacerlo directamente sin necesitar a los administradores técnicos. Ver `MIGRATION.md` y `TROUBLESHOOTING.md` sección 4.
 
-- [ ] **YunoHost-A. Abrir puerto 22 para SSH/SFTP** — necesario para `sync-to-production.sh`
-- [ ] **YunoHost-B. Registrar `kilombo` como administrador SPIP** en `www.kilombo.top/ecrire/`
+- [ ] **YunoHost-A. Abrir puerto 22** → `https://kilombo.top/yunohost/admin/` → Herramientas → Firewall → TCP 22
 - [ ] **YunoHost-C. Crear app `my_webapp` para `kilombo.top` raíz** desde el panel YunoHost
-- [ ] **YunoHost-D. Ejecutar `sync-to-production.sh`** y verificar deploy en `kilombo.top`
-
-Ver opciones concretas en `TROUBLESHOOTING.md` secciones 4 y 5.
+- [ ] **YunoHost-D. Ejecutar `./end-of-session.sh`** y verificar deploy en `kilombo.top`
 
 ---
 
@@ -67,4 +64,4 @@ Ver opciones concretas en `TROUBLESHOOTING.md` secciones 4 y 5.
 | 11 | `plandemismo.html` + `.css` | `page-lead` centrado — confirmar intención visual | 🟡 Esperando cliente |
 | A-2 | JSON data files | CTAs con URL raíz Canal7 — necesitan URLs reales por vídeo | 🟡 Esperando datos |
 | 21 | `main.js` | `.card:not(a)` sin coincidencias hoy (intencionado) | 🟡 Sin acción |
-| YunoHost-A/B/C/D | servidor | SSH, SPIP admin, app `kilombo.top`, deploy final | ⏸ Aplazado |
+| YunoHost-A/C/D | servidor | Abrir puerto 22, crear app, primer deploy | ⏸ Pendiente cliente |
