@@ -162,7 +162,7 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 
 | Bloque | Estado | Tiempo estimado |
 |--------|--------|-----------------|
-| **1. Flujo de subida / deploy** | ✅ Scripts creados — pendiente prueba en prod (bloqueado por SSH) | — |
+| **1. Flujo de subida / deploy** | ✅ GitHub Pages activo (`ukoquique-proves.github.io/kilombo/`) — deploy a `kilombo.top` aplazado a fase futura | — |
 | **2. Plandemismo + videos Canal7 (Actualidad + SIDA→COVID)** | ✅ Construido y poblado — pendiente URLs reales y subtítulos FR | — |
 | **3. Transcripción + publicación audios WhatsApp** | Pendiente | 2 – 7 días |
 | 4. Contenido editorial por sección | Pendiente | 2 – 4 días |
@@ -170,5 +170,5 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 | 6. Organización por idiomas dentro de cada sección | Pendiente | 1 – 2 días |
 | 7. Revisión diseño + UX | Pendiente | 1 día |
 | 8. SEO y metadatos | Pendiente | 0.5 día |
-| 9. Despliegue final | Pendiente — bloqueado por acceso SSH | 0.5 día |
+| **9. Migración a `kilombo.top`** | ⏸ Aplazado — requiere coordinación con el equipo YunoHost (otra fase) | — |
 | 10–11. Mantenimiento (documentación) | Pendiente | 0.5 día |
