@@ -137,10 +137,15 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 - [ ] `sitemap.xml`
 - [ ] `robots.txt`
 
-### 9. Despliegue final
-- [ ] Ejecutar el flujo de subida definido en el Paso 1
-- [ ] Configurar en `kilombo.top` que la URL raíz o la URL del portal apunte a este nuevo sitio
-- [ ] Verificar que todos los enlaces salientes funcionan
+### 9. Despliegue final en `kilombo.top`
+
+> ⏸ **Aplazado a fase futura** — requiere coordinación con el equipo que gestiona el servidor YunoHost. No bloquea el trabajo actual; el portal está activo en GitHub Pages.
+
+- [ ] Abrir puerto SSH (ver TROUBLESHOOTING.md sección 4)
+- [ ] Crear app `my_webapp` para `kilombo.top` raíz desde el panel YunoHost
+- [ ] Ejecutar `./sync-to-production.sh` y verificar deploy
+- [ ] Configurar en `kilombo.top` que la URL raíz apunte al nuevo portal
+- [ ] Verificar que todos los enlaces salientes funcionan desde el dominio final
 - [ ] Probar desde red externa (no solo intranet/local)
 
 ---
