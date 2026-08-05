@@ -2,6 +2,8 @@
 
 Portal central de acceso a la red de sitios de Kilombo. Construido como página estática (HTML, CSS, JS) para ser alojado en la infraestructura YunoHost de `kilombo.top`.
 
+> **Este portal y `kilombo.top` son sitios arquitectónicamente distintos.** El portal es una propuesta nueva que se construye gradualmente como referencia de cómo quedará `kilombo.top` tras la migración. Ver [`MIGRATION.md`](MIGRATION.md) para entender la relación entre ambos sitios y las fases del proceso.
+
 ---
 
 ## Sobre el contenido y las fuentes
@@ -73,7 +75,7 @@ Acceso central por SSO: `https://kilombo.top/yunohost/sso/`
 
 ```
 KILOMBO/
-├── site/                  ← Código fuente del sitio web (el que se sube al servidor)
+├── site/                  ← Código fuente del sitio web publicado en GitHub Pages y kilombo.top
 │   ├── index.html         ← Página principal — estructura de las 4 secciones
 │   ├── plandemismo.html   ← Sección 03: NOM / Plandemismo + videos Canal7 (3 pestañas)
 │   ├── css/
@@ -81,22 +83,42 @@ KILOMBO/
 │   │   └── plandemismo.css ← Estilos específicos de la sección Plandemismo (videos, tabs)
 │   ├── js/
 │   │   ├── main.js        ← Accesibilidad global (teclado Enter/Espacio en tarjetas no-anchor)
-│   │   └── plandemismo.js ← Tabs WAI-ARIA, fetch+render de tarjetas desde JSON, page guard
+│   │   ├── plandemismo.js ← Tabs WAI-ARIA, fetch+render de tarjetas desde JSON, page guard
+│   │   └── render.mjs     ← Módulo ES puro: escapeHtml, buildLangs, renderCard (compartido con tests)
 │   └── assets/            ← Scaffolding versionado con .gitkeep (contenido pendiente de poblar)
-│       ├── data/          ← Inventarios JSON — plandemismo-actualidad.json, plandemismo-sida-covid.json (ya creados)
+│       ├── data/          ← JSON de vídeos: plandemismo-actualidad.json, plandemismo-sida-covid.json
 │       ├── subtitles/     ← Archivos .vtt de subtítulos (FR prioritario — pendiente)
 │       ├── audios/        ← Audios WhatsApp en MP3 estandarizado (pendiente)
 │       └── transcripts/   ← Transcripciones MD/HTML con timestamps (pendiente)
 │
+├── test/
+│   └── render.test.mjs    ← 32 tests unitarios: escapeHtml, buildLangs, buildKeypoints, renderCard
+│
+├── scripts/
+│   ├── test.sh            ← Runner de tests: unit tests + validate-data + check-urls
+│   ├── validate-data.mjs  ← Validador de esquema para los JSON de vídeos
+│   └── check-urls.mjs     ← Comprueba consistencia de URLs entre .env.example, index.html y README
+│
+├── .github/
+│   └── workflows/
+│       └── deploy.yml     ← GitHub Actions: publica site/ en GitHub Pages en cada push a main
+│
 ├── INICIO/                ← Documentación de fase de diagnóstico
 │   ├── ROADMAP.md         ← Hoja de ruta de 5 fases
-│   ├── inventario-inicial-kilombo.md   ← Inventario de sitios detectados
-│   └── pasos-trabajo-kilombo.md        ← Flujos de trabajo con/sin credenciales
+│   ├── inventario-inicial-kilombo.md
+│   └── pasos-trabajo-kilombo.md
 │
 ├── .env                   ← Credenciales y referencias externas (NO SUBIR A REPO PÚBLICO)
 ├── .env.example           ← Plantilla de .env (segura, para subir al repo)
+├── end-of-session.sh      ← Ejecutar al terminar cada sesión: push a GitHub + deploy a kilombo.top
+├── start-preview.sh       ← Túnel Serveo para preview local temporal
+├── sync-to-production.sh  ← Deploy manual a kilombo.top via rsync/scp
 ├── README.md              ← Este archivo
-└── ROADMAP.md             ← Hoja de ruta TÉCNICA del proyecto (pasos numerados)
+├── ROADMAP.md             ← Hoja de ruta técnica (pasos numerados)
+├── MIGRATION.md           ← Relación entre kilombo.top (SPIP) y el portal espejo (GitHub Pages)
+├── TROUBLESHOOTING.md     ← Diagnóstico de acceso al servidor + flujo de publicación en GitHub Pages
+├── TO_FIX.md              ← Bugs y pendientes activos
+└── CHANGELOG.md           ← Historial de versiones
 ```
 
 ---
@@ -153,10 +175,6 @@ Si el puerto SSH (22) no está accesible en ese momento, el script lo detecta, a
 
 ---
 
-## Desarrollo local
-
----
-
 ## Paleta y diseño
 
 | Elemento | Valor |
@@ -181,5 +199,6 @@ Si el puerto SSH (22) no está accesible en ese momento, el script lo detecta, a
 - [ ] Ajustar los textos descriptivos de cada tarjeta al tono editorial definitivo
 - [ ] Obtener URLs reales de cada vídeo en Canal7 y actualizar `assets/data/plandemismo-actualidad.json`
 - [ ] Validar enlaces y URLs con el cliente antes de publicar
-- [ ] Resolver acceso SSH/SFTP al servidor (ver `TROUBLESHOOTING.md`) y subir `site/` a `kilombo.top`
+- [ ] Resolver acceso SSH/SFTP al servidor (ver `TROUBLESHOOTING.md` sección 4) — necesario para `./end-of-session.sh` paso 2
 - [ ] Generar archivos `.vtt` de subtítulos FR para los vídeos prioritarios (IDs 167, 1111, 2250, 2252)
+- [ ] Continuar migración gradual de `kilombo.top` al nuevo portal (ver `MIGRATION.md`)
