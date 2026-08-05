@@ -62,22 +62,37 @@ fi
 # ---- Pre-flight validation ----
 PREFLIGHT_OK=1
 
-if [ -z "${KILOMBOTOP_PASSWORD}" ] || echo "${KILOMBOTOP_PASSWORD}" | grep -qi "cambia\|change\|placeholder\|your_password"; then
-  echo "❌ KILOMBOTOP_PASSWORD no está configurado en .env (valor vacío o placeholder)."
+# Determine auth method: SSH key takes precedence over password.
+# If a key exists for this host, sshpass is not needed and
+# KILOMBOTOP_PASSWORD can be left empty (as the new-key instructions say).
+SSH_KEY_AVAILABLE=0
+if ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no \
+       -p "${KILOMBOTOP_PORT}" "${KILOMBOTOP_USER}@${KILOMBOTOP_HOST}" exit 2>/dev/null; then
+  SSH_KEY_AVAILABLE=1
+  SSHPASS_CMD=""
+  echo "ℹ️  Autenticación por clave SSH detectada — no se necesita contraseña."
+elif [ -n "${KILOMBOTOP_PASSWORD}" ] && ! echo "${KILOMBOTOP_PASSWORD}" | grep -qi "cambia\|change\|placeholder\|your_password"; then
+  # Fall back to password auth via sshpass
+  if command -v sshpass >/dev/null 2>&1; then
+    SSHPASS_CMD="sshpass -p ${KILOMBOTOP_PASSWORD}"
+  else
+    echo "⚠️  sshpass no encontrado — la conexión SSH pedirá la contraseña de forma interactiva."
+    echo "   Instala sshpass para automatizar: apt install sshpass"
+    SSHPASS_CMD=""
+  fi
+else
+  echo "❌ No se encontró clave SSH para ${KILOMBOTOP_USER}@${KILOMBOTOP_HOST}"
+  echo "   ni KILOMBOTOP_PASSWORD configurado en .env."
+  echo ""
+  echo "   Opciones:"
+  echo "   A) Configura una clave SSH (recomendado — ver encabezado de este script)"
+  echo "   B) Añade KILOMBOTOP_PASSWORD al .env"
   PREFLIGHT_OK=0
 fi
 
 if ! command -v rsync >/dev/null 2>&1 && ! command -v scp >/dev/null 2>&1; then
   echo "❌ Ni rsync ni scp están disponibles. Instala uno de los dos antes de continuar."
   PREFLIGHT_OK=0
-fi
-
-if ! command -v sshpass >/dev/null 2>&1; then
-  echo "⚠️  sshpass no encontrado — la conexión SSH pedirá la contraseña de forma interactiva."
-  echo "   Instala sshpass para automatizar: apt install sshpass"
-  SSHPASS_CMD=""
-else
-  SSHPASS_CMD="sshpass -p ${KILOMBOTOP_PASSWORD}"
 fi
 
 # Verify port 22 is reachable before asking for confirmation
