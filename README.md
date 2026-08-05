@@ -124,66 +124,36 @@ El sitio es **100% estático** — no requiere build step, dependencias ni backe
 
 ---
 
-## Sitio público permanente (GitHub Pages)
+## Flujo de trabajo por sesión
 
-El portal está publicado de forma permanente en GitHub Pages:
+### Durante la sesión — previsualizar en GitHub Pages
 
+Edita libremente en `site/`, haz commit y push a `main`:
+
+```bash
+git add site/
+git commit -m "content: descripción del cambio"
+git push origin main
+```
+
+GitHub Pages publica los cambios en **~30 segundos**:
 **🌍 https://ukoquique-proves.github.io/kilombo/**
 
-- Se actualiza **automáticamente** con cada `git push origin main` — no requiere acción manual.
-- El workflow que lo gestiona está en `.github/workflows/deploy.yml`.
-- URL estable y permanente — válida para compartir con el cliente en cualquier momento.
+### Al terminar la sesión — deploy completo
+
+```bash
+./end-of-session.sh
+```
+
+Hace en orden:
+1. Push a GitHub → GitHub Pages actualizado
+2. Sincroniza `kilombo.top` via rsync/scp
+
+Si el puerto SSH (22) no está accesible en ese momento, el script lo detecta, avisa, y deja GitHub Pages actualizado igualmente. Instrucciones para abrir el puerto en `TROUBLESHOOTING.md` sección 4.
 
 ---
 
 ## Desarrollo local
-
-Levantar un servidor HTTP desde la carpeta `site/` para trabajar en local:
-
-```bash
-cd site
-python3 -m http.server 8080
-```
-
-Abrir `http://localhost:8080` en el navegador.
-
-El sitio es **100% estático** — no requiere build step, dependencias ni backend.
-
----
-
-## Preview temporal (Serveo) — solo para sesiones de trabajo
-
-Si necesitas compartir cambios locales **antes de hacer push** (por ejemplo para validar algo rápido con el cliente), puedes usar el túnel Serveo:
-
-```bash
-./start-preview.sh
-```
-
-Levanta el servidor local y abre un túnel HTTPS temporal. La URL cambia en cada sesión y muere cuando se cierra la terminal — **no es apta para compartir con el cliente como referencia permanente**. Para eso, usar la URL de GitHub Pages.
-
----
-
-## Subida a producción real (kilombo.top)
-
-Cuando el cliente apruebe los cambios y se resuelva el acceso SSH (ver `TROUBLESHOOTING.md`), usar:
-
-```bash
-./sync-to-production.sh
-```
-
-1.  Lee las credenciales del `.env` (host, usuario, puerto, ruta remota).
-2.  Pide escribir la palabra `PROD` como medida de seguridad.
-3.  Usa **rsync** (con `--delete` para que quede idéntico) o scp si rsync no existe.
-
-### A mano (si prefieres)
-
-```bash
-# Con rsync (recomendado)
-rsync -avz --delete -e 'ssh -p 22' site/ admin@kilombo.top:/var/www/kilombo.top/
-
-# Con scp — usar punto final para copiar contenidos, no el directorio
-scp -P 22 -r site/. admin@kilombo.top:/var/www/kilombo.top/
-```
 
 ---
 
