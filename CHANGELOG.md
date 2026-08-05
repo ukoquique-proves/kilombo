@@ -8,32 +8,16 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 ## [0.12.0] — 2026-08-03
 
 ### Added (nuevo)
+- **`MIGRATION.md`**: documento que define la relación entre los dos sitios activos — `kilombo.top` (SPIP CMS) y el portal estático (GitHub Pages) — y el proceso de migración gradual. Incluye tabla de diferencias estructurales, fases de migración, cómo usar el espejo durante el desarrollo, y tablas de qué existe en cada sitio. Referenciado desde `README.md`.
 - **`end-of-session.sh`**: script de fin de sesión que ejecuta los dos pasos de deploy en orden — push a GitHub (→ GitHub Pages) y sincronización a `kilombo.top` via rsync/scp. Si el puerto 22 no está accesible, detecta el bloqueo, imprime las instrucciones exactas para abrirlo desde el panel YunoHost, y termina dejando GitHub Pages actualizado igualmente.
 
 ### Changed (cambiado)
-- **`sync-to-production.sh`** — tres mejoras:
-  - Usuario por defecto cambiado de `admin` a `kilombo` (nombre de usuario correcto confirmado).
-  - `sshpass` integrado automáticamente cuando está disponible — evita prompt interactivo de contraseña.
-  - Comprobación de accesibilidad del puerto 22 añadida antes del prompt `PROD` — falla rápido con mensaje accionable en lugar de colgar.
-- **`README.md`** — sección de despliegue reorganizada: nueva sección "Flujo de trabajo por sesión" que separa claramente "durante la sesión" (push para preview en GitHub Pages) de "al terminar la sesión" (`./end-of-session.sh`).
-- **`ROADMAP.md`** — paso 1 actualizado: ítems 1.1–1.4 marcados como completados, nuevo ítem 1.5 para la prueba de deploy en `kilombo.top` (pendiente de acceso SSH). Paso 9 renombrado a "Despliegue final en `kilombo.top`" con nota `⏸ Aplazado` explícita.
-- **`TROUBLESHOOTING.md`** — resumen ejecutivo actualizado con el estado real de acceso; tabla de apps YunoHost ampliada con Nextcloud, Roundcube y Redirect; sección 4 reescrita con opciones concretas para los dos bloqueos restantes (SSH y SPIP admin); próximos pasos actualizados.
-- **`.env`** — `KILOMBOTOP_USER` corregido a `kilombo`; `KILOMBOTOP_FUTURE_PASSWORD` entre comillas simples para preservar caracteres especiales (`$$`, `&&`); `PREVIEW_PUBLIC_URL` actualizado a GitHub Pages.
-
----
-
-## [0.12.0] — 2026-08-03
-
-### Added (nuevo)
-- **`MIGRATION.md`**: documento que define la relación entre los dos sitios activos — `kilombo.top` (SPIP CMS) y el portal estático (GitHub Pages) — y el proceso de migración gradual. Incluye: tabla de diferencias estructurales, fases de migración, cómo usar el espejo durante el desarrollo, y tablas de qué existe en cada sitio.
-- **`end-of-session.sh`**: script de fin de sesión que ejecuta los dos pasos de deploy en orden — push a GitHub (→ GitHub Pages) y sincronización a `kilombo.top` via rsync/scp. Si el puerto 22 no está accesible, detecta el bloqueo, imprime las instrucciones exactas para abrirlo desde el panel YunoHost, y termina dejando GitHub Pages actualizado igualmente.
-
-### Changed (cambiado)
-- **`sync-to-production.sh`**: usuario por defecto corregido a `kilombo`; `sshpass` integrado; comprobación de accesibilidad del puerto 22 antes del prompt `PROD`.
-- **`README.md`**: nueva sección "Flujo de trabajo por sesión" — separa claramente "durante la sesión" (push para preview) de "al terminar la sesión" (`./end-of-session.sh`).
+- **`sync-to-production.sh`**: usuario por defecto corregido a `kilombo`; `sshpass` integrado automáticamente; comprobación de accesibilidad del puerto 22 antes del prompt `PROD`.
+- **`README.md`**: nueva sección "Flujo de trabajo por sesión"; referencia a `MIGRATION.md` añadida al intro; sección duplicada "Desarrollo local" eliminada.
 - **`ROADMAP.md`**: paso 1 ítems 1.1–1.4 marcados como completados; nuevo ítem 1.5 para prueba de deploy en `kilombo.top`; paso 9 marcado `⏸ Aplazado`.
 - **`TROUBLESHOOTING.md`**: resumen ejecutivo actualizado; tabla de apps ampliada con Nextcloud/Roundcube/Redirect; sección 4 reescrita con opciones concretas para los dos bloqueos restantes.
 - **`.env`**: `KILOMBOTOP_USER` corregido a `kilombo`; `KILOMBOTOP_FUTURE_PASSWORD` entre comillas simples; `PREVIEW_PUBLIC_URL` actualizado a GitHub Pages.
+- **`TO_FIX.md`**: sección `⏸ Aplazado` añadida para los ítems YunoHost; versión stamp actualizada a v0.12.0.
 
 ---
 
