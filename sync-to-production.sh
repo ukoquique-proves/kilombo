@@ -3,8 +3,8 @@
 # sync-to-production.sh
 # =========================================================
 # Copia TODO el contenido de ./site/ al servidor real de
-# kilombo.top por rsync/SCP via SFTP, sustituyendo la
-# versión del portal publicada.
+# kilombo.top por rsync/SCP, sustituyendo la versión del
+# portal publicada.
 #
 # FLUJO DE TRABAJO:
 #   - Durante la sesión: usa GitHub Pages para previsualizar
@@ -16,9 +16,27 @@
 #   1. Puerto 22 abierto en el firewall del servidor
 #      → Panel YunoHost: https://kilombo.top/yunohost/admin/
 #      → Herramientas → Firewall → TCP 22
-#   2. Credenciales correctas en .env:
-#      KILOMBOTOP_USER, KILOMBOTOP_PASSWORD, KILOMBOTOP_REMOTE_PATH
+#   2. Credenciales en .env: KILOMBOTOP_USER, KILOMBOTOP_PASSWORD
 #   3. rsync o scp disponible en esta máquina
+#
+# AUTENTICACIÓN RECOMENDADA — CLAVE SSH (más seguro que contraseña):
+#   En lugar de KILOMBOTOP_PASSWORD, configura una clave SSH:
+#   1. Genera un par de claves si no tienes uno:
+#        ssh-keygen -t ed25519 -C "kilombo-deploy"
+#   2. Copia la clave pública al servidor:
+#        ssh-copy-id -p 22 kilombo@kilombo.top
+#      (o añade ~/.ssh/id_ed25519.pub al archivo
+#       ~/.ssh/authorized_keys del usuario kilombo en el servidor)
+#   3. En .env, deja KILOMBOTOP_PASSWORD vacío — el script
+#      usará la clave automáticamente sin necesitar sshpass.
+#
+# NOTA SOBRE rsync --delete:
+#   Este script usa --delete, lo que significa que cualquier
+#   fichero en el servidor que NO esté en ./site/ será borrado.
+#   Esto es intencional para mantener producción idéntica al
+#   espejo. PERO: asegúrate de que no hay ficheros subidos
+#   manualmente al servidor que quieras conservar. Si los hay,
+#   añádelos primero a ./site/ antes de ejecutar este script.
 #
 # USO:
 #   chmod +x sync-to-production.sh   (solo la primera vez)
@@ -103,6 +121,25 @@ REMOTE="${KILOMBOTOP_USER}@${KILOMBOTOP_HOST}:${KILOMBOTOP_REMOTE_PATH}"
 if command -v rsync >/dev/null 2>&1; then
   echo ""
   echo "[sync] Usando rsync..."
+  echo "       NOTA: --delete activo — ficheros en el servidor no presentes en"
+  echo "       ./site/ serán eliminados. Si has subido ficheros manualmente al"
+  echo "       servidor, cancela ahora y añádelos primero a ./site/."
+  echo ""
+
+  # Dry run first so the operator can review what will change
+  echo "[sync] Simulacro (--dry-run) — nada se modifica aún:"
+  ${SSHPASS_CMD} rsync -avz --delete --dry-run \
+        -e "ssh -p ${KILOMBOTOP_PORT} -o StrictHostKeyChecking=no" \
+        "${SOURCE}" "${REMOTE}"
+  echo ""
+  read -p "¿El simulacro es correcto? Escribe SI para ejecutar:  " DRYRUN_CONFIRM
+  if [ "${DRYRUN_CONFIRM}" != "SI" ]; then
+    echo "Cancelado."
+    exit 0
+  fi
+
+  echo ""
+  echo "[sync] Ejecutando rsync real..."
   ${SSHPASS_CMD} rsync -avz --delete \
         -e "ssh -p ${KILOMBOTOP_PORT} -o StrictHostKeyChecking=no" \
         "${SOURCE}" "${REMOTE}"
