@@ -8,7 +8,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 ## [0.12.0] — 2026-08-03
 
 ### Added (nuevo)
-- **`MIGRATION.md`**: documento que define la relación entre los dos sitios activos — `kilombo.top` (SPIP CMS) y el portal estático (GitHub Pages) — y el proceso de migración gradual. Incluye tabla de diferencias estructurales, fases de migración, cómo usar el espejo durante el desarrollo, y tablas de qué existe en cada sitio. Referenciado desde `README.md`.
+- **`MIGRATION.md`**: documento que explica la estrategia del espejo — el portal es el nuevo diseño de `kilombo.top` construido en paralelo para que el cliente pueda comparar sin tocar el original. El reemplazo se hace de forma incremental al final de cada sesión con `./end-of-session.sh`, en cuanto el cliente aprueba los avances. Incluye explicación de por qué el sitio estático no da problemas, y confirma que el deploy es autónomo (no depende de los administradores técnicos).
 - **`end-of-session.sh`**: script de fin de sesión que ejecuta los dos pasos de deploy en orden — push a GitHub (→ GitHub Pages) y sincronización a `kilombo.top` via rsync/scp. Si el puerto 22 no está accesible, detecta el bloqueo, imprime las instrucciones exactas para abrirlo desde el panel YunoHost, y termina dejando GitHub Pages actualizado igualmente.
 
 ### Changed (cambiado)
