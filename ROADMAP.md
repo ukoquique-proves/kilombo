@@ -7,16 +7,16 @@
 ## PRIMEROS PASOS (inmediatos / alta prioridad)
 
 ### 1. Establecer flujo claro de subida de modificaciones al sitio
-Definir y documentar cómo pasar de cambios en local (`/site`) a producción en `kilombo.top`:
 
-- [ ] **1.1 Evaluar opciones de despliegue**
-  - Opción A: SFTP/SCP manual al directorio de YunoHost
-  - Opción B: Repositorio GitHub + Action de despliegue automático (rsync/SFTP)
-  - Opción C: Script `deploy.sh` local con rsync + credenciales SSH
-- [x] **1.2 Implementar la opción elegida**
-  - GitHub Pages via GitHub Actions (`gh-pages` branch → luego `main` + workflow). URL permanente: `https://ukoquique-proves.github.io/kilombo/`
+**Flujo de trabajo definido:**
+- **Durante la sesión** → push libremente a `main` para previsualizar en GitHub Pages (`https://ukoquique-proves.github.io/kilombo/`). Cada push se publica en ~30 segundos.
+- **Al finalizar la sesión** → ejecutar `./end-of-session.sh`. Hace ambas cosas en orden: push a GitHub + deploy a `kilombo.top`.
+
+- [x] **1.1 Evaluar opciones de despliegue** — elegida Opción B (GitHub Actions) para preview permanente + rsync/scp para producción
+- [x] **1.2 Implementar la opción elegida** — GitHub Pages activo en `https://ukoquique-proves.github.io/kilombo/`
 - [x] **1.3 Documentar paso a paso en `README.md` sección "Despliegue"**
-- [ ] **1.4 Prueba de despliegue en `kilombo.top`** — *bloqueado hasta resolver acceso SSH (ver TROUBLESHOOTING.md)*
+- [x] **1.4 Crear `end-of-session.sh`** — script de fin de sesión que pushea a GitHub y sincroniza `kilombo.top` en un solo paso. Si el puerto 22 está cerrado, avisa y deja GitHub Pages actualizado igualmente.
+- [ ] **1.5 Prueba de deploy en `kilombo.top`** — pendiente de que el puerto 22 sea accesible (ver TROUBLESHOOTING.md sección 4)
 
 ---
 
