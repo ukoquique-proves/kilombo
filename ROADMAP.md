@@ -137,16 +137,16 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 - [ ] `sitemap.xml`
 - [ ] `robots.txt`
 
-### 9. Despliegue final en `kilombo.top`
+### 9. Deploy final en `kilombo.top`
 
-> ⏸ **Aplazado a fase futura** — requiere coordinación con el equipo que gestiona el servidor YunoHost. No bloquea el trabajo actual; el portal está activo en GitHub Pages.
+El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`, en cuanto el cliente apruebe el estado del espejo. No es un evento único al final del proyecto — ocurre de forma incremental.
 
-- [ ] Abrir puerto SSH (ver TROUBLESHOOTING.md sección 4)
+**Único prerrequisito:** abrir el puerto 22 desde el panel YunoHost (lo puede hacer el propio cliente, sin necesitar a los administradores técnicos). Ver `TROUBLESHOOTING.md` sección 4.
+
+- [ ] Abrir puerto SSH desde `https://kilombo.top/yunohost/admin/` → Herramientas → Firewall → TCP 22
 - [ ] Crear app `my_webapp` para `kilombo.top` raíz desde el panel YunoHost
-- [ ] Ejecutar `./sync-to-production.sh` y verificar deploy
-- [ ] Configurar en `kilombo.top` que la URL raíz apunte al nuevo portal
+- [ ] Ejecutar `./end-of-session.sh` y verificar deploy en `kilombo.top`
 - [ ] Verificar que todos los enlaces salientes funcionan desde el dominio final
-- [ ] Probar desde red externa (no solo intranet/local)
 
 ---
 
@@ -175,5 +175,5 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 | 6. Organización por idiomas dentro de cada sección | Pendiente | 1 – 2 días |
 | 7. Revisión diseño + UX | Pendiente | 1 día |
 | 8. SEO y metadatos | Pendiente | 0.5 día |
-| **9. Migración a `kilombo.top`** | ⏸ Aplazado — requiere coordinación con el equipo YunoHost (otra fase) | — |
+| **9. Deploy a `kilombo.top`** | Pendiente — solo requiere abrir puerto 22 desde el panel YunoHost (sin necesitar a los administradores) | 0.5 día |
 | 10–11. Mantenimiento (documentación) | Pendiente | 0.5 día |
