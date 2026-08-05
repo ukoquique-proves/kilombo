@@ -62,6 +62,16 @@ El servidor corre **YunoHost** con las siguientes aplicaciones registradas:
 
 Se probaron 7 combinaciones de usuario/contraseña (3 nombres de usuario × varias contraseñas). Todas fallaron con HTTP 401. Las credenciales concretas no se registran aquí — consultar con el administrador del servidor para obtener las correctas.
 
+### Resultado final (sesión posterior)
+
+**Credenciales correctas:** usuario `kilombo`, contraseña en `.env` como `KILOMBOTOP_PASSWORD`.
+
+- `POST /yunohost/portalapi/login` → ✅ `200 Logged in`
+- `POST /yunohost/api/login` → ✅ `200 Logged in`
+- El usuario `kilombo` pertenece al grupo `admins` de YunoHost — acceso completo al panel de administración en `https://kilombo.top/yunohost/admin/`
+
+**Por qué fallaron los intentos anteriores:** el username es `kilombo`, no `admin`. Los intentos anteriores usaron `admin`, `kilombo@kilombo.top` y `ukoquique` — ninguno de ellos es correcto.
+
 ### Por qué el SPIP login tampoco funciona
 
 El servidor devuelve la cabecera:
@@ -117,11 +127,12 @@ Ejecutar `./sync-to-production.sh` directamente desde un equipo que sí tenga ac
 
 ## 5. Próximos pasos concretos
 
-- [ ] Confirmar la contraseña correcta del usuario `admin` de YunoHost
-- [ ] Verificar si el puerto 22 está accesible desde la red del administrador del servidor
-- [ ] Decidir en qué app/dominio se despliega el nuevo portal (`kilombo.top` raíz o un subdominio)
+- [x] Confirmar credenciales correctas — **usuario: `kilombo`, contraseña: ver `.env`**
+- [ ] Resolver acceso SSH/SFTP (port 22 bloqueado desde IPs externas)
+- [ ] Registrar usuario `kilombo` como administrador en SPIP (`www.kilombo.top/ecrire/`)
+- [ ] Decidir en qué app/dominio se despliega el nuevo portal (`kilombo.top` raíz o subdominio)
 - [ ] Si no existe app para `kilombo.top`, crear una `my_webapp` nueva desde el panel YunoHost
-- [ ] Actualizar `.env` con las credenciales verificadas y volver a ejecutar `./sync-to-production.sh`
+- [ ] Una vez resuelto SSH: ejecutar `./sync-to-production.sh` desde una máquina con acceso al puerto 22
 
 ---
 
