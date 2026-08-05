@@ -5,6 +5,26 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.13.0] — 2026-08-03
+
+### Fixed (corregido)
+- **`sync-to-production.sh` — pre-flight auth logic**: el chequeo anterior fallaba si `KILOMBOTOP_PASSWORD` estaba vacío, lo que contradecía las instrucciones del propio script que dicen dejar la contraseña vacía al usar clave SSH. La nueva lógica tiene tres ramas: (1) clave SSH disponible → se usa sin contraseña; (2) contraseña configurada → se usa `sshpass`; (3) ninguna de las dos → falla con mensaje claro listando ambas opciones.
+
+### Added (nuevo)
+- **`deploy.yml` — job `test` antes de deploy**: el workflow de GitHub Pages ahora ejecuta `npm test` (unit tests + validación JSON + consistencia de URLs) antes de publicar. Un test fallido bloquea el deploy a Pages.
+- **`sync-to-production.sh` — dry-run pass**: antes del rsync real, el script ejecuta `--dry-run` y muestra exactamente qué se modificaría. Pide una segunda confirmación (`SI`) antes de proceder. Incluye aviso visible sobre el comportamiento de `--delete`.
+- **`sync-to-production.sh` — instrucciones de clave SSH**: el encabezado del script documenta cómo generar un par de claves `ed25519` y copiar la pública al servidor para eliminar la dependencia de contraseña.
+- **`MIGRATION.md`**: documento que explica la estrategia del espejo — el portal es el nuevo diseño de `kilombo.top` construido en paralelo. El reemplazo es incremental por sesión con `./end-of-session.sh`. Confirma que el deploy es autónomo (no depende de administradores técnicos) y explica por qué el sitio estático no da problemas en YunoHost.
+- **`end-of-session.sh`**: script de fin de sesión — push a GitHub Pages + sync a `kilombo.top` en un solo comando.
+
+### Changed (cambiado)
+- **`TO_FIX.md`**: eliminado ítem `YunoHost-B` (admin SPIP — irrelevante con el nuevo diseño estático); añadido `YunoHost-E` (migración a clave SSH); sección `⏸ Aplazado` clarifica que el cliente puede abrir el puerto 22 directamente.
+- **`ROADMAP.md`**: paso 9 deja de estar aplazado — es una tarea concreta pendiente de que el cliente abra el puerto 22.
+- **`TROUBLESHOOTING.md`**: próximos pasos simplificados a 3 ítems que el cliente puede hacer sin intermediarios.
+- **`README.md`**: intro actualizada con la estrategia de espejo correcta; árbol de archivos completo con todos los ficheros actuales.
+
+---
+
 ## [0.12.0] — 2026-08-03
 
 ### Added (nuevo)
