@@ -6,10 +6,21 @@ Diagnóstico completo del intento de conexión al servidor `kilombo.top` realiza
 
 ## Resumen ejecutivo
 
-El servidor está en pie y respondiendo. El bloqueo tiene dos causas independientes:
+El servidor está en pie y respondiendo. Estado actual de acceso:
 
-1. **Puerto SSH (22) cerrado a nivel de firewall** — no hay acceso directo por SSH/SFTP desde máquinas externas.
-2. **Credenciales incorrectas para el panel YunoHost** — las contraseñas probadas desde `.env` no coinciden con las del servidor.
+1. **Credenciales resueltas** — usuario `kilombo`, contraseña en `.env` como `KILOMBOTOP_PASSWORD`. Ambas APIs de YunoHost autentican correctamente.
+2. **Puerto SSH (22) cerrado a nivel de firewall** — no hay acceso directo por SSH/SFTP desde máquinas externas. Es el único bloqueo activo para `sync-to-production.sh`.
+3. **`kilombo` no es administrador SPIP** — el usuario tiene acceso al panel YunoHost completo pero no al backend de SPIP en `www.kilombo.top/ecrire/`.
+
+### Qué podemos hacer ahora mismo
+
+| Acción | Método | Estado |
+|--------|--------|--------|
+| Panel YunoHost (gestión de apps, usuarios, dominios) | `https://kilombo.top/yunohost/admin/` con `kilombo:KILOMBOTOP_PASSWORD` | ✅ Funciona |
+| Nextcloud (gestor de ficheros web) | `https://cloud.kilombo.top/` con SSO | ✅ Funciona |
+| Webmail | `https://mail.kilombo.top/` con SSO | ✅ Funciona |
+| Backend SPIP (`www.kilombo.top/ecrire/`) | SSO + permisos SPIP | ❌ `kilombo` no es admin SPIP |
+| SSH / SFTP / `sync-to-production.sh` | Puerto 22 | ❌ Firewall bloquea IPs externas |
 
 ---
 
@@ -33,18 +44,21 @@ El servidor está en pie y respondiendo. El bloqueo tiene dos causas independien
 
 ## 2. Infraestructura detectada en el servidor
 
-El servidor corre **YunoHost** con las siguientes aplicaciones registradas:
+El servidor corre **YunoHost** con las siguientes aplicaciones registradas (obtenidas vía `/yunohost/portalapi/me` con usuario autenticado):
 
-| App ID | Label | Dominio | Tipo |
-|--------|-------|---------|------|
-| `spip.main` | Espacio Tierra y Libertad | `www.kilombo.top` | SPIP 4.4.15 |
-| `spip__2.main` | Proletarios Internacionalistas | `proletariosinternacionalistas.kilombo.top` | SPIP |
-| `spip__3.main` | International Global Revolution | `in.kilombo.top` | SPIP |
-| `spip__4.main` | GCI / ICG — Sitio oficial | `icg-gci.kilombo.top` | SPIP |
-| `my_webapp.main` | ICG / GCI CD-Rom | `cdrom.kilombo.top` | Static webapp + SFTP |
-| `my_webapp__3.main` | ICG — Sitio histórico | `icg-old.kilombo.top` | Static webapp + SFTP |
+| App ID | Label | Dominio | Tipo | Acceso público |
+|--------|-------|---------|------|----------------|
+| `spip.main` | Espacio Tierra y Libertad | `www.kilombo.top` | SPIP 4.4.15 | ✅ Público |
+| `spip__2.main` | Proletarios Internacionalistas | `proletariosinternacionalistas.kilombo.top` | SPIP | ✅ Público |
+| `spip__3.main` | International Global Revolution | `in.kilombo.top` | SPIP | ✅ Público |
+| `spip__4.main` | GCI / ICG — Sitio oficial | `icg-gci.kilombo.top` | SPIP | ✅ Público |
+| `my_webapp.main` | ICG / GCI CD-Rom | `cdrom.kilombo.top` | Static webapp + SFTP | ✅ Público |
+| `my_webapp__3.main` | ICG — Sitio histórico | `icg-old.kilombo.top` | Static webapp + SFTP | ✅ Público |
+| `nextcloud.main` | Nextcloud | `cloud.kilombo.top` | Nextcloud | 🔒 SSO |
+| `redirect.main` | Redirect PI to Proletarios | `pi.kilombo.top` | Redirect | 🔒 SSO |
+| `roundcube.main` | Webmail | `mail.kilombo.top` | Roundcube | 🔒 SSO |
 
-> **Importante:** No existe ninguna app registrada para el dominio raíz `kilombo.top`. El portal nuevo que estamos construyendo necesita un nuevo `my_webapp` apuntando a `kilombo.top` (o una redirección desde él).
+> **Importante:** No existe ninguna app registrada para el dominio raíz `kilombo.top`. El portal nuevo necesita un nuevo `my_webapp` apuntando a `kilombo.top` — se puede crear desde el panel YunoHost con las credenciales actuales.
 
 ---
 
@@ -82,57 +96,45 @@ Esto significa que SPIP está **detrás del SSO de YunoHost**. Autenticarse dire
 
 ---
 
-## 4. Cómo resolver el acceso
+## 4. Cómo resolver los dos bloqueos restantes
 
-### Opción A — Recuperar la contraseña correcta (recomendado)
+### Bloqueo A — SSH/SFTP (port 22 cerrado desde IPs externas)
 
-La contraseña del usuario `admin` de YunoHost se puede consultar o resetear:
+Necesario para `sync-to-production.sh`. Opciones:
 
-1. Accediendo físicamente o por consola al servidor (si es un VPS, desde el panel del proveedor).
-2. Desde la CLI de YunoHost si se tiene acceso root:
-   ```bash
-   yunohost user info admin
-   # o para resetear:
-   yunohost user update admin --password NUEVA_CONTRASEÑA
-   ```
-3. Desde el panel de administración del proveedor de VPS (Hetzner, OVH, etc.) usando la consola web.
+**Opción A1 — Abrir port 22 desde el panel YunoHost (recomendado)**
+Tenemos acceso al panel admin. Desde `https://kilombo.top/yunohost/admin/`:
+- Herramientas → Firewall → Añadir regla para TCP puerto 22 desde la IP de esta máquina.
 
-Una vez confirmada, actualizar `KILOMBOTOP_PASSWORD` en `.env`.
+**Opción A2 — Ejecutar desde la red del administrador del servidor**
+Si el puerto 22 está abierto solo en la red local del servidor, ejecutar `./sync-to-production.sh` directamente desde esa máquina.
 
-### Opción B — Abrir el puerto SSH desde una IP de confianza
+**Opción A3 — Usar Nextcloud como puente de ficheros**
+Tenemos acceso a Nextcloud en `https://cloud.kilombo.top/`. Se pueden subir ficheros del portal desde el navegador como solución provisional hasta resolver el SSH.
 
-Si el servidor es un VPS, el proveedor suele ofrecer una opción de firewall desde su panel web. Añadir la IP de la máquina de trabajo a la lista blanca para el puerto 22.
+### Bloqueo B — `kilombo` no es administrador SPIP
 
-Alternativamente, desde la consola del proveedor (sin SSH), ejecutar en el servidor:
+El usuario `kilombo` tiene SSO pero no figura en la tabla de administradores de SPIP. Para editar el CMS de `www.kilombo.top`:
+
+**Opción B1 — Añadir como admin desde la CLI de YunoHost**
+Tenemos acceso al panel admin — desde allí se puede abrir un terminal o, una vez resuelto el SSH:
 ```bash
-# Permitir SSH solo desde tu IP
-ufw allow from TU_IP_PUBLICA to any port 22
-# o desactivar temporalmente el bloqueo:
-ufw allow 22
+# En el servidor:
+php /var/www/spip/ecrire/index.php --action=créer_admin
+# o directamente en la base de datos SPIP
 ```
 
-### Opción C — Usar el SFTP de las `my_webapp` existentes como referencia
-
-Las apps `my_webapp.main` y `my_webapp__3.main` tienen SFTP habilitado por YunoHost. YunoHost crea un usuario SFTP específico por app. Si se puede acceder al panel de administración de YunoHost, se puede:
-1. Crear una nueva app `my_webapp` para `kilombo.top`
-2. Consultar las credenciales SFTP de esa app en `Aplicaciones → kilombo → Configuración`
-
-Esas credenciales SFTP funcionan por SFTP sobre SSH (puerto 22) — lo que vuelve al punto del firewall.
-
-### Opción D — Deploy desde la máquina del administrador del servidor
-
-Ejecutar `./sync-to-production.sh` directamente desde un equipo que sí tenga acceso SSH al servidor (la máquina local del administrador de `kilombo.top`), en lugar de hacerlo desde este entorno de desarrollo.
+**Opción B2 — Acceder a la base de datos desde phpMyAdmin / Adminer**
+Si YunoHost tiene phpMyAdmin instalado, se puede promover al usuario `kilombo` directamente en la tabla `spip_auteurs`.
 
 ---
 
 ## 5. Próximos pasos concretos
 
 - [x] Confirmar credenciales correctas — **usuario: `kilombo`, contraseña: ver `.env`**
-- [ ] Resolver acceso SSH/SFTP (port 22 bloqueado desde IPs externas)
-- [ ] Registrar usuario `kilombo` como administrador en SPIP (`www.kilombo.top/ecrire/`)
-- [ ] Decidir en qué app/dominio se despliega el nuevo portal (`kilombo.top` raíz o subdominio)
-- [ ] Si no existe app para `kilombo.top`, crear una `my_webapp` nueva desde el panel YunoHost
-- [ ] Una vez resuelto SSH: ejecutar `./sync-to-production.sh` desde una máquina con acceso al puerto 22
+- [ ] Abrir puerto 22 desde el panel YunoHost → `https://kilombo.top/yunohost/admin/` → Herramientas → Firewall → TCP 22 (lo puede hacer el cliente directamente, sin necesitar a los administradores técnicos)
+- [ ] Crear app `my_webapp` para `kilombo.top` raíz desde el panel YunoHost
+- [ ] Ejecutar `./end-of-session.sh` al final de la próxima sesión de trabajo para hacer el primer deploy a `kilombo.top`
 
 ---
 
