@@ -5,6 +5,25 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.16.0] — 2026-08-06
+
+### Fixed (corregido)
+- **`site/js/render.mjs`**: CTA de tarjetas de vídeo cambiado de `rel="noopener"` a `rel="noopener noreferrer"` (faltaba `noreferrer` — ahora consistente con los enlaces saneados por `sanitizeHtml()`).
+- **`site/js/articles.js`**: `initDetailPage()` actualiza ahora `document.title` con el título del artículo al cargar (mejora bookmarking e historial del navegador).
+- **`site/js/articles.js`**: el texto visible del enlace de fuente ya no muestra entidades HTML (`&amp;` etc.) — se usaba la cadena ya escapada como texto de display en vez de la URL cruda.
+- **`site/js/articles.js`**: enlace de fuente cambiado a `rel="noopener noreferrer"` (consistencia con el resto del proyecto).
+- **`scripts/validate-data.mjs`**: el `catch` de `readdirSync` en `scanDir` ahora captura `(e)` y muestra `e.message`, evitando perder el detalle del error de sistema de archivos.
+- **`package.json`**: eliminado el campo `"main": "index.js"` (muerto — no existe ningún `index.js`); añadido `"type": "module"` para eliminar la advertencia de Node sobre módulos sin tipo declarado.
+- **`site/js/main.js`**: añadido comentario explicando por qué es un script plano sin `type="module"`.
+
+### Added (nuevo)
+- **`site/assets/content/articles.json`**: primer artículo publicado — Israel/Mohamad Safa (sección `general`, status `imported`).
+
+### Tests
+- **`test/render.test.mjs`**: aserción del test `renderCard — CTA opens in new tab` actualizada a `rel="noopener noreferrer"`.
+
+---
+
 ## [0.15.0] — 2026-08-06
 
 ### Security (seguridad)
