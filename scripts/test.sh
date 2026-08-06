@@ -1,0 +1,41 @@
+#!/bin/bash
+# =========================================================
+# scripts/test.sh
+# =========================================================
+# Single entry point for the project's checks. Runs, in order:
+#   1. Unit tests — every test/*.test.mjs file (render.mjs, articles.js, ...)
+#   2. JSON data validation for site/assets/data/*.json and site/assets/content/*.json
+#   3. Cross-file URL consistency check (.env.example / index.html / README.md)
+#
+# Stops at the first failure (set -e) so a broken step is obvious
+# instead of getting buried under later output.
+#
+# USO:
+#   chmod +x scripts/test.sh   (solo la primera vez)
+#   npm test                   (o directamente: ./scripts/test.sh)
+# =========================================================
+
+set -e
+
+HERE="$(cd "$(dirname "$0")/.." && pwd)"
+cd "${HERE}"
+
+echo "============================================================"
+echo " 1/3  Unit tests — test/render.test.mjs, test/articles.test.mjs"
+echo "============================================================"
+node --test
+
+echo ""
+echo "============================================================"
+echo " 2/3  Data validation — scripts/validate-data.mjs"
+echo "============================================================"
+node scripts/validate-data.mjs
+
+echo ""
+echo "============================================================"
+echo " 3/3  URL consistency — scripts/check-urls.mjs"
+echo "============================================================"
+node scripts/check-urls.mjs
+
+echo ""
+echo "✅  All checks passed."

@@ -1,0 +1,352 @@
+:root {
+  --ink: #0a0a0a;
+  --paper: #f5f2eb;
+  --paper-alt: #ebe6d9;
+  --red: #c1121f;
+  --red-dark: #8b0000;
+  --gray: #555555;
+  --gray-light: #a0a0a0;
+  --rule: #1a1a1a;
+  --lang-es: #1b5e20;
+  --lang-fr: #0d47a1;
+  --lang-en: #311b92;
+  --lang-multi: #4a148c;
+  --status-active-bg: #e8f5e9;
+  --status-active-fg: #1b5e20;
+  --status-archive-bg: #fff8e1;
+  --status-archive-fg: #e65100;
+  --status-legacy-bg: #eceff1;
+  --status-legacy-fg: #455a64;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.site-header {
+  background: var(--ink);
+  color: var(--paper);
+  border-bottom: 4px solid var(--red);
+  padding: 2.5rem 0 2rem;
+  margin-bottom: 3rem;
+}
+
+.site-title {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.site-subtitle {
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: var(--gray-light);
+  margin-top: 0.5rem;
+  letter-spacing: 0.04em;
+  font-style: italic;
+}
+
+.section {
+  margin-bottom: 4.5rem;
+}
+
+.section-header {
+  border-left: 5px solid var(--red);
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.section-header--featured {
+  border-left: 5px solid var(--red);
+  background: linear-gradient(90deg, rgba(193,18,31,0.08), transparent);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-right: 1rem;
+}
+
+.section-number {
+  display: inline-block;
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: 0.85rem;
+  color: var(--red);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+}
+
+.section-label {
+  display: inline-block;
+  background: var(--red);
+  color: var(--paper);
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.7rem;
+  margin-bottom: 0.6rem;
+  font-weight: 700;
+}
+
+.section-title {
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+.section-tagline {
+  font-size: 1rem;
+  color: var(--gray);
+  font-style: italic;
+  line-height: 1.5;
+  max-width: 70ch;
+}
+
+.section--featured {
+  background: var(--paper-alt);
+  padding: 2.5rem;
+  border: 1px solid rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.section--featured::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: var(--red);
+}
+
+.featured-intro {
+  max-width: 75ch;
+  margin: 0 0 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(0,0,0,0.15);
+  font-size: 1.05rem;
+  color: #2a2a2a;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.cards-grid--featured {
+  grid-template-columns: 1fr;
+}
+
+/* ====================================================================
+   NOTE: previous rules `.cards-grid--two` and `.card--lang-fr` were
+   removed after v0.8.0 PI section unification (single bilingual card
+   instead of separate ES / FR cards).
+   Re-add if section 02 ever splits again into two separate URLs.
+   ==================================================================== */
+
+.card {
+  display: block;
+  background: var(--paper);
+  border: 1px solid rgba(0,0,0,0.18);
+  padding: 1.4rem 1.25rem 1.25rem;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--rule);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  border-color: var(--red);
+}
+
+.card--featured::before {
+  height: 5px;
+  background: var(--red);
+}
+
+.card--featured {
+  background: linear-gradient(180deg, #fff 0%, var(--paper) 100%);
+  border: 2px solid rgba(193,18,31,0.35);
+}
+
+.card--archive {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--paper),
+    var(--paper) 10px,
+    var(--paper-alt) 10px,
+    var(--paper-alt) 20px
+  );
+}
+
+.card--thematic {
+  border-left: 4px solid var(--red-dark);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.card-lang {
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.card--lang-es .card-lang { background: var(--lang-es); }
+/* .card--lang-fr rule removed after PI section unification (v0.8.0).
+   Re-enable only if individual lang-FR cards return in the markup. */
+.card--lang-en .card-lang { background: var(--lang-en); }
+.card--lang-multi .card-lang { background: var(--lang-multi); }
+
+.card-status {
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+}
+
+.card-status--active {
+  background: var(--status-active-bg);
+  color: var(--status-active-fg);
+}
+
+.card-status--archive {
+  background: var(--status-archive-bg);
+  color: var(--status-archive-fg);
+}
+
+.card-status--legacy {
+  background: var(--status-legacy-bg);
+  color: var(--status-legacy-fg);
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.3;
+  margin-bottom: 0.55rem;
+  color: var(--ink);
+}
+
+.card-desc {
+  font-size: 0.92rem;
+  color: #333;
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tag {
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.2);
+  color: #222;
+  background: rgba(255,255,255,0.6);
+}
+
+.tag--type { border-color: var(--red); color: var(--red-dark); }
+.tag--lang { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.tag--affil { background: var(--paper-alt); }
+.tag--scope { background: rgba(193,18,31,0.08); color: var(--red-dark); border-color: rgba(193,18,31,0.3); }
+
+.site-footer {
+  background: var(--ink);
+  color: var(--gray-light);
+  margin-top: 5rem;
+  padding: 3rem 0 1.5rem;
+  border-top: 4px solid var(--red);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.footer-title {
+  color: var(--paper);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.8rem;
+}
+
+.footer-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.footer-link {
+  font-size: 0.9rem;
+  color: var(--paper);
+  border-bottom: 1px solid var(--red);
+  padding-bottom: 0.1rem;
+}
+
+.footer-link:hover {
+  color: var(--red);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 1.25rem;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .section--featured { padding: 1.5rem 1rem; }
+  .site-header { padding: 2rem 0 1.5rem; }
+}

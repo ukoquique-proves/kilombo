@@ -1,0 +1,167 @@
+[
+  {
+    "id": "1641",
+    "country": "ARG",
+    "countryLabel": "Argentina",
+    "year": 2020,
+    "tags": ["miedo", "fabricacion", "pandemia"],
+    "category": "Plandemia · Datos estadísticos",
+    "title": "2020: El año del miedo fabricado",
+    "desc": "Análisis de la primera etapa del montaje pandémico en Argentina y sus coordenadas internacionales de producción del miedo.",
+    "langs": [
+      { "chip": "es", "label": "ES original" },
+      { "chip": "pending", "label": "FR: pendiente", "title": "En espera de subtítulos" }
+    ],
+    "subtitlesFr": "",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  },
+  {
+    "id": "1642",
+    "country": "ARG",
+    "countryLabel": "Argentina",
+    "year": 2022,
+    "tags": ["estadisticas", "covid19", "lic-analia-alvarez"],
+    "category": "Plandemia · Datos estadísticos",
+    "title": "Lic. Analía Álvarez — Datos estadísticos COVID-19 2020-2021",
+    "desc": "Exposición pormenorizada de cifras oficiales cruzadas y su desviación frente a la narrativa mediática.",
+    "langs": [
+      { "chip": "es", "label": "ES original" },
+      { "chip": "pending", "label": "FR: pendiente" }
+    ],
+    "subtitlesFr": "",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  },
+  {
+    "id": "1651",
+    "country": "CHL",
+    "countryLabel": "Chile",
+    "year": 2022,
+    "tags": ["apsiin", "vacunas", "arnm", "crisis-medica"],
+    "category": "Crisis médica internacional · Vacunas",
+    "title": "APSIIN Chile — Crisis médica internacional con vacunas ARNm COVID",
+    "desc": "Testimonios y datos clínicos chilenos sobre eventos adversos post-vacunales ARNm.",
+    "langs": [
+      { "chip": "es", "label": "ES original" },
+      { "chip": "pending", "label": "FR: pendiente" }
+    ],
+    "subtitlesFr": "",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  },
+  {
+    "id": "2200",
+    "country": "USA",
+    "countryLabel": "Estados Unidos",
+    "year": 2020,
+    "tags": ["100000-medicos", "vacunas", "medicos-eticos"],
+    "category": "Médicos éticos y valientes · Vacunas",
+    "title": "100.000 médicos contra las vacunas COVID-19",
+    "desc": "Declaración colectiva de profesionales de la salud cuestionando la narrativa oficial.",
+    "langs": [
+      { "chip": "es", "label": "ES subtitulado" },
+      { "chip": "pending", "label": "FR: pendiente" }
+    ],
+    "subtitlesFr": "",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  },
+  {
+    "id": "2202",
+    "country": "ARG",
+    "countryLabel": "Argentina",
+    "year": 2020,
+    "tags": ["dr-luis-marcelo-martinez", "genetista", "ataque-planificado"],
+    "category": "Médicos éticos y valientes",
+    "title": "Dr. Luis Marcelo Martínez (genetista) — Ataque planificado COVID-19",
+    "desc": "Análisis genético-molecular del \"virus\" y lectura política del operativo sanitario.",
+    "langs": [
+      { "chip": "es", "label": "ES original" },
+      { "chip": "pending", "label": "FR: pendiente" }
+    ],
+    "subtitlesFr": "",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  },
+  {
+    "id": "2206",
+    "country": "ARG",
+    "countryLabel": "Argentina",
+    "year": 2022,
+    "tags": ["dr-martin-monteverde", "ninos", "afectados", "vacunas"],
+    "category": "Médicos éticos y valientes · Niños",
+    "title": "Dr. Martín Monteverde — Niños afectados gravemente por las vacunas COVID-19",
+    "desc": "Casos clínicos pediátricos post-vacunación expuestos por el médico argentino.",
+    "langs": [
+      { "chip": "es", "label": "ES original" },
+      { "chip": "pending", "label": "FR: pendiente" }
+    ],
+    "subtitlesFr": "",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  },
+  {
+    "id": "1111",
+    "country": "EU",
+    "countryLabel": "Unión Europea / EEUU",
+    "year": 2023,
+    "tags": ["dr-david-martin", "parlamento-europeo", "oms", "cartel-criminal"],
+    "category": "OMS · Documental parlamentario",
+    "title": "Dr. David Martin (PhD) ante el Parlamento Europeo — La OMS es un cartel criminal desde su base fundacional",
+    "desc": "Intervención subtitulada en español. Demostración documental de la trayectoria criminal de la Organización Mundial de la Salud.",
+    "langs": [
+      { "chip": "en", "label": "EN original" },
+      { "chip": "es", "label": "ES subt." },
+      { "chip": "todo", "label": "FR: a subtitular ★", "title": "Subtítulos en francés a realizar" }
+    ],
+    "subtitlesFr": "assets/subtitles/1111-fr.vtt",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  },
+  {
+    "id": "2250",
+    "country": "CHE",
+    "countryLabel": "Suiza",
+    "year": 2021,
+    "tags": ["dra-astrid-stuckelberger", "biologa-oms", "vacuna-arma-biologica"],
+    "category": "OMS · Vacunas como arma biológica",
+    "title": "Dra. Astrid Stückelberger (bióloga OMS) — La vacuna es un arma biológica mortal",
+    "desc": "Testimonio insider de una profesional que trabajó en el seno de la Organización Mundial de la Salud.",
+    "langs": [
+      { "chip": "de", "label": "DE original" },
+      { "chip": "es", "label": "ES subt." },
+      { "chip": "todo", "label": "FR: a subtitular ★" }
+    ],
+    "subtitlesFr": "assets/subtitles/2250-fr.vtt",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  },
+  {
+    "id": "2252",
+    "country": "GBR",
+    "countryLabel": "Reino Unido",
+    "year": 2023,
+    "tags": ["dr-mike-yeadon", "ex-pfizer", "pandemia-ataque"],
+    "category": "Insiders · Ex-Pfizer",
+    "title": "Dr. Mike Yeadon (ex vicepresidente Pfizer) — La pandemia es un ataque asesino contra la humanidad",
+    "desc": "Análisis desde la perspectiva de un alto directivo que abandonó la industria y denuncia el operativo completo.",
+    "langs": [
+      { "chip": "en", "label": "EN original" },
+      { "chip": "es", "label": "ES subt." },
+      { "chip": "todo", "label": "FR: a subtitular ★" }
+    ],
+    "subtitlesFr": "assets/subtitles/2252-fr.vtt",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  }
+]

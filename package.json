@@ -1,0 +1,19 @@
+{
+  "name": "kilombo",
+  "version": "1.0.0",
+  "description": "Portal central de acceso a la red de sitios de Kilombo. Construido como página estática (HTML, CSS, JS) para ser alojado en la infraestructura YunoHost de `kilombo.top`.",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "bash scripts/test.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "happy-dom": "^20.11.1"
+  }
+}

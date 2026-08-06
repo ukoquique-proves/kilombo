@@ -1,0 +1,60 @@
+# =========================================================
+# Kilombo — .gitignore
+# =========================================================
+# NUNCA subir credenciales, archivos temporales, ni logs
+# al repositorio público.
+
+# --------- Entorno / credenciales ---------
+.env
+.env.backup
+.env.local
+.env.*.local
+
+# --------- Logs y archivos temporales ---------
+*.log
+tmp/
+temp/
+cache/
+*.tmp
+*.swp
+*~
+
+# Serveo / ngrok / tuneles temporales
+serveo.log
+ngrok-stable*
+
+# --------- Sistemas ---------
+.DS_Store
+Thumbs.db
+
+# --------- Old nested clone from initial setup (redundant) ---------
+repo/
+
+# --------- Editores ---------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# --------- Python (si se usan scripts) ---------
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# --------- Node (si se usa alguna herramienta) ---------
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# --------- Backups locales ---------
+*.bak
+*.backup
+site-backup*/
+
+# --------- Audios / videos / contenido pesado ---------
+# (si se sube contenido grande, usar LFS u otro almacenamiento)
+# assets/audios/*.mp3
+# assets/subtitles/*.vtt

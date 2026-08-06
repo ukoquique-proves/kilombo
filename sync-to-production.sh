@@ -1,0 +1,171 @@
+#!/bin/bash
+# =========================================================
+# sync-to-production.sh
+# =========================================================
+# Copia TODO el contenido de ./site/ al servidor real de
+# kilombo.top por rsync/SCP, sustituyendo la versión del
+# portal publicada.
+#
+# FLUJO DE TRABAJO:
+#   - Durante la sesión: usa GitHub Pages para previsualizar
+#     (push a main → auto-deploy en ~30s)
+#   - Al finalizar la sesión: ejecuta este script para
+#     sincronizar también el servidor real kilombo.top
+#
+# REQUISITOS PREVIOS:
+#   1. Puerto 22 abierto en el firewall del servidor
+#      → Panel YunoHost: https://kilombo.top/yunohost/admin/
+#      → Herramientas → Firewall → TCP 22
+#   2. Credenciales en .env: KILOMBOTOP_USER, KILOMBOTOP_PASSWORD
+#   3. rsync o scp disponible en esta máquina
+#
+# AUTENTICACIÓN RECOMENDADA — CLAVE SSH (más seguro que contraseña):
+#   En lugar de KILOMBOTOP_PASSWORD, configura una clave SSH:
+#   1. Genera un par de claves si no tienes uno:
+#        ssh-keygen -t ed25519 -C "kilombo-deploy"
+#   2. Copia la clave pública al servidor:
+#        ssh-copy-id -p 22 kilombo@kilombo.top
+#      (o añade ~/.ssh/id_ed25519.pub al archivo
+#       ~/.ssh/authorized_keys del usuario kilombo en el servidor)
+#   3. En .env, deja KILOMBOTOP_PASSWORD vacío — el script
+#      usará la clave automáticamente sin necesitar sshpass.
+#
+# NOTA SOBRE rsync --delete:
+#   Este script usa --delete, lo que significa que cualquier
+#   fichero en el servidor que NO esté en ./site/ será borrado.
+#   Esto es intencional para mantener producción idéntica al
+#   espejo. PERO: asegúrate de que no hay ficheros subidos
+#   manualmente al servidor que quieras conservar. Si los hay,
+#   añádelos primero a ./site/ antes de ejecutar este script.
+#
+# USO:
+#   chmod +x sync-to-production.sh   (solo la primera vez)
+#   ./sync-to-production.sh
+# =========================================================
+
+set -e
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+SITE_DIR="${HERE}/site"
+
+# Cargar .env
+if [ -f "${HERE}/.env" ]; then
+  set -a; . "${HERE}/.env"; set +a
+fi
+
+# Valores por defecto
+: "${KILOMBOTOP_HOST:=kilombo.top}"
+: "${KILOMBOTOP_PORT:=22}"
+: "${KILOMBOTOP_USER:=kilombo}"
+: "${KILOMBOTOP_REMOTE_PATH:=/var/www/kilombo.top}"
+
+# ---- Pre-flight validation ----
+PREFLIGHT_OK=1
+
+# Determine auth method: SSH key takes precedence over password.
+# If a key exists for this host, sshpass is not needed and
+# KILOMBOTOP_PASSWORD can be left empty (as the new-key instructions say).
+SSH_KEY_AVAILABLE=0
+if ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no \
+       -p "${KILOMBOTOP_PORT}" "${KILOMBOTOP_USER}@${KILOMBOTOP_HOST}" exit 2>/dev/null; then
+  SSH_KEY_AVAILABLE=1
+  SSHPASS_CMD=""
+  echo "ℹ️  Autenticación por clave SSH detectada — no se necesita contraseña."
+elif [ -n "${KILOMBOTOP_PASSWORD}" ] && ! echo "${KILOMBOTOP_PASSWORD}" | grep -qi "cambia\|change\|placeholder\|your_password"; then
+  # Fall back to password auth via sshpass
+  if command -v sshpass >/dev/null 2>&1; then
+    SSHPASS_CMD="sshpass -p ${KILOMBOTOP_PASSWORD}"
+  else
+    echo "⚠️  sshpass no encontrado — la conexión SSH pedirá la contraseña de forma interactiva."
+    echo "   Instala sshpass para automatizar: apt install sshpass"
+    SSHPASS_CMD=""
+  fi
+else
+  echo "❌ No se encontró clave SSH para ${KILOMBOTOP_USER}@${KILOMBOTOP_HOST}"
+  echo "   ni KILOMBOTOP_PASSWORD configurado en .env."
+  echo ""
+  echo "   Opciones:"
+  echo "   A) Configura una clave SSH (recomendado — ver encabezado de este script)"
+  echo "   B) Añade KILOMBOTOP_PASSWORD al .env"
+  PREFLIGHT_OK=0
+fi
+
+if ! command -v rsync >/dev/null 2>&1 && ! command -v scp >/dev/null 2>&1; then
+  echo "❌ Ni rsync ni scp están disponibles. Instala uno de los dos antes de continuar."
+  PREFLIGHT_OK=0
+fi
+
+# Verify port 22 is reachable before asking for confirmation
+if ! nc -zw5 "${KILOMBOTOP_HOST}" "${KILOMBOTOP_PORT}" 2>/dev/null; then
+  echo "❌ Puerto ${KILOMBOTOP_PORT} no accesible en ${KILOMBOTOP_HOST}."
+  echo "   Abre el puerto SSH desde el panel YunoHost antes de continuar:"
+  echo "   https://${KILOMBOTOP_HOST}/yunohost/admin/ → Herramientas → Firewall → TCP ${KILOMBOTOP_PORT}"
+  PREFLIGHT_OK=0
+fi
+
+if [ "${PREFLIGHT_OK}" = "0" ]; then
+  echo ""
+  echo "Corrige los errores anteriores antes de continuar. Abortando."
+  exit 1
+fi
+# ---- /Pre-flight validation ----
+
+echo "============================================================"
+echo "🚀 Subida a producción → ${KILOMBOTOP_USER}@${KILOMBOTOP_HOST}:${KILOMBOTOP_REMOTE_PATH}"
+echo "============================================================"
+echo ""
+
+if [ ! -d "${SITE_DIR}" ]; then
+  echo "❌ Carpeta ./site no existe. Abortando."
+  exit 1
+fi
+
+echo "Esto SOBREESCRIBIRÁ el contenido remoto de:"
+echo "   ${KILOMBOTOP_REMOTE_PATH}"
+echo ""
+read -p "¿Seguro? Escribe PROD para continuar:  " CONFIRM
+if [ "${CONFIRM}" != "PROD" ]; then
+  echo "Cancelado."
+  exit 0
+fi
+
+# ---- Subida: rsync preferido, scp como fallback ----
+SOURCE="${SITE_DIR}/"
+REMOTE="${KILOMBOTOP_USER}@${KILOMBOTOP_HOST}:${KILOMBOTOP_REMOTE_PATH}"
+
+if command -v rsync >/dev/null 2>&1; then
+  echo ""
+  echo "[sync] Usando rsync..."
+  echo "       NOTA: --delete activo — ficheros en el servidor no presentes en"
+  echo "       ./site/ serán eliminados. Si has subido ficheros manualmente al"
+  echo "       servidor, cancela ahora y añádelos primero a ./site/."
+  echo ""
+
+  # Dry run first so the operator can review what will change
+  echo "[sync] Simulacro (--dry-run) — nada se modifica aún:"
+  ${SSHPASS_CMD} rsync -avz --delete --dry-run \
+        -e "ssh -p ${KILOMBOTOP_PORT} -o StrictHostKeyChecking=no" \
+        "${SOURCE}" "${REMOTE}"
+  echo ""
+  read -p "¿El simulacro es correcto? Escribe SI para ejecutar:  " DRYRUN_CONFIRM
+  if [ "${DRYRUN_CONFIRM}" != "SI" ]; then
+    echo "Cancelado."
+    exit 0
+  fi
+
+  echo ""
+  echo "[sync] Ejecutando rsync real..."
+  ${SSHPASS_CMD} rsync -avz --delete \
+        -e "ssh -p ${KILOMBOTOP_PORT} -o StrictHostKeyChecking=no" \
+        "${SOURCE}" "${REMOTE}"
+else
+  echo ""
+  echo "[sync] rsync no encontrado — usando scp..."
+  ${SSHPASS_CMD} scp -P "${KILOMBOTOP_PORT}" -o StrictHostKeyChecking=no \
+        -r "${SITE_DIR}/." "${REMOTE}"
+fi
+
+echo ""
+echo "✅ Hecho. El contenido de ./site/ está ahora en producción:"
+echo "   https://${KILOMBOTOP_HOST}"
+echo ""

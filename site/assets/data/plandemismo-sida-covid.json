@@ -1,0 +1,29 @@
+[
+  {
+    "id": "167",
+    "idAlt": "1201",
+    "country": "ESP",
+    "countryLabel": "España",
+    "year": 2018,
+    "tags": ["elisa-mato-a-ruth", "documental", "sida", "test-elisa", "antecesor-covid"],
+    "category": "SIDA → COVID · Montaje de tests",
+    "title": "ELISA MATO A RUTH — Documental de una muerte anunciada",
+    "desc": "Historia del test ELISA y cómo su falsa fiabilidad sirvió de base para construir el genocidio SIDA. Documental fundacional para entender que el mismo modus operandi se repitió con los tests PCR y el montaje COVID-19. Pionero en denunciar la industria del miedo, el negocio de los tests y la criminalización de poblaciones-objetivo.",
+    "keypoints": [
+      "Fiabilidad nula del test ELISA de anticuerpos",
+      "Mecanismo político del \"grupo de riesgo\"",
+      "Paralelos estructurales: SIDA → COVID",
+      "Caso concreto: Ruth, víctima del diagnóstico"
+    ],
+    "langs": [
+      { "chip": "es", "label": "ES original" },
+      { "chip": "todo", "label": "FR: subtítulos prioritarios ★★★", "title": "Subtítulos en francés prioritarios para este documental" }
+    ],
+    "subtitlesFr": "assets/subtitles/167-fr.vtt",
+    "featured": true,
+    "cornerLabel": "Documental · Prioridad",
+    "ctaUrl": "https://tv.canal7salta.com/",
+    "ctaLabel": "Ver documental completo en tv.canal7salta.com →",
+    "ctaPlaceholder": true
+  }
+]
