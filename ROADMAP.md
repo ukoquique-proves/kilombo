@@ -125,7 +125,64 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 
 ## FASE 3 — Publicación y ajustes finales
 
-### 7. Revisión de diseño y experiencia de usuario
+### 7. Protección de acceso al espejo (StatiCrypt)
+
+El espejo en GitHub Pages es de acceso público por diseño de la plataforma. Para restringir la lectura del contenido a personas que conozcan la contraseña compartida, se usa **cifrado AES-256 en el lado del cliente** mediante [StatiCrypt](https://github.com/robinmoisson/staticrypt).
+
+#### Qué es StatiCrypt y cómo funciona
+
+StatiCrypt es una herramienta open-source que cifra páginas HTML estáticas con AES-256-CBC usando una clave derivada con PBKDF2. El resultado es un archivo HTML autónomo que:
+
+1. Muestra un formulario de contraseña al visitante
+2. Deriva la clave criptográfica de la contraseña introducida
+3. Descifra el contenido en memoria, directamente en el navegador
+4. Muestra la página solo si la contraseña es correcta
+
+El repositorio de GitHub contiene únicamente texto cifrado — no hay contenido legible en el código fuente ni en los archivos JSON servidos.
+
+#### Modelo de seguridad honesto
+
+| Amenaza | Protegido |
+|---------|-----------|
+| Bots y scrapers sin JS | ✅ Sí — solo ven ciphertext |
+| Visitante casual sin contraseña | ✅ Sí |
+| Alguien que inspecciona el repo en GitHub | ✅ Sí — solo ve blobs cifrados |
+| Alguien que tiene la contraseña y usa devtools | ❌ No — puede extraer el DOM descifrado |
+| Borrado o modificación del contenido | ❌ No aplica — GitHub Pages es de solo lectura para visitantes; kilombo.top actúa como backup permanente |
+
+La protección es equivalente a una puerta con cerrojo de combinación: detiene a quien no sabe el código, pero no a quien sí lo tiene. Es el nivel máximo alcanzable en un host estático sin servidor.
+
+#### Arquitectura de implementación
+
+- `index.html` — **queda pública** (es el directorio del portal, sin contenido sensible)
+- `plandemismo.html`, `articulos.html`, `articulo.html` — **cifradas** en el paso de build
+- Archivos JSON de datos (`assets/data/*.json`, `assets/content/*.json`) — **cifrados** con la misma contraseña
+- La contraseña se almacena como **GitHub Actions Secret** (`STATICRYPT_PASSWORD`) — nunca en el repo
+- El paso de cifrado se añade en `deploy.yml` entre checkout y upload del artifact
+- En desarrollo local, `npm run preview` sirve el sitio sin cifrar para no bloquear el flujo de trabajo
+- Un script `scripts/encrypt.mjs` orquesta el cifrado de páginas y JSON antes del deploy
+
+#### Flujo de build con cifrado activo
+
+```
+git push → GitHub Actions →
+  1. npm ci + npm test  (igual que ahora)
+  2. node scripts/encrypt.mjs  (cifra HTML + JSON con STATICRYPT_PASSWORD)
+  3. upload artifact (site/ con archivos cifrados)
+  4. deploy to GitHub Pages
+```
+
+- [x] **7.0 Decisión de arquitectura documentada** (este apartado)
+- [ ] **7.1 Instalar staticrypt** como devDependency (`npm install --save-dev staticrypt`)
+- [ ] **7.2 Crear `scripts/encrypt.mjs`** — cifra las 3 páginas de contenido y todos los JSON de assets usando la CLI de staticrypt
+- [ ] **7.3 Actualizar `deploy.yml`** — añadir paso de cifrado entre `npm test` y upload; leer contraseña desde el secret `STATICRYPT_PASSWORD`
+- [ ] **7.4 Añadir `STATICRYPT_PASSWORD` como GitHub Actions Secret** en la configuración del repositorio
+- [ ] **7.5 Verificar en GitHub Pages** — confirmar que las páginas cifradas muestran el formulario de contraseña y que el contenido se descifra correctamente al introducirla
+- [ ] **7.6 Verificar que `index.html` sigue siendo público** y que no hay contenido sensible filtrado en ella
+
+---
+
+### 8. Revisión de diseño y experiencia de usuario
 - [ ] Revisión visual completa con el cliente (paleta, tipografía, sensación)
 - [ ] Incorporar logotipos / marcas de cada plataforma en sus tarjetas correspondientes
 - [ ] Imagen de portada / banner principal en la cabecera
@@ -174,7 +231,8 @@ El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`,
 | 4. Contenido editorial por sección (incl. referencias cruzadas automáticas) | Pendiente | 2 – 4 días |
 | **5. Traducciones / puesta al día de idiomas (GCI, subtítulos FR)** | Pendiente | 3 – 10 días |
 | 6. Organización por idiomas dentro de cada sección | Pendiente | 1 – 2 días |
-| 7. Revisión diseño + UX | Pendiente | 1 día |
-| 8. SEO y metadatos | Pendiente | 0.5 día |
-| **9. Deploy a `kilombo.top`** | Pendiente — solo requiere abrir puerto 22 desde el panel YunoHost (sin necesitar a los administradores) | 0.5 día |
-| 10–11. Mantenimiento (documentación) | Pendiente | 0.5 día |
+| **7. Protección de acceso — StatiCrypt (cifrado AES-256 client-side)** | En curso — arquitectura documentada, implementación pendiente | 0.5 día |
+| 8. Revisión diseño + UX | Pendiente | 1 día |
+| 9. SEO y metadatos | Pendiente | 0.5 día |
+| **10. Deploy a `kilombo.top`** | Pendiente — solo requiere abrir puerto 22 desde el panel YunoHost (sin necesitar a los administradores) | 0.5 día |
+| 11–12. Mantenimiento (documentación) | Pendiente | 0.5 día |
