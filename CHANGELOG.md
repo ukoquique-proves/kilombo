@@ -5,6 +5,32 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.19.0] — 2026-08-06
+
+### Added (seguridad — cifrado client-side)
+- **`scripts/encrypt.mjs`** (nuevo): script de cifrado para el paso de build de CI. Cifra con AES-256-CBC (PBKDF2, 600k iteraciones SHA-256) usando la librería [StatiCrypt](https://github.com/robinmoisson/staticrypt) v3.5.4. Cifra tres tipos de artefactos:
+  - **Páginas HTML de contenido** (`plandemismo.html`, `articulos.html`, `articulo.html`): cada página queda envuelta en un formulario de contraseña autocontenido. El visitante introduce la contraseña; si es correcta, la página se descifra en memoria y se muestra. La contraseña derivada (PBKDF2) se guarda en `sessionStorage` para que los fetches de JSON no requieran nueva introducción.
+  - **Archivos JSON de datos** (`assets/data/*.json`, `assets/content/*.json`): cifrados en el propio archivo como un envelope `{"encrypted":true,"ciphertext":"<hex>","salt":"<hex>"}`. Ilegibles sin la contraseña.
+  - **`index.html`** queda pública (no tiene contenido sensible — es solo el directorio del portal).
+- **`site/js/decrypt.mjs`** (nuevo): módulo ES6 compartido por `plandemismo.js` y `articles.js`. Lee la contraseña derivada de `sessionStorage` (puesta allí por el prompt de staticrypt tras login correcto) y descifra los envelopes JSON antes de parsear. En modo dev/preview (JSON sin cifrar), actúa como no-op.
+- **`.staticrypt.json`**: salt fijo del proyecto (hex de 32 chars). El salt no es secreto — solo la contraseña lo es. Salt fijo = builds reproducibles.
+- **`STATICRYPT_PASSWORD`**: añadido como GitHub Actions Secret en el repositorio.
+
+### Changed
+- **`site/js/plandemismo.js`**: `res.json()` sustituido por `parseJson(await res.text())` para soportar transparentemente JSON cifrado o en claro.
+- **`site/js/articles.js`**: ídem — `loadArticles()` usa `parseJson()`.
+- **`.github/workflows/deploy.yml`**: añadido paso `Encrypt site content` (`npm run encrypt`) en el job `deploy`, entre `Install dependencies` y `Setup Pages`. Lee `STATICRYPT_PASSWORD` del secret del repositorio. El job `test` no cifra — trabaja siempre con archivos en claro.
+- **`package.json`**: añadidos scripts `encrypt` (`node scripts/encrypt.mjs`) y `preview` (`python3 -m http.server 8080 --directory site`).
+- **`.env.example`**: añadida variable `STATICRYPT_PASSWORD` con instrucciones para configurarla también como GitHub Actions Secret.
+
+### Modelo de seguridad (resumen)
+- Protege contra: bots/scrapers, visitantes casuales, inspección del repo en GitHub (solo ciphertext visible).
+- No protege contra: alguien que tiene la contraseña y extrae el DOM descifrado desde devtools.
+- Nivel máximo alcanzable en un host estático sin servidor.
+- kilombo.top (YunoHost) sigue siendo el sitio autoritativo con auth server-side real.
+
+---
+
 ## [0.18.0] — 2026-08-06
 
 ### Changed (responsive layout)
