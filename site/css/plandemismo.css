@@ -532,9 +532,57 @@
   border-top: 1px dashed rgba(0,0,0,0.15);
 }
 
-@media (max-width: 640px) {
-  .tabs { gap: 0; }
-  .tab { flex: 1 1 100%; text-align: left; padding: 0.7rem 1rem; }
-  .video-grid { grid-template-columns: 1fr; }
-  .page-lead { padding: 1rem; }
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+/* --- Tablet: 481px – 768px --- */
+@media (max-width: 768px) {
+  .video-grid {
+    /* 320px min would try to fit two columns at ~650px — force single */
+    grid-template-columns: 1fr;
+  }
+
+  .tabs {
+    gap: 0.15rem;
+  }
+
+  .page-lead {
+    padding: 1.1rem 1.25rem;
+  }
+}
+
+/* --- Mobile: ≤ 480px --- */
+@media (max-width: 480px) {
+  .tabs {
+    gap: 0;
+  }
+
+  .tab {
+    flex: 1 1 100%;
+    text-align: left;
+    padding: 0.7rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  .page-lead {
+    padding: 1rem;
+  }
+
+  /* Keep video card body padding consistent for badge rows */
+  .video-card__body {
+    padding: 0.9rem 1rem 1.1rem;
+  }
+
+  .video-card__langs {
+    gap: 0.3rem;
+  }
+
+  .video-card__meta {
+    gap: 0.3rem;
+  }
+
+  .warning-block {
+    padding: 1rem;
+  }
 }

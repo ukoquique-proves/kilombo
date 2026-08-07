@@ -398,7 +398,70 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
 }
 
-@media (max-width: 640px) {
-  .section--featured { padding: 1.5rem 1rem; }
-  .site-header { padding: 2rem 0 1.5rem; }
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+/* --- Tablet: 481px – 768px --- */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  .cards-grid {
+    /* Force single column — 280px min would try to fit two at ~580px */
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    margin-bottom: 3rem;
+  }
+
+  .section--featured {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* --- Mobile: ≤ 480px --- */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .site-header {
+    padding: 1.75rem 0 1.25rem;
+  }
+
+  .section--featured {
+    padding: 1.25rem 1rem;
+  }
+
+  .section-header {
+    padding-left: 0.9rem;
+  }
+
+  /* Keep card internal padding consistent so tags don't hug the edge */
+  .card {
+    padding: 1.1rem 1rem 1rem;
+  }
+
+  /* Tags row: tighten gap slightly but keep wrap working cleanly */
+  .card-tags {
+    gap: 0.3rem;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .site-footer {
+    margin-top: 3rem;
+    padding: 2rem 0 1.25rem;
+  }
 }

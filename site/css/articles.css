@@ -158,3 +158,35 @@
   background: rgba(255, 255, 255, 0.35);
 }
 
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+/* --- Tablet: 481px – 768px --- */
+@media (max-width: 768px) {
+  .article-list {
+    /* minmax(260px) can force two tight columns at ~530px — go single */
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Mobile: ≤ 480px --- */
+@media (max-width: 480px) {
+  .article-card {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  /* Topic chips: slightly smaller gap so they wrap cleanly */
+  .article-card__topics {
+    gap: 0.28rem;
+  }
+
+  .article-detail {
+    padding: 1rem;
+  }
+
+  .article-detail__meta {
+    gap: 0.3rem 0.45rem;
+  }
+}
+
