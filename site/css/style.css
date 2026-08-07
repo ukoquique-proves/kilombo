@@ -129,6 +129,23 @@ a { color: inherit; text-decoration: none; }
   max-width: 70ch;
 }
 
+.section--tierra {
+  background: rgba(27, 94, 32, 0.04);
+  border-left: 5px solid #1b5e20;
+  padding-left: 1.5rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.section--tierra .section-header {
+  border-left: none;
+  padding-left: 0;
+}
+
+.section--tierra .section-number {
+  color: #1b5e20;
+  font-size: 1rem;
+}
+
 .section--featured {
   background: var(--paper-alt);
   padding: 2.5rem;
@@ -421,6 +438,10 @@ a { color: inherit; text-decoration: none; }
     padding: 1.75rem 1.25rem;
   }
 
+  .section--tierra {
+    padding-left: 1.25rem;
+  }
+
   .footer-grid {
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
@@ -439,6 +460,10 @@ a { color: inherit; text-decoration: none; }
 
   .section--featured {
     padding: 1.25rem 1rem;
+  }
+
+  .section--tierra {
+    padding-left: 1rem;
   }
 
   .section-header {
