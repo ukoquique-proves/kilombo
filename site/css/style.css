@@ -1,12 +1,12 @@
 :root {
-  --ink: #0a0a0a;
-  --paper: #f5f2eb;
-  --paper-alt: #ebe6d9;
-  --red: #c1121f;
+  --ink: #121212;
+  --paper: #fcfbf7;
+  --paper-alt: #f0ede4;
+  --red: #b91c2a;
   --red-dark: #8b0000;
-  --gray: #555555;
+  --gray: #595959;
   --gray-light: #a0a0a0;
-  --rule: #1a1a1a;
+  --rule: #1e1e1e;
   --lang-es: #1b5e20;
   --lang-fr: #0d47a1;
   --lang-en: #311b92;
@@ -83,7 +83,7 @@ a { color: inherit; text-decoration: none; }
 
 .section-header--featured {
   border-left: 5px solid var(--red);
-  background: linear-gradient(90deg, rgba(193,18,31,0.08), transparent);
+  background: linear-gradient(90deg, rgba(185,28,42,0.07), transparent);
   padding-top: 1rem;
   padding-bottom: 1rem;
   padding-right: 1rem;
@@ -91,7 +91,7 @@ a { color: inherit; text-decoration: none; }
 
 .section-number {
   display: inline-block;
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   color: var(--red);
   letter-spacing: 0.2em;
@@ -103,7 +103,7 @@ a { color: inherit; text-decoration: none; }
   display: inline-block;
   background: var(--red);
   color: var(--paper);
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -132,7 +132,7 @@ a { color: inherit; text-decoration: none; }
 .section--featured {
   background: var(--paper-alt);
   padding: 2.5rem;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.09);
   position: relative;
 }
 
@@ -148,7 +148,7 @@ a { color: inherit; text-decoration: none; }
   max-width: 75ch;
   margin: 0 0 1.75rem;
   padding-bottom: 1.25rem;
-  border-bottom: 1px solid rgba(0,0,0,0.15);
+  border-bottom: 1px solid rgba(0,0,0,0.12);
   font-size: 1.05rem;
   color: #2a2a2a;
 }
@@ -170,15 +170,25 @@ a { color: inherit; text-decoration: none; }
    Re-add if section 02 ever splits again into two separate URLs.
    ==================================================================== */
 
+/* ------------------------------------------------------------------ */
+/* CARD BASE                                                            */
+/* ------------------------------------------------------------------ */
+
 .card {
   display: block;
   background: var(--paper);
-  border: 1px solid rgba(0,0,0,0.18);
+  border: 1px solid rgba(0,0,0,0.14);
   padding: 1.4rem 1.25rem 1.25rem;
   position: relative;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  /* elevation + border glow + top-bar color + arrow opacity */
+  transition:
+    transform        0.18s ease,
+    box-shadow       0.18s ease,
+    border-color     0.18s ease;
+  overflow: hidden;
 }
 
+/* top accent bar */
 .card::before {
   content: "";
   position: absolute;
@@ -186,13 +196,44 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: 3px;
   background: var(--rule);
+  transition: height 0.18s ease, background 0.18s ease;
+}
+
+/* arrow indicator — slides in from the right on hover */
+.card::after {
+  content: "→";
+  position: absolute;
+  bottom: 1.1rem;
+  right: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--red);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-  border-color: var(--red);
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.11),
+    0 0 0 1px rgba(185,28,42,0.25);
+  border-color: rgba(185,28,42,0.45);
 }
+
+.card:hover::before {
+  height: 4px;
+  background: var(--red);
+}
+
+.card:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ------------------------------------------------------------------ */
+/* CARD VARIANTS                                                        */
+/* ------------------------------------------------------------------ */
 
 .card--featured::before {
   height: 5px;
@@ -201,7 +242,7 @@ a { color: inherit; text-decoration: none; }
 
 .card--featured {
   background: linear-gradient(180deg, #fff 0%, var(--paper) 100%);
-  border: 2px solid rgba(193,18,31,0.35);
+  border: 1.5px solid rgba(185,28,42,0.28);
 }
 
 .card--archive {
@@ -218,35 +259,39 @@ a { color: inherit; text-decoration: none; }
   border-left: 4px solid var(--red-dark);
 }
 
+/* ------------------------------------------------------------------ */
+/* CARD INTERNALS                                                       */
+/* ------------------------------------------------------------------ */
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.9rem;
   padding-bottom: 0.6rem;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
 .card-lang {
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  background: rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.09);
   color: #444;
 }
 
-.card--lang-es .card-lang { background: rgba(27,94,32,0.15);  color: #1b5e20; }
+.card--lang-es .card-lang { background: rgba(27,94,32,0.13);  color: #1b5e20; }
 /* .card--lang-fr rule removed after PI section unification (v0.8.0).
    Re-enable only if individual lang-FR cards return in the markup. */
-.card--lang-en .card-lang { background: rgba(49,27,146,0.13); color: #311b92; }
-.card--lang-multi .card-lang { background: rgba(74,20,140,0.13); color: #4a148c; }
+.card--lang-en .card-lang { background: rgba(49,27,146,0.11); color: #311b92; }
+.card--lang-multi .card-lang { background: rgba(74,20,140,0.11); color: #4a148c; }
 
 .card-status {
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -255,20 +300,9 @@ a { color: inherit; text-decoration: none; }
   border-radius: 999px;
 }
 
-.card-status--active {
-  background: rgba(27,94,32,0.12);
-  color: #2e7d32;
-}
-
-.card-status--archive {
-  background: rgba(230,81,0,0.1);
-  color: #bf360c;
-}
-
-.card-status--legacy {
-  background: rgba(69,90,100,0.12);
-  color: #546e7a;
-}
+.card-status--active  { background: rgba(27,94,32,0.1);    color: #2e7d32; }
+.card-status--archive { background: rgba(230,81,0,0.09);   color: #bf360c; }
+.card-status--legacy  { background: rgba(69,90,100,0.1);   color: #546e7a; }
 
 .card-title {
   font-family: var(--font-serif);
@@ -282,7 +316,7 @@ a { color: inherit; text-decoration: none; }
 .card-desc {
   font-family: var(--font-sans);
   font-size: 0.92rem;
-  color: #333;
+  color: #3a3a3a;
   line-height: 1.55;
   margin-bottom: 1rem;
 }
@@ -294,7 +328,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .tag {
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -303,13 +337,17 @@ a { color: inherit; text-decoration: none; }
   border-radius: 999px;
   border: 1px solid transparent;
   color: #555;
-  background: rgba(0,0,0,0.07);
+  background: rgba(0,0,0,0.06);
 }
 
-.tag--type  { background: rgba(193,18,31,0.09);  color: #9b1320; border-color: rgba(193,18,31,0.18); }
-.tag--lang  { background: rgba(0,0,0,0.1);        color: #333;    border-color: rgba(0,0,0,0.18); }
-.tag--affil { background: rgba(0,0,0,0.06);       color: #555; }
-.tag--scope { background: rgba(193,18,31,0.07);   color: #9b1320; border-color: rgba(193,18,31,0.18); }
+.tag--type  { background: rgba(185,28,42,0.08);  color: #8b1320; border-color: rgba(185,28,42,0.16); }
+.tag--lang  { background: rgba(0,0,0,0.08);       color: #333;    border-color: rgba(0,0,0,0.15); }
+.tag--affil { background: rgba(0,0,0,0.05);       color: #555; }
+.tag--scope { background: rgba(185,28,42,0.06);   color: #8b1320; border-color: rgba(185,28,42,0.16); }
+
+/* ------------------------------------------------------------------ */
+/* FOOTER                                                               */
+/* ------------------------------------------------------------------ */
 
 .site-footer {
   background: var(--ink);
@@ -346,6 +384,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--paper);
   border-bottom: 1px solid var(--red);
   padding-bottom: 0.1rem;
+  transition: color 0.15s ease;
 }
 
 .footer-link:hover {
@@ -353,7 +392,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255,255,255,0.08);
   padding-top: 1.25rem;
   font-size: 0.8rem;
   text-align: center;
