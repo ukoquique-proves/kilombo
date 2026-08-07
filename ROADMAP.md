@@ -1,6 +1,6 @@
 # Hoja de ruta técnica — Kilombo Portal
 
-> Objetivo: construir, poblar y publicar el portal central de Kilombo con la estructura de 4 secciones definida, integrando contenido de fuentes externas y estableciendo un flujo claro de despliegue.
+> Objetivo: construir, poblar y publicar el portal central de Kilombo con la estructura de 4 secciones definida, integrando contenido de fuentes externas y estableciendo un flujo claro de despliegue. Ver [`MIRROR_GROWING.md`](MIRROR_GROWING.md) para las reglas de incorporación de contenido, criterios de diseño y sincronización con otros procesos.
 
 ---
 
@@ -90,7 +90,7 @@ Material oral histórico (audios de WhatsApp, notas de voz, comunicados grabados
 ## FASE 2 — Ampliación de contenido y estructura
 
 ### 4. Poblar cada sección con contenido editorial propio
-No solo enlaces externos; agregar dentro del propio portal:
+No solo enlaces externos; agregar dentro del propio portal. Ver [`MIRROR_GROWING.md`](MIRROR_GROWING.md) para el proceso detallado de incorporación, criterios de admisión y checklist de publicación.
 
 - [ ] **4.1 Espacio Tierra y Libertad** — artículos destacados, últimos textos publicados, sección "En portada"
 - [ ] **4.2 GCI** — últimos comunicados oficiales, biblioteca de textos programáticos por idioma (ES/EN/FR), acceso directo al CD-Rom con categorías
