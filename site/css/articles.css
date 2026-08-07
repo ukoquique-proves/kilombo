@@ -39,11 +39,18 @@
 .article-card__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 0.75rem;
+  gap: 0.4rem 0.55rem;
   margin: 0 0 0.75rem;
   font-family: "Courier New", Courier, monospace;
-  font-size: 0.85rem;
-  color: #222;
+  font-size: 0.72rem;
+  color: #555;
+}
+
+.article-card__meta span {
+  background: rgba(0,0,0,0.07);
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 .article-card__title {
@@ -60,10 +67,12 @@
 
 .topic-chip {
   display: inline-block;
-  padding: 0.2rem 0.5rem;
+  padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.08);
-  font-size: 0.8rem;
+  background: rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.1);
+  font-size: 0.72rem;
+  color: #555;
 }
 
 .article-detail {
@@ -77,11 +86,18 @@
 .article-detail__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 0.75rem;
+  gap: 0.4rem 0.55rem;
   margin: 0.75rem 0 1.25rem;
   font-family: "Courier New", Courier, monospace;
-  font-size: 0.9rem;
-  color: #222;
+  font-size: 0.75rem;
+  color: #555;
+}
+
+.article-detail__meta span {
+  background: rgba(0,0,0,0.07);
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 .article-detail__content {
