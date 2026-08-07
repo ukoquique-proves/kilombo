@@ -188,7 +188,8 @@ git push → GitHub Actions →
 
 ### 8. Revisión de diseño y experiencia de usuario
 - [ ] Revisión visual completa con el cliente (paleta, tipografía, sensación)
-- [ ] Incorporar logotipos / marcas de cada plataforma en sus tarjetas correspondientes
+- [ ] **Ilustraciones / iconografía por sección** — el sitio `kilombo.top` original usaba logos y dibujos que daban calidez visual a cada sección. El espejo debe incorporar imágenes representativas propias, diseñadas con coherencia real respecto al significado de cada sección (Tierra y Libertad, GCI, Proletarios Internacionalistas, NOM/Plandemismo) — no copias de las originales, que carecían de representación coherente. Pueden ser ilustraciones SVG, iconografía editorial o imágenes de dominio público seleccionadas por criterio político y estético.
+- [ ] Incorporar logotipos / marcas de cada plataforma en sus tarjetas correspondientes (pendiente de obtener assets de cada espacio amigo)
 - [ ] Imagen de portada / banner principal en la cabecera
 - [ ] Testear en móvil, tablet y escritorio
 - [ ] Testear accesibilidad (contrastes, teclado, lectores de pantalla)
