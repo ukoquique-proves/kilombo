@@ -55,7 +55,9 @@
 
 .article-card__title {
   margin: 0 0 0.5rem;
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.05rem;
+  font-weight: 700;
 }
 
 .article-card__topics {
@@ -101,11 +103,15 @@
 }
 
 .article-detail__content {
-  line-height: 1.55;
+  line-height: 1.7;
+  font-family: 'Inter', Verdana, Arial, sans-serif;
+  font-size: 1rem;
 }
 
 .article-detail__content h2,
 .article-detail__content h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
   margin-top: 1.25rem;
 }
 

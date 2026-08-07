@@ -159,8 +159,9 @@
 }
 
 .section-subheader h2 {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
   font-size: clamp(1.4rem, 2.8vw, 1.9rem);
-  font-weight: 900;
+  font-weight: 700;
   margin-bottom: 0.6rem;
   letter-spacing: 0.01em;
   border-bottom: 2px solid var(--rule);
@@ -379,8 +380,9 @@
 }
 
 .video-card__title {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
   font-size: 1.08rem;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.35;
   color: var(--ink);
   margin-bottom: 0.55rem;
