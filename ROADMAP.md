@@ -120,6 +120,11 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 - [ ] Sistema de pestañas (tabs) o selector de idioma dentro de cada sección numerada (GCI, P.I., NOM)
 - [ ] Páginas individuales por idioma con contenido filtrado
 - [ ] Selector global de idioma en la cabecera (ES / EN / FR / Multilingüe)
+- [ ] Indicadores visuales explícitos de enlace externo vs. interno — distinguir en las tarjetas qué links permanecen dentro del espejo (articulos.html, plandemismo.html) y cuáles abren subdominios externos (icg-gci.kilombo.top, etc.)
+
+### 6b. Búsqueda y descubrimiento de contenido
+- [ ] **Búsqueda client-side** — integrar herramienta ligera (Pagefind, Lunr.js, o Algolia) sobre todos los artículos e índices de archivo del portal
+- [ ] Nota: el banner de "volver al portal" en subdominios externos (icg-gci, cdrom, etc.) está fuera de alcance — esos sitios no están bajo control de este repo
 
 ---
 
@@ -193,18 +198,6 @@ git push → GitHub Actions →
 - [ ] Favicon y apple-touch-icon
 - [ ] `sitemap.xml`
 - [ ] `robots.txt`
-
-### 9. SEO y metadatos
-- [ ] Meta tags (description, Open Graph, Twitter Cards) por página
-- [ ] Favicon y apple-touch-icon
-- [ ] `sitemap.xml`
-- [ ] `robots.txt`
-
-### 10. Deploy final en `kilombo.top`
-
-El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`, en cuanto el cliente apruebe el estado del espejo. No es un evento único al final del proyecto — ocurre de forma incremental.
-
-**Único prerrequisito:** abrir el puerto 22 desde el panel YunoHost (lo puede hacer el propio cliente, sin necesitar a los administradores técnicos). Ver `TROUBLESHOOTING.md` sección 4.
 
 ### 10. Deploy final en `kilombo.top`
 
