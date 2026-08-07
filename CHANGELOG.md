@@ -5,6 +5,21 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.17.0] — 2026-08-06
+
+### Changed (cambios visuales)
+- **Pill badges — todos los archivos CSS**: las etiquetas de idioma, estado, tipo, afiliación, chips de idioma de vídeo y metadatos de artículo han sido rediseñadas como píldoras compactas de bajo contraste (`border-radius: 999px`, fondos translúcidos, peso de fuente reducido de 700 a 600). Objetivo: que no compitan visualmente con los títulos de las tarjetas.
+  - `site/css/style.css` — `.card-lang`, `.card-status` y todas las variantes de `.tag` (`--type`, `--lang`, `--affil`, `--scope`): eliminados fondos sólidos oscuros; sustituidos por tintes translúcidos del color de idioma/estado correspondiente.
+  - `site/css/plandemismo.css` — `.meta-pais`, `.meta-fecha`: eliminado relleno rojo/negro sólido; ahora tinte rojo a baja opacidad. `.lang-chip` y sus variantes (`--es`, `--en`, `--de`, `--pending`, `--todo`): eliminados rellenos saturados; convertidos a píldoras translúcidas.
+  - `site/css/articles.css` — Spans de `.article-card__meta` y `.article-detail__meta`: envueltos en píldoras con tinte neutro y borde tenue. `.topic-chip`: borde fino añadido, tamaño de fuente reducido.
+
+### Changed (contenido)
+- **`site/index.html`**: reformulado el párrafo introductorio de Espacio Tierra y Libertad — eliminada la frase redundante sobre "plataforma principal".
+- **`site/index.html`**: recortada la descripción de la sección de artículos — eliminada la frase sobre clasificación temática.
+- **Todos los HTML + `README.md`**: subtítulo del portal cambiado de "Publicaciones y archivos **comunistas** internacionalistas" a "Publicaciones y archivos internacionalistas" (6 ocurrencias: `index.html` título, subtítulo y footer; `plandemismo.html`, `articulos.html`, `articulo.html`, `README.md`).
+
+---
+
 ## [0.16.0] — 2026-08-06
 
 ### Fixed (corregido)
