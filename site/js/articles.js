@@ -8,6 +8,7 @@
 // Los datos viven en: `assets/content/articles.json`
 
 import { escapeHtml, sanitizeHtml } from './render.mjs';
+import { parseJson } from './decrypt.mjs';
 
 const DATA_PATH = 'assets/content/articles.json';
 
@@ -28,7 +29,7 @@ const DATA_PATH = 'assets/content/articles.json';
 async function loadArticles() {
   const res = await fetch(DATA_PATH);
   if (!res.ok) throw new Error(`Failed to load ${DATA_PATH}: ${res.status}`);
-  const data = await res.json();
+  const data = await parseJson(await res.text());
   if (!Array.isArray(data)) throw new Error(`${DATA_PATH} must be an array`);
   return /** @type {ArticleEntry[]} */ (data);
 }

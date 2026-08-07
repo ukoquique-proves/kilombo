@@ -7,6 +7,7 @@
 // test/render.test.mjs without pulling in the tab/DOM init logic.
 
 import { renderCard } from './render.mjs';
+import { parseJson } from './decrypt.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (document.body.dataset.page !== 'plandemismo') return;
@@ -119,8 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(jsonPath)
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to load ${jsonPath}: ${res.status}`);
-        return res.json();
+        return res.text();
       })
+      .then((text) => parseJson(text))
       .then((videos) => {
         const fragment = document.createDocumentFragment();
         videos.forEach((/** @type {import('./render.mjs').VideoEntry} */ v) =>

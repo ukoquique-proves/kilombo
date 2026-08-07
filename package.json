@@ -7,13 +7,16 @@
     "test": "test"
   },
   "scripts": {
-    "test": "bash scripts/test.sh"
+    "test": "bash scripts/test.sh",
+    "encrypt": "node scripts/encrypt.mjs",
+    "preview": "python3 -m http.server 8080 --directory site"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.62.1",
-    "happy-dom": "^20.11.1"
+    "happy-dom": "^20.11.1",
+    "staticrypt": "^3.5.4"
   }
 }
