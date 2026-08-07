@@ -363,6 +363,49 @@ a { color: inherit; text-decoration: none; }
 .tag--scope { background: rgba(185,28,42,0.06);   color: #8b1320; border-color: rgba(185,28,42,0.16); }
 
 /* ------------------------------------------------------------------ */
+/* SECTION ILLUSTRATIONS                                                */
+/* ------------------------------------------------------------------ */
+
+.section-header--illustrated {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.section-header__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.section-illustration {
+  flex: 0 0 auto;
+  opacity: 0.18;
+  transition: opacity 0.3s ease;
+}
+
+.section:hover .section-illustration {
+  opacity: 0.32;
+}
+
+.section-svg {
+  display: block;
+  width: 68px;
+  height: 68px;
+}
+
+.section-svg--tierra { color: #1b5e20; }
+.section-svg--gci    { color: var(--ink); }
+.section-svg--pi     { color: var(--red-dark); }
+.section-svg--nom    { color: var(--ink); }
+
+@media (max-width: 480px) {
+  .section-illustration {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* FOOTER                                                               */
 /* ------------------------------------------------------------------ */
 
