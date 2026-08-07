@@ -96,6 +96,7 @@ No solo enlaces externos; agregar dentro del propio portal:
 - [ ] **4.2 GCI** — últimos comunicados oficiales, biblioteca de textos programáticos por idioma (ES/EN/FR), acceso directo al CD-Rom con categorías
 - [ ] **4.3 Proletarios Internacionalistas** — últimos números/artículos separados por edición (ES / FR)
 - [ ] **4.4 NOM / Plandemismo** — además de los videos: artículos, dossieres, infografías, líneas de tiempo cronológicas
+- [ ] **4.5 Referencias cruzadas automáticas en artículos** — cada artículo tendrá una sección oculta (expandible o cargada bajo demanda) con referencias generadas automáticamente a otros artículos del portal y/o fuentes externas que complementen su contenido
 
 ### 5. Traducciones y puesta al día de idiomas
 Hay **atraso histórico de traducciones**, especialmente las revistas del GCI que están disponibles en español pero no en francés, y viceversa. También hay que prever subtítulos en francés para los videos de Canal7.
@@ -170,7 +171,7 @@ El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`,
 | **1. Flujo de subida / deploy** | ✅ GitHub Pages activo (`ukoquique-proves.github.io/kilombo/`) — deploy a `kilombo.top` aplazado a fase futura | — |
 | **2. Plandemismo + videos Canal7 (Actualidad + SIDA→COVID)** | ✅ Construido y poblado — pendiente URLs reales y subtítulos FR | — |
 | **3. Transcripción + publicación audios WhatsApp** | Pendiente | 2 – 7 días |
-| 4. Contenido editorial por sección | Pendiente | 2 – 4 días |
+| 4. Contenido editorial por sección (incl. referencias cruzadas automáticas) | Pendiente | 2 – 4 días |
 | **5. Traducciones / puesta al día de idiomas (GCI, subtítulos FR)** | Pendiente | 3 – 10 días |
 | 6. Organización por idiomas dentro de cada sección | Pendiente | 1 – 2 días |
 | 7. Revisión diseño + UX | Pendiente | 1 día |
