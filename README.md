@@ -88,7 +88,8 @@ KILOMBO/
 │   │   ├── main.js        ← Accesibilidad global (teclado Enter/Espacio en tarjetas no-anchor)
 │   │   ├── plandemismo.js ← Tabs WAI-ARIA, fetch+render de tarjetas desde JSON, page guard
 │   │   ├── articles.js    ← Índice y detalle de artículos internos (fetch+render desde JSON)
-│   │   └── render.mjs     ← Módulo ES puro: escapeHtml, sanitizeHtml, buildLangs, renderCard (compartido con tests)
+│   │   ├── render.mjs     ← Módulo ES puro: escapeHtml, sanitizeHtml, buildLangs, renderCard (compartido con tests)
+│   │   └── decrypt.mjs    ← Módulo ES puro: descifra envelopes JSON cifrados por StatiCrypt (no-op en dev)
 │   └── assets/            ← Scaffolding versionado con .gitkeep (contenido pendiente de poblar)
 │       ├── data/          ← JSON de vídeos: plandemismo-actualidad.json, plandemismo-sida-covid.json
 │       ├── content/       ← JSON de contenido interno: `articles.json` (artículos)
@@ -102,6 +103,7 @@ KILOMBO/
 │
 ├── scripts/
 │   ├── test.sh            ← Runner de tests: unit tests + validate-data + check-urls
+│   ├── encrypt.mjs        ← Cifra HTML + JSON con StatiCrypt antes del deploy a GitHub Pages
 │   ├── validate-data.mjs  ← Validador de esquemas para JSON (videos + contenido interno)
 │   └── check-urls.mjs     ← Comprueba consistencia de URLs entre .env.example, index.html y README
 │
@@ -189,16 +191,17 @@ Si el puerto SSH (22) no está accesible en ese momento, el script lo detecta, a
 
 | Elemento | Valor |
 |----------|-------|
-| Fondo (papel) | `#f5f2eb` |
-| Texto (tinta) | `#0a0a0a` |
-| Acento rojo revolucionario | `#c1121f` |
+| Fondo (papel) | `#fcfbf7` |
+| Texto (tinta) | `#121212` |
+| Acento rojo / crimson | `#b91c2a` |
 | Rojo oscuro para bordes temáticos | `#8b0000` |
 | Idioma ES | Verde `#1b5e20` |
 | Idioma FR | Azul `#0d47a1` |
 | Idioma EN | Púrpura `#311b92` |
 | Multilingüe | Morado `#4a148c` |
-| Tipografía general | Verdana, Arial, Helvetica, sans-serif (alineada con SPIP Escal 5.2.9 de producción) |
-| Tipografía metadata (etiquetas) | Courier New (monoespacio) |
+| Tipografía titulares | Playfair Display (serif) |
+| Tipografía cuerpo | Inter (sans-serif) |
+| Tipografía metadata / badges | Courier New (monoespacio) |
 
 ---
 

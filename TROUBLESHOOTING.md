@@ -293,7 +293,7 @@ Si hay errores, se imprimen con el campo y el fichero exacto. Corregir antes de 
 [ ] Editar el/los fichero(s) en site/
 [ ] node scripts/validate-data.mjs  → 0 errores
 [ ] node scripts/check-urls.mjs     → todas consistentes
-[ ] npm test                         → 32/32 tests pasan
+[ ] npm test                         → 51/51 tests pasan
 [ ] git add site/ && git commit && git push origin main
     (o API push si git push no está disponible)
 [ ] Verificar deploy: https://ukoquique-proves.github.io/kilombo/

@@ -172,13 +172,12 @@ git push → GitHub Actions →
   4. deploy to GitHub Pages
 ```
 
-- [x] **7.0 Decisión de arquitectura documentada** (este apartado)
-- [ ] **7.1 Instalar staticrypt** como devDependency (`npm install --save-dev staticrypt`)
-- [ ] **7.2 Crear `scripts/encrypt.mjs`** — cifra las 3 páginas de contenido y todos los JSON de assets usando la CLI de staticrypt
-- [ ] **7.3 Actualizar `deploy.yml`** — añadir paso de cifrado entre `npm test` y upload; leer contraseña desde el secret `STATICRYPT_PASSWORD`
-- [ ] **7.4 Añadir `STATICRYPT_PASSWORD` como GitHub Actions Secret** en la configuración del repositorio
-- [ ] **7.5 Verificar en GitHub Pages** — confirmar que las páginas cifradas muestran el formulario de contraseña y que el contenido se descifra correctamente al introducirla
-- [ ] **7.6 Verificar que `index.html` sigue siendo público** y que no hay contenido sensible filtrado en ella
+- [x] **7.1 Instalar staticrypt** como devDependency (`npm install --save-dev staticrypt`) ✅
+- [x] **7.2 Crear `scripts/encrypt.mjs`** — cifra las 3 páginas de contenido y todos los JSON de assets usando la CLI de staticrypt ✅
+- [x] **7.3 Actualizar `deploy.yml`** — paso de cifrado añadido entre `npm test` y upload; lee contraseña desde el secret `STATICRYPT_PASSWORD` ✅
+- [x] **7.4 Añadir `STATICRYPT_PASSWORD` como GitHub Actions Secret** en la configuración del repositorio ✅
+- [x] **7.5 Verificar en GitHub Pages** — páginas cifradas muestran el formulario de contraseña; el contenido se descifra correctamente al introducirla ✅
+- [x] **7.6 Verificar que `index.html` sigue siendo público** — confirmado: `index.html` PUBLIC, las otras tres GATED ✅
 
 ---
 
@@ -189,13 +188,25 @@ git push → GitHub Actions →
 - [ ] Testear en móvil, tablet y escritorio
 - [ ] Testear accesibilidad (contrastes, teclado, lectores de pantalla)
 
-### 8. SEO y metadatos
+### 9. SEO y metadatos
 - [ ] Meta tags (description, Open Graph, Twitter Cards) por página
 - [ ] Favicon y apple-touch-icon
 - [ ] `sitemap.xml`
 - [ ] `robots.txt`
 
-### 9. Deploy final en `kilombo.top`
+### 9. SEO y metadatos
+- [ ] Meta tags (description, Open Graph, Twitter Cards) por página
+- [ ] Favicon y apple-touch-icon
+- [ ] `sitemap.xml`
+- [ ] `robots.txt`
+
+### 10. Deploy final en `kilombo.top`
+
+El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`, en cuanto el cliente apruebe el estado del espejo. No es un evento único al final del proyecto — ocurre de forma incremental.
+
+**Único prerrequisito:** abrir el puerto 22 desde el panel YunoHost (lo puede hacer el propio cliente, sin necesitar a los administradores técnicos). Ver `TROUBLESHOOTING.md` sección 4.
+
+### 10. Deploy final en `kilombo.top`
 
 El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`, en cuanto el cliente apruebe el estado del espejo. No es un evento único al final del proyecto — ocurre de forma incremental.
 
@@ -210,12 +221,12 @@ El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`,
 
 ## FASE 4 — Mantenimiento
 
-### 10. Rutina de actualización
+### 11. Rutina de actualización
 - [ ] Documentar cómo agregar un nuevo artículo/video/comunicado/audio/traducción
 - [ ] Calendario sugerido de revisión (semanal de enlaces, mensual de contenido, trimestral de atraso de traducciones)
 - [ ] Checklist rápido de publicación (ver formato, enlaces, idiomas disponibles, categorías)
 
-### 11. Monitoreo
+### 12. Monitoreo
 - [ ] Detección de enlaces rotos (herramienta de crawl automático)
 - [ ] Registro de mejoras pendientes (`issues` en GitHub o lista en markdown)
 
@@ -231,7 +242,7 @@ El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`,
 | 4. Contenido editorial por sección (incl. referencias cruzadas automáticas) | Pendiente | 2 – 4 días |
 | **5. Traducciones / puesta al día de idiomas (GCI, subtítulos FR)** | Pendiente | 3 – 10 días |
 | 6. Organización por idiomas dentro de cada sección | Pendiente | 1 – 2 días |
-| **7. Protección de acceso — StatiCrypt (cifrado AES-256 client-side)** | En curso — arquitectura documentada, implementación pendiente | 0.5 día |
+| **7. Protección de acceso — StatiCrypt (cifrado AES-256 client-side)** | ✅ Implementado y verificado en GitHub Pages | — |
 | 8. Revisión diseño + UX | Pendiente | 1 día |
 | 9. SEO y metadatos | Pendiente | 0.5 día |
 | **10. Deploy a `kilombo.top`** | Pendiente — solo requiere abrir puerto 22 desde el panel YunoHost (sin necesitar a los administradores) | 0.5 día |
