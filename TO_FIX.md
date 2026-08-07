@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-07 (v0.19.0).
+Última actualización: 2026-08-07 (v0.19.0) — ítems 24–26 añadidos desde ARCH_DEBT.md.
 
 ---
 
@@ -45,6 +45,22 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ---
 
+## 🟡 Deuda técnica — arquitectura y operaciones
+
+- [ ] **24. Crear `scripts/rotate-password.sh`** — actualmente rotar `KILOMBOTOP_PASSWORD` requiere editar `.env` manualmente (ítem #23) y rotar `STATICRYPT_PASSWORD` requiere re-subir el GitHub Actions Secret a mano. Son dos sistemas de autenticación independientes sin proceso común. Un script pequeño que:
+  1. Lea la contraseña nueva desde stdin o argumento
+  2. Actualice `.env` (reemplaza `KILOMBOTOP_PASSWORD`)
+  3. Re-suba `STATICRYPT_PASSWORD` al repo vía GitHub API (usando `GITHUB_TOKEN` del `.env`)
+  4. Ejecute `STATICRYPT_PASSWORD=<nueva> npm run encrypt` localmente para verificar que el cifrado sigue funcionando
+  5. Confirme que el acceso SSH sigue funcionando con `./sync-to-production.sh --dry-run`
+  - Elimina el proceso manual multi-paso de TO_FIX #23 y evita que un error humano deje los dos sistemas con contraseñas distintas.
+
+- [ ] **25. Blind spot del generador de contexto compacto** — el generador de ficheros que se usa para revisiones de arquitectura (compact bundle) excluye la carpeta `.github/` y sus subcarpetas. Esto significa que `deploy.yml` — donde vive el paso de cifrado, el secret `STATICRYPT_PASSWORD` y el orden de los jobs — nunca aparece en los bundles de revisión. Impacto: cualquier revisión de arquitectura que incluya el pipeline de CI/CD trabaja a ciegas sobre la parte más crítica. **Fix:** añadir `.github/workflows/` explícitamente al generador, o documentar que hay que adjuntarlo manualmente cuando se pida una revisión de CI.
+
+- [ ] **26. Ventana de doble mantenimiento** — `kilombo.top` (SPIP/YunoHost) y el espejo GitHub Pages son actualmente dos fuentes de verdad en paralelo. Cada cambio de contenido debe razonarse en ambos sistemas hasta que el deploy a `kilombo.top` se complete (ítem YunoHost-A/C/D). No es un bug — es deuda intencional de la estrategia de migración incremental documentada en `MIGRATION.md`. **Acción futura:** una vez que el primer deploy a `kilombo.top` funcione, crear un checklist de "fase out" que cierre explícitamente la ventana de doble mantenimiento y archive el flujo de GitHub Pages como preview-only o lo descontinúe.
+
+---
+
 ## ⏸ Aplazado — fase YunoHost / deploy a `kilombo.top`
 
 Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede hacerlo directamente sin necesitar a los administradores técnicos. Ver `MIGRATION.md` y `TROUBLESHOOTING.md` sección 4.
@@ -65,4 +81,7 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | 11 | `plandemismo.html` + `.css` | `page-lead` centrado — confirmar intención visual | 🟡 Esperando cliente |
 | A-2 | JSON data files | CTAs con URL raíz Canal7 — necesitan URLs reales por vídeo | 🟡 Esperando datos |
 | 21 | `main.js` | `.card:not(a)` sin coincidencias hoy (intencionado) | 🟡 Sin acción |
+| 24 | `scripts/` | Script de rotación de contraseñas para KILOMBOTOP + STATICRYPT | 🟡 Deuda técnica |
+| 25 | tooling | Blind spot de `.github/` en generador de contexto compacto | 🟡 Deuda técnica |
+| 26 | global | Doble mantenimiento kilombo.top + espejo — cerrar ventana tras primer deploy | 🟡 Deuda futura |
 | YunoHost-A/C/D | servidor | Abrir puerto 22, crear app, primer deploy | ⏸ Pendiente cliente |
