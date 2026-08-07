@@ -1,4 +1,4 @@
-# Kilombo — Portal de publicaciones y archivos comunistas internacionalistas
+# Kilombo — Portal de publicaciones y archivos internacionalistas
 
 Portal central de acceso a la red de sitios de Kilombo. Construido como página estática (HTML, CSS, JS) para ser alojado en la infraestructura YunoHost de `kilombo.top`.
 
