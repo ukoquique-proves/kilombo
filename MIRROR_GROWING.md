@@ -204,6 +204,98 @@ Cuando se integre búsqueda client-side (`ROADMAP.md` §6b), el índice se const
 
 ---
 
+## 7. Contenido prioritario — qué traer primero
+
+Esta sección es concreta e inmediatamente accionable. Lista los artículos y series que deben incorporarse antes que cualquier otro, con la URL exacta de la fuente, la sección de destino en el espejo y el motivo de la prioridad.
+
+El criterio de orden es: **coherencia temática con lo ya publicado** → **series completas antes que artículos sueltos** → **textos que dan fundamento a los vídeos ya incorporados en Plandemismo**.
+
+---
+
+### 7.1 Espacio Tierra y Libertad — prioridad inmediata
+
+Estos artículos están en `https://www.kilombo.top/` y corresponden directamente a las secciones ya activas en el espejo.
+
+| Título | URL fuente | Sección espejo | Por qué primero |
+|--------|-----------|----------------|-----------------|
+| El fraude de los PCR | `spip.php?article37` | `nom` | Texto fundacional — complementa directamente los vídeos ya publicados en la tab Actualidad |
+| REPRESIÓN PLANDÉMICA 1: ocultan la HECATOMBE | `spip.php?article79` | `nom` | Serie de 4 partes — traer las 4 juntas para mantener coherencia |
+| REPRESIÓN PLANDÉMICA 2: ocultan la HECATOMBE | `spip.php?article80` | `nom` | Parte 2 de la misma serie |
+| REPRESIÓN PLANDÉMICA 3 | `spip.php?article81` | `nom` | Parte 3 |
+| REPRESIÓN PLANDÉMICA 4 | `spip.php?article82` | `nom` | Parte 4 |
+| 1er MAI 2023 | `spip.php?article40` | `tierra` | Comunicado político de referencia — ancla temporal la sección Tierra |
+| FUNDAMENTOS CIENTÍFICOS (sección) | `spip.php?rubrique6` | `tierra` | Sección entera — varios artículos bajo esta rúbrica dan base científica al resto del contenido |
+
+**Nota sobre la serie REPRESIÓN PLANDÉMICA:** son 4 artículos que forman una unidad. Importarlos todos antes de publicar el primero, para no dejar la serie incompleta en el espejo.
+
+---
+
+### 7.2 Proletarios Internacionalistas — prioridad inmediata
+
+Artículos en `https://proletariosinternacionalistas.kilombo.top/`.
+
+| Título | URL fuente | Sección espejo | Por qué primero |
+|--------|-----------|----------------|-----------------|
+| ¡Contra el genocidio y las guerras infinitas de la Gobernanza Mundial del Capital! | `spip.php?article54` | `pi` | Texto de coyuntura internacional — el más reciente y directamente vinculado al artículo Israel ya publicado |
+| 1 de mayo 2023 — ¡CONTRA LA MILITARIZACIÓN DEL MUNDO Y EL NUEVO ORDEN MUNDIAL! | `spip.php?article44` | `pi` | Comunicado de referencia, bilingüe ES/FR |
+| FALSOS INTERNACIONALISTAS 1–6 (serie completa) | `spip.php?article52` a `article48` | `pi` | Serie de 6 partes — traer completa; da contexto político al espacio PI |
+| PLANDEMISMO Y DOMESTICACIÓN (11) NOTAS de DECANTACIÓN | `spip.php?article41` | `nom` | Articula PI con la sección NOM — puente entre las dos secciones |
+| LA PLANDEMIA Y "LAS ASAMBLEAS DEL PUEBLO" (6 y 7) | `spip.php?article40`, `article42` | `pi` | Serie sobre estrategia organizativa — complementa los análisis de coyuntura |
+
+---
+
+### 7.3 GCI — segunda oleada (después de PI y Tierra)
+
+Los textos del GCI son más largos y requieren más trabajo de adaptación. Traerlos en una segunda oleada, una vez que PI y Tierra estén suficientemente pobladas.
+
+| Título / Serie | URL base | Sección espejo | Nota |
+|----------------|---------|----------------|------|
+| COMUNISM 17, 18, 19 (últimos números) | `icg-gci.kilombo.top/` | `gci` | Traer en orden inverso — más reciente primero |
+| COMMUNISME 68 (versión FR) | `icg-gci.kilombo.top/` | `gci` | Importar junto con la versión ES del mismo número si existe |
+| Theses on the Historical Arc of Value and the State (series 6 y 7) | `icg-gci.kilombo.top/` | `gci` | Textos programáticos — base teórica de todo el espacio GCI; priorizar en inglés + traducir/adaptar |
+
+---
+
+### 7.4 Artículo ya en el espejo — referencia de ejemplo
+
+El único artículo actualmente en `articles.json` es:
+
+```
+id:        israel-mohamad-safa-siempre-victimas
+section:   general
+topics:    israel, gaza, medio-oriente, derecho-internacional, ONU
+status:    imported
+sourceUrl: https://x.com/MohamadSafa
+```
+
+Está en `section: general` porque no encaja estrictamente en ninguna sección temática. Cuando se añadan artículos de PI sobre el mismo conflicto (ítem 7.2, primer artículo), mover este a `section: pi` o crear un topic cruzado `guerra-israel-gaza` que los enlace cuando se implemente el sistema de referencias (ROADMAP §4.5).
+
+---
+
+### 7.5 Orden de trabajo recomendado
+
+```
+Semana 1:
+  [ ] Serie REPRESIÓN PLANDÉMICA 1-4 (Tierra → nom)
+  [ ] El fraude de los PCR (Tierra → nom)
+  [ ] Artículo "¡Contra el genocidio!" de PI (PI → pi)
+
+Semana 2:
+  [ ] Serie FALSOS INTERNACIONALISTAS 1-6 (PI → pi)
+  [ ] 1 de mayo 2023 PI + Tierra (bilingüe)
+  [ ] PLANDEMISMO Y DOMESTICACIÓN 11 (PI → nom)
+
+Semana 3:
+  [ ] FUNDAMENTOS CIENTÍFICOS de Tierra (rubrique6 — varios artículos)
+  [ ] LA PLANDEMIA Y LAS ASAMBLEAS DEL PUEBLO 6-7 (PI → pi)
+
+Semana 4+:
+  [ ] COMUNISM 17-19 y COMMUNISME 68 (GCI → gci)
+  [ ] Theses on Historical Arc (GCI → gci, en inglés primero)
+```
+
+---
+
 ## Referencias
 
 - `MIGRATION.md` — relación entre el espejo y `kilombo.top`, proceso de deploy
