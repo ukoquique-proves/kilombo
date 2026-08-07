@@ -17,6 +17,6 @@
   "devDependencies": {
     "@playwright/test": "^1.62.1",
     "happy-dom": "^20.11.1",
-    "staticrypt": "^3.5.4"
+    "staticrypt": "3.5.4"
   }
 }
