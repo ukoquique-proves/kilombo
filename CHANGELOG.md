@@ -5,6 +5,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.18.0] — 2026-08-06
+
+### Changed (responsive layout)
+- **`site/css/style.css`**: replaced single `640px` breakpoint with a two-tier system. At `≤768px` the cards grid collapses to single column (was `minmax(280px,1fr)` which forced two cramped columns at tablet widths). At `≤480px` container padding tightens to `1rem`, card internal padding adjusts to keep badge rows from touching the edge, `.card-tags` gap reduced slightly for cleaner wrap, footer grid goes single column.
+- **`site/css/plandemismo.css`**: replaced single `640px` breakpoint with the same two-tier system. At `≤768px` the video grid collapses to single column (was `minmax(320px,1fr)` which forced two columns at ~650px). At `≤480px` tab buttons go full-width stacked, video card body padding and badge gaps tightened for consistent horizontal rhythm.
+- **`site/css/articles.css`**: added responsive rules (previously had none). At `≤768px` the article list grid collapses to single column. At `≤480px` article card and detail padding adjusted; topic chip gap tightened to prevent awkward wrap.
+
+---
+
 ## [0.17.0] — 2026-08-06
 
 ### Changed (cambios visuales)
