@@ -282,7 +282,7 @@ Semana 1:
 
 Semana 2:
   [x] Serie FALSOS INTERNACIONALISTAS 1-6 (PI → pi) ✅ importada completa 2026-08-07
-  [x] 1 de mayo 2023 PI + Tierra (bilingüe) ✅ importado PI ES (article44) 2026-08-07 — versión Tierra pendiente
+  [x] 1 de mayo 2023 PI + Tierra (bilingüe) ✅ completo — PI ES (article44) + Tierra FR (article40) 2026-08-07. Nota: Tierra publicó solo la versión FR; PI publicó la versión ES. No son traducciones entre sí sino dos comunicados independientes del mismo espacio político.
   [x] PLANDEMISMO Y DOMESTICACIÓN 11 (PI → nom) ✅ importada 2026-08-07
 
 Semana 3:

@@ -5,6 +5,16 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.22.1] — 2026-08-07
+
+### Added (contenido)
+- `1er-mai-2023-tierra-fr` — 1er MAI 2023 (Tierra → tierra, FR, 2023-05-01) — completa el par bilingüe del 1 de mayo: Tierra publicó el comunicado en FR (article40), PI lo publicó en ES (article44, ya importado en v0.22.0). No son traducciones entre sí — son dos comunicados independientes del mismo espacio político.
+
+### Docs
+- `MIRROR_GROWING.md` §7.5: checkbox "1 de mayo 2023 bilingüe" actualizado a completado con nota explicativa
+
+---
+
 ## [0.22.0] — 2026-08-07
 
 ### Added (contenido — importación Weeks 1 y 2)
