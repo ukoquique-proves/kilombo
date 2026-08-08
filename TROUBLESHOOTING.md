@@ -293,8 +293,135 @@ Si hay errores, se imprimen con el campo y el fichero exacto. Corregir antes de 
 [ ] Editar el/los fichero(s) en site/
 [ ] node scripts/validate-data.mjs  → 0 errores
 [ ] node scripts/check-urls.mjs     → todas consistentes
-[ ] npm test                         → 51/51 tests pasan
+[ ] npm test                         → 58/58 tests pasan
 [ ] git add site/ && git commit && git push origin main
     (o API push si git push no está disponible)
 [ ] Verificar deploy: https://ukoquique-proves.github.io/kilombo/
+```
+
+---
+
+## 7. Para qué sirve realmente `KILOMBOTOP_PASSWORD`
+
+`kilombo.top` y todos sus subdominios son **públicamente legibles sin contraseña**. Cualquier visitante puede leer todos los artículos desde un navegador sin autenticarse. El servidor devuelve HTTP 200 directamente — el SSO de YunoHost solo protege el backend de gestión, no el contenido publicado.
+
+**Lo que `KILOMBOTOP_PASSWORD` permite hacer — y solo esto:**
+
+| Uso | Por qué necesita la contraseña |
+|-----|-------------------------------|
+| **SSH/rsync a producción** (`sync-to-production.sh`) | El servidor requiere autenticación para recibir archivos por SSH |
+| **Panel de administración YunoHost** (`kilombo.top/yunohost/admin/`) | Gestión de apps, dominios, firewall, usuarios del servidor |
+| **API YunoHost** (`/yunohost/portalapi/login`) | Necesaria para automatizar operaciones de infraestructura |
+| **Nextcloud** (`cloud.kilombo.top`) | Gestor de ficheros web como alternativa al SSH |
+
+**Lo que NO requiere la contraseña:**
+
+- Leer cualquier artículo publicado en `kilombo.top` o sus subdominios
+- Scraping de contenido para importar al espejo (ver sección 8)
+- Verificar que un deploy llegó a producción
+- Comprobar el estado de los sitios SPIP
+
+En resumen: la contraseña es una **credencial de deploy e infraestructura**, no una credencial de lectura de contenido.
+
+---
+
+## 8. Scraping de contenido SPIP para importar al espejo
+
+Durante la importación de artículos desde `kilombo.top` y subdominios (sesión 2026-08-07) se identificaron los selectores correctos del template SPIP Escal 5.2.9. Esta sección documenta los patrones fiables para no repetir el proceso de descubrimiento.
+
+### Por qué los selectores obvios fallan
+
+El template SPIP de estos sitios pone el **cuerpo del artículo** y la **barra lateral** ("En la misma sección") dentro de `divs` con clases similares. Los selectores genéricos como `class="texte"` o el fallback de `<h1>` a `<footer>` capturan la barra lateral en lugar del artículo.
+
+### Selectores correctos — sitios Tierra y Libertad / subdominios Tierra
+
+```python
+# Título del artículo actual
+id="titre-article"
+
+# Fecha de publicación
+id="date-article"  →  buscar <span class="majuscules"> dentro
+
+# Autor
+id="auteur-article"  →  buscar <a> dentro
+
+# Cuerpo del artículo (delimitado explícitamente por comentarios SPIP)
+id="texte-article"  →  terminar en el comentario <!-- Fin texte-article -->
+
+# Descripción breve (cuando el artículo es solo imágenes)
+id="descriptif-article"
+```
+
+Ejemplo de extracción fiable en Python:
+
+```python
+import urllib.request, re
+
+req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+with urllib.request.urlopen(req) as r:
+    body = r.read().decode('utf-8', errors='replace')
+
+title = re.search(r'id="titre-article"[^>]*>([^<]{3,300})', body)
+date  = re.search(r'id="date-article"[^>]*>[^<]*<span[^>]*>([^<]+)</span>', body)
+body_content = re.search(r'id="texte-article"[^>]*>([\s\S]+?)<!-- Fin texte-article', body)
+```
+
+### Selectores correctos — Proletarios Internacionalistas (PI)
+
+El subdomain PI usa una plantilla SPIP diferente (más cercana a WordPress en estructura):
+
+```python
+# Título — dentro de <h2 class="spip">
+re.search(r'<h2[^>]+class="spip"[^>]*>([\s\S]{5,300}?)</h2>', body)
+
+# Fecha — primer párrafo con fecha en el bloque texte
+# (PI no usa id="date-article" — la fecha está en el primer <p> del cuerpo)
+
+# Cuerpo del artículo
+class="texte surlignable clearfix"
+# No tiene comentario de cierre — truncar al encontrar <section id= o <footer
+```
+
+**Atención:** En PI, muchos artículos ponen el título de la serie directamente dentro del cuerpo como primer párrafo (`<p>FALSOS INTERNACIONALISTAS 3<br>...`), no en un `<h2>`. Hay que extraerlo manualmente del texto del cuerpo cuando el `<h2 class="spip">` está vacío o ausente.
+
+### Casos especiales documentados
+
+**Artículos solo de imágenes** (`article37` — El fraude de los PCR):
+- `id="texte-article"` contiene únicamente tags `<img>` sin texto
+- Detectar: si el cuerpo extraído tiene menos de 200 caracteres de texto plano, tratar como imagen-only
+- Solución: usar `id="descriptif-article"` para el texto y añadir nota de que el contenido es gráfico
+
+**Barra lateral ("En la misma sección")**:
+- Vive en `class="texte meme-rub"` — nombre confusamente similar al cuerpo del artículo
+- Aparece después del cuerpo en el HTML
+- Si el regex termina en `<!-- Fin texte-article -->` en sitios Tierra, nunca la captura
+- En PI, truncar en `<section id=` o `<footer` para evitarla
+
+**Atributos de evento en imágenes PI**:
+- Algunas imágenes en PI tienen `onclick="location.href=..."` — no pasan la validación de `validate-data.mjs`
+- Eliminar con: `re.sub(r'\s+on\w+\s*=\s*(?:"[^"]*"|\'[^\']*\')', '', html, flags=re.I)`
+
+**Imágenes de cabecera/logo en PI**:
+- Algunas entradas del cuerpo empiezan con una imagen SPIP que es el logo del autor, no contenido editorial
+- Eliminar con: `re.sub(r'<img[^>]*(?:spip_logo|cache-vignettes)[^>]*/>', '', html, flags=re.I)`
+
+### Flujo de importación recomendado
+
+```python
+# 1. Fetch
+req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+body = urllib.request.urlopen(req).read().decode('utf-8', errors='replace')
+
+# 2. Extraer con los selectores correctos según el sitio (Tierra vs. PI)
+
+# 3. Limpiar HTML
+#    - Eliminar <script>, <style>, <!-- comentarios -->
+#    - Eliminar atributos on* (event handlers)
+#    - Eliminar class= e id= en elementos de contenido
+#    - Convertir {{texto}} → <strong>, {texto} → <em> (markup SPIP)
+#    - Eliminar imágenes de logo/cabecera
+#    - Reducir a etiquetas del allowlist de sanitizeHtml()
+
+# 4. Validar: ejecutar npm test — validate-data.mjs detecta
+#    <script>, on*, javascript: y contentHtml vacío antes de que llegue al repo
 ```
