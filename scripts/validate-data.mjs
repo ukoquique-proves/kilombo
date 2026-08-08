@@ -167,6 +167,13 @@ const ARTICLE_RULES = [
       if (/(?:href|src)\s*=\s*["']?\s*(?:javascript|data|vbscript):/i.test(s)) {
         return 'contentHtml must not contain javascript:/data:/vbscript: URLs';
       }
+      // Relative src/href would resolve against the mirror URL, not the source
+      // site, causing 404s for images and broken links. All src/href values
+      // in imported contentHtml must be absolute (https://...).
+      const relativeUrlMatch = s.match(/(?:src|href)=["'](?!https?:\/\/|#|mailto:)([^"']{1,200})["']/i);
+      if (relativeUrlMatch) {
+        return `contentHtml must not contain relative URLs — found: ${relativeUrlMatch[1].slice(0, 60)} (rewrite to absolute using sourceUrl before importing)`;
+      }
       return null;
     }},
 ];

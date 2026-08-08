@@ -39,6 +39,8 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🟡 Notas de mantenimiento (sin acción inmediata)
 
+- [x] **31. URLs relativas en `contentHtml` resuelven contra el espejo, no contra el sitio fuente** — ✅ Resuelto en v0.23.0. `sanitizeHtml()` solo bloqueaba `javascript:`/`data:`/`vbscript:` pero no URLs relativas. Un `src` relativo (p.ej. `local/cache-gd2/...`) en el espejo se resuelve contra `ukoquique-proves.github.io/kilombo/` en lugar del subdomain SPIP de origen, dando 404. Fix en tres capas: (1) patch de los 98 URLs relativas en las 10 entradas afectadas de `articles.json`; (2) nueva regla en `validate-data.mjs` que rechaza cualquier `src=` o `href=` no-absoluto en `contentHtml`; (3) `rewrite_relative_urls()` documentado en TROUBLESHOOTING.md §8 como paso obligatorio del pipeline de importación.
+
 - [ ] **30. `el-fraude-de-los-pcr` — entrada stub, pendiente de contenido real** — el artículo original en `https://www.kilombo.top/spip.php?article37` es solo imágenes (dos PNG: `pcr1.png`, `pcr2.png`), sin texto en el cuerpo SPIP. Fue importado como stub de dos frases con enlace a la fuente. El campo `status` se ha corregido a `pending-review` para que no se confunda con un import completo.
   - **Opciones para resolver el gap:**
     1. **Transcripción manual del contenido de las imágenes** — si los PNG muestran texto (infografía, tabla, documento), transcribir el texto a `contentHtml` y cambiar `status` a `imported`. Ver §8 de TROUBLESHOOTING.md para el flujo de limpieza.
@@ -96,6 +98,7 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | 11 | `plandemismo.html` + `.css` | `page-lead` centrado — confirmar intención visual | ✅ Resuelto v0.8.0 |
 | A-2 | JSON data files | CTAs con URL raíz Canal7 — necesitan URLs reales por vídeo | 🟡 Esperando datos |
 | 21 | `main.js` | `.card:not(a)` sin coincidencias hoy (intencionado) | 🟡 Sin acción |
+| **31** | `articles.json` + `validate-data.mjs` | URLs relativas en contentHtml dan 404 en el espejo | ✅ Resuelto v0.23.0 |
 | **30** | `articles.json` | `el-fraude-de-los-pcr` es un stub imagen-only — pendiente de contenido real | 🟡 Pendiente de revisión |
 | 29 | `test/encrypt-decrypt.test.mjs` | Docstring sobreestima cobertura — no ejercita `decrypt.mjs` directamente | 🟡 Deuda técnica |
 | 24 | `scripts/` | Script de rotación de contraseñas para KILOMBOTOP + STATICRYPT | 🟡 Deuda técnica |

@@ -408,6 +408,9 @@ class="texte surlignable clearfix"
 ### Flujo de importación recomendado
 
 ```python
+from urllib.parse import urljoin
+import re
+
 # 1. Fetch
 req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 body = urllib.request.urlopen(req).read().decode('utf-8', errors='replace')
@@ -422,6 +425,22 @@ body = urllib.request.urlopen(req).read().decode('utf-8', errors='replace')
 #    - Eliminar imágenes de logo/cabecera
 #    - Reducir a etiquetas del allowlist de sanitizeHtml()
 
-# 4. Validar: ejecutar npm test — validate-data.mjs detecta
-#    <script>, on*, javascript: y contentHtml vacío antes de que llegue al repo
+# 4. *** REESCRIBIR URLs RELATIVAS A ABSOLUTAS ***
+#    SIEMPRE hacer este paso antes de guardar en articles.json.
+#    src/href relativos resuelven contra la URL del espejo, no contra
+#    el sitio fuente — las imágenes y enlaces darán 404 en producción.
+def rewrite_relative_urls(html, source_url):
+    def rewrite(m):
+        attr, quote, val = m.group(1), m.group(2), m.group(3)
+        if re.match(r'https?://', val) or val.startswith('#') or val.startswith('mailto:'):
+            return m.group(0)
+        return f'{attr}={quote}{urljoin(source_url, val)}{quote}'
+    return re.sub(r'(src|href)=(["\'])([^"\']+)\2', rewrite, html, flags=re.I)
+
+html = rewrite_relative_urls(html, source_url)
+
+# 5. Validar: ejecutar npm test — validate-data.mjs detecta
+#    <script>, on*, javascript:, y ahora también URLs relativas en src/href
 ```
+
+**Por qué validate-data.mjs lo detecta ahora:** la regla `contentHtml` en `scripts/validate-data.mjs` incluye desde v0.23.0 un check que falla si cualquier `src=` o `href=` tiene un valor no-absoluto (que no empiece por `https?://`, `#`, o `mailto:`). El CI bloqueará el deploy si se intenta publicar una entrada con URLs relativas.

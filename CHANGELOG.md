@@ -5,6 +5,18 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.23.0] — 2026-08-07
+
+### Fixed (bug — URLs relativas en contentHtml)
+- **`site/assets/content/articles.json`**: 98 URLs relativas (`src`/`href`) reescritas a absolutas en 10 entradas afectadas (`contre-genocide-guerres-infinites-pi`, `falsos-internacionalistas-1` a `6`, `1-mayo-2023-contra-militarizacion`, `plandemismo-y-domesticacion-11`). La imagen `local/cache-gd2/...` en `contre-genocide` era el caso reportado — ahora apunta a `https://proletariosinternacionalistas.kilombo.top/local/cache-gd2/...`.
+- **`scripts/validate-data.mjs`**: nueva regla en la validación de `contentHtml` — falla si cualquier `src=` o `href=` contiene un valor no-absoluto (que no empiece por `https?://`, `#` o `mailto:`). Esto convierte el error de "imagen 404 silenciosa en producción" en un error de CI visible antes del deploy.
+
+### Docs
+- **`TROUBLESHOOTING.md §8`**: paso 4 añadido al flujo de importación recomendado — función `rewrite_relative_urls(html, source_url)` en Python usando `urllib.parse.urljoin`. Incluye nota explicando que `validate-data.mjs` bloqueará el deploy si se omite este paso.
+- **`TO_FIX.md`**: ítem #31 añadido y cerrado en la misma versión.
+
+---
+
 ## [0.22.1] — 2026-08-07
 
 ### Added (contenido)
