@@ -1,4 +1,9 @@
 name: Deploy to GitHub Pages
+# ⚠️  CONTEXT NOTE: the compact/context generator used for AI-assisted sessions
+# excludes .github/, so this file never appears in those bundles automatically.
+# If any session work touches the deploy pipeline, encryption step, or CI job
+# order, include this file manually — otherwise the session is blind to the
+# most security-sensitive part of the pipeline. (see TO_FIX #25)
 
 on:
   push:
