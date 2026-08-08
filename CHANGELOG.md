@@ -5,6 +5,80 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.22.0] — 2026-08-07
+
+### Added (contenido — importación Weeks 1 y 2)
+Primera importación masiva de artículos desde fuentes autorizadas, siguiendo el plan de `MIRROR_GROWING.md` §7.5. El repo pasa de 1 artículo a 16.
+
+**Week 1 — NOM / nom:**
+- `represion-plandemica-1` — REPRESIÓN PLANDÉMICA 1: ocultan la HECATOMBE (Tierra → nom, 2024-08-24)
+- `represion-plandemica-2` — REPRESIÓN PLANDÉMICA 2: ocultan la HECATOMBE (Tierra → nom, 2024-08-25)
+- `represion-plandemica-3` — REPRESIÓN PLANDÉMICA 3 (Tierra → nom, 2024-08-26)
+- `represion-plandemica-4` — REPRESIÓN PLANDÉMICA 4 (Tierra → nom, 2024-08-27)
+- `el-fraude-de-los-pcr` — El fraude de los PCR (Tierra → nom, 2022-02-27) — artículo solo imágenes, importado como stub; `status: pending-review` (ver TO_FIX #30)
+
+**Week 1 — PI / pi:**
+- `contra-genocidio-guerras-infinitas-pi` — ¡Contra el genocidio y las guerras infinitas! ES (PI → pi, 2024-05-01)
+- `contre-genocide-guerres-infinites-pi` — Contre le génocide et les guerres sans fin FR (PI → pi, 2024-04-29) — par bilingüe del anterior, cumple regla §5.3 de MIRROR_GROWING
+
+**Week 2 — PI / pi:**
+- `falsos-internacionalistas-1` a `falsos-internacionalistas-6` — serie completa FALSOS INTERNACIONALISTAS (PI → pi, 2022)
+- `1-mayo-2023-contra-militarizacion` — 1 de mayo 2023 (PI → pi, 2023-05-01)
+
+**Week 2 — NOM / nom:**
+- `plandemismo-y-domesticacion-11` — Plandemismo y Domesticación (11) — Notas de decantación (PI → nom, 2021-12-01)
+
+### Fixed
+- `el-fraude-de-los-pcr`: campo `status` corregido de `imported` a `pending-review` para que no se confunda con un import completo
+
+### Docs
+- `MIRROR_GROWING.md` §7.5: checkboxes Week 1 y Week 2 marcados `[x]`
+- `TO_FIX.md`: ítem #30 añadido (`el-fraude-de-los-pcr` pendiente de contenido real, con 4 opciones de resolución)
+- `TROUBLESHOOTING.md`: añadido §7 (para qué sirve `KILOMBOTOP_PASSWORD`) y §8 (guía de scraping SPIP con selectores correctos documentados)
+
+---
+
+## [0.21.0] — 2026-08-07
+
+### Added (diseño — ilustraciones SVG y logo)
+- **Ilustraciones SVG por sección** en `site/index.html`: cada sección del portal tiene ahora un símbolo SVG inline en el header, visible a la derecha del título, con baja opacidad en reposo y ligera intensificación al hacer hover. Los símbolos son propios del proyecto, no copias del original:
+  - ⭐ Tierra y Libertad — sol naciente (amanecer, tierra libre) en verde `#1b5e20`
+  - 01 GCI — globo con meridianos y paralelos (lucha internacionalista organizada)
+  - 02 Proletarios Internacionalistas — puño alzado (fuerza proletaria colectiva)
+  - 03 NOM / Plandemismo — ojo con líneas discontinuas (vigilancia expuesta)
+- **Logo estrella Kilombo** en la cabecera del sitio: estrella de 5 puntas rellena en carmesí (`#b91c2a`) con estrella interior como contorno blanco, alineada a la izquierda del título `KILOMBO`. SVG inline, escala responsiva de 48px a 72px.
+
+### Changed (diseño — Tierra y Libertad)
+- **Demotion de Espacio Tierra y Libertad**: eliminados `section--featured`, `section-label "Sección destacada"`, `featured-intro` (párrafo editorial largo) y `card--featured` en ambas tarjetas. La sección pasa de masthead editorial a sección par con acento verde distintivo (`section--tierra`), manteniendo la primera posición visual sin sugerir que representa la identidad editorial del portal.
+
+### Changed (responsive / paleta / tipografía)
+- **Paleta refinada**: `#f5f2eb` → `#fcfbf7`, `#0a0a0a` → `#121212`, `#c1121f` → `#b91c2a`
+- **Tipografía**: Playfair Display (serif) para titulares + Inter (sans-serif) para cuerpo, cargadas desde Google Fonts con `display=swap`
+- **Responsive layout**: grids colapsados a una columna a `≤768px`, padding consistente a `≤480px` en los tres CSS
+- **Hover states**: elevación `translateY(-4px)` + ring carmesí + flecha `→` animada en todas las tarjetas
+
+### Fixed
+- Footer de `index.html`: texto "comunistas internacionalistas" (rezago) corregido a "internacionalistas"
+
+---
+
+## [0.20.0] — 2026-08-07
+
+### Fixed (seguridad — cifrado)
+- **`scripts/encrypt.mjs` — reescrito para escribir a `dist/` en lugar de mutar `site/`** (TO_FIX #27 y #28):
+  - El script ahora copia `site/` → `dist/` en cada ejecución y cifra los archivos dentro de `dist/`. `site/` nunca se modifica.
+  - Elimina el escenario de fallo crítico: ejecutar `npm run encrypt` localmente y luego `end-of-session.sh` ya no puede poner un muro de contraseña en el servidor de producción.
+  - El doble cifrado (idempotencia del paso HTML) queda estructuralmente imposible — `dist/` siempre se regenera desde cero.
+- **`deploy.yml`**: el paso "Upload artifact" ahora sube `dist/` en lugar de `site/`
+- **`sync-to-production.sh`**: añadido guard que aborta si detecta archivos cifrados dentro de `site/` (firma `staticrypt-html` o `"encrypted":true`), haciendo imposible un rsync accidental de contenido cifrado a producción
+- **`.gitignore`**: `dist/` añadido para que el directorio de artefactos cifrados nunca entre al repo
+
+### Fixed (docs)
+- `TO_FIX.md`: ítems #6 y #11 cerrados `[x]` — ambos resueltos en v0.8.0 según CHANGELOG, no eran pendientes reales
+- `TO_FIX.md`: ítems #27 y #28 añadidos y cerrados en la misma versión
+
+---
+
 ## [0.19.0] — 2026-08-06
 
 ### Added (seguridad — cifrado client-side)
