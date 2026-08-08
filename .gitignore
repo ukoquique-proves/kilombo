@@ -49,7 +49,8 @@ node_modules/
 npm-debug.log*
 yarn-error.log*
 
-# --------- Backups locales ---------
+# --------- Build output (encrypted deploy artefact — never commit) ---------
+dist/
 *.bak
 *.backup
 site-backup*/

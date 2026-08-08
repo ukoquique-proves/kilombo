@@ -4,51 +4,62 @@
  *
  * Encrypts the Kilombo mirror site content for deployment to GitHub Pages.
  *
- * What gets encrypted:
- *   HTML pages with content:  plandemismo.html, articulos.html, articulo.html
- *   JSON data files:          site/assets/data/*.json, site/assets/content/*.json
+ * OUTPUT DIRECTORY: dist/
+ *   This script NEVER modifies site/. It copies the entire site/ tree to
+ *   dist/, then encrypts the target files inside dist/. The source files
+ *   in site/ remain plaintext at all times.
  *
- * What stays public:
+ *   This means:
+ *     - Running npm run encrypt locally is safe — site/ is not touched.
+ *     - sync-to-production.sh always sees plaintext site/ regardless of
+ *       whether encrypt.mjs has been run.
+ *     - CI uploads dist/ to GitHub Pages; the repo never contains ciphertext.
+ *
+ * What gets encrypted (inside dist/):
+ *   HTML pages with content:  plandemismo.html, articulos.html, articulo.html
+ *   JSON data files:          assets/data/*.json, assets/content/*.json
+ *
+ * What stays public (inside dist/, copied verbatim from site/):
  *   index.html  — the portal directory, no article/video content
  *   CSS / JS    — code only, no content
  *
  * HTML encryption:
  *   Uses the staticrypt CLI to wrap each page in a self-contained
  *   password-prompt shell. The visitor enters the password once; the
- *   hashed password is stored in sessionStorage so subsequent JSON
- *   fetches can use it without prompting again.
+ *   hashed password is stored in localStorage so subsequent page navigations
+ *   and JSON fetches do not re-prompt.
  *
  * JSON encryption:
  *   Uses staticrypt's own cryptoEngine + codec (the same PBKDF2 + AES-256-CBC
- *   pipeline) to encrypt each JSON file in-place. The output is a JSON
- *   envelope:
+ *   pipeline) to encrypt each JSON file. The output is a JSON envelope:
  *
  *     { "encrypted": true, "ciphertext": "<hex>", "salt": "<hex>" }
  *
  *   The JS fetchers (plandemismo.js, articles.js) detect this envelope and
- *   call decryptJson() — injected by this script into the page HTML — to
- *   recover the plaintext before parsing.
+ *   call parseJson() from decrypt.mjs to recover the plaintext before parsing.
  *
  * Usage:
  *   STATICRYPT_PASSWORD=<password> node scripts/encrypt.mjs
  *   (or: npm run encrypt)
  *
  * In CI (deploy.yml), the password is read from the STATICRYPT_PASSWORD
- * GitHub Actions secret.
+ * GitHub Actions secret. The deploy step uploads dist/ (not site/).
  */
 
-import { execSync } from 'node:child_process';
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
+import { execSync }                                                  from 'node:child_process';
+import { readFileSync, writeFileSync, readdirSync, existsSync,
+         mkdirSync, cpSync }                                         from 'node:fs';
+import { resolve, dirname, join, relative }                          from 'node:path';
+import { fileURLToPath }                                             from 'node:url';
+import { createRequire }                                             from 'node:module';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT     = resolve(__dirname, '..');
-const SITE_DIR = join(ROOT, 'site');
+const ROOT      = resolve(__dirname, '..');
+const SITE_DIR  = join(ROOT, 'site');
+const DIST_DIR  = join(ROOT, 'dist');
 
 // ── Load staticrypt internals via CJS require ────────────────────────────────
-const require = createRequire(import.meta.url);
+const require      = createRequire(import.meta.url);
 const cryptoEngine = require('../node_modules/staticrypt/lib/cryptoEngine.js');
 const codec        = require('../node_modules/staticrypt/lib/codec.js');
 const { encode }   = codec.init(cryptoEngine);
@@ -68,11 +79,26 @@ if (!salt || salt.length !== 32) {
   process.exit(1);
 }
 
-console.log(`\n🔐  Kilombo encrypt — staticrypt 3.x  (salt: ${salt.slice(0, 8)}…)\n`);
+console.log(`\n🔐  Kilombo encrypt — staticrypt 3.x  (salt: ${salt.slice(0, 8)}…)`);
+console.log(`    source: site/   →   output: dist/\n`);
 
-// ── Step 1: Encrypt HTML pages ───────────────────────────────────────────────
-// staticrypt CLI encrypts HTML and writes to --directory.
-// We write directly back into site/ (same filenames, overwriting originals).
+// ── Step 0: Copy site/ → dist/ (fresh every run) ────────────────────────────
+// dist/ is always rebuilt from scratch so there is no stale-ciphertext risk
+// and the HTML idempotency problem (encrypting an already-encrypted page) is
+// structurally impossible — dist/ starts as a clean copy of plaintext site/.
+if (existsSync(DIST_DIR)) {
+  // Remove existing dist/ to avoid stale files from a previous run
+  execSync(`rm -rf "${DIST_DIR}"`, { cwd: ROOT });
+}
+mkdirSync(DIST_DIR, { recursive: true });
+cpSync(SITE_DIR, DIST_DIR, { recursive: true });
+console.log(`✅  Copied site/ → dist/\n`);
+
+// ── Step 1: Encrypt HTML pages inside dist/ ──────────────────────────────────
+// staticrypt CLI encrypts the file at the given path and writes the result to
+// --directory. We point it at dist/ so site/ is never touched.
+// Because dist/ is always freshly copied from site/ (Step 0), the HTML files
+// here are always plaintext — double-encryption is structurally impossible.
 
 const HTML_PAGES = [
   'plandemismo.html',
@@ -82,8 +108,8 @@ const HTML_PAGES = [
 
 const STATICRYPT_FLAGS = [
   `--config .staticrypt.json`,
-  `--directory ${SITE_DIR}`,         // output back into site/
-  `--remember 0`,                    // no persistent localStorage — sessionStorage only
+  `--directory ${DIST_DIR}`,
+  `--remember 0`,
   `--template-title "Kilombo — Acceso restringido"`,
   `--template-instructions "Este espejo es de acceso privado. Introduce la contraseña para continuar."`,
   `--template-placeholder "Contraseña"`,
@@ -91,20 +117,21 @@ const STATICRYPT_FLAGS = [
   `--template-error "Contraseña incorrecta"`,
   `--template-color-primary "#b91c2a"`,
   `--template-color-secondary "#fcfbf7"`,
-  `--short`,                         // suppress short-password warning (CI env)
+  `--short`,
 ].join(' ');
 
 for (const page of HTML_PAGES) {
-  const fullPath = join(SITE_DIR, page);
-  if (!existsSync(fullPath)) {
-    console.warn(`⚠️   Skipping ${page} — file not found`);
+  const srcPath  = join(SITE_DIR, page);   // used only to check existence
+  const distPath = join(DIST_DIR, page);   // what we actually encrypt
+
+  if (!existsSync(srcPath)) {
+    console.warn(`⚠️   Skipping ${page} — not found in site/`);
     continue;
   }
 
   try {
-    // staticrypt reads STATICRYPT_PASSWORD from env automatically
     execSync(
-      `npx staticrypt ${fullPath} ${STATICRYPT_FLAGS}`,
+      `npx staticrypt ${distPath} ${STATICRYPT_FLAGS}`,
       { cwd: ROOT, stdio: 'pipe', env: { ...process.env } }
     );
     console.log(`✅  HTML encrypted: ${page}`);
@@ -115,45 +142,41 @@ for (const page of HTML_PAGES) {
   }
 }
 
-// ── Step 2: Encrypt JSON data files ─────────────────────────────────────────
-// Uses staticrypt's own codec so the client-side decryption uses the same
-// key derivation as the HTML password prompt.
+// ── Step 2: Encrypt JSON data files inside dist/ ─────────────────────────────
+// Because dist/ is rebuilt from scratch every run, the "already encrypted"
+// guard below is a safety net for unusual edge cases only — in normal usage
+// these files are always plaintext at this point.
 
 const JSON_DIRS = [
-  join(SITE_DIR, 'assets', 'data'),
-  join(SITE_DIR, 'assets', 'content'),
+  join(DIST_DIR, 'assets', 'data'),
+  join(DIST_DIR, 'assets', 'content'),
 ];
 
 async function encryptJsonFile(filePath) {
   const plaintext = readFileSync(filePath, 'utf8');
 
-  // Skip if already encrypted (idempotent — safe to re-run)
+  // Guard: skip if somehow already encrypted (belt-and-suspenders)
   try {
     const parsed = JSON.parse(plaintext);
     if (parsed && parsed.encrypted === true && parsed.ciphertext) {
-      console.log(`⏭   Already encrypted, skipping: ${filePath.replace(ROOT + '/', '')}`);
+      console.warn(`⚠️   Already encrypted, skipping: ${relative(ROOT, filePath)}`);
       return;
     }
-  } catch {
-    // not valid JSON — shouldn't happen but don't crash
-  }
+  } catch { /* not valid JSON — treat as plaintext and attempt to encrypt */ }
 
   const ciphertext = await encode(plaintext, password, salt);
-
-  const envelope = JSON.stringify({ encrypted: true, ciphertext, salt });
-  writeFileSync(filePath, envelope, 'utf8');
-  console.log(`✅  JSON encrypted: ${filePath.replace(ROOT + '/', '')}`);
+  writeFileSync(filePath, JSON.stringify({ encrypted: true, ciphertext, salt }), 'utf8');
+  console.log(`✅  JSON encrypted: ${relative(ROOT, filePath)}`);
 }
 
 const jsonPromises = [];
 for (const dir of JSON_DIRS) {
   if (!existsSync(dir)) continue;
-  const files = readdirSync(dir).filter(f => f.endsWith('.json') && !f.startsWith('.'));
-  for (const file of files) {
+  for (const file of readdirSync(dir).filter(f => f.endsWith('.json') && !f.startsWith('.'))) {
     jsonPromises.push(encryptJsonFile(join(dir, file)));
   }
 }
 
 await Promise.all(jsonPromises);
 
-console.log('\n🏁  Encryption complete.\n');
+console.log('\n🏁  Encryption complete. Deploy from dist/ — never from site/.\n');

@@ -7,12 +7,9 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🔴 Acción pendiente urgente
 
-- [ ] **27. CRÍTICO: `encrypt.mjs` muta `site/` en lugar de escribir a `dist/`** — `scripts/encrypt.mjs` sobrescribe los archivos HTML y JSON reales dentro de `./site/` (los mismos archivos fuente del repo). `sync-to-production.sh` luego sincroniza `./site/` tal como esté en disco directamente al servidor YunoHost de `kilombo.top`.
-  - **Escenario de fallo concreto:** si alguien ejecuta `STATICRYPT_PASSWORD=... npm run encrypt` localmente para probar el cifrado y luego ejecuta `end-of-session.sh`, el paso 1 ve `site/` modificado (o lo commitea como si fuera fuente) y el paso 2 rsyncroniza el HTML cifrado y el JSON encriptado al servidor de producción real — poniendo un muro de contraseña frente al sitio del cliente sin que nadie lo sepa.
-  - **Fix:** dar a `encrypt.mjs` un directorio de salida explícito (`dist/`) en lugar de sobreescribir `site/`. El paso de deploy en `deploy.yml` subiría `dist/` en lugar de `site/`. `sync-to-production.sh` nunca vería archivos cifrados ya que siempre trabajaría sobre el `site/` en claro. Este cambio elimina el modo de fallo del ítem 28 como efecto secundario.
+- [x] **27. CRÍTICO: `encrypt.mjs` muta `site/` en lugar de escribir a `dist/`** — ✅ Resuelto en v0.20.0: `encrypt.mjs` ahora copia `site/` a `dist/` y cifra únicamente dentro de `dist/`. `site/` nunca se modifica.
 
-- [ ] **28. Bug relacionado: el paso HTML de `encrypt.mjs` no es idempotente** — el cifrado de JSON comprueba `parsed.encrypted === true` y omite el re-cifrado. El cifrado HTML no tiene ningún guard equivalente: ejecuta `npx staticrypt` incondicionalmente en cada página cada vez. Si `encrypt.mjs` se ejecuta dos veces sobre el mismo `site/` (un test local seguido de CI, o un workflow re-lanzado sin checkout fresco), la segunda pasada alimenta un HTML ya envuelto por staticrypt de vuelta a staticrypt — produciendo una página doblemente envuelta y probablemente corrupta.
-  - **Fix:** añadir al paso HTML el mismo guard que ya tiene el JSON — leer el `<html class="staticrypt-html">` del archivo de salida antes de cifrar y saltarlo si ya está cifrado. Resuelto de forma más limpia como efecto secundario del fix del ítem 27 (si la salida va a `dist/`, que siempre se regenera desde cero, la idempotencia ya no es necesaria).
+- [x] **28. Bug relacionado: el paso HTML de `encrypt.mjs` no es idempotente** — ✅ Resuelto en v0.20.0: efecto secundario del fix del ítem 27. `dist/` se regenera desde cero en cada ejecución, por lo que el doble cifrado es estructuralmente imposible.
 
 - [ ] **23. Cambiar `KILOMBOTOP_PASSWORD` por `KILOMBOTOP_FUTURE_PASSWORD` en `.env`**
   - En cuanto el cliente confirme que el nuevo password está activo en el servidor, ejecutar:
@@ -87,8 +84,8 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 
 | # | Archivo | Problema | Estado |
 |---|---------|----------|--------|
-| **27** | `scripts/encrypt.mjs` | Muta `site/` en lugar de escribir a `dist/` — riesgo de cifrar producción accidentalmente | 🔴 **Crítico** |
-| **28** | `scripts/encrypt.mjs` | Paso HTML no idempotente — doble cifrado produce página corrupta | 🔴 **Crítico** |
+| **27** | `scripts/encrypt.mjs` | Muta `site/` en lugar de escribir a `dist/` — riesgo de cifrar producción accidentalmente | ✅ Resuelto v0.20.0 |
+| **28** | `scripts/encrypt.mjs` | Paso HTML no idempotente — doble cifrado produce página corrupta | ✅ Resuelto v0.20.0 |
 | 23 | `.env` | Cambiar PASSWORD por FUTURE_PASSWORD cuando el cliente confirme | 🔴 Acción pendiente |
 | 6 | `index.html` | Tarjetas P.I. — confirmar si URL única es correcta | 🟡 Esperando cliente |
 | 11 | `plandemismo.html` + `.css` | `page-lead` centrado — confirmar intención visual | 🟡 Esperando cliente |
