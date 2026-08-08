@@ -93,9 +93,13 @@ Material oral histórico (audios de WhatsApp, notas de voz, comunicados grabados
 No solo enlaces externos; agregar dentro del propio portal. Ver [`MIRROR_GROWING.md`](MIRROR_GROWING.md) para el proceso detallado de incorporación, criterios de admisión y checklist de publicación.
 
 - [ ] **4.1 Espacio Tierra y Libertad** — artículos destacados, últimos textos publicados, sección "En portada"
+  - [ ] Filtrado y ordenación en `articulos.html` — por etiqueta (topic), idioma, fecha y fuente/publicación de origen
+  - [ ] Campos de metadatos adicionales por artículo: tiempo estimado de lectura, autor/fuente visible en la tarjeta
 - [ ] **4.2 GCI** — últimos comunicados oficiales, biblioteca de textos programáticos por idioma (ES/EN/FR), acceso directo al CD-Rom con categorías
 - [ ] **4.3 Proletarios Internacionalistas** — últimos números/artículos separados por edición (ES / FR)
 - [ ] **4.4 NOM / Plandemismo** — además de los videos: artículos, dossieres, infografías, líneas de tiempo cronológicas
+  - [ ] Estructura cronológica o por medio en `plandemismo.html` (Documentales / Serie Canal7 / Dossieres escritos)
+  - [ ] Reproductores de vídeo embebidos o interfaces de player claras, en lugar de listas de enlaces externos
 - [ ] **4.5 Referencias cruzadas automáticas en artículos** — cada artículo tendrá una sección oculta (expandible o cargada bajo demanda) con referencias generadas automáticamente a otros artículos del portal y/o fuentes externas que complementen su contenido
 
 ### 5. Traducciones y puesta al día de idiomas
