@@ -276,14 +276,14 @@ Está en `section: general` porque no encaja estrictamente en ninguna sección t
 
 ```
 Semana 1:
-  [ ] Serie REPRESIÓN PLANDÉMICA 1-4 (Tierra → nom)
-  [ ] El fraude de los PCR (Tierra → nom)
-  [ ] Artículo "¡Contra el genocidio!" de PI (PI → pi)
+  [x] Serie REPRESIÓN PLANDÉMICA 1-4 (Tierra → nom) ✅ importada 2026-08-07
+  [x] El fraude de los PCR (Tierra → nom) ✅ importada 2026-08-07 (artículo solo imágenes — publicado con nota y enlace al original)
+  [x] Artículo "¡Contra el genocidio!" de PI (PI → pi) ✅ importado ES + FR (articles 54 + 53) 2026-08-07
 
 Semana 2:
-  [ ] Serie FALSOS INTERNACIONALISTAS 1-6 (PI → pi)
-  [ ] 1 de mayo 2023 PI + Tierra (bilingüe)
-  [ ] PLANDEMISMO Y DOMESTICACIÓN 11 (PI → nom)
+  [x] Serie FALSOS INTERNACIONALISTAS 1-6 (PI → pi) ✅ importada completa 2026-08-07
+  [x] 1 de mayo 2023 PI + Tierra (bilingüe) ✅ importado PI ES (article44) 2026-08-07 — versión Tierra pendiente
+  [x] PLANDEMISMO Y DOMESTICACIÓN 11 (PI → nom) ✅ importada 2026-08-07
 
 Semana 3:
   [ ] FUNDAMENTOS CIENTÍFICOS de Tierra (rubrique6 — varios artículos)
