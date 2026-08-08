@@ -22,13 +22,9 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🟡 Pendiente de confirmación del cliente
 
-- [ ] **6. Ambas tarjetas de P.I. apuntan a la misma URL** — `index.html`
-  - Tarjeta ES y FR enlazan ambas a `https://proletariosinternacionalistas.kilombo.top/`.
-  - **Fix:** confirmar con el cliente si el sitio PI es bilingüe en una sola URL — si es así, unificar en una tarjeta con doble chip ES+FR.
+- [x] **6. Ambas tarjetas de P.I. apuntan a la misma URL** — resuelto en v0.8.0: confirmado vía `.env.example` y DNS que sólo existe un dominio PI bilingüe. Las dos tarjetas separadas ES/FR fueron fusionadas en una sola tarjeta bilingüe con chip ES+FR. Decisión documentada en CHANGELOG v0.8.0.
 
-- [ ] **11. `page-lead` centrado vs. contenido a ancho completo** — `plandemismo.html` + `plandemismo.css`
-  - El bloque introductorio usa `max-width: 80ch; margin: 0 auto` creando un salto visual con las tabs y el grid.
-  - **Fix:** confirmar con el cliente si el estrechamiento es intencionado; si no, cambiar a `max-width: 100%; margin: 0 0 2.5rem`.
+- [x] **11. `page-lead` centrado vs. contenido a ancho completo** — resuelto en v0.8.0: el estrechamiento (`max-width: 80ch`) es intencionado como contraste visual entre el bloque introductorio y el grid. Decisión documentada en CHANGELOG v0.8.0.
 
 ---
 
@@ -89,8 +85,8 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | **27** | `scripts/encrypt.mjs` | Muta `site/` en lugar de escribir a `dist/` — riesgo de cifrar producción accidentalmente | ✅ Resuelto v0.20.0 |
 | **28** | `scripts/encrypt.mjs` | Paso HTML no idempotente — doble cifrado produce página corrupta | ✅ Resuelto v0.20.0 |
 | 23 | `.env` | Cambiar PASSWORD por FUTURE_PASSWORD cuando el cliente confirme | 🔴 Acción pendiente |
-| 6 | `index.html` | Tarjetas P.I. — confirmar si URL única es correcta | 🟡 Esperando cliente |
-| 11 | `plandemismo.html` + `.css` | `page-lead` centrado — confirmar intención visual | 🟡 Esperando cliente |
+| 6 | `index.html` | Tarjetas P.I. — confirmar si URL única es correcta | ✅ Resuelto v0.8.0 |
+| 11 | `plandemismo.html` + `.css` | `page-lead` centrado — confirmar intención visual | ✅ Resuelto v0.8.0 |
 | A-2 | JSON data files | CTAs con URL raíz Canal7 — necesitan URLs reales por vídeo | 🟡 Esperando datos |
 | 21 | `main.js` | `.card:not(a)` sin coincidencias hoy (intencionado) | 🟡 Sin acción |
 | 29 | `test/encrypt-decrypt.test.mjs` | Docstring sobreestima cobertura — no ejercita `decrypt.mjs` directamente | 🟡 Deuda técnica |
