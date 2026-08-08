@@ -39,6 +39,13 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🟡 Notas de mantenimiento (sin acción inmediata)
 
+- [ ] **30. `el-fraude-de-los-pcr` — entrada stub, pendiente de contenido real** — el artículo original en `https://www.kilombo.top/spip.php?article37` es solo imágenes (dos PNG: `pcr1.png`, `pcr2.png`), sin texto en el cuerpo SPIP. Fue importado como stub de dos frases con enlace a la fuente. El campo `status` se ha corregido a `pending-review` para que no se confunda con un import completo.
+  - **Opciones para resolver el gap:**
+    1. **Transcripción manual del contenido de las imágenes** — si los PNG muestran texto (infografía, tabla, documento), transcribir el texto a `contentHtml` y cambiar `status` a `imported`. Ver §8 de TROUBLESHOOTING.md para el flujo de limpieza.
+    2. **Solicitar al cliente el texto fuente** — el autor original (`kilombo`) puede tener el texto que usó para crear las imágenes.
+    3. **Sustituir por otro artículo sobre PCR** — si existe un artículo equivalente con texto completo en cualquiera de las fuentes autorizadas, reemplazar esta entrada y mantener la misma `id` para no romper URLs.
+    4. **Dejar como placeholder documentado** — si las imágenes son el contenido intencionado (sin texto transcribible), actualizar `contentHtml` para decirlo explícitamente y cambiar `status` a `external-only`.
+
 - [ ] **21. `main.js` — `.card:not(a)` no coincide con nada actualmente**
   - Todos los `.card` en `index.html` son `<a>`. El script no hace nada hoy.
   - Future-proofing intencionado. Sin acción necesaria salvo que se añadan cards no-anchor.
@@ -89,6 +96,7 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | 11 | `plandemismo.html` + `.css` | `page-lead` centrado — confirmar intención visual | ✅ Resuelto v0.8.0 |
 | A-2 | JSON data files | CTAs con URL raíz Canal7 — necesitan URLs reales por vídeo | 🟡 Esperando datos |
 | 21 | `main.js` | `.card:not(a)` sin coincidencias hoy (intencionado) | 🟡 Sin acción |
+| **30** | `articles.json` | `el-fraude-de-los-pcr` es un stub imagen-only — pendiente de contenido real | 🟡 Pendiente de revisión |
 | 29 | `test/encrypt-decrypt.test.mjs` | Docstring sobreestima cobertura — no ejercita `decrypt.mjs` directamente | 🟡 Deuda técnica |
 | 24 | `scripts/` | Script de rotación de contraseñas para KILOMBOTOP + STATICRYPT | 🟡 Deuda técnica |
 | 25 | tooling | Blind spot de `.github/` en generador de contexto compacto | 🟡 Deuda técnica |
