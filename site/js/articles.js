@@ -88,29 +88,194 @@ export function renderArticleCard(a) {
   return el;
 }
 
+// ================================================================
+// Topic filtering (articulos.html)
+// ================================================================
+
+/**
+ * Collects every distinct topic across a set of articles, sorted
+ * alphabetically (locale-aware, Spanish collation) for stable, predictable
+ * ordering in the filter bar.
+ * @param {ArticleEntry[]} articles
+ * @returns {string[]}
+ */
+export function getAllTopics(articles) {
+  const set = new Set();
+  for (const a of articles) {
+    for (const t of a.topics || []) set.add(t);
+  }
+  return [...set].sort((x, y) => x.localeCompare(y, 'es'));
+}
+
+/**
+ * @param {ArticleEntry[]} articles
+ * @param {string|null} topic  null/'' means "no filter, show all"
+ * @returns {ArticleEntry[]}
+ */
+export function filterArticlesByTopic(articles, topic) {
+  if (!topic) return articles;
+  return articles.filter((a) => (a.topics || []).includes(topic));
+}
+
+/**
+ * Builds the clickable topic filter bar as real <button> elements (never
+ * <a>, so it's keyboard-accessible and never fights with the card links —
+ * this bar lives outside any .article-card anchor).
+ * @param {string[]} topics
+ * @param {string|null} activeTopic
+ * @param {(topic: string|null) => void} onSelect
+ * @returns {HTMLElement}
+ */
+export function renderFilterBar(topics, activeTopic, onSelect) {
+  const bar = document.createElement('div');
+  bar.className = 'topic-filter-bar';
+  bar.setAttribute('role', 'group');
+  bar.setAttribute('aria-label', 'Filtrar artículos por tema');
+
+  const makeButton = (label, topicValue) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'topic-filter-btn';
+    btn.textContent = label;
+    if (topicValue) btn.dataset.topic = topicValue;
+    const isActive = topicValue === activeTopic || (!topicValue && !activeTopic);
+    btn.classList.toggle('is-active', isActive);
+    btn.setAttribute('aria-pressed', String(isActive));
+    btn.addEventListener('click', () => onSelect(topicValue));
+    return btn;
+  };
+
+  bar.appendChild(makeButton('Todos', null));
+  topics.forEach((t) => bar.appendChild(makeButton(t, t)));
+
+  return bar;
+}
+
+// ================================================================
+// Related articles (articulo.html)
+// ================================================================
+
+/**
+ * Ranks other articles by how many topics they share with the current one.
+ * Ties broken by most recent date first. Articles with zero shared topics
+ * are excluded — "related" should mean something, not just "other".
+ * @param {ArticleEntry} current
+ * @param {ArticleEntry[]} all
+ * @param {number} [limit]
+ * @returns {ArticleEntry[]}
+ */
+export function findRelatedArticles(current, all, limit = 3) {
+  const currentTopics = new Set(current.topics || []);
+  if (currentTopics.size === 0) return [];
+
+  const scored = all
+    .filter((a) => a.id !== current.id)
+    .map((a) => {
+      const shared = (a.topics || []).filter((t) => currentTopics.has(t)).length;
+      return { article: a, shared };
+    })
+    .filter((x) => x.shared > 0)
+    .sort((x, y) => {
+      if (y.shared !== x.shared) return y.shared - x.shared;
+      // Most recent first; articles without a date sort last.
+      return (y.article.date || '').localeCompare(x.article.date || '');
+    });
+
+  return scored.slice(0, limit).map((x) => x.article);
+}
+
+/**
+ * @param {ArticleEntry[]} related
+ * @returns {HTMLElement|null}  null when there's nothing to show — callers
+ *   should skip inserting the section entirely rather than render an empty box.
+ */
+export function renderRelatedArticles(related) {
+  if (!related || related.length === 0) return null;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'article-detail__related';
+
+  const heading = document.createElement('h3');
+  heading.className = 'article-detail__related-title';
+  heading.textContent = 'Sobre el mismo tema';
+  wrap.appendChild(heading);
+
+  const grid = document.createElement('div');
+  grid.className = 'related-grid';
+  related.forEach((a) => grid.appendChild(renderArticleCard(a)));
+  wrap.appendChild(grid);
+
+  return wrap;
+}
+
+// ================================================================
+// Page wiring
+// ================================================================
+
 function getArticleIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get('id') || '';
+}
+
+function getTopicFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('topic') || null;
 }
 
 function renderEmptyState(container, msg) {
   container.innerHTML = `<div class="article-empty"><p>${escapeHtml(msg)}</p></div>`;
 }
 
+/**
+ * @param {HTMLElement} list
+ * @param {ArticleEntry[]} articles
+ */
+function renderList(list, articles) {
+  list.innerHTML = '';
+  if (articles.length === 0) {
+    renderEmptyState(list, 'No hay artículos que coincidan con este filtro.');
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  articles.forEach((a) => fragment.appendChild(renderArticleCard(a)));
+  list.appendChild(fragment);
+}
+
 async function initIndexPage() {
   const list = document.getElementById('article-list');
+  const filterBarSlot = document.getElementById('article-filter-bar');
   if (!list) return;
 
   try {
     const articles = await loadArticles();
+
     if (articles.length === 0) {
       renderEmptyState(list, 'Todavía no hay artículos internos publicados.');
       return;
     }
 
-    const fragment = document.createDocumentFragment();
-    articles.forEach((a) => fragment.appendChild(renderArticleCard(a)));
-    list.appendChild(fragment);
+    const topics = getAllTopics(articles);
+    let activeTopic = getTopicFromUrl();
+    if (activeTopic && !topics.includes(activeTopic)) activeTopic = null;
+
+    const applyFilter = (topic) => {
+      activeTopic = topic;
+      const url = new URL(window.location.href);
+      if (topic) url.searchParams.set('topic', topic);
+      else url.searchParams.delete('topic');
+      window.history.replaceState({}, '', url);
+
+      if (filterBarSlot) {
+        filterBarSlot.innerHTML = '';
+        filterBarSlot.appendChild(renderFilterBar(topics, activeTopic, applyFilter));
+      }
+      renderList(list, filterArticlesByTopic(articles, activeTopic));
+    };
+
+    if (filterBarSlot && topics.length > 0) {
+      filterBarSlot.appendChild(renderFilterBar(topics, activeTopic, applyFilter));
+    }
+    renderList(list, filterArticlesByTopic(articles, activeTopic));
   } catch (e) {
     console.error('[articulos]', e);
     renderEmptyState(list, 'Error cargando el índice de artículos. Intenta recargar la página.');
@@ -122,6 +287,7 @@ async function initDetailPage() {
   const metaEl = document.getElementById('article-meta');
   const contentEl = document.getElementById('article-content');
   const sourceEl = document.getElementById('article-source');
+  const relatedEl = document.getElementById('article-related');
 
   if (!titleEl || !metaEl || !contentEl || !sourceEl) return;
 
@@ -163,6 +329,13 @@ async function initDetailPage() {
     sourceEl.innerHTML = `
       <p><strong>Fuente:</strong> ${escapeHtml(a.sourceSite)} · <a class="ext-link" href="${safeSourceUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(a.sourceUrl)}</a></p>
     `.trim();
+
+    if (relatedEl) {
+      relatedEl.innerHTML = '';
+      const related = findRelatedArticles(a, articles);
+      const relatedBlock = renderRelatedArticles(related);
+      if (relatedBlock) relatedEl.appendChild(relatedBlock);
+    }
   } catch (e) {
     console.error('[articulo]', e);
     titleEl.textContent = 'Error';
@@ -180,4 +353,3 @@ if (typeof document !== 'undefined') {
     if (page === 'articulo') initDetailPage();
   });
 }
-

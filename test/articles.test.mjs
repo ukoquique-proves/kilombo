@@ -11,7 +11,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Window } from 'happy-dom';
-import { sectionLabel, renderTopics, renderArticleCard } from '../site/js/articles.js';
+import {
+  sectionLabel,
+  renderTopics,
+  renderArticleCard,
+  getAllTopics,
+  filterArticlesByTopic,
+  renderFilterBar,
+  findRelatedArticles,
+  renderRelatedArticles,
+} from '../site/js/articles.js';
 
 // ================================================================
 // DOM shim setup — happy-dom gives us document.createElement
@@ -106,3 +115,126 @@ test('renderArticleCard — omits the topics block when topics is empty', () => 
   const el = renderArticleCard({ ...baseArticle, topics: [] });
   assert.equal(el.querySelector('.article-card__topics'), null);
 });
+
+// ================================================================
+// getAllTopics / filterArticlesByTopic
+// ================================================================
+
+const articleSet = [
+  { ...baseArticle, id: 'a1', topics: ['salud', 'pandemia'], date: '2026-01-01' },
+  { ...baseArticle, id: 'a2', topics: ['pandemia', 'medios'], date: '2026-02-01' },
+  { ...baseArticle, id: 'a3', topics: [], date: '2026-03-01' },
+];
+
+test('getAllTopics — returns the deduplicated, sorted union of all topics', () => {
+  assert.deepEqual(getAllTopics(articleSet), ['medios', 'pandemia', 'salud']);
+});
+
+test('getAllTopics — returns an empty array when no article has topics', () => {
+  assert.deepEqual(getAllTopics([{ ...baseArticle, topics: [] }]), []);
+});
+
+test('filterArticlesByTopic — returns all articles when topic is null/empty', () => {
+  assert.equal(filterArticlesByTopic(articleSet, null).length, 3);
+  assert.equal(filterArticlesByTopic(articleSet, '').length, 3);
+});
+
+test('filterArticlesByTopic — keeps only articles that include the topic', () => {
+  const result = filterArticlesByTopic(articleSet, 'salud');
+  assert.deepEqual(result.map((a) => a.id), ['a1']);
+});
+
+test('filterArticlesByTopic — returns an empty array for a topic no article has', () => {
+  assert.deepEqual(filterArticlesByTopic(articleSet, 'inexistente'), []);
+});
+
+// ================================================================
+// renderFilterBar
+// ================================================================
+
+test('renderFilterBar — renders one button per topic plus "Todos"', () => {
+  const el = renderFilterBar(['pandemia', 'salud'], null, () => {});
+  const buttons = el.querySelectorAll('button');
+  assert.equal(buttons.length, 3);
+  assert.equal(buttons[0].textContent, 'Todos');
+});
+
+test('renderFilterBar — marks the active topic button with is-active and aria-pressed', () => {
+  const el = renderFilterBar(['pandemia', 'salud'], 'salud', () => {});
+  const active = el.querySelector('.is-active');
+  assert.equal(active.textContent, 'salud');
+  assert.equal(active.getAttribute('aria-pressed'), 'true');
+});
+
+test('renderFilterBar — clicking a topic button calls onSelect with that topic', () => {
+  let selected = 'not-called';
+  const el = renderFilterBar(['pandemia'], null, (topic) => { selected = topic; });
+  const btn = [...el.querySelectorAll('button')].find((b) => b.textContent === 'pandemia');
+  btn.click();
+  assert.equal(selected, 'pandemia');
+});
+
+test('renderFilterBar — clicking "Todos" calls onSelect with null', () => {
+  let selected = 'not-called';
+  const el = renderFilterBar(['pandemia'], 'pandemia', (topic) => { selected = topic; });
+  const btn = [...el.querySelectorAll('button')].find((b) => b.textContent === 'Todos');
+  btn.click();
+  assert.equal(selected, null);
+});
+
+// ================================================================
+// findRelatedArticles
+// ================================================================
+
+test('findRelatedArticles — ranks by number of shared topics, most first', () => {
+  const current = { ...baseArticle, id: 'cur', topics: ['salud', 'pandemia'] };
+  const pool = [
+    current,
+    { ...baseArticle, id: 'one-shared', topics: ['salud'], date: '2026-01-01' },
+    { ...baseArticle, id: 'two-shared', topics: ['salud', 'pandemia'], date: '2026-01-01' },
+    { ...baseArticle, id: 'no-shared', topics: ['medios'], date: '2026-01-01' },
+  ];
+  const result = findRelatedArticles(current, pool);
+  assert.deepEqual(result.map((a) => a.id), ['two-shared', 'one-shared']);
+});
+
+test('findRelatedArticles — never includes the current article itself', () => {
+  const current = { ...baseArticle, id: 'cur', topics: ['salud'] };
+  const result = findRelatedArticles(current, [current]);
+  assert.deepEqual(result, []);
+});
+
+test('findRelatedArticles — respects the limit', () => {
+  const current = { ...baseArticle, id: 'cur', topics: ['salud'] };
+  const pool = [
+    current,
+    { ...baseArticle, id: 'r1', topics: ['salud'], date: '2026-01-01' },
+    { ...baseArticle, id: 'r2', topics: ['salud'], date: '2026-01-02' },
+    { ...baseArticle, id: 'r3', topics: ['salud'], date: '2026-01-03' },
+  ];
+  assert.equal(findRelatedArticles(current, pool, 2).length, 2);
+});
+
+test('findRelatedArticles — returns an empty array when current article has no topics', () => {
+  const current = { ...baseArticle, id: 'cur', topics: [] };
+  const pool = [current, { ...baseArticle, id: 'other', topics: ['salud'] }];
+  assert.deepEqual(findRelatedArticles(current, pool), []);
+});
+
+// ================================================================
+// renderRelatedArticles
+// ================================================================
+
+test('renderRelatedArticles — returns null for an empty list (caller skips the section)', () => {
+  assert.equal(renderRelatedArticles([]), null);
+  assert.equal(renderRelatedArticles(undefined), null);
+});
+
+test('renderRelatedArticles — renders a card per related article', () => {
+  const el = renderRelatedArticles([
+    { ...baseArticle, id: 'r1' },
+    { ...baseArticle, id: 'r2' },
+  ]);
+  assert.equal(el.querySelectorAll('.article-card').length, 2);
+});
+
