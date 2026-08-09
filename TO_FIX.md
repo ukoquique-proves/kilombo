@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-09 (v0.23.0+) — ítems 40–42 añadidos; sidebar leakage de 10 artículos PI resuelto.
+Última actualización: 2026-08-09 (v0.23.0+) — ítems 40–42 añadidos; sidebar leakage de 10 artículos PI resuelto. Ítem 44 añadido (duplicación de URLs de red en 3 fuentes).
 
 ---
 
@@ -152,6 +152,15 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | 25 | tooling | Deploy.yml invisible en compact-bundle — incluir manualmente en sesiones CI | 🟡 Solución adoptada (nota en deploy.yml) |
 | 26 | global | Doble mantenimiento kilombo.top + espejo — cerrar ventana tras primer deploy | 🟡 Deuda futura |
 | **43** | `site/js/decrypt.mjs` | Offset IV incorrecto — JSON cifrado siempre falla tras login | ✅ Resuelto v0.26.0 |
+| **44** | `.env.example` / `index.html` / `README.md` | URLs de red en 3 fuentes de verdad paralelas — solo detectado, no eliminado | 🟡 Deuda técnica |
 | YunoHost-A/C/D | servidor | Abrir puerto 22, crear app, primer deploy | ⏸ Pendiente cliente |
 
 - [x] **43. CRÍTICO: `decrypt.mjs` usa offset de IV incorrecto — ✅ Resuelto en v0.26.0.** El formato real del ciphertext de staticrypt es `hmac(64 hex) + iv(32 hex) + datos`. `aesDecrypt()` trataba los primeros 32 hex como IV (parte del HMAC), produciendo fallo silencioso de decifrado en toda página con JSON cifrado. Fix: `HMAC_HEX_LEN = 64` añadido, slices corregidos a `ciphertext.slice(64, 96)` para IV y `ciphertext.slice(96)` para datos.
+
+- [ ] **44. Las URLs de la red Kilombo tienen 3 fuentes de verdad en paralelo, sin una fuente única** — `.env.example`, el bloque `<!-- CONFIG -->` de `site/index.html`, y la tabla de `README.md` declaran las mismas URLs de forma independiente. `scripts/check-urls.mjs` existe únicamente para *detectar* el drift entre las tres — no lo elimina, y una sesión puede seguir editando solo una de las tres fuentes y no descubrirlo hasta que `npm test` falle (o, si no se corre el test, nunca).
+  - **Fix propuesto:** centralizar la lista en un único archivo, p. ej. `assets/data/network-urls.json` (formato `{ tierra: "...", gci: "...", gci_en: "...", ... }`), y hacer que las otras tres fuentes lo consuman en vez de declarar valores propios:
+    1. `.env.example` — generar sus líneas `KILOMBO_SITE_*` a partir del JSON con un script pequeño, o documentar que el JSON es la fuente y `.env.example` solo referencia sus keys
+    2. `site/index.html` — el bloque `<!-- CONFIG -->` deja de ser comentario informativo y pasa a construirse (o al menos verificarse) desde el mismo JSON en build/test
+    3. `README.md` — la tabla "Sitios reales de la red Kilombo" se genera desde el JSON, o `check-urls.mjs` la valida contra el JSON en vez de comparar tres fuentes libres entre sí
+  - Con esto, `check-urls.mjs` pasa de ser un detector de drift a ser (opcionalmente) redundante — o se reduce a validar que nadie haya hardcodeado una URL fuera del JSON central.
+  - Relacionado con el ítem **39** (mismo patrón de duplicación, en CSS en vez de URLs) — si se aborda uno, vale la pena revisar el otro con el mismo criterio.

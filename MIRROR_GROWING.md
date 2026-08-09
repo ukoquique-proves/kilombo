@@ -10,6 +10,45 @@ Para el plan de trabajo ver `ROADMAP.md`.
 
 ---
 
+## 0. Arquitectura del espejo — dos niveles, no uno
+
+El espejo Kilombo **no** replica todo el contenido de la red de forma uniforme.
+Existen dos niveles distintos, cada uno con su propio contrato técnico. Esto
+es una decisión de diseño explícita — no debe interpretarse como una mezcla
+accidental de patrones, ni "completarse" añadiendo scraping automático a
+Nivel 1 sin pasar por este documento primero.
+
+| | **Nivel 1 — Directorio** | **Nivel 2 — Espejo real** |
+|---|---|---|
+| **Qué es** | Tarjeta con enlace saliente (`target="_blank"`) a un subdominio de la red (`icg-gci.kilombo.top`, `proletariosinternacionalistas.kilombo.top`, `www.kilombo.top`) | Contenido copiado, saneado y servido desde el propio portal |
+| **Dónde vive** | Solo en `index.html` — no hay JSON, no hay JS de render detrás | `assets/content/articles.json` + `assets/data/plandemismo-*.json`, renderizados por `articles.js` / `plandemismo.js` / `render.mjs` |
+| **Persistencia si la fuente cae** | Ninguna — el enlace deja de funcionar | Total — el contenido sigue sirviéndose desde GitHub Pages / `kilombo.top` |
+| **Pasa por `sanitizeHtml()` / cifrado StatiCrypt** | No aplica | Sí, siempre |
+| **Cómo crece** | Se añade una tarjeta nueva a mano en `index.html` cuando hay un nuevo espacio amigo/aliado confirmado | Sigue el proceso de la sección 2 de este documento (selección → JSON → `npm test` → deploy) |
+| **Indicador visual al usuario** | **Pendiente — ver ROADMAP.md §6.** Hoy usa la misma clase `.card` que el Nivel 2, sin distinción visible. No confiar en la URL de destino como única señal. | — |
+
+### Regla de promoción Nivel 1 → Nivel 2
+
+Un enlace de Nivel 1 **no** se convierte en Nivel 2 automáticamente ni por
+iniciativa individual de una sesión de trabajo. Se promueve pieza por pieza
+(artículo o vídeo concreto) siguiendo la regla de admisión de la sección 1,
+nunca "todo el sitio de golpe". El objetivo de Kilombo no es espejar la red
+entera 1:1, sino incorporar selectivamente lo que encaja con la línea
+editorial — ver sección 1, regla de admisión, punto 1.
+
+### Por qué esto importa para cualquier sesión nueva
+
+Si una sesión de trabajo (humana o asistida por IA) llega a este repo y
+asume que "espejo" significa "todo lo enlazado también está copiado
+localmente", va a diagnosticar como bug algo que es diseño intencional, o
+peor, va a intentar auto-scrapear secciones enteras de GCI/PI/Tierra que
+nunca estuvieron destinadas a Nivel 2. Este documento es la fuente de verdad
+sobre qué nivel le corresponde a cada contenido — antes de tocar `index.html`
+o de escribir en `articles.json`, confirmar aquí en qué nivel se está
+trabajando.
+
+---
+
 ## 1. Fuentes de contenido autorizadas
 
 El espejo puede incorporar material de las siguientes fuentes:
@@ -306,3 +345,4 @@ Semana 4+:
 - `TO_FIX.md` — problemas abiertos que afectan al contenido actual
 - `scripts/validate-data.mjs` — schema completo de artículos y vídeos
 - `site/js/render.mjs` — allowlist de etiquetas HTML permitidas en contentHtml
+

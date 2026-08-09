@@ -124,7 +124,11 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 - [ ] Sistema de pestañas (tabs) o selector de idioma dentro de cada sección numerada (GCI, P.I., NOM)
 - [ ] Páginas individuales por idioma con contenido filtrado
 - [ ] Selector global de idioma en la cabecera (ES / EN / FR / Multilingüe)
-- [ ] Indicadores visuales explícitos de enlace externo vs. interno — distinguir en las tarjetas qué links permanecen dentro del espejo (articulos.html, plandemismo.html) y cuáles abren subdominios externos (icg-gci.kilombo.top, etc.)
+- [ ] **Indicadores visuales explícitos Nivel 1 (directorio) vs. Nivel 2 (espejo real)** — ver `MIRROR_GROWING.md §0` para la definición de los dos niveles. Especificación mínima para cerrar este ítem:
+  - [ ] Nueva variante de badge, p. ej. `.card-status--external` (Nivel 1) vs. `.card-status--mirrored` (Nivel 2), añadida junto a las existentes `.card-status--active` / `--archive` / `--legacy` en `style.css`
+  - [ ] Icono o texto corto y consistente en el badge (p. ej. "↗ Externo" vs. "Espejo") — no solo color, para cumplir el requisito de accesibilidad de `MIRROR_GROWING.md §4.6` ("no usar color como único indicador de estado")
+  - [ ] Aplicar la nueva clase a **todas** las tarjetas de `index.html`: Nivel 1 = las que apuntan a `icg-gci.kilombo.top`, `in.kilombo.top`, `cdrom.kilombo.top`, `icg-old.kilombo.top`, `proletariosinternacionalistas.kilombo.top`, `www.kilombo.top`; Nivel 2 = las que apuntan a `articulos.html` / `plandemismo.html`
+  - [ ] Test de regresión simple (o checklist manual) que falle si se añade una tarjeta nueva a `index.html` sin badge de nivel — evita que este ítem se resuelva una vez y luego se erosione con el siguiente artículo/enlace añadido
 
 ### 6b. Búsqueda y descubrimiento de contenido
 - [ ] **Búsqueda client-side** — integrar herramienta ligera (Pagefind, Lunr.js, o Algolia) sobre todos los artículos e índices de archivo del portal
@@ -245,3 +249,4 @@ El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`,
 | 9. SEO y metadatos | Pendiente | 0.5 día |
 | **10. Deploy a `kilombo.top`** | Pendiente — solo requiere abrir puerto 22 desde el panel YunoHost (sin necesitar a los administradores) | 0.5 día |
 | 11–12. Mantenimiento (documentación) | Pendiente | 0.5 día |
+
