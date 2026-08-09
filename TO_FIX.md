@@ -151,16 +151,7 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | **42** | `articles.json` / contre-genocide-pi (FR) | `<strong>` fuera de `<p>` en encabezado (inconsistencia con ES) | ✅ Resuelto 2026-08-09 |
 | 25 | tooling | Deploy.yml invisible en compact-bundle — incluir manualmente en sesiones CI | 🟡 Solución adoptada (nota en deploy.yml) |
 | 26 | global | Doble mantenimiento kilombo.top + espejo — cerrar ventana tras primer deploy | 🟡 Deuda futura |
-| **43** | `site/js/decrypt.mjs` | Offset IV incorrecto — JSON cifrado siempre falla tras login | 🔴 Crítico |
+| **43** | `site/js/decrypt.mjs` | Offset IV incorrecto — JSON cifrado siempre falla tras login | ✅ Resuelto v0.26.0 |
 | YunoHost-A/C/D | servidor | Abrir puerto 22, crear app, primer deploy | ⏸ Pendiente cliente |
 
-- [ ] **43. CRÍTICO: `decrypt.mjs` usa offset de IV incorrecto — JSON cifrado siempre falla tras login** — el formato real del ciphertext producido por `encode()` de staticrypt es `hmac(64 hex) + iv(32 hex) + datos`. `aesDecrypt()` en `decrypt.mjs` trata los primeros 32 hex chars como el IV (`IV_HEX_LEN = IV_BYTES * 2 = 32`), que en realidad son los primeros 32 chars del HMAC-SHA256. El IV real empieza en offset 64, no en 0. El resultado: `crypto.subtle.decrypt()` usa bytes incorrectos, falla, el catch de `parseJson()` lanza excepción, y `articulos.html` y cualquier página con JSON cifrado muestran "Error cargando el índice" aunque la contraseña sea correcta.
-  - **Verificado:** `encode('{"test":1}', pwd, salt)` produce 128 hex chars — primeros 64 = HMAC-SHA256, siguientes 32 = IV, resto = datos AES-CBC. `cryptoEngine.decrypt(ct.slice(64), hashedPwd)` descifra correctamente.
-  - **Fix en `aesDecrypt()`:**
-    ```js
-    const HMAC_HEX_LEN = 64;  // HMAC-SHA256 = 32 bytes = 64 hex chars
-    const IV_HEX_LEN   = 32;  // AES IV = 16 bytes = 32 hex chars
-    const iv   = fromHex(ciphertext.slice(HMAC_HEX_LEN, HMAC_HEX_LEN + IV_HEX_LEN));
-    const data = fromHex(ciphertext.slice(HMAC_HEX_LEN + IV_HEX_LEN));
-    ```
-  - **Además:** actualizar `test/encrypt-decrypt.test.mjs` para que ejercite el `aesDecrypt` manual directamente (cierra también TO_FIX #35 Fix B).
+- [x] **43. CRÍTICO: `decrypt.mjs` usa offset de IV incorrecto — ✅ Resuelto en v0.26.0.** El formato real del ciphertext de staticrypt es `hmac(64 hex) + iv(32 hex) + datos`. `aesDecrypt()` trataba los primeros 32 hex como IV (parte del HMAC), produciendo fallo silencioso de decifrado en toda página con JSON cifrado. Fix: `HMAC_HEX_LEN = 64` añadido, slices corregidos a `ciphertext.slice(64, 96)` para IV y `ciphertext.slice(96)` para datos.

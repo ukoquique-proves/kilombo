@@ -5,6 +5,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.26.0] — 2026-08-09
+
+### Fixed (bug crítico — artículos no visibles tras login, segunda causa)
+- **`site/js/decrypt.mjs`**: offset de IV incorrecto en `aesDecrypt()`. El ciphertext producido por `encode()` de staticrypt tiene formato `hmac(64 hex) + iv(32 hex) + datos AES-CBC`. El código anterior usaba `IV_HEX_LEN = IV_BYTES * 2 = 32` y hacía `ciphertext.slice(0, 32)` como IV, que en realidad son los primeros 32 chars del HMAC-SHA256. El IV real está en `slice(64, 96)` y los datos en `slice(96)`. Resultado del bug: `crypto.subtle.decrypt()` recibía bytes incorrectos, fallaba, `parseJson()` lanzaba excepción, y `articulos.html` mostraba "Error cargando el índice de artículos" aunque la contraseña fuera correcta. Fix: `HMAC_HEX_LEN = 64` añadido, slices corregidos. Verificado con round-trip en Node antes del deploy.
+- Eliminada constante `IV_BYTES` (ya no necesaria tras el fix).
+
+---
+
 ## [0.25.0] — 2026-08-09
 
 ### Fixed (bug crítico — artículos no visibles tras login)
