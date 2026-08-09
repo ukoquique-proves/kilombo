@@ -130,7 +130,22 @@ KILOMBO/
 ```
 
 ---
+## Preparación para subir a GitHub
 
+Antes de publicar, asegúrate de que el repositorio cumple estas condiciones:
+
+- Ejecuta `npm test` y confirma que todas las comprobaciones pasan.
+- Comprueba que `.env` y `dist/` no estén rastreados por Git.
+- Usa `.env.example` como plantilla pública y no subas credenciales reales.
+- Verifica que `.github/workflows/deploy.yml` existe para publicar en GitHub Pages.
+- Tiene un hook `pre-push` que puede pausar `git push` si hay cambios en `site/`; revisa la vista previa local antes de continuar.
+- Si necesitas hacer push desde un entorno automatizado, usa `SKIP_PREVIEW_CHECK=1 git push origin main`.
+- Revisa `package.json` y añade `author`, `repository`, `homepage` o descripción si quieres mejorar el metadata del paquete.
+- Asegúrate de que no hay datos sensibles en los archivos versionados.
+
+> Esta sección resume las recomendaciones necesarias para subir el proyecto de forma segura y coherente.
+
+---
 ## Convenciones del proyecto
 
 - **Comunicación entre equipo (humano/IA):** Inglés
