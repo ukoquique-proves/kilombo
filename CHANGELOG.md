@@ -5,6 +5,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.28.0] — 2026-08-09
+
+### Fixed (TO_FIX #44 — triple source of truth for network URLs)
+- **`site/assets/network-urls.json`** (nuevo): fuente única de verdad para las 7 URLs de la red Kilombo (`sso`, `tierra`, `gci`, `gci_en`, `gci_cdrom`, `gci_old`, `pi`). Para cambiar una URL, se edita aquí — el CI detecta automáticamente si alguna de las tres fuentes dependientes queda desincronizada.
+- **`scripts/check-urls.mjs`** reescrito: sustituye el modelo anterior ("comparar tres fuentes libres entre sí") por "validar cada fuente contra el JSON de referencia". El script carga `network-urls.json`, comprueba que cada URL aparezca en `.env.example`, `site/index.html` y `README.md`, e informa exactamente qué fuente falta cada URL. Elimina el blindspot de TO_FIX #44 donde una sesión podía editar solo una de las tres fuentes y no descubrirlo hasta que `npm test` fallara (o nunca).
+- `network-urls.json` se coloca en `site/assets/` (no en `site/assets/data/`) para no ser recogido por el validador de arrays de `validate-data.mjs`.
+
+---
+
 ## [0.27.0] — 2026-08-09
 
 ### Added (diseño — badges de nivel)

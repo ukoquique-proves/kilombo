@@ -152,7 +152,7 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | 25 | tooling | Deploy.yml invisible en compact-bundle — incluir manualmente en sesiones CI | 🟡 Solución adoptada (nota en deploy.yml) |
 | 26 | global | Doble mantenimiento kilombo.top + espejo — cerrar ventana tras primer deploy | 🟡 Deuda futura |
 | **43** | `site/js/decrypt.mjs` | Offset IV incorrecto — JSON cifrado siempre falla tras login | ✅ Resuelto v0.26.0 |
-| **44** | `.env.example` / `index.html` / `README.md` | URLs de red en 3 fuentes de verdad paralelas — solo detectado, no eliminado | 🟡 Deuda técnica |
+| **44** | `.env.example` / `index.html` / `README.md` | URLs de red en 3 fuentes de verdad paralelas — solo detectado, no eliminado | ✅ Resuelto v0.28.0 |
 | YunoHost-A/C/D | servidor | Abrir puerto 22, crear app, primer deploy | ⏸ Pendiente cliente |
 
 - [x] **43. CRÍTICO: `decrypt.mjs` usa offset de IV incorrecto — ✅ Resuelto en v0.26.0.** El formato real del ciphertext de staticrypt es `hmac(64 hex) + iv(32 hex) + datos`. `aesDecrypt()` trataba los primeros 32 hex como IV (parte del HMAC), produciendo fallo silencioso de decifrado en toda página con JSON cifrado. Fix: `HMAC_HEX_LEN = 64` añadido, slices corregidos a `ciphertext.slice(64, 96)` para IV y `ciphertext.slice(96)` para datos.
