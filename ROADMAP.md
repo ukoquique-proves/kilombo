@@ -128,7 +128,7 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
   - [ ] Nueva variante de badge, p. ej. `.card-status--external` (Nivel 1) vs. `.card-status--mirrored` (Nivel 2), añadida junto a las existentes `.card-status--active` / `--archive` / `--legacy` en `style.css`
   - [ ] Icono o texto corto y consistente en el badge (p. ej. "↗ Externo" vs. "Espejo") — no solo color, para cumplir el requisito de accesibilidad de `MIRROR_GROWING.md §4.6` ("no usar color como único indicador de estado")
   - [ ] Aplicar la nueva clase a **todas** las tarjetas de `index.html`: Nivel 1 = las que apuntan a `icg-gci.kilombo.top`, `in.kilombo.top`, `cdrom.kilombo.top`, `icg-old.kilombo.top`, `proletariosinternacionalistas.kilombo.top`, `www.kilombo.top`; Nivel 2 = las que apuntan a `articulos.html` / `plandemismo.html`
-  - [ ] Test de regresión simple (o checklist manual) que falle si se añade una tarjeta nueva a `index.html` sin badge de nivel — evita que este ítem se resuelva una vez y luego se erosione con el siguiente artículo/enlace añadido
+  - [ ] Test de regresión simple (o checklist manual) que falle si se añade una tarjeta nueva a `index.html` sin badge de nivel — evita que este ítem se resuelva una vez y luego se erosione con el siguiente artículo/enlace añadido. Actualmente no hay verificación automatizada; la clase se aplicó correctamente a mano en esta sesión, pero no existe un enforcement técnico para nuevas tarjetas.
 
 ### 6b. Búsqueda y descubrimiento de contenido
 - [ ] **Búsqueda client-side** — integrar herramienta ligera (Pagefind, Lunr.js, o Algolia) sobre todos los artículos e índices de archivo del portal
