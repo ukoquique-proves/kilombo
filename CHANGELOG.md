@@ -5,6 +5,26 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.27.0] — 2026-08-09
+
+### Added (diseño — badges de nivel)
+- **`site/css/style.css`**: dos nuevas variantes de `.card-status`:
+  - `.card-status--external` — píldora gris neutro con texto "↗ Externo" — para tarjetas de Nivel 1 (enlaces salientes a subdominios externos)
+  - `.card-status--mirrored` — píldora tinte índigo con texto "⬡ Espejo" — para tarjetas de Nivel 2 (contenido alojado localmente en el portal)
+  - `.card-header` pasa de `justify-content: space-between` sin wrap a `flex-wrap: wrap` + `gap: 0.35rem` para que tres badges quepan en móvil sin desbordamiento
+- **`site/index.html`**: badge de nivel añadido a las 8 tarjetas:
+  - Nivel 1 (↗ Externo): Espacio Tierra y Libertad, GCI Oficial, International Global Revolution, ICG CD-Rom, ICG Histórico, Proletarios Internacionalistas
+  - Nivel 2 (⬡ Espejo): Artículos internos, Sección Plandemismo
+  - Los badges usan texto, no solo color — cumple regla de accesibilidad MIRROR_GROWING.md §4.6
+- Implementa la especificación de ROADMAP.md §6 (indicadores Nivel 1 vs Nivel 2)
+
+### Docs
+- `MIRROR_GROWING.md`: añadida §0 "Arquitectura del espejo — dos niveles, no uno" — tabla comparativa, regla de promoción L1→L2, advertencia para sesiones futuras
+- `ROADMAP.md §6`: ítem de badges expandido a spec completa (nombres de clase, requisito de accesibilidad, lista de tarjetas por nivel, nota de regresión)
+- `TO_FIX.md`: ítem #44 añadido — URLs de red duplicadas en 3 fuentes de verdad (`.env.example`, `index.html` CONFIG block, `README.md`)
+
+---
+
 ## [0.26.0] — 2026-08-09
 
 ### Fixed (bug crítico — artículos no visibles tras login, segunda causa)
