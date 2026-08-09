@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-07 (v0.23.0+) — ítems 32–34 añadidos.
+Última actualización: 2026-08-07 (v0.23.0+) — ítems 35–39 añadidos.
 
 ---
 
@@ -62,7 +62,21 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 - [x] **34. TROUBLESHOOTING.md §8 (scraping) no está referenciado desde MIRROR_GROWING.md §2** — ✅ Resuelto: añadida referencia cruzada en MIRROR_GROWING.md §2 → TROUBLESHOOTING.md §8.
 
-- [ ] **29. Docstring de `test/encrypt-decrypt.test.mjs` sobreestima lo que verifica** — el comentario de cabecera dice que el test "reimplementa la lógica de `decrypt.mjs` usando `crypto.webcrypto` de Node... sin importar `decrypt.mjs` directamente." En la práctica el test usa `codec.decode()` de staticrypt (no una reimplementación del `aesDecrypt()` manual de `decrypt.mjs`). El test valida correctamente el round-trip a nivel de la librería staticrypt, pero un bug específico del código manual de `decrypt.mjs` (p.ej. un off-by-one en `ciphertext.slice(IV_HEX_LEN)`) lo atravesaría sin ser detectado.
+- [ ] **35. Los dos safety checkers pueden divergir silenciosamente** — `render.mjs`'s `isSafeUrl()` bloquea `javascript:`/`data:`/`vbscript:`. La nueva regla de URLs relativas en `validate-data.mjs` vive solo en el validador CI, no en el sanitizador del navegador. Defensible (las URLs relativas no son riesgo XSS, solo breakage), pero es exactamente la asimetría que dejó pasar el bug original.
+  - **Fix A (mínimo):** añadir un test que afirme que ambas implementaciones coinciden sobre un fixture compartido — si una de las dos cambia, el test falla.
+  - **Fix B (completo):** extraer las reglas compartidas de allowlist/URL a un módulo pequeño importado por ambos archivos (`site/js/sanitize-rules.mjs`), eliminando la duplicación.
+
+- [ ] **36. El pipeline de importación de contenido es documentación, no código** — todo lo demás en `scripts/` (`encrypt.mjs`, `validate-data.mjs`, `check-urls.mjs`) es un script real y testado. La lógica de scraping/limpieza/reescritura de URLs en TROUBLESHOOTING.md §8 son snippets Python en un Markdown, ejecutados ad hoc por quien hace el import en esa sesión. Esta inconsistencia es la razón por la que los bugs de URL relativa y `alt` vacío ocurrieron — un humano/sesión tiene que recordar ejecutar cada paso correctamente cada vez.
+  - **Fix:** promover §8 a un script real `scripts/import-article.mjs` (o `.py`) que ejecute dedup → fetch → extract → clean → rewrite_relative_urls → write y llame a `validate-data.mjs` al final. Convierte "disciplina documentada" en "disciplina reforzada".
+
+- [ ] **37. `INICIO/ROADMAP.md` crea ambigüedad con el `ROADMAP.md` activo** — hay dos archivos con el mismo nombre: `ROADMAP.md` (raíz, hoja de ruta técnica activa) y `INICIO/ROADMAP.md` (plan diagnóstico de 5 fases, archivado). Está documentado en el README, pero es una trampa para cualquier sesión — humana o IA — que haga `grep ROADMAP` sin leer el README primero.
+  - **Fix (barato):** renombrar el archivado a `INICIO/ROADMAP-fase-diagnostico.md`. ✅ Hecho en este mismo commit.
+
+- [ ] **38. La deuda de traducción ES/FR solo es visible por búsqueda de texto** — el incumplimiento de la regla §5.3 de MIRROR_GROWING.md (ningún texto nuevo en una sola lengua si se puede cubrir la traducción) se detecta haciendo `grep` por "pendiente FR" en los docs. No hay visión estructurada.
+  - **Fix:** un script pequeño `scripts/check-translations.mjs` que lea `articles.json`, agrupe las entradas por `sourceUrl` o por pares de topics/title, e informe qué artículos tienen versión ES pero no FR (o viceversa). Corto de escribir, directamente accionable antes de cada sesión de importación.
+
+- [ ] **39. `plandemismo.css` redeclara los tokens de color de `style.css` con valores hex hardcodeados** — el patrón `var(--x, #fallback)` es legítimo (autocontención del módulo CSS), pero los valores hex están duplicados a mano en dos archivos y pueden divergir si uno se actualiza sin el otro. Baja prioridad pero es deuda real.
+  - **Fix:** usar `@import` de `style.css` en `plandemismo.css` (si la arquitectura lo permite) o eliminar los fallbacks hex y confiar en que `style.css` siempre se cargue antes (ya es el caso en todos los HTML del proyecto). — el comentario de cabecera dice que el test "reimplementa la lógica de `decrypt.mjs` usando `crypto.webcrypto` de Node... sin importar `decrypt.mjs` directamente." En la práctica el test usa `codec.decode()` de staticrypt (no una reimplementación del `aesDecrypt()` manual de `decrypt.mjs`). El test valida correctamente el round-trip a nivel de la librería staticrypt, pero un bug específico del código manual de `decrypt.mjs` (p.ej. un off-by-one en `ciphertext.slice(IV_HEX_LEN)`) lo atravesaría sin ser detectado.
   - **Fix A (mínimo):** corregir el comentario para que describa con exactitud lo que se verifica.
   - **Fix B (completo):** extraer `fromHex()` y `aesDecrypt()` de `decrypt.mjs` a un pequeño módulo puro importable desde Node sin `sessionStorage`, y añadir un test que ejercite ese código directamente.
 
@@ -111,6 +125,11 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | **30** | `articles.json` | `el-fraude-de-los-pcr` es un stub imagen-only — pendiente de contenido real | 🟡 Pendiente de revisión |
 | 29 | `test/encrypt-decrypt.test.mjs` | Docstring sobreestima cobertura — no ejercita `decrypt.mjs` directamente | 🟡 Deuda técnica |
 | 24 | `scripts/` | Script de rotación de contraseñas para KILOMBOTOP + STATICRYPT | 🟡 Deuda técnica |
-| 25 | tooling | Blind spot de `.github/` en generador de contexto compacto | 🟡 Deuda técnica |
+| **35** | `render.mjs` + `validate-data.mjs` | Safety checkers pueden divergir — reglas no compartidas | 🟡 Deuda técnica |
+| **36** | `scripts/` | Pipeline de importación es doc, no código — debería ser `import-article.mjs` | 🟡 Deuda técnica |
+| **37** | `INICIO/ROADMAP.md` | Ambigüedad de nombre con `ROADMAP.md` activo | ✅ Renombrado en este commit |
+| **38** | `articles.json` | Deuda traducción ES/FR sin visión estructurada — falta `check-translations.mjs` | 🟡 Deuda técnica |
+| **39** | `plandemismo.css` | Tokens de color duplicados con `style.css` — pueden divergir | 🟡 Baja prioridad |
+| 25 | tooling | Deploy.yml invisible en compact-bundle — incluir manualmente en sesiones CI | 🟡 Solución adoptada (nota en deploy.yml) |
 | 26 | global | Doble mantenimiento kilombo.top + espejo — cerrar ventana tras primer deploy | 🟡 Deuda futura |
 | YunoHost-A/C/D | servidor | Abrir puerto 22, crear app, primer deploy | ⏸ Pendiente cliente |
