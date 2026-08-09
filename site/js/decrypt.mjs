@@ -19,7 +19,6 @@
  */
 
 const STORAGE_KEY = 'staticrypt_passphrase';
-const IV_BYTES    = 16; // AES-CBC IV length in bytes (32 hex chars)
 
 /** hex string → Uint8Array */
 function fromHex(hex) {
@@ -39,9 +38,10 @@ function fromHex(hex) {
  * @returns {Promise<string>}     Decrypted plaintext
  */
 async function aesDecrypt(ciphertext, hashedPassword) {
-  const IV_HEX_LEN = IV_BYTES * 2;
-  const iv         = fromHex(ciphertext.slice(0, IV_HEX_LEN));
-  const data       = fromHex(ciphertext.slice(IV_HEX_LEN));
+  const HMAC_HEX_LEN = 64; // HMAC-SHA256 = 32 bytes = 64 hex chars (prepended by staticrypt's encode())
+  const IV_HEX_LEN   = 32; // AES-CBC IV = 16 bytes = 32 hex chars
+  const iv   = fromHex(ciphertext.slice(HMAC_HEX_LEN, HMAC_HEX_LEN + IV_HEX_LEN));
+  const data = fromHex(ciphertext.slice(HMAC_HEX_LEN + IV_HEX_LEN));
 
   const key = await crypto.subtle.importKey(
     'raw',
