@@ -19,10 +19,13 @@
  *   5. A wrong password produces a decryption error (not silent garbage)
  *   6. Plain (non-encrypted) JSON passes through parseJson() unchanged
  *
- * The test reimplements the decrypt.mjs logic using Node's built-in
- * crypto.webcrypto (structurally identical to the browser Web Crypto API)
- * so it runs in Node without a DOM shim and without importing decrypt.mjs
- * directly (which references sessionStorage, a browser-only global).
+ * The test uses staticrypt's own codec.decode() — the canonical inverse of
+ * encode() — rather than reimplementing the AES/HMAC pipeline directly.
+ * This means it validates the encrypt→decode round-trip at the staticrypt
+ * library level. A bug specific to decrypt.mjs's manual aesDecrypt() path
+ * (e.g. the HMAC prefix offset) would NOT be caught here — see TO_FIX #35
+ * Fix B for that gap. The trade-off is accepted: codec.decode() is the
+ * authoritative inverse and will break first if staticrypt changes format.
  *
  * Run with:   node --test test/encrypt-decrypt.test.mjs
  * Or via:     ./scripts/test.sh

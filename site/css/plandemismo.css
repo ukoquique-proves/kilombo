@@ -30,6 +30,9 @@
   --lang-en:           var(--lang-en,           #311b92);
   --status-legacy-bg:  var(--status-legacy-bg,  #eceff1);
   --status-legacy-fg:  var(--status-legacy-fg,  #455a64);
+  --font-serif:        var(--font-serif,        'Playfair Display', Georgia, serif);
+  --font-sans:         var(--font-sans,         'Inter', Verdana, Arial, sans-serif);
+  --font-mono:         var(--font-mono,         'Courier New', 'Lucida Console', monospace);
 
   /* NOM section own palette (always defined here, no fallback needed) */
   --plandem-red: #8b0000;
@@ -46,7 +49,7 @@
 
 .site-back-link {
   display: inline-block;
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   color: var(--paper);
   opacity: 0.75;
@@ -76,7 +79,7 @@
 
 .page-lead__note {
   font-size: 0.88rem;
-  color: #555;
+  color: var(--gray);
   font-style: italic;
   border-top: 1px dashed rgba(0,0,0,0.12);
   padding-top: 0.75rem;
@@ -103,14 +106,14 @@
 }
 
 .tab {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
   font-weight: 700;
   font-size: 0.95rem;
   padding: 0.85rem 1.4rem;
   background: transparent;
   border: 2px solid transparent;
   border-bottom: none;
-  color: #555;
+  color: var(--gray);
   cursor: pointer;
   letter-spacing: 0.02em;
   position: relative;
@@ -131,7 +134,7 @@
 }
 
 .tab-num {
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.15em;
   color: var(--gray-light);
@@ -170,7 +173,7 @@
 }
 
 .section-subheader p {
-  color: #444;
+  color: var(--gray);
   font-size: 1rem;
 }
 
@@ -206,7 +209,7 @@
 
 .coming-soon {
   margin-top: 1.5rem;
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 1.2rem;
   letter-spacing: 0.4em;
   text-align: center;
@@ -341,7 +344,7 @@
   position: absolute;
   bottom: 0.6rem;
   left: 0.75rem;
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   font-weight: 700;
   color: #fff;
@@ -359,7 +362,7 @@
   position: absolute;
   top: 0.6rem;
   right: 0.75rem;
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 700;
   background: var(--plandem-red);
@@ -405,7 +408,7 @@
   font-style: italic;
   text-transform: none;
   letter-spacing: 0;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.75rem;
 }
 
@@ -425,7 +428,7 @@
 
 .video-card__desc {
   font-size: 0.9rem;
-  color: #3a3a3a;
+  color: var(--gray);
   line-height: 1.55;
   margin-bottom: 0.9rem;
 }
@@ -440,7 +443,7 @@
 
 .video-card__keypoints li {
   font-size: 0.88rem;
-  color: #333;
+  color: var(--ink);
   padding: 0.2rem 0;
   position: relative;
 }
@@ -460,7 +463,7 @@
 }
 
 .lang-chip {
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 0.67rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -476,11 +479,11 @@
    It was only ever used with --pending / --todo variants. Re-add only if
    FR-original videos appear (i.e. videos whose source is FR, not subtitles). */
 .lang-chip--en { background: rgba(49,27,146,0.11); color: #311b92; border-color: rgba(49,27,146,0.22); }
-.lang-chip--de { background: rgba(0,0,0,0.09);     color: #333;    border-color: rgba(0,0,0,0.2); }
+.lang-chip--de { background: rgba(0,0,0,0.09); color: var(--ink); border-color: rgba(0,0,0,0.2); }
 
 .lang-chip--pending {
   background: rgba(69,90,100,0.1);
-  color: #546e7a;
+  color: var(--status-legacy-fg);
   font-style: italic;
   border-style: dashed;
   border-color: rgba(69,90,100,0.25);
@@ -502,7 +505,7 @@
   display: inline-block;
   margin-top: auto;
   align-self: flex-start;
-  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-weight: 700;
   font-size: 0.82rem;
   letter-spacing: 0.04em;
