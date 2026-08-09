@@ -411,6 +411,17 @@ class="texte surlignable clearfix"
 from urllib.parse import urljoin
 import re
 
+# 0. *** DEDUP CHECK — hacer ANTES de cualquier fetch ***
+#    Verificar que el sourceUrl (y el id previsto) no existe ya en articles.json.
+#    MIRROR_GROWING.md §1 regla #3 lo exige explícitamente.
+import json
+with open('site/assets/content/articles.json') as f:
+    existing = json.load(f)
+existing_urls = {a['sourceUrl'] for a in existing}
+existing_ids  = {a['id']        for a in existing}
+if source_url in existing_urls:
+    raise SystemExit(f"SKIP: {source_url} ya está en articles.json")
+
 # 1. Fetch
 req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 body = urllib.request.urlopen(req).read().decode('utf-8', errors='replace')
@@ -424,6 +435,8 @@ body = urllib.request.urlopen(req).read().decode('utf-8', errors='replace')
 #    - Convertir {{texto}} → <strong>, {texto} → <em> (markup SPIP)
 #    - Eliminar imágenes de logo/cabecera
 #    - Reducir a etiquetas del allowlist de sanitizeHtml()
+#    - Si queda algún <img>, verificar que alt sea descriptivo —
+#      alt="" vacío viola MIRROR_GROWING.md §4.6; escribirlo manualmente
 
 # 4. *** REESCRIBIR URLs RELATIVAS A ABSOLUTAS ***
 #    SIEMPRE hacer este paso antes de guardar en articles.json.
@@ -444,3 +457,10 @@ html = rewrite_relative_urls(html, source_url)
 ```
 
 **Por qué validate-data.mjs lo detecta ahora:** la regla `contentHtml` en `scripts/validate-data.mjs` incluye desde v0.23.0 un check que falla si cualquier `src=` o `href=` tiene un valor no-absoluto (que no empiece por `https?://`, `#`, o `mailto:`). El CI bloqueará el deploy si se intenta publicar una entrada con URLs relativas.
+
+**Restricciones conocidas del allowlist de `sanitizeHtml()`:**
+- `<h1>` y `<h2>` **no están en el allowlist** — se eliminan silenciosamente. Si el artículo fuente usa encabezados, aplanarlos en `<p><strong>...</strong></p>` antes de guardar, o usarlos solo como `<h3>`/`<h4>` (que sí están permitidos).
+- `<img alt="">` vacío pasa la sanitización pero viola MIRROR_GROWING.md §4.6. Si el `alt` del original está vacío, escribir uno descriptivo manualmente (ver TO_FIX #32).
+
+**Verificación del truncado en PI (heurística `<section id=` / `<footer`):**
+La heurística de truncado del bloque `texte surlignable` en PI es fiable para los artículos de las semanas 1–2, pero no ha sido verificada contra todas las variantes de plantilla PI. Antes de importar artículos PI de Week 3+, hacer un spot-check: abrir el HTML crudo del artículo y confirmar que el marcador de fin (`<section id=` o `<footer`) aparece después del cuerpo completo y antes de la barra lateral "meme-rub".

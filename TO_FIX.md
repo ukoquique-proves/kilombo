@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-07 (v0.19.0+) — ítems 27–29 añadidos.
+Última actualización: 2026-08-07 (v0.23.0+) — ítems 32–34 añadidos.
 
 ---
 
@@ -52,9 +52,15 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - Todos los `.card` en `index.html` son `<a>`. El script no hace nada hoy.
   - Future-proofing intencionado. Sin acción necesaria salvo que se añadan cards no-anchor.
 
+- [x] **32. `alt=""` vacío en imágenes importadas** — ✅ Resuelto en el artículo afectado (`contre-genocide-guerres-infinites-pi`): alt escrito manualmente. Pendiente: añadir comprobación explícita al checklist de importación en MIRROR_GROWING.md §6 y TROUBLESHOOTING.md §8 para que no se repita en imports futuros.
+
+- [x] **33. El flujo documentado de importación no incluye paso de dedup contra articles.json** — ✅ Resuelto: paso 0 de dedup añadido a TROUBLESHOOTING.md §8 flujo de importación.
+
 ---
 
 ## 🟡 Deuda técnica — arquitectura y operaciones
+
+- [x] **34. TROUBLESHOOTING.md §8 (scraping) no está referenciado desde MIRROR_GROWING.md §2** — ✅ Resuelto: añadida referencia cruzada en MIRROR_GROWING.md §2 → TROUBLESHOOTING.md §8.
 
 - [ ] **29. Docstring de `test/encrypt-decrypt.test.mjs` sobreestima lo que verifica** — el comentario de cabecera dice que el test "reimplementa la lógica de `decrypt.mjs` usando `crypto.webcrypto` de Node... sin importar `decrypt.mjs` directamente." En la práctica el test usa `codec.decode()` de staticrypt (no una reimplementación del `aesDecrypt()` manual de `decrypt.mjs`). El test valida correctamente el round-trip a nivel de la librería staticrypt, pero un bug específico del código manual de `decrypt.mjs` (p.ej. un off-by-one en `ciphertext.slice(IV_HEX_LEN)`) lo atravesaría sin ser detectado.
   - **Fix A (mínimo):** corregir el comentario para que describa con exactitud lo que se verifica.
@@ -98,6 +104,9 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | 11 | `plandemismo.html` + `.css` | `page-lead` centrado — confirmar intención visual | ✅ Resuelto v0.8.0 |
 | A-2 | JSON data files | CTAs con URL raíz Canal7 — necesitan URLs reales por vídeo | 🟡 Esperando datos |
 | 21 | `main.js` | `.card:not(a)` sin coincidencias hoy (intencionado) | 🟡 Sin acción |
+| **32** | `articles.json` + flujo scraping | `alt=""` vacío en imágenes importadas — viola MIRROR_GROWING §4.6 | ✅ Dato corregido; checklist pendiente |
+| **33** | TROUBLESHOOTING.md §8 | Flujo de importación sin paso de dedup contra articles.json | ✅ Resuelto |
+| **34** | MIRROR_GROWING.md §2 | No hay referencia cruzada a TROUBLESHOOTING.md §8 (selectores SPIP) | ✅ Resuelto |
 | **31** | `articles.json` + `validate-data.mjs` | URLs relativas en contentHtml dan 404 en el espejo | ✅ Resuelto v0.23.0 |
 | **30** | `articles.json` | `el-fraude-de-los-pcr` es un stub imagen-only — pendiente de contenido real | 🟡 Pendiente de revisión |
 | 29 | `test/encrypt-decrypt.test.mjs` | Docstring sobreestima cobertura — no ejercita `decrypt.mjs` directamente | 🟡 Deuda técnica |
