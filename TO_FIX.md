@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-07 (v0.23.0+) — ítems 35–39 añadidos.
+Última actualización: 2026-08-09 (v0.23.0+) — ítems 40–42 añadidos; sidebar leakage de 10 artículos PI resuelto.
 
 ---
 
@@ -69,8 +69,8 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 - [ ] **36. El pipeline de importación de contenido es documentación, no código** — todo lo demás en `scripts/` (`encrypt.mjs`, `validate-data.mjs`, `check-urls.mjs`) es un script real y testado. La lógica de scraping/limpieza/reescritura de URLs en TROUBLESHOOTING.md §8 son snippets Python en un Markdown, ejecutados ad hoc por quien hace el import en esa sesión. Esta inconsistencia es la razón por la que los bugs de URL relativa y `alt` vacío ocurrieron — un humano/sesión tiene que recordar ejecutar cada paso correctamente cada vez.
   - **Fix:** promover §8 a un script real `scripts/import-article.mjs` (o `.py`) que ejecute dedup → fetch → extract → clean → rewrite_relative_urls → write y llame a `validate-data.mjs` al final. Convierte "disciplina documentada" en "disciplina reforzada".
 
-- [ ] **37. `INICIO/ROADMAP.md` crea ambigüedad con el `ROADMAP.md` activo** — hay dos archivos con el mismo nombre: `ROADMAP.md` (raíz, hoja de ruta técnica activa) y `INICIO/ROADMAP.md` (plan diagnóstico de 5 fases, archivado). Está documentado en el README, pero es una trampa para cualquier sesión — humana o IA — que haga `grep ROADMAP` sin leer el README primero.
-  - **Fix (barato):** renombrar el archivado a `INICIO/ROADMAP-fase-diagnostico.md`. ✅ Hecho en este mismo commit.
+- [x] **37. `INICIO/ROADMAP.md` crea ambigüedad con el `ROADMAP.md` activo** — hay dos archivos con el mismo nombre: `ROADMAP.md` (raíz, hoja de ruta técnica activa) y `INICIO/ROADMAP.md` (plan diagnóstico de 5 fases, archivado). Está documentado en el README, pero es una trampa para cualquier sesión — humana o IA — que haga `grep ROADMAP` sin leer el README primero.
+  - **Fix (barato):** renombrar el archivado a `INICIO/ROADMAP-fase-diagnostico.md`. ✅ Hecho; renombrado confirmado vía `ls INICIO/`. Resuelto en sesión 2026-08-09.
 
 - [ ] **38. La deuda de traducción ES/FR solo es visible por búsqueda de texto** — el incumplimiento de la regla §5.3 de MIRROR_GROWING.md (ningún texto nuevo en una sola lengua si se puede cubrir la traducción) se detecta haciendo `grep` por "pendiente FR" en los docs. No hay visión estructurada.
   - **Fix:** un script pequeño `scripts/check-translations.mjs` que lea `articles.json`, agrupe las entradas por `sourceUrl` o por pares de topics/title, e informe qué artículos tienen versión ES pero no FR (o viceversa). Corto de escribir, directamente accionable antes de cada sesión de importación.
@@ -107,6 +107,24 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 
 ---
 
+
+- [x] **40. Fuga sistemática de barra lateral/sidebar en artículos importados de PI** — los 10 artículos importados desde Proletarios Internacionalistas (PI) (`proletariosinternacionalistas.kilombo.top/spip.php?article{41,43,44,48,49,50,51,52,53,54}`) incluían al final de `contentHtml` el bloque completo de sidebar de SPIP: ancla `#forum`, campo de búsqueda, lista de artículos relacionados ("Also in this section" / "Dans la même rubrique" con 10 enlaces), sección "Portfolio" con miniatura de imagen y bloque "CRITIQUE (Fr)" con enlaces a rubricas. Total: entre 1.545 y 1.556 chars basura por artículo (5,9%–27,4% del `contentHtml` de cada uno). Era el bug previsible documentado en TO_FIX #36 (pipeline de importación es doc, no código) — el truncamiento documentado en TROUBLESHOOTING §8 "encontrar `<section id=` o `<footer`" no se aplicó.
+  - **Fix aplicado en sesión 2026-08-09:** corte limpio al inicio del ancla `<a href="#forum" name="forum">` en los 10 artículos. Script `tmp-clean-pi-articles.py` ejecutado y auditado con `tmp-audit-articles.py` (ambos archivos eliminados tras aplicar).
+  - **Artículos afectados y chars eliminados:**
+    - `contra-genocidio-guerras-infinitas-pi` — 1.521 chars (22,3%)
+    - `contre-genocide-guerres-infinites-pi` — 1.152 chars (16,7%) + portfolio 90×90
+    - `falsos-internacionalistas-1` a `-6` — 1.556 chars × 6 artículos (6,1%–23,0%)
+    - `1-mayo-2023-contra-militarizacion` — 1.545 chars (27,4%)
+    - `plandemismo-y-domesticacion-11` — 1.545 chars (5,9%)
+
+- [x] **41. HTML malformado: `<strong>` anidado/desbalanceado en `contra-genocidio-guerras-infinitas-pi`** — el encabezado del artículo ES tenía la secuencia: `</p>\n<strong>\n ¡Contra el genocidio...! \n<p><strong></strong> </strong></p>`: un `<strong>` abierto fuera de párrafo + un `<strong></strong>` vacío interior + cierre desbalanceado. No rompía el render pero sí la estructura semántica y provocaba warnings de anidamiento.
+  - **Fix aplicado en sesión 2026-08-09:** reemplazado por `<p><strong>¡Contra el genocidio...!</strong></p>` párrafo bien formado, sin strong vacíos ni anidamiento roto.
+
+- [x] **42. HTML inconsistente en `contre-genocide-guerres-infinites-pi`** — el encabezado FR tenía `<strong>Contre le génocide...&nbsp;! </strong>` **fuera** de cualquier etiqueta de párrafo (`<p>`), colgado directamente como hijo del `contentHtml`. El hermano ES ya lo tenía dentro de `<p><strong>…</strong></p>` (diferencia de estructura entre los dos de la traducción).
+  - **Fix aplicado en sesión 2026-08-09:** envuelto en `<p>` (igual que el ES), y eliminado el espacio sobrante antes de `</strong>`: `…agendas&nbsp;! </strong>` → `…agendas&nbsp;!</strong>`.
+
+---
+
 ## Resumen
 
 | # | Archivo | Problema | Estado |
@@ -127,9 +145,12 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | 24 | `scripts/` | Script de rotación de contraseñas para KILOMBOTOP + STATICRYPT | 🟡 Deuda técnica |
 | **35** | `render.mjs` + `validate-data.mjs` | Safety checkers pueden divergir — reglas no compartidas | 🟡 Deuda técnica |
 | **36** | `scripts/` | Pipeline de importación es doc, no código — debería ser `import-article.mjs` | 🟡 Deuda técnica |
-| **37** | `INICIO/ROADMAP.md` | Ambigüedad de nombre con `ROADMAP.md` activo | ✅ Renombrado en este commit |
+| **37** | `INICIO/ROADMAP.md` | Ambigüedad de nombre con `ROADMAP.md` activo | ✅ Resuelto — renombrado a `ROADMAP-fase-diagnostico.md` |
 | **38** | `articles.json` | Deuda traducción ES/FR sin visión estructurada — falta `check-translations.mjs` | 🟡 Deuda técnica |
 | **39** | `plandemismo.css` | Tokens de color duplicados con `style.css` — pueden divergir | 🟡 Baja prioridad |
+| **40** | `articles.json` (10 entradas PI) | Fuga sidebar/footer SPIP + ancla #forum + "Also in this section" — hasta 27% de contenido basura por artículo | ✅ Resuelto 2026-08-09 |
+| **41** | `articles.json` / contra-genocidio-pi (ES) | `<strong>` desbalanceado + strong vacío en encabezado del artículo | ✅ Resuelto 2026-08-09 |
+| **42** | `articles.json` / contre-genocide-pi (FR) | `<strong>` fuera de `<p>` en encabezado (inconsistencia con ES) | ✅ Resuelto 2026-08-09 |
 | 25 | tooling | Deploy.yml invisible en compact-bundle — incluir manualmente en sesiones CI | 🟡 Solución adoptada (nota en deploy.yml) |
 | 26 | global | Doble mantenimiento kilombo.top + espejo — cerrar ventana tras primer deploy | 🟡 Deuda futura |
 | YunoHost-A/C/D | servidor | Abrir puerto 22, crear app, primer deploy | ⏸ Pendiente cliente |

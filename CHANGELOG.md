@@ -5,6 +5,46 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.24.0] — 2026-08-09
+
+> Versión de saneamiento post-importación: auditoría sistemática de los 10 artículos
+> importados desde PI tras el descubrimiento de fuga de sidebar en el par ES/FR.
+> 14.470 caracteres de contenido basura eliminados en total.
+
+### Fixed (bug — fuga sistemática de sidebar SPIP en artículos PI)
+- **`site/assets/content/articles.json` — 10 entradas PI afectadas**: corte limpio del bloque sidebar/footer de SPIP presente al final de `contentHtml` en TODOS los artículos importados desde Proletarios Internacionalistas (`sourceUrl` en `proletariosinternacionalistas.kilombo.top`). El bloque contenía, según artículo:
+  - Ancla de foro (`<a href="#forum" name="forum">`)
+  - Campo de búsqueda (`Search:` / `Rechercher` / `Buscar`)
+  - Lista de artículos relacionados ("Also in this section" / "Dans la même rubrique") con 8–10 enlaces a `spip.php?article{id}` (hermanos en la misma rubrica SPIP)
+  - Sección **Portfolio** con miniatura de imagen 90×90 (solo en `contre-genocide-guerres-infinites-pi`)
+  - Bloque **CRITIQUE (Fr)** con enlaces a rubricas (solo en `contre-genocide-guerres-infinites-pi`)
+
+  **Detalle por artículo (chars eliminados / % del `contentHtml` original):**
+  - `contra-genocidio-guerras-infinitas-pi` (ES) — 1.521 chars (22,3%)
+  - `contre-genocide-guerres-infinites-pi` (FR) — 1.152 chars (16,7%) + portfolio 90×90
+  - `falsos-internacionalistas-1` — 1.556 chars (6,1%)
+  - `falsos-internacionalistas-2` — 1.556 chars (23,0%)
+  - `falsos-internacionalistas-3` — 1.556 chars (7,7%)
+  - `falsos-internacionalistas-4` — 1.556 chars (8,9%)
+  - `falsos-internacionalistas-5` — 1.556 chars (19,4%)
+  - `falsos-internacionalistas-6` — 1.556 chars (9,7%)
+  - `1-mayo-2023-contra-militarizacion` — 1.545 chars (27,4%)
+  - `plandemismo-y-domesticacion-11` — 1.545 chars (5,9%)
+
+  **Total** : 14.470 caracteres de contenido basura eliminados.
+  Punto de corte usado: `<a href="#forum" name="forum">` — ancla que marca de forma fiable el inicio del sidebar en todos los artículos SPIP de la fuente. Este es el bug sistemático que el ítem #36 de `TO_FIX.md` ("pipeline de importación es doc, no código") predecía: el truncamiento manual documentado en `TROUBLESHOOTING §8` ("cortar al encontrar `<section id=` o `<footer`") no se aplicó en el 100% de los artículos importados en v0.22.0.
+
+### Fixed (bug — HTML malformado en encabezados de artículos PI)
+- **`site/assets/content/articles.json` / `contra-genocidio-guerras-infinitas-pi` (ES)**: `<strong>` desbalanceado en encabezado. Secuencia original: `</p>\n<strong>\n ¡Contra el genocidio...! \n<p><strong></strong> </strong></p>` — un `<strong>` abierto fuera de cualquier párrafo, más un `<strong></strong>` vacío anidado dentro, más cierres desbalanceados (3 cierres para 2 aperturas). No rompía render pero rompía el árbol semántico y cualquier herramienta de validación. Arreglo: envuelto correctamente en `<p><strong>¡Contra el genocidio…!</strong></p>`, sin strong vacíos.
+- **`site/assets/content/articles.json` / `contre-genocide-guerres-infinites-pi` (FR)**: encabezado `<strong>Contre le génocide…! </strong>` colgado directamente de `contentHtml` sin `<p>` envolviéndolo (inconsistente con el hermano ES, que ya lo tenía dentro de `<p>`). Además tenía un espacio sobrante antes de `</strong>`. Arreglo: `<p><strong>Contre le génocide…!</strong></p>` — mismo patrón que ES.
+
+### Docs
+- **`TO_FIX.md` — item #37**: checkbox `[ ]` corregido a `[x]` (estaba marcado como pendiente a pesar de que el propio texto del ítem decía "✅ Hecho en este mismo commit"). Fila correspondiente en la tabla Resumen actualizada de "Renombrado en este commit" a "✅ Resuelto — renombrado a ROADMAP-fase-diagnostico.md".
+- **`TO_FIX.md` — items #40, #41, #42 añadidos y cerrados en la misma versión**: documentan respectivamente: (40) la fuga sistemática de sidebar en los 10 artículos PI con detalle por artículo, (41) el `<strong>` desbalanceado de contra-genocidio ES, (42) la inconsistencia de encapsulado del encabezado FR. Las 3 filas añadidas también a la tabla Resumen principal.
+- **`TO_FIX.md` — cabecera**: "Última actualización" cambiada de `2026-08-07 (v0.23.0+) — ítems 35–39 añadidos.` a `2026-08-09 (v0.23.0+) — ítems 40–42 añadidos; sidebar leakage de 10 artículos PI resuelto.`
+
+---
+
 ## [0.23.0] — 2026-08-07
 
 ### Fixed (bug — URLs relativas en contentHtml)
