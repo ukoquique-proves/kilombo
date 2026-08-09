@@ -2,15 +2,20 @@
 /**
  * scripts/check-urls.mjs
  *
- * Checks that the Kilombo network URLs are consistent across the three
- * places they are declared:
- *   1. .env.example  (KILOMBO_SITE_* and FRIEND_* variables)
- *   2. site/index.html  (the <!-- CONFIG … --> comment block)
- *   3. README.md  (the "Sitios reales de la red Kilombo" table)
+ * Validates that the Kilombo network URLs declared in three sources are
+ * consistent with the single source of truth:
  *
- * Exits with code 1 and prints a diff-style report if any URL appears in
- * one source but not another. Helps catch the common drift problem of
- * updating one place and forgetting the others.
+ *   Ground truth: site/assets/network-urls.json
+ *
+ *   Sources validated against it:
+ *     1. .env.example        (KILOMBO_SITE_* variables)
+ *     2. site/index.html     (the <!-- CONFIG … --> comment block)
+ *     3. README.md           (the "Sitios reales de la red Kilombo" table)
+ *
+ * Any URL in network-urls.json that is missing from any of the three sources
+ * is reported as a discrepancy. This replaces the old "cross-compare three
+ * free sources" model with a "validate against a declared ground truth" model,
+ * eliminating the drift-detection blindspot described in TO_FIX #44.
  *
  * Run with:   node scripts/check-urls.mjs
  * Or via:     ./scripts/test.sh
@@ -24,40 +29,45 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
 // ================================================================
+// Load ground truth
+// ================================================================
+
+let networkUrls;
+try {
+  const raw = readFileSync(resolve(ROOT, 'site/assets/network-urls.json'), 'utf8');
+  const parsed = JSON.parse(raw);
+  // Collect all string values, normalise (strip trailing slash), skip _comment
+  networkUrls = Object.entries(parsed)
+    .filter(([k]) => !k.startsWith('_'))
+    .map(([, v]) => String(v).replace(/\/+$/, ''));
+} catch (e) {
+  console.error(`❌  Could not read network-urls.json: ${e.message}`);
+  process.exit(1);
+}
+
+// ================================================================
 // Helpers
 // ================================================================
 
 /**
- * Extract all https?:// URLs from a string.
- * Returns a Set of normalised URLs (trailing slash stripped for comparison).
+ * Extract all https?:// kilombo.top URLs from a string.
+ * Returns a Set of normalised URLs (trailing slash stripped).
  * @param {string} text
  * @returns {Set<string>}
  */
-const extractUrls = (text) => {
+const extractNetworkUrls = (text) => {
   const matches = text.match(/https?:\/\/[^\s"'<>)]+/g) || [];
   return new Set(
     matches
       .map((u) => u
-        .replace(/[`)\].,;:]+$/, '')  // strip trailing markdown/punctuation chars
-        .replace(/\/+$/, '')           // strip trailing slash
+        .replace(/[`)\].,;:]+$/, '')
+        .replace(/\/+$/, '')
       )
       .filter((u) => {
+        if (!u.includes('kilombo.top')) return false;
         try { new URL(u); return true; }
         catch { return false; }
       })
-  );
-};
-
-/**
- * Filter a URL set to only kilombo.top network URLs.
- * Canal7 and other allied/friend sources are intentionally excluded —
- * they don't need to appear in the index.html config block.
- * @param {Set<string>} urls
- * @returns {Set<string>}
- */
-const filterNetworkUrls = (urls) => {
-  return new Set(
-    [...urls].filter((u) => u.includes('kilombo.top'))
   );
 };
 
@@ -66,9 +76,9 @@ const filterNetworkUrls = (urls) => {
 // ================================================================
 
 const sources = {
-  '.env.example':    '.env.example',
-  'index.html':      'site/index.html',
-  'README.md':       'README.md',
+  '.env.example': '.env.example',
+  'index.html':   'site/index.html',
+  'README.md':    'README.md',
 };
 
 /** @type {Record<string, Set<string>>} */
@@ -77,7 +87,7 @@ const urlSets = {};
 for (const [label, relativePath] of Object.entries(sources)) {
   try {
     const text = readFileSync(resolve(ROOT, relativePath), 'utf8');
-    urlSets[label] = filterNetworkUrls(extractUrls(text));
+    urlSets[label] = extractNetworkUrls(text);
   } catch (e) {
     console.error(`❌  Could not read ${relativePath}: ${e.message}`);
     process.exit(1);
@@ -85,28 +95,25 @@ for (const [label, relativePath] of Object.entries(sources)) {
 }
 
 // ================================================================
-// Build union and find discrepancies
+// Validate each ground-truth URL against all three sources
 // ================================================================
-
-const allUrls = new Set([...Object.values(urlSets)].flatMap((s) => [...s]));
 
 let hasDiscrepancy = false;
 
 console.log('Kilombo network URL consistency check');
 console.log('======================================');
+console.log(`Ground truth: site/assets/network-urls.json (${networkUrls.length} URLs)`);
 console.log(`Sources checked: ${Object.keys(sources).join(', ')}`);
 console.log('');
 
-// Print presence matrix
 const labels = Object.keys(urlSets);
 const colWidth = 18;
 const header = 'URL'.padEnd(50) + labels.map((l) => l.padEnd(colWidth)).join('');
 console.log(header);
 console.log('-'.repeat(header.length));
 
-const sortedUrls = [...allUrls].sort();
-for (const url of sortedUrls) {
-  const presence = labels.map((l) => (urlSets[l].has(url) ? '✅' : '❌').padEnd(colWidth));
+for (const url of networkUrls) {
+  const presence = labels.map((l) => (urlSets[l].has(url) ? '✅ ' : '❌ ').padEnd(colWidth));
   const missing = labels.filter((l) => !urlSets[l].has(url));
   const line = url.padEnd(50) + presence.join('');
   console.log(line);
@@ -119,8 +126,8 @@ for (const url of sortedUrls) {
 console.log('');
 
 if (hasDiscrepancy) {
-  console.error('⚠️   URL discrepancies found. Update the missing sources to match.');
-  console.error('    See TO_FIX.md item A-2 for background.');
+  console.error('⚠️   URL discrepancies found — update the flagged sources to match network-urls.json.');
+  console.error('    See TO_FIX.md #44 for context.');
   process.exit(1);
 } else {
   console.log('✅  All network URLs are consistent across sources.');
