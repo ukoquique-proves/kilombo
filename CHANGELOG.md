@@ -5,6 +5,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.25.0] — 2026-08-09
+
+### Fixed (bug crítico — artículos no visibles tras login)
+- **`site/js/decrypt.mjs`**: clave de storage incorrecta causaba que `articulos.html` (y cualquier página con JSON cifrado) quedara vacía después de entrar la contraseña correctamente en el gate de StatiCrypt. La causa: `decrypt.mjs` leía de `sessionStorage` con clave `"staticrypt_hashed_password"`, pero staticrypt almacena la contraseña en `localStorage` bajo `"staticrypt_passphrase"`. `parseJson()` no encontraba la clave, lanzaba excepción, y el catch de `articles.js` mostraba el estado vacío. Fix: `STORAGE_KEY` corregido a `"staticrypt_passphrase"` y `sessionStorage` → `localStorage`. Docstring del módulo actualizado para ser preciso.
+- Este es exactamente el fallo que TO_FIX #35 anticipaba: una divergencia entre la implementación de `decrypt.mjs` y el comportamiento real de staticrypt, sin ningún test que lo detectara.
+
+---
+
 ## [0.24.0] — 2026-08-09
 
 > Versión de saneamiento post-importación: auditoría sistemática de los 10 artículos

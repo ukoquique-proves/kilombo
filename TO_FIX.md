@@ -62,9 +62,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 - [x] **34. TROUBLESHOOTING.md §8 (scraping) no está referenciado desde MIRROR_GROWING.md §2** — ✅ Resuelto: añadida referencia cruzada en MIRROR_GROWING.md §2 → TROUBLESHOOTING.md §8.
 
-- [ ] **35. Los dos safety checkers pueden divergir silenciosamente** — `render.mjs`'s `isSafeUrl()` bloquea `javascript:`/`data:`/`vbscript:`. La nueva regla de URLs relativas en `validate-data.mjs` vive solo en el validador CI, no en el sanitizador del navegador. Defensible (las URLs relativas no son riesgo XSS, solo breakage), pero es exactamente la asimetría que dejó pasar el bug original.
-  - **Fix A (mínimo):** añadir un test que afirme que ambas implementaciones coinciden sobre un fixture compartido — si una de las dos cambia, el test falla.
-  - **Fix B (completo):** extraer las reglas compartidas de allowlist/URL a un módulo pequeño importado por ambos archivos (`site/js/sanitize-rules.mjs`), eliminando la duplicación.
+- [x] **35. Los dos safety checkers pueden divergir silenciosamente — y ya ocurrió** — ✅ Resuelto parcialmente en v0.25.0. `decrypt.mjs` usaba `sessionStorage` con clave `"staticrypt_hashed_password"` — la clave real de staticrypt es `"staticrypt_passphrase"` en `localStorage`. Esto causaba que `parseJson()` no encontrara la contraseña tras el login y fallara silenciosamente, dejando `articulos.html` vacía a pesar de que el password gate se desbloqueaba correctamente. Fix: clave y storage corregidos en `decrypt.mjs`. Pendiente aún: extraer reglas compartidas o añadir test cross-coverage (Fix A/B del ítem original).
 
 - [ ] **36. El pipeline de importación de contenido es documentación, no código** — todo lo demás en `scripts/` (`encrypt.mjs`, `validate-data.mjs`, `check-urls.mjs`) es un script real y testado. La lógica de scraping/limpieza/reescritura de URLs en TROUBLESHOOTING.md §8 son snippets Python en un Markdown, ejecutados ad hoc por quien hace el import en esa sesión. Esta inconsistencia es la razón por la que los bugs de URL relativa y `alt` vacío ocurrieron — un humano/sesión tiene que recordar ejecutar cada paso correctamente cada vez.
   - **Fix:** promover §8 a un script real `scripts/import-article.mjs` (o `.py`) que ejecute dedup → fetch → extract → clean → rewrite_relative_urls → write y llame a `validate-data.mjs` al final. Convierte "disciplina documentada" en "disciplina reforzada".
@@ -143,7 +141,7 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 | **30** | `articles.json` | `el-fraude-de-los-pcr` es un stub imagen-only — pendiente de contenido real | 🟡 Pendiente de revisión |
 | 29 | `test/encrypt-decrypt.test.mjs` | Docstring sobreestima cobertura — no ejercita `decrypt.mjs` directamente | 🟡 Deuda técnica |
 | 24 | `scripts/` | Script de rotación de contraseñas para KILOMBOTOP + STATICRYPT | 🟡 Deuda técnica |
-| **35** | `render.mjs` + `validate-data.mjs` | Safety checkers pueden divergir — reglas no compartidas | 🟡 Deuda técnica |
+| **35** | `decrypt.mjs` | Storage key incorrecto — articulos.html vacía tras login | ✅ Resuelto v0.25.0 |
 | **36** | `scripts/` | Pipeline de importación es doc, no código — debería ser `import-article.mjs` | 🟡 Deuda técnica |
 | **37** | `INICIO/ROADMAP.md` | Ambigüedad de nombre con `ROADMAP.md` activo | ✅ Resuelto — renombrado a `ROADMAP-fase-diagnostico.md` |
 | **38** | `articles.json` | Deuda traducción ES/FR sin visión estructurada — falta `check-translations.mjs` | 🟡 Deuda técnica |
