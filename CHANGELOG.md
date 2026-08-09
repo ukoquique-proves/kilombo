@@ -5,6 +5,20 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.29.0] — 2026-08-09
+
+### Added (UX — navegación y descubribilidad)
+- **`site/articulos.html` + `site/js/articles.js`**: el índice de artículos internos ahora incluye una barra de filtros por tema y un buscador de texto libre. El listado puede filtrarse por tema y por coincidencia en título/topics, y el estado del filtro se sincroniza con la URL (`?topic=...` y `?q=...`).
+- **`site/articulo.html` + `site/js/articles.js`**: la vista de detalle incorpora una sección de artículos relacionados, generada a partir de la coincidencia de topics entre entradas del JSON. Esto mejora la navegación entre contenidos afines sin introducir enlaces manuales.
+- **`site/plandemismo.html` + `site/js/plandemismo.js`**: la sección Plandemismo ahora ofrece filtros por etiqueta dentro de cada bloque de vídeos y una navegación por pestañas accesible con patrón tablist/roving tabindex. El comportamiento es más claro y más usable sin recargar la página.
+- **`site/js/render.mjs`**: se centralizan los helpers de renderizado y filtros compartidos para artículos y vídeos. Esto elimina duplicación y reduce el riesgo de divergencia entre las dos superficies de navegación.
+- **`site/css/articles.css` + `site/css/style.css` + `site/css/plandemismo.css`**: añadidos estilos para la nueva barra de filtros, los botones de tema, la sección de relacionados y la experiencia responsive de las nuevas interfaces.
+
+### Tests
+- **`test/articles.test.mjs` + `test/render.test.mjs`**: añadida cobertura de regresión para filtros por tema, búsqueda, artículos relacionados y el render compartido de barras de filtro.
+
+---
+
 ## [0.28.0] — 2026-08-09
 
 ### Fixed (TO_FIX #44 — triple source of truth for network URLs)
