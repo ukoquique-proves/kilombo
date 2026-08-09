@@ -170,6 +170,8 @@ git commit -m "content: descripción del cambio"
 git push origin main
 ```
 
+> **Nota sobre el hook `pre-push`:** Si el commit incluye cambios en `site/`, `git push` pausará pidiendo confirmación interactiva de que has revisado los cambios en local (`npm run preview`). Debes pulsar `ENTER` para continuar. Si haces push desde un entorno automatizado o sin terminal interactiva, utiliza `SKIP_PREVIEW_CHECK=1 git push origin main` para saltarte la pausa.
+
 GitHub Pages publica los cambios en **~30 segundos**:
 **🌍 https://ukoquique-proves.github.io/kilombo/**
 
