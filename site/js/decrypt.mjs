@@ -6,8 +6,8 @@
  *
  *   { "encrypted": true, "ciphertext": "<hex>", "salt": "<hex>" }
  *
- * staticrypt stores the PBKDF2-derived hashed password in sessionStorage under
- * the key "staticrypt_hashed_password" after a successful login. This module
+ * staticrypt stores the PBKDF2-derived hashed password in localStorage under
+ * the key "staticrypt_passphrase" after a successful login. This module
  * reads that key and decrypts the ciphertext using the same AES-256-CBC
  * pipeline, returning the original plaintext.
  *
@@ -18,7 +18,7 @@
  * @returns {any}            Parsed and (if needed) decrypted JSON value
  */
 
-const STORAGE_KEY = 'staticrypt_hashed_password';
+const STORAGE_KEY = 'staticrypt_passphrase';
 const IV_BYTES    = 16; // AES-CBC IV length in bytes (32 hex chars)
 
 /** hex string → Uint8Array */
@@ -75,8 +75,10 @@ export async function parseJson(jsonText) {
   // Not encrypted — plain dev/preview mode
   if (!parsed || parsed.encrypted !== true) return parsed;
 
-  // Encrypted — retrieve the hashed password from sessionStorage
-  const hashedPassword = sessionStorage.getItem(STORAGE_KEY);
+  // Encrypted — retrieve the hashed password from localStorage
+  // staticrypt stores it as 'staticrypt_passphrase' in localStorage
+  // (not sessionStorage — it persists across page navigations within the same browser)
+  const hashedPassword = localStorage.getItem(STORAGE_KEY);
   if (!hashedPassword) {
     throw new Error(
       'El contenido está cifrado y no se encontró la contraseña en la sesión. ' +
