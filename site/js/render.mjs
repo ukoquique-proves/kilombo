@@ -67,7 +67,7 @@ const SANITIZE_DROP_ENTIRELY = new Set([
  * @param {string} url
  * @returns {boolean}
  */
-const isSafeUrl = (url) => !/^\s*(javascript|data|vbscript):/i.test(String(url));
+import { isSafeUrl } from './shared/url-safety.mjs';
 
 /**
  * Recursively copy the safe subset of `source`'s children into `target`,
@@ -271,3 +271,70 @@ export const renderCard = (v) => {
 
   return article;
 };
+
+// ================================================================
+// GENERIC FILTER BAR
+// Shared by site/js/articles.js (topics) and site/js/plandemismo.js
+// (tags) — one implementation instead of two copies that could drift.
+// ================================================================
+
+/**
+ * Builds a clickable filter bar as real <button> elements — never <a>, so
+ * it's keyboard-accessible and safe to place anywhere, including directly
+ * above card grids where the cards themselves are links.
+ *
+ * @param {string[]} values           - the filterable values (topics or tags)
+ * @param {string|null} activeValue   - currently selected value, or null for "show all"
+ * @param {(value: string|null) => void} onSelect
+ * @param {string} [allLabel]         - label for the "clear filter" button
+ * @returns {HTMLElement}
+ */
+export const renderFilterBar = (values, activeValue, onSelect, allLabel = 'Todos') => {
+  const bar = document.createElement('div');
+  bar.className = 'topic-filter-bar';
+  bar.setAttribute('role', 'group');
+  bar.setAttribute('aria-label', 'Filtrar por tema');
+
+  const makeButton = (label, value) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'topic-filter-btn';
+    btn.textContent = label;
+    if (value) btn.dataset.topic = value;
+    const isActive = value === activeValue || (!value && !activeValue);
+    btn.classList.toggle('is-active', isActive);
+    btn.setAttribute('aria-pressed', String(isActive));
+    btn.addEventListener('click', () => onSelect(value));
+    return btn;
+  };
+
+  bar.appendChild(makeButton(allLabel, null));
+  values.forEach((v) => bar.appendChild(makeButton(v, v)));
+
+  return bar;
+};
+
+// ================================================================
+// VIDEO TAG HELPERS (plandemismo.js)
+// ================================================================
+
+/**
+ * @param {VideoEntry[]} videos
+ * @returns {string[]} deduplicated, alphabetically sorted (es collation)
+ */
+export const getAllTags = (videos) => {
+  const set = new Set();
+  for (const v of videos) for (const t of v.tags || []) set.add(t);
+  return [...set].sort((x, y) => x.localeCompare(y, 'es'));
+};
+
+/**
+ * @param {VideoEntry[]} videos
+ * @param {string|null} tag  null/'' means "no filter, show all"
+ * @returns {VideoEntry[]}
+ */
+export const filterVideosByTag = (videos, tag) => {
+  if (!tag) return videos;
+  return videos.filter((v) => (v.tags || []).includes(tag));
+};
+

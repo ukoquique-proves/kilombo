@@ -7,8 +7,13 @@
 //
 // Los datos viven en: `assets/content/articles.json`
 
-import { escapeHtml, sanitizeHtml } from './render.mjs';
+import { escapeHtml, sanitizeHtml, renderFilterBar } from './render.mjs';
 import { parseJson } from './decrypt.mjs';
+
+// Re-exported so existing imports of renderFilterBar from articles.js
+// (including test/articles.test.mjs) keep working. The implementation now
+// lives in render.mjs, shared with plandemismo.js's tag filter bar.
+export { renderFilterBar };
 
 const DATA_PATH = 'assets/content/articles.json';
 
@@ -118,37 +123,19 @@ export function filterArticlesByTopic(articles, topic) {
 }
 
 /**
- * Builds the clickable topic filter bar as real <button> elements (never
- * <a>, so it's keyboard-accessible and never fights with the card links —
- * this bar lives outside any .article-card anchor).
- * @param {string[]} topics
- * @param {string|null} activeTopic
- * @param {(topic: string|null) => void} onSelect
- * @returns {HTMLElement}
+ * Case-insensitive substring match against title + topics. Empty/blank
+ * query returns every article unchanged.
+ * @param {ArticleEntry[]} articles
+ * @param {string} query
+ * @returns {ArticleEntry[]}
  */
-export function renderFilterBar(topics, activeTopic, onSelect) {
-  const bar = document.createElement('div');
-  bar.className = 'topic-filter-bar';
-  bar.setAttribute('role', 'group');
-  bar.setAttribute('aria-label', 'Filtrar artículos por tema');
-
-  const makeButton = (label, topicValue) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'topic-filter-btn';
-    btn.textContent = label;
-    if (topicValue) btn.dataset.topic = topicValue;
-    const isActive = topicValue === activeTopic || (!topicValue && !activeTopic);
-    btn.classList.toggle('is-active', isActive);
-    btn.setAttribute('aria-pressed', String(isActive));
-    btn.addEventListener('click', () => onSelect(topicValue));
-    return btn;
-  };
-
-  bar.appendChild(makeButton('Todos', null));
-  topics.forEach((t) => bar.appendChild(makeButton(t, t)));
-
-  return bar;
+export function filterArticlesByQuery(articles, query) {
+  const q = (query || '').trim().toLowerCase();
+  if (!q) return articles;
+  return articles.filter((a) => {
+    const haystack = [a.title, ...(a.topics || [])].join(' ').toLowerCase();
+    return haystack.includes(q);
+  });
 }
 
 // ================================================================
@@ -222,6 +209,11 @@ function getTopicFromUrl() {
   return params.get('topic') || null;
 }
 
+function getQueryFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('q') || '';
+}
+
 function renderEmptyState(container, msg) {
   container.innerHTML = `<div class="article-empty"><p>${escapeHtml(msg)}</p></div>`;
 }
@@ -244,6 +236,9 @@ function renderList(list, articles) {
 async function initIndexPage() {
   const list = document.getElementById('article-list');
   const filterBarSlot = document.getElementById('article-filter-bar');
+  const searchInput = /** @type {HTMLInputElement|null} */ (
+    document.getElementById('article-search')
+  );
   if (!list) return;
 
   try {
@@ -257,25 +252,48 @@ async function initIndexPage() {
     const topics = getAllTopics(articles);
     let activeTopic = getTopicFromUrl();
     if (activeTopic && !topics.includes(activeTopic)) activeTopic = null;
+    let activeQuery = getQueryFromUrl();
+    if (searchInput) searchInput.value = activeQuery;
 
-    const applyFilter = (topic) => {
-      activeTopic = topic;
+    const render = () => {
       const url = new URL(window.location.href);
-      if (topic) url.searchParams.set('topic', topic);
+      if (activeTopic) url.searchParams.set('topic', activeTopic);
       else url.searchParams.delete('topic');
+      if (activeQuery) url.searchParams.set('q', activeQuery);
+      else url.searchParams.delete('q');
       window.history.replaceState({}, '', url);
 
       if (filterBarSlot) {
         filterBarSlot.innerHTML = '';
-        filterBarSlot.appendChild(renderFilterBar(topics, activeTopic, applyFilter));
+        filterBarSlot.appendChild(renderFilterBar(topics, activeTopic, applyTopic));
       }
-      renderList(list, filterArticlesByTopic(articles, activeTopic));
+
+      const filtered = filterArticlesByQuery(
+        filterArticlesByTopic(articles, activeTopic),
+        activeQuery
+      );
+      renderList(list, filtered);
     };
 
-    if (filterBarSlot && topics.length > 0) {
-      filterBarSlot.appendChild(renderFilterBar(topics, activeTopic, applyFilter));
+    const applyTopic = (topic) => {
+      activeTopic = topic;
+      render();
+    };
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        activeQuery = searchInput.value;
+        render();
+      });
     }
-    renderList(list, filterArticlesByTopic(articles, activeTopic));
+
+    if (filterBarSlot && topics.length > 0) {
+      filterBarSlot.appendChild(renderFilterBar(topics, activeTopic, applyTopic));
+    }
+    renderList(
+      list,
+      filterArticlesByQuery(filterArticlesByTopic(articles, activeTopic), activeQuery)
+    );
   } catch (e) {
     console.error('[articulos]', e);
     renderEmptyState(list, 'Error cargando el índice de artículos. Intenta recargar la página.');
@@ -327,7 +345,7 @@ async function initDetailPage() {
 
     const safeSourceUrl = escapeHtml(a.sourceUrl);
     sourceEl.innerHTML = `
-      <p><strong>Fuente:</strong> ${escapeHtml(a.sourceSite)} · <a class="ext-link" href="${safeSourceUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(a.sourceUrl)}</a></p>
+      <p><strong>Fuente:</strong> ${escapeHtml(a.sourceSite)} · <a class="ext-link" href="${safeSourceUrl}" target="_blank" rel="noopener noreferrer">${safeSourceUrl}</a></p>
     `.trim();
 
     if (relatedEl) {
@@ -353,3 +371,4 @@ if (typeof document !== 'undefined') {
     if (page === 'articulo') initDetailPage();
   });
 }
+

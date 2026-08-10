@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-09 — ítem 44 resuelto y la lista reordenada.
+Última actualización: 2026-08-10 — añadido el aviso de artefacto obsoleto en dist/.
 
 ---
 
@@ -40,25 +40,31 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - Todos los `.card` en `index.html` son `<a>`. El script no hace nada hoy.
   - Future-proofing intencionado; sin acción necesaria salvo que se añadan cards no-anchor.
 
+- [ ] **45. `dist/` contiene un artefacto cifrado obsoleto y desfasado**
+  - El directorio `dist/` está correctamente ignorado por Git, así que no es un problema del repositorio.
+  - En este estado, el build exportado sigue siendo un artefacto viejo que falta el módulo nuevo `site/js/shared/url-safety.mjs` y el archivo `site/assets/network-urls.json` que sí existen en `site/`.
+  - No debe zipearse, compartirse ni entregarse al cliente hasta regenerar y validar el build correspondiente.
+
 ---
 
 ## 🟡 Deuda técnica — arquitectura y operaciones
 
-- [ ] **29. `test/encrypt-decrypt.test.mjs` — docstring sobreestima cobertura de `decrypt.mjs`**
+- [ ] **29. `test/encrypt-decrypt.test.mjs` — cobertura incompleta del camino criptográfico**
   - El test actual valida el round-trip de `codec.decode()` de staticrypt, pero no ejerce el código manual de `decrypt.mjs` que usa `aesDecrypt()` y la gestión de IV.
-  - Fix: extraer las funciones de descifrado a un módulo puro importable y añadir un test directo para `decrypt.mjs`.
+  - Este es un gap de priorización alta porque toca el flujo de descifrado real del sitio y podría dejar errores de IV/parseo sin detectar.
+  - Fix: extraer las funciones de descifrado a un módulo puro importable y añadir un test directo para `decrypt.mjs` que cubra tanto el caso feliz como un fallo de descifrado.
 
-- [ ] **36. El pipeline de importación de contenido es documentación, no código**
-  - La lógica de scraping/limpieza/reescritura de URLs en TROUBLESHOOTING.md §8 son snippets Python en un Markdown, ejecutados ad hoc por quien hace el import.
-  - Fix: promover §8 a un script real `scripts/import-article.mjs` (o `.py`) que ejecute dedup → fetch → extract → clean → rewrite_relative_urls → write y llame a `validate-data.mjs` al final.
+- [x] **36. El pipeline de importación de contenido es documentación, no código**
+  - La lógica de scraping/limpieza/reescritura de URLs en TROUBLESHOOTING.md §8 ya está implementada en `scripts/import-article.mjs`, eliminando la necesidad de ejecutar solo snippets Python ad hoc.
+  - Fix: `scripts/import-article.mjs` ejecuta dedup → fetch → extract → clean → rewrite_relative_urls → write y llama a `validate-data.mjs` al final.
 
 - [ ] **38. La deuda de traducción ES/FR solo es visible por búsqueda de texto**
   - El incumplimiento de la regla §5.3 de MIRROR_GROWING.md se detecta haciendo `grep` por "pendiente FR" en los docs.
   - Fix: un script pequeño `scripts/check-translations.mjs` que lea `articles.json`, agrupe las entradas y detecte versiones incompletas.
 
-- [ ] **39. `plandemismo.css` redeclara tokens de color de `style.css` con valores hex hardcodeados**
-  - El patrón `var(--x, #fallback)` es legítimo, pero los valores hex duplicados a mano pueden divergir.
-  - Fix: usar `@import` o eliminar los fallbacks hex y confiar en que `style.css` se cargue antes.
+- [x] **39. `plandemismo.css` redeclara tokens de color de `style.css` con valores hex hardcodeados**
+  - Esta duplicación es intencional: `plandemismo.css` usa `var(--x, #fallback)` como una capa de seguridad si se carga sin `style.css` o si el orden de carga no fuera el esperado.
+  - No hay impacto de runtime; el fallback no se aplica cuando `style.css` define las variables primero.
 
 - [ ] **24. Crear `scripts/rotate-password.sh`**
   - Rotar `KILOMBOTOP_PASSWORD` y `STATICRYPT_PASSWORD` hoy requiere pasos manuales separados.

@@ -14,7 +14,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Window } from 'happy-dom';
-import { escapeHtml, buildLangs, buildKeypoints, renderCard, sanitizeHtml } from '../site/js/render.mjs';
+import {
+  escapeHtml,
+  buildLangs,
+  buildKeypoints,
+  renderCard,
+  sanitizeHtml,
+  renderFilterBar,
+  getAllTags,
+  filterVideosByTag,
+} from '../site/js/render.mjs';
 
 /** Serialize a sanitizeHtml() fragment back to an HTML string for assertions. */
 function fragmentToHtml(fragment) {
@@ -333,3 +342,66 @@ test('sanitizeHtml — handles null/undefined/empty input without throwing', () 
   assert.equal(fragmentToHtml(sanitizeHtml(null)), '');
   assert.equal(fragmentToHtml(sanitizeHtml('')), '');
 });
+
+// ================================================================
+// getAllTags / filterVideosByTag  (plandemismo.html tag filter)
+// ================================================================
+
+const videoSet = [
+  { id: 'v1', tags: ['sida', 'covid'] },
+  { id: 'v2', tags: ['covid', 'censura'] },
+  { id: 'v3', tags: [] },
+];
+
+test('getAllTags — returns the deduplicated, sorted union of all tags', () => {
+  assert.deepEqual(getAllTags(videoSet), ['censura', 'covid', 'sida']);
+});
+
+test('getAllTags — returns an empty array when no video has tags', () => {
+  assert.deepEqual(getAllTags([{ id: 'x', tags: [] }]), []);
+});
+
+test('filterVideosByTag — returns all videos when tag is null/empty', () => {
+  assert.equal(filterVideosByTag(videoSet, null).length, 3);
+  assert.equal(filterVideosByTag(videoSet, '').length, 3);
+});
+
+test('filterVideosByTag — keeps only videos that include the tag', () => {
+  assert.deepEqual(filterVideosByTag(videoSet, 'sida').map((v) => v.id), ['v1']);
+});
+
+test('filterVideosByTag — returns an empty array for a tag no video has', () => {
+  assert.deepEqual(filterVideosByTag(videoSet, 'inexistente'), []);
+});
+
+// ================================================================
+// renderFilterBar  (shared by articulos.html and plandemismo.html)
+// ================================================================
+
+test('renderFilterBar — renders one button per value plus the "all" button', () => {
+  const el = renderFilterBar(['covid', 'sida'], null, () => {});
+  const buttons = el.querySelectorAll('button');
+  assert.equal(buttons.length, 3);
+  assert.equal(buttons[0].textContent, 'Todos');
+});
+
+test('renderFilterBar — accepts a custom "all" label', () => {
+  const el = renderFilterBar(['covid'], null, () => {}, 'Ver todos');
+  assert.equal(el.querySelectorAll('button')[0].textContent, 'Ver todos');
+});
+
+test('renderFilterBar — marks the active value with is-active and aria-pressed', () => {
+  const el = renderFilterBar(['covid', 'sida'], 'sida', () => {});
+  const active = el.querySelector('.is-active');
+  assert.equal(active.textContent, 'sida');
+  assert.equal(active.getAttribute('aria-pressed'), 'true');
+});
+
+test('renderFilterBar — clicking a value button calls onSelect with that value', () => {
+  let selected = 'not-called';
+  const el = renderFilterBar(['covid'], null, (v) => { selected = v; });
+  const btn = [...el.querySelectorAll('button')].find((b) => b.textContent === 'covid');
+  btn.click();
+  assert.equal(selected, 'covid');
+});
+

@@ -6,7 +6,7 @@
 // live in render.mjs so they can be unit-tested independently via
 // test/render.test.mjs without pulling in the tab/DOM init logic.
 
-import { renderCard } from './render.mjs';
+import { renderCard, getAllTags, filterVideosByTag, renderFilterBar } from './render.mjs';
 import { parseJson } from './decrypt.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -109,13 +109,33 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================================================================
 
   /**
-   * Fetch a JSON file and render its video cards into a grid container.
-   * @param {string} jsonPath - relative path to the JSON data file
-   * @param {string} gridId   - id of the target .video-grid element
+   * @param {HTMLElement} grid
+   * @param {import('./render.mjs').VideoEntry[]} videos
    */
-  const renderVideoCards = (jsonPath, gridId) => {
+  const renderGrid = (grid, videos) => {
+    grid.innerHTML = '';
+    if (videos.length === 0) {
+      grid.innerHTML =
+        '<p class="tab-footer"><em>Ningún vídeo coincide con este filtro.</em></p>';
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    videos.forEach((v) => fragment.appendChild(renderCard(v)));
+    grid.appendChild(fragment);
+  };
+
+  /**
+   * Fetch a JSON file, then render its video cards into a grid container
+   * with an optional tag filter bar above it. Videos are fetched once and
+   * kept in memory so clicking a tag re-filters instead of re-fetching.
+   * @param {string} jsonPath  - relative path to the JSON data file
+   * @param {string} gridId    - id of the target .video-grid element
+   * @param {string} [tagBarId] - id of the tag filter bar mount point, if any
+   */
+  const renderVideoCards = (jsonPath, gridId, tagBarId) => {
     const grid = document.getElementById(gridId);
     if (!grid) return;
+    const tagBarSlot = tagBarId ? document.getElementById(tagBarId) : null;
 
     fetch(jsonPath)
       .then((res) => {
@@ -123,12 +143,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return res.text();
       })
       .then((text) => parseJson(text))
-      .then((videos) => {
-        const fragment = document.createDocumentFragment();
-        videos.forEach((/** @type {import('./render.mjs').VideoEntry} */ v) =>
-          fragment.appendChild(renderCard(v))
-        );
-        grid.appendChild(fragment);
+      .then((/** @type {import('./render.mjs').VideoEntry[]} */ videos) => {
+        const tags = getAllTags(videos);
+        let activeTag = null;
+
+        // A filter bar only makes sense with more than one video AND more
+        // than one distinct tag — otherwise every button narrows to the
+        // same single result, which is worse than no filter bar at all
+        // (same "skip an empty/useless section" rule as related-articles
+        // in articles.js).
+        if (tagBarSlot && videos.length > 1 && tags.length > 1) {
+          const applyTag = (tag) => {
+            activeTag = tag;
+            tagBarSlot.innerHTML = '';
+            tagBarSlot.appendChild(renderFilterBar(tags, activeTag, applyTag));
+            renderGrid(grid, filterVideosByTag(videos, activeTag));
+          };
+          tagBarSlot.appendChild(renderFilterBar(tags, activeTag, applyTag));
+        }
+
+        renderGrid(grid, videos);
       })
       .catch((err) => {
         console.error('[plandemismo]', err);
@@ -138,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Load both tabs
-  renderVideoCards('assets/data/plandemismo-actualidad.json', 'grid-actualidad');
-  renderVideoCards('assets/data/plandemismo-sida-covid.json', 'grid-sida-covid');
+  renderVideoCards('assets/data/plandemismo-actualidad.json', 'grid-actualidad', 'tags-actualidad');
+  renderVideoCards('assets/data/plandemismo-sida-covid.json', 'grid-sida-covid', 'tags-sida-covid');
 });
+

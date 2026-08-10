@@ -17,6 +17,7 @@ import {
   renderArticleCard,
   getAllTopics,
   filterArticlesByTopic,
+  filterArticlesByQuery,
   renderFilterBar,
   findRelatedArticles,
   renderRelatedArticles,
@@ -237,4 +238,32 @@ test('renderRelatedArticles — renders a card per related article', () => {
   ]);
   assert.equal(el.querySelectorAll('.article-card').length, 2);
 });
+
+// ================================================================
+// filterArticlesByQuery
+// ================================================================
+
+test('filterArticlesByQuery — returns all articles for an empty/blank query', () => {
+  assert.equal(filterArticlesByQuery(articleSet, '').length, 3);
+  assert.equal(filterArticlesByQuery(articleSet, '   ').length, 3);
+  assert.equal(filterArticlesByQuery(articleSet, undefined).length, 3);
+});
+
+test('filterArticlesByQuery — matches against the title, case-insensitively', () => {
+  const result = filterArticlesByQuery(
+    [{ ...baseArticle, id: 'x', title: 'Un Título de Ejemplo', topics: [] }],
+    'título'
+  );
+  assert.equal(result.length, 1);
+});
+
+test('filterArticlesByQuery — matches against topics too', () => {
+  const result = filterArticlesByQuery(articleSet, 'medios');
+  assert.deepEqual(result.map((a) => a.id), ['a2']);
+});
+
+test('filterArticlesByQuery — returns an empty array when nothing matches', () => {
+  assert.deepEqual(filterArticlesByQuery(articleSet, 'inexistente-xyz'), []);
+});
+
 

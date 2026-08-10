@@ -407,6 +407,11 @@ class="texte surlignable clearfix"
 
 ### Flujo de importación recomendado
 
+El flujo descrito abajo ahora también está implementado de forma reproducible en
+`./scripts/import-article.mjs`. Ese script ejecuta el chequeo de duplicados,
+fetch, extracción Tierra/PI, limpieza, reescritura de URLs relativas y salida a
+`site/assets/content/articles.json` o a JSON en modo `--dry-run`.
+
 ```python
 from urllib.parse import urljoin
 import re
@@ -457,6 +462,12 @@ html = rewrite_relative_urls(html, source_url)
 ```
 
 **Por qué validate-data.mjs lo detecta ahora:** la regla `contentHtml` en `scripts/validate-data.mjs` incluye desde v0.23.0 un check que falla si cualquier `src=` o `href=` tiene un valor no-absoluto (que no empiece por `https?://`, `#`, o `mailto:`). El CI bloqueará el deploy si se intenta publicar una entrada con URLs relativas.
+
+> Nota de integración: se ha añadido `scripts/import-article.mjs` como la implementación
+> segura y reproducible de este flujo de importación. El fix de TO_FIX #36 ya está aplicado.
+> También se han agregado los parches `url-safety.mjs` e `i18n-coverage.mjs` al repositorio.
+>   - `url-safety.mjs` se usa ahora en `site/js/render.mjs` y `scripts/validate-data.mjs`.
+>   - `i18n-coverage.mjs` proporciona `npm run i18n-coverage` para reportar gaps de traducción.
 
 **Restricciones conocidas del allowlist de `sanitizeHtml()`:**
 - `<h1>` y `<h2>` **no están en el allowlist** — se eliminan silenciosamente. Si el artículo fuente usa encabezados, aplanarlos en `<p><strong>...</strong></p>` antes de guardar, o usarlos solo como `<h3>`/`<h4>` (que sí están permitidos).

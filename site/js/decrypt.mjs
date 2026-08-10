@@ -34,7 +34,7 @@ function fromHex(hex) {
  * The ciphertext format is: <32-hex IV> + <hex AES-CBC ciphertext>
  *
  * @param {string} ciphertext     Hex-encoded IV + ciphertext
- * @param {string} hashedPassword Hex-encoded 256-bit key (from sessionStorage)
+ * @param {string} hashedPassword Hex-encoded 256-bit key read from localStorage
  * @returns {Promise<string>}     Decrypted plaintext
  */
 async function aesDecrypt(ciphertext, hashedPassword) {

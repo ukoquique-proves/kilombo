@@ -14,6 +14,7 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isSafeUrl, isAbsoluteOrExempt } from '../site/js/shared/url-safety.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const VIDEO_DATA_DIR = resolve(__dirname, '../site/assets/data');
@@ -167,16 +168,27 @@ const ARTICLE_RULES = [
       if (/(?:href|src)\s*=\s*["']?\s*(?:javascript|data|vbscript):/i.test(s)) {
         return 'contentHtml must not contain javascript:/data:/vbscript: URLs';
       }
-      // Relative src/href would resolve against the mirror URL, not the source
-      // site, causing 404s for images and broken links. All src/href values
-      // in imported contentHtml must be absolute (https://...).
-      const relativeUrlMatch = s.match(/(?:src|href)=["'](?!https?:\/\/|#|mailto:)([^"']{1,200})["']/i);
-      if (relativeUrlMatch) {
-        return `contentHtml must not contain relative URLs — found: ${relativeUrlMatch[1].slice(0, 60)} (rewrite to absolute using sourceUrl before importing)`;
-      }
+      const urlError = validateContentHtmlUrls(s);
+      if (urlError) return urlError;
       return null;
     }},
 ];
+
+const URL_ATTR_RE = /(?:href|src)=['"]([^'"]+)['"]/gi;
+
+/** @param {string} html */
+function validateContentHtmlUrls(html) {
+  for (const match of html.matchAll(URL_ATTR_RE)) {
+    const url = match[1];
+    if (!isSafeUrl(url)) {
+      return `contentHtml must not contain unsafe URL scheme: ${url}`;
+    }
+    if (!isAbsoluteOrExempt(url)) {
+      return `contentHtml must not contain relative URLs — found: ${url} (rewrite to absolute using sourceUrl before importing)`;
+    }
+  }
+  return null;
+}
 
 /**
  * @param {unknown} entry

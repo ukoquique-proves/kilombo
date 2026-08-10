@@ -28,7 +28,11 @@
     </p>
   </section>
 
-  <div id="article-filter-bar"></div>
+  <div class="article-controls">
+    <input type="search" id="article-search" class="article-search"
+           placeholder="Buscar por título o tema…" aria-label="Buscar artículos">
+    <div id="article-filter-bar"></div>
+  </div>
 
   <section class="article-list" id="article-list" aria-live="polite">
     <noscript>
@@ -58,3 +62,4 @@
 <script src="js/articles.js" type="module"></script>
 </body>
 </html>
+

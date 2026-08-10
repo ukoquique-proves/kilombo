@@ -76,7 +76,7 @@ Antes de incorporar cualquier material nuevo, verificar:
 
 ### Paso a paso
 
-> Para los selectores de scraping por sitio (Tierra vs. PI), el código de extracción, limpieza y reescritura de URLs, ver **TROUBLESHOOTING.md §8**. Esta sección describe el flujo editorial; §8 describe la implementación técnica.
+> Para los selectores de scraping por sitio (Tierra vs. PI), el código de extracción, limpieza y reescritura de URLs, ver **TROUBLESHOOTING.md §8** y el script reproducible **scripts/import-article.mjs**. Esta sección describe el flujo editorial; §8 y el script describen la implementación técnica.
 
 ```
 1. Leer el artículo en la fuente original
