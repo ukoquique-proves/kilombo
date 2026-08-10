@@ -71,7 +71,64 @@ Acceso central por SSO: `https://kilombo.top/yunohost/sso/`
 
 ---
 
-## Estructura de archivos
+## Credenciales de acceso — qué funciona y qué no
+
+El proyecto usa dos credenciales independientes, con propósitos distintos y estados de acceso distintos. Esta sección documenta el estado **verificado** — no el estado esperado o documentado en otra parte.
+
+### 1. `GITHUB_TOKEN` — acceso al repositorio
+
+Funciona sin restricciones. Se usa para:
+- Push a `main` vía HTTPS (cuando `git push` no está disponible)
+- Dispatch manual de workflows de GitHub Actions
+- Upload de GitHub Actions Secrets (p. ej. `STATICRYPT_PASSWORD`)
+
+### 2. `KILOMBOTOP_PASSWORD` — acceso a la infraestructura YunoHost
+
+La contraseña del usuario `kilombo` en `kilombo.top` autentica correctamente contra el SSO de YunoHost (`/yunohost/portalapi/login` devuelve `200 Logged in`). El usuario pertenece al grupo `admins` de YunoHost.
+
+**Lo que SÍ desbloquea esta contraseña (verificado):**
+
+| Servicio | URL | Acceso |
+|----------|-----|--------|
+| Panel de administración YunoHost | `https://kilombo.top/yunohost/admin/` | ✅ Acceso completo |
+| Nextcloud (ficheros, drafts, media) | `https://cloud.kilombo.top/` | ✅ Acceso completo |
+| Webmail | `https://mail.kilombo.top/` | ✅ Acceso completo |
+| API YunoHost (`/yunohost/portalapi/me`) | Lista de apps, grupos, email | ✅ Acceso completo |
+
+**Lo que NO desbloquea esta contraseña (verificado):**
+
+| Servicio | URL | Estado |
+|----------|-----|--------|
+| Backend SPIP — Tierra y Libertad | `https://www.kilombo.top/ecrire/` | ❌ Redirige a `spip.php?page=login` — `kilombo` no es admin SPIP |
+| Backend SPIP — Proletarios Internacionalistas | `https://proletariosinternacionalistas.kilombo.top/ecrire/` | ❌ Ídem — instancia SPIP separada, misma restricción |
+| Backend SPIP — International Global Revolution | `https://in.kilombo.top/ecrire/` | ❌ Ídem |
+| Backend SPIP — GCI Oficial | `https://icg-gci.kilombo.top/ecrire/` | ❌ Ídem |
+| SSH / SFTP / rsync | Puerto 22 | ❌ Firewall bloquea acceso externo |
+
+**Por qué el SPIP backend no funciona:**
+El SSO de YunoHost autentica al usuario en la capa de YunoHost, pero SPIP mantiene su propia tabla de administradores (`spip_auteurs`) independiente. `kilombo` no aparece en esa tabla en ninguna de las cuatro instancias. El SSO propaga la sesión hasta el frontend público de SPIP (los artículos se ven normalmente), pero no otorga acceso a `/ecrire/`.
+
+**Para desbloquear el backend SPIP** se requiere una de estas dos acciones (detalladas en `TROUBLESHOOTING.md` sección 4, Bloqueo B):
+- **Opción B1:** promover `kilombo` como admin SPIP desde la CLI del servidor (requiere SSH abierto)
+- **Opción B2:** editar la tabla `spip_auteurs` directamente desde phpMyAdmin / Adminer si está instalado en YunoHost
+
+### Qué aporta Nextcloud para este proyecto
+
+Nextcloud (`cloud.kilombo.top`) es el recurso de mayor valor que la contraseña desbloquea. Puede contener:
+- Archivos de audio (WhatsApp, grabaciones) pendientes de transcripción — ver `ROADMAP.md` §3
+- Imágenes, PDFs y documentos de apoyo para artículos
+- Borradores de artículos no publicados aún en SPIP
+- Materiales compartidos por espacios aliados antes de publicación
+
+Acceso WebDAV verificado: `https://cloud.kilombo.top/remote.php/dav/files/kilombo/`
+
+### Contenido público sin contraseña
+
+Los seis sitios SPIP de la red son **completamente públicos** sin autenticación — todos los artículos publicados son accesibles por scraping anónimo. Ver `TROUBLESHOOTING.md` §7 para más detalle sobre este punto.
+
+---
+
+
 
 ```
 KILOMBO/
