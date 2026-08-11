@@ -103,7 +103,7 @@ No solo enlaces externos; agregar dentro del propio portal. Ver [`MIRROR_GROWING
   - [ ] Estructura cronológica o por medio en `plandemismo.html` (Documentales / Serie Canal7 / Dossieres escritos)
   - [ ] Reproductores de vídeo embebidos o interfaces de player claras, en lugar de listas de enlaces externos
 - [ ] **4.5 Referencias cruzadas automáticas en artículos** — cada artículo tendrá una sección oculta (expandible o cargada bajo demanda) con referencias generadas automáticamente a otros artículos del portal y/o fuentes externas que complementen su contenido
-
+- [ ] **4.6 Rescatar e incorporar los 7 artículos franceses ocultos** — Extraídos del servidor original (donde no tenían sección y eran invisibles). Limpiar el HTML, asignarles la temática correspondiente y agregarlos a `articles.json` (Nivel 2) para darles un hogar visible en el espejo. (Incluye: serie *Contre l'esclavage...* de S. Almería, *La pandémie n'existe pas !*, etc.).
 ### 5. Traducciones y puesta al día de idiomas
 Hay **atraso histórico de traducciones**, especialmente las revistas del GCI que están disponibles en español pero no en francés, y viceversa. También hay que prever subtítulos en francés para los videos de Canal7.
 
