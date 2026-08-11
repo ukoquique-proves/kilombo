@@ -141,7 +141,7 @@ a { color: inherit; text-decoration: none; }
 
 .section-tagline {
   font-size: 1rem;
-  color: var(--gray);
+  color: #1a1a1a;
   font-style: italic;
   line-height: 1.5;
   max-width: 70ch;
