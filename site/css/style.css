@@ -157,9 +157,7 @@ a { color: inherit; text-decoration: none; }
 .section--tierra .section-title,
 .section--tierra .section-tagline,
 .section--tierra .section-label,
-.section--tierra .section-number,
-.section--tierra .card-title,
-.section--tierra .card-desc {
+.section--tierra .section-number {
   color: #f0f0f0;
 }
 
@@ -169,7 +167,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .section--tierra .section-number {
-  color: #1b5e20;
+  color: #f0f0f0;
   font-size: 1rem;
 }
 
