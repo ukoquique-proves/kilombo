@@ -182,6 +182,55 @@
   border-top: 1px dashed rgba(0, 0, 0, 0.25);
 }
 
+.source-box {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(185, 28, 42, 0.08);
+  border: 1px solid rgba(185, 28, 42, 0.25);
+  border-left: 4px solid #b91c2a;
+  border-radius: 6px;
+}
+
+.source-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #b91c2a;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.source-site {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 0.5rem;
+}
+
+.source-link {
+  display: inline-block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #0066cc;
+  text-decoration: none;
+  word-break: break-all;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 102, 204, 0.08);
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.source-link:hover {
+  background: rgba(0, 102, 204, 0.15);
+  text-decoration: underline;
+}
+
+.source-link::after {
+  content: " ↗";
+  font-size: 0.8em;
+}
+
 .article-empty {
   padding: 1rem;
   border: 2px dashed rgba(0, 0, 0, 0.25);
