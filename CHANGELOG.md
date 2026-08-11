@@ -5,6 +5,44 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.31.0] — 2026-08-11
+
+### Changed (Infrastructure & Documentation)
+- **`.gitignore` refactored** — `sandbox/` and `scraped-full/` now fully ignored (not shipped assets). These contain:
+  - Auth/decrypt workflows (keep private, not part of public codebase)
+  - 6.3MB+ of raw HTML crawl output (regenerable, not version-controlled)
+  - Locally available for dev but never committed
+- **`docs/SITE_ANALYSIS.md` merged** — consolidated `SITE_ANALYSIS_FULL.md` into single authoritative document covering:
+  - 63 total articles (54 visible in navigation + 9 hidden with no SPIP section)
+  - Complete access model explanation
+  - Hidden French-language articles discovery methodology
+  - Server technical details
+- **`.env.example` corrected** — `KILOMBOTOP_USER` was `admin`, now correctly `kilombo` to match actual `.env`
+- **Script paths updated** — all documentation and `package.json` npm scripts now reference `sandbox/scrape-curl.sh` and `sandbox/scrape-comprehensive.sh`
+- **Footer simplified** — consolidated redundant SSO links:
+  - Removed: "Acceso central" + "Acceso privado" (both identical)
+  - Added: Single "Acceso SSO" section with unified description
+
+### Added (Documentation)
+- **`TROUBLESHOOTING.md § 9`** — New section documenting the architecture quirk:
+  - Why authenticated users see identical content to anonymous visitors
+  - Explanation: credentials are for YunoHost (infrastructure), not SPIP (content)
+  - `kilombo` user has no SPIP editor permissions
+  - All articles are public; no draft/private access via this user
+  - Implications for future reader-restricted content
+
+### Fixed
+- **Credential analysis clarity** — documented that `KILOMBOTOP_USER`/`KILOMBOTOP_PASSWORD` are infrastructure credentials only:
+  - Used for: SSH deployment, YunoHost admin panel, scraping automation
+  - NOT used for: unlocking reader content (site is fully public)
+  - Removes the "weird behavior" confusion
+
+### Cleanup
+- Removed 116 committed ephemeral files (temporary test outputs, raw HTML dumps)
+- Repository size reduced by ~6MB in history
+
+---
+
 ## [0.30.0] — 2026-08-11
 
 ### Added (Infrastructure — site analysis & scraping)
