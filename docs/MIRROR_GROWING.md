@@ -25,7 +25,7 @@ Nivel 1 sin pasar por este documento primero.
 | **Persistencia si la fuente cae** | Ninguna — el enlace deja de funcionar | Total — el contenido sigue sirviéndose desde GitHub Pages / `kilombo.top` |
 | **Pasa por `sanitizeHtml()` / cifrado StatiCrypt** | No aplica | Sí, siempre |
 | **Cómo crece** | Se añade una tarjeta nueva a mano en `index.html` cuando hay un nuevo espacio amigo/aliado confirmado | Sigue el proceso de la sección 2 de este documento (selección → JSON → `npm test` → deploy) |
-| **Indicador visual al usuario** | **Pendiente — ver ROADMAP.md §6.** Hoy usa la misma clase `.card` que el Nivel 2, sin distinción visible. No confiar en la URL de destino como única señal. | — |
+| **Indicador visual al usuario** | ✅ Implementado — `.card-status--external` (↗ Externo) vs. `.card-status--mirrored` (⬡ Espejo) en `style.css`, aplicado a las 8 tarjetas de `index.html`. Test de regresión: `scripts/check-badges.mjs` (ver `ROADMAP.md §6`). | — |
 
 ### El equilibrio buscado (Regla de promoción Nivel 1 → Nivel 2)
 

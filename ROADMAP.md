@@ -4,7 +4,7 @@
 
 ---
 
-## FASE INMEDIATA (Próximas 2 sesiones) — Sistema de filtrado interactivo 3-tiers
+## FASE INMEDIATA (Próximas 3 sesiones) — Sistema de filtrado interactivo 3-tiers
 
 ### v0.32.0 — Transformar badges estáticos en controles funcionales
 
@@ -143,7 +143,7 @@ Las tarjetas tendrán atributos `data-lang`, `data-status`, `data-type` para que
 - **Sesión 2:** v0.32.3 – v0.32.5 (JS logic + tests, ~3 horas)
 - **Sesión 3:** v0.32.6 (documentación + ajustes finales, ~1 hora)
 
-**Total:** 2 sesiones de trabajo concentrado
+**Total:** 3 sesiones de trabajo concentrado (~6 horas)
 
 ---
 
@@ -269,11 +269,11 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 - [ ] Sistema de pestañas (tabs) o selector de idioma dentro de cada sección numerada (GCI, P.I., NOM)
 - [ ] Páginas individuales por idioma con contenido filtrado
 - [ ] Selector global de idioma en la cabecera (ES / EN / FR / Multilingüe)
-- [ ] **Indicadores visuales explícitos Nivel 1 (directorio) vs. Nivel 2 (espejo real)** — ver `MIRROR_GROWING.md §0` para la definición de los dos niveles. Especificación mínima para cerrar este ítem:
-  - [ ] Nueva variante de badge, p. ej. `.card-status--external` (Nivel 1) vs. `.card-status--mirrored` (Nivel 2), añadida junto a las existentes `.card-status--active` / `--archive` / `--legacy` en `style.css`
-  - [ ] Icono o texto corto y consistente en el badge (p. ej. "↗ Externo" vs. "Espejo") — no solo color, para cumplir el requisito de accesibilidad de `MIRROR_GROWING.md §4.6` ("no usar color como único indicador de estado")
-  - [ ] Aplicar la nueva clase a **todas** las tarjetas de `index.html`: Nivel 1 = las que apuntan a `icg-gci.kilombo.top`, `in.kilombo.top`, `cdrom.kilombo.top`, `icg-old.kilombo.top`, `proletariosinternacionalistas.kilombo.top`, `www.kilombo.top`; Nivel 2 = las que apuntan a `articulos.html` / `plandemismo.html`
-  - [ ] Test de regresión simple (o checklist manual) que falle si se añade una tarjeta nueva a `index.html` sin badge de nivel — evita que este ítem se resuelva una vez y luego se erosione con el siguiente artículo/enlace añadido. Actualmente no hay verificación automatizada; la clase se aplicó correctamente a mano en esta sesión, pero no existe un enforcement técnico para nuevas tarjetas.
+- [x] **Indicadores visuales explícitos Nivel 1 (directorio) vs. Nivel 2 (espejo real)** — ver `MIRROR_GROWING.md §0` para la definición de los dos niveles. ✅ Implementado y verificado:
+  - [x] Nueva variante de badge, `.card-status--external` (Nivel 1) vs. `.card-status--mirrored` (Nivel 2), añadida junto a las existentes `.card-status--active` / `--archive` / `--legacy` en `style.css`
+  - [x] Icono o texto corto y consistente en el badge ("↗ Externo" vs. "⬡ Espejo") — no solo color, cumple el requisito de accesibilidad de `MIRROR_GROWING.md §4.6` ("no usar color como único indicador de estado")
+  - [x] Aplicada la nueva clase a **todas** las tarjetas de `index.html` (8/8): Nivel 1 = las que apuntan a `icg-gci.kilombo.top`, `in.kilombo.top`, `cdrom.kilombo.top`, `icg-old.kilombo.top`, `proletariosinternacionalistas.kilombo.top`, `www.kilombo.top`; Nivel 2 = las que apuntan a `articulos.html` / `plandemismo.html`
+  - [x] Test de regresión automatizado: `scripts/check-badges.mjs`, integrado en `npm test` — falla el build si se añade una tarjeta nueva a `index.html` sin badge de nivel. Ya no depende de aplicación manual ni de checklist humano.
 
 ### 6b. Búsqueda y descubrimiento de contenido
 - [ ] **Búsqueda client-side** — integrar herramienta ligera (Pagefind, Lunr.js, o Algolia) sobre todos los artículos e índices de archivo del portal
@@ -383,12 +383,13 @@ El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`,
 
 | Bloque | Estado | Tiempo estimado |
 |--------|--------|-----------------|
+| **0. Sistema de filtrado interactivo 3-tiers (v0.32)** | Pendiente — spec completa, sin empezar (ver `FASE INMEDIATA` al inicio de este documento) | 3 sesiones (~6h) |
 | **1. Flujo de subida / deploy** | ✅ GitHub Pages activo (`ukoquique-proves.github.io/kilombo/`) — deploy a `kilombo.top` aplazado a fase futura | — |
 | **2. Plandemismo + videos Canal7 (Actualidad + SIDA→COVID)** | ✅ Construido y poblado — pendiente URLs reales y subtítulos FR | — |
 | **3. Transcripción + publicación audios WhatsApp** | Pendiente | 2 – 7 días |
 | 4. Contenido editorial por sección (incl. referencias cruzadas automáticas) | Pendiente | 2 – 4 días |
 | **5. Traducciones / puesta al día de idiomas (GCI, subtítulos FR)** | Pendiente | 3 – 10 días |
-| 6. Organización por idiomas dentro de cada sección | Pendiente | 1 – 2 días |
+| 6. Organización por idiomas dentro de cada sección | Parcial — indicadores Nivel 1/2 ✅ implementados y con test de regresión; pestañas/selector de idioma pendientes | 1 – 2 días |
 | **7. Protección de acceso — StatiCrypt (cifrado AES-256 client-side)** | ✅ Implementado y verificado en GitHub Pages | — |
 | 8. Revisión diseño + UX | Pendiente | 1 día |
 | 9. SEO y metadatos | Pendiente | 0.5 día |
