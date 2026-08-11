@@ -1,0 +1,321 @@
+/* articles.css — estilos mínimos para el sistema de artículos (JSON → HTML) */
+
+.articles-header {
+  margin: 2rem 0 1rem;
+}
+
+.articles-header h2 {
+  margin: 0 0 0.5rem;
+}
+
+.articles-note {
+  margin: 0.5rem 0 0;
+  color: #333;
+}
+
+.article-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 2rem;
+}
+
+.article-card {
+  display: block;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform    0.18s ease,
+    box-shadow   0.18s ease,
+    border-color 0.18s ease;
+}
+
+/* arrow indicator */
+.article-card::after {
+  content: "→";
+  position: absolute;
+  bottom: 0.9rem;
+  right: 1rem;
+  font-size: 0.85rem;
+  color: #b91c2a;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+}
+
+.article-card:hover,
+.article-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.1),
+    0 0 0 1px rgba(185,28,42,0.22);
+  border-color: rgba(185, 28, 42, 0.45);
+  outline: none;
+}
+
+.article-card:hover::after,
+.article-card:focus-visible::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.article-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.55rem;
+  margin: 0 0 0.75rem;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.72rem;
+  color: #555;
+}
+
+.article-card__meta span {
+  background: rgba(0,0,0,0.07);
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.article-card__title {
+  margin: 0 0 0.5rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.article-card__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.topic-chip {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.1);
+  font-size: 0.72rem;
+  color: #555;
+}
+
+.article-detail {
+  margin: 1.5rem 0 2rem;
+  padding: 1.25rem;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.article-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.55rem;
+  margin: 0.75rem 0 1.25rem;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.75rem;
+  color: #555;
+}
+
+.article-detail__meta span {
+  background: rgba(0,0,0,0.07);
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.article-detail__content {
+  line-height: 1.7;
+  font-family: 'Inter', Verdana, Arial, sans-serif;
+  font-size: 1rem;
+  max-width: 72ch;
+}
+
+.article-detail__content h2,
+.article-detail__content h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  margin-top: 1.25rem;
+}
+
+.article-detail__content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem 0;
+  border-radius: 6px;
+}
+
+.article-detail__content figure {
+  margin: 1.5rem 0;
+  padding: 0;
+}
+
+.article-detail__content figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.article-detail__content blockquote {
+  margin: 1.25rem 0;
+  padding: 0.75rem 0 0.75rem 1rem;
+  border-left: 4px solid #b91c2a;
+  background: rgba(185, 28, 42, 0.05);
+  font-style: italic;
+  color: #444;
+}
+
+.article-detail__source-box {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(185, 28, 42, 0.08);
+  border: 1px solid rgba(185, 28, 42, 0.25);
+  border-left: 4px solid #b91c2a;
+  border-radius: 6px;
+}
+
+.article-detail__source-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #b91c2a;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.article-detail__source-site {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 0.5rem;
+}
+
+.article-detail__source-link {
+  display: inline-block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #0066cc;
+  text-decoration: none;
+  word-break: break-all;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 102, 204, 0.08);
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.article-detail__source-link:hover {
+  background: rgba(0, 102, 204, 0.15);
+  text-decoration: underline;
+}
+
+.article-detail__source-link::after {
+  content: " ↗";
+  font-size: 0.8em;
+}
+
+.article-empty {
+  padding: 1rem;
+  border: 2px dashed rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ================================================================
+   ARTICLE CONTROLS — search box (articulos.html)
+   .topic-filter-bar / .topic-filter-btn now live in style.css,
+   shared with plandemismo.js's per-tab tag filter.
+   ================================================================ */
+
+.article-controls {
+  margin: 1rem 0 0.5rem;
+}
+
+.article-search {
+  font: inherit;
+  font-size: 0.92rem;
+  width: 100%;
+  max-width: 360px;
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: rgba(255, 255, 255, 0.7);
+  color: #222;
+}
+
+.article-search:focus-visible {
+  outline: 2px solid rgba(185, 28, 42, 0.6);
+  outline-offset: 1px;
+  border-color: rgba(185, 28, 42, 0.4);
+}
+
+/* ================================================================
+   RELATED ARTICLES (articulo.html)
+   ================================================================ */
+
+.article-detail__related {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.25);
+}
+
+.article-detail__related-title {
+  margin: 0 0 0.85rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.related-grid .article-card {
+  padding: 0.85rem;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+/* --- Tablet: 481px – 768px --- */
+@media (max-width: 768px) {
+  .article-list {
+    /* minmax(260px) can force two tight columns at ~530px — go single */
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Mobile: ≤ 480px --- */
+@media (max-width: 480px) {
+  .article-card {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  /* Topic chips: slightly smaller gap so they wrap cleanly */
+  .article-card__topics {
+    gap: 0.28rem;
+  }
+
+  .article-detail {
+    padding: 1rem;
+  }
+
+  .article-detail__meta {
+    gap: 0.3rem 0.45rem;
+  }
+}
+

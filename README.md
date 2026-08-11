@@ -12,13 +12,13 @@ Portal central de acceso a la red de sitios de Kilombo. Construido como página 
 
 ### Sitio de referencia: www.kilombo.top
 
-El contenido principal proviene de `https://www.kilombo.top/` — sitio editorial SPIP donde se publican artículos, videos y materiales de la red Kilombo. Ver [`SOURCE_VISITING.md`](SOURCE_VISITING.md) para un **análisis completo en vivo** del servidor: estructura, secciones, artículos, vídeos identificados, y estado de acceso.
+El contenido principal proviene de `https://www.kilombo.top/` — sitio editorial SPIP donde se publican artículos, videos y materiales de la red Kilombo. Ver [`docs/SITE_ANALYSIS.md`](docs/SITE_ANALYSIS.md) para un **análisis completo en vivo** del servidor: estructura, secciones, artículos, vídeos identificados, y estado de acceso.
 
 ### Fuentes / espacios colaboradores
 
 | Espacio | URL | Tipo de colaboración |
 |---------|-----|----------------------|
-| **Espacio Tierra y Libertad** | `https://www.kilombo.top/` | Sitio editorial principal (SPIP 4.4.15). Publica artículos, documentales y materiales de la red internacionalista. Análisis detallado: [`SOURCE_VISITING.md`](SOURCE_VISITING.md) |
+| **Espacio Tierra y Libertad** | `https://www.kilombo.top/` | Sitio editorial principal (SPIP 4.4.15). Publica artículos, documentales y materiales de la red internacionalista. Análisis detallado: [`docs/SITE_ANALYSIS.md`](docs/SITE_ANALYSIS.md) |
 | **Canal7 Salta · TV** | `https://tv.canal7salta.com/` | Comparten sus videos de análisis sobre montajes sanitarios, NOM, médicos éticos. Nosotros lo republicamos/organizamos dentro de la sección **Plandemismo** del portal con subtítulos en francés. |
 | *(otras fuentes amigas)* | *(se irán añadiendo)* | Textos, artículos, dosiers, audios, videos de organizaciones y personas de confianza. |
 
@@ -53,7 +53,7 @@ Dentro de cada sección, las tarjetas indican el **idioma** del sitio mediante u
 
 Este portal nuevo se construye a partir del análisis de una **red ya existente** de espacios Kilombo en la infraestructura YunoHost, más un prototipo de rediseño inicial. Todos son sitios "hermanos" (misma organización, diferentes plataformas).
 
-**Análisis detallado del sitio principal:** Ver [`SOURCE_VISITING.md`](SOURCE_VISITING.md) — contiene datos vivos del servidor (estructura SPIP, catálogo de 54 artículos, vídeos identificados, estado de acceso, etc.).
+**Análisis detallado del sitio principal:** Ver [`docs/SITE_ANALYSIS.md`](docs/SITE_ANALYSIS.md) — contiene datos vivos del servidor (estructura SPIP, catálogo de 54 artículos, vídeos identificados, estado de acceso, etc.).
 
 ### Prototipo / rediseño inicial (Referencia visual del cliente)
 

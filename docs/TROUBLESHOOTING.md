@@ -2,7 +2,7 @@
 
 Diagnóstico completo del intento de conexión al servidor `kilombo.top` realizado el 2026-08-03.
 
-**Para un análisis completo y datos vivos del sitio www.kilombo.top** (estructura SPIP, artículos, vídeos, estado de acceso), ver [`SOURCE_VISITING.md`](SOURCE_VISITING.md).
+**Para un análisis completo y datos vivos del sitio www.kilombo.top** (estructura SPIP, artículos, vídeos, estado de acceso), ver [`docs/SITE_ANALYSIS.md`](SITE_ANALYSIS.md).
 
 ---
 

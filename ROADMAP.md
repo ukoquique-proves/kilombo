@@ -16,13 +16,13 @@
 - [x] **1.2 Implementar la opción elegida** — GitHub Pages activo en `https://ukoquique-proves.github.io/kilombo/`
 - [x] **1.3 Documentar paso a paso en `README.md` sección "Despliegue"**
 - [x] **1.4 Crear `end-of-session.sh`** — script de fin de sesión que pushea a GitHub y sincroniza `kilombo.top` en un solo paso. Si el puerto 22 está cerrado, avisa y deja GitHub Pages actualizado igualmente.
-- [ ] **1.5 Prueba de deploy en `kilombo.top`** — pendiente de que el puerto 22 sea accesible (ver TROUBLESHOOTING.md sección 4)
+- [ ] **1.5 Prueba de deploy en `kilombo.top`** — pendiente de que el puerto 22 sea accesible (ver `docs/TROUBLESHOOTING.md` sección 4)
 
 ---
 
 ### 2. Integrar contenido nuevo: sección Plandemismo + videos de `tv.canal7salta.com`
 
-**Referencia de contenido disponible:** [`SOURCE_VISITING.md`](SOURCE_VISITING.md) enumera todos los 54 artículos actuales en www.kilombo.top, 5+ vídeos identificados, estructura SPIP, y URLs de descarga.
+**Referencia de contenido disponible:** [`docs/SITE_ANALYSIS.md`](docs/SITE_ANALYSIS.md) enumera todos los 54 artículos actuales en www.kilombo.top, 5+ vídeos identificados, estructura SPIP, y URLs de descarga.
 
 La sección **"Nuevo Orden Mundial: plandemismo y domesticación"** debe expandirse incorporando materiales compartidos por los compañeros de `tv.canal7salta.com` (espacio amigo y aliado).
 
