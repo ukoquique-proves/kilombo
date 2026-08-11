@@ -8,12 +8,16 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 ## [0.30.0] — 2026-08-11
 
 ### Added (Infrastructure — site analysis & scraping)
-- **`scrape-comprehensive.sh`** (nuevo): Full-site crawler que descubre ALL article IDs a través de:
+- **`sandbox/scrape-comprehensive.sh`** (nuevo): Full-site crawler que descubre ALL article IDs a través de:
   1. Archive index pages (2023-2025)
   2. RSS feed (11 most recent)
   3. Exhaustive article download & verification
-  - Identifica 61 article IDs totales, 54 válidos, 7 eliminados (404)
-  - Descubre 3-4 artículos antiguos no indexados en RSS (IDs: 2, 62, 65, 67)
+  - Identifica 61+ article IDs totales, 54+ válidos
+  - Descubre hidden French articles not in navigation
+
+- **`sandbox/scrape-curl.sh`**: YunoHost SSO authentication + homepage download
+
+- **`sandbox/decrypt-staticrypt.mjs`**: Placeholder for future StatiCrypt decryption in Node.js
 
 - **`docs/SITE_ANALYSIS_FULL.md`** (nuevo): Análisis completo con inventario detallado:
   - 54 artículos válidos (confirmado)

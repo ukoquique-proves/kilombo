@@ -175,7 +175,12 @@ The sidebar menu includes 27+ links. See primary entries:
 
 Run the automated scraper:
 ```bash
-npm run scrape
+bash sandbox/scrape-curl.sh
+```
+
+For a full-site crawl (discovers all article IDs including archived ones):
+```bash
+bash sandbox/scrape-comprehensive.sh
 ```
 
 This updates `./scraped-content/index.html` with fresh data from the live server using YunoHost SSO credentials from `.env`.

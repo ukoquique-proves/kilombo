@@ -2,7 +2,7 @@
 
 **Source:** Authenticated probe of IDs 1–120 via YunoHost SSO session (2026-08-11)  
 **Coverage:** All article archives + RSS + sections + hidden/unlisted articles  
-**Method:** Sequential probe of all article IDs + YunoHost SSO authentication  
+**Method:** Sequential probe of all article IDs + YunoHost SSO authentication via `sandbox/scrape-comprehensive.sh`  
 **⚠️ LIMITATION:** Only publicly accessible articles — SPIP draft/private articles still inaccessible (user lacks SPIP author rights)
 
 ---
