@@ -5,6 +5,49 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.30.0] — 2026-08-11
+
+### Added (Infrastructure — site analysis & scraping)
+- **`scrape-comprehensive.sh`** (nuevo): Full-site crawler que descubre ALL article IDs a través de:
+  1. Archive index pages (2023-2025)
+  2. RSS feed (11 most recent)
+  3. Exhaustive article download & verification
+  - Identifica 61 article IDs totales, 54 válidos, 7 eliminados (404)
+  - Descubre 3-4 artículos antiguos no indexados en RSS (IDs: 2, 62, 65, 67)
+
+- **`docs/SITE_ANALYSIS_FULL.md`** (nuevo): Análisis completo con inventario detallado:
+  - 54 artículos válidos (confirmado)
+  - 7 artículos borrados/404
+  - Nuevo descubrimiento: "La pandémie n'existe pas" (article 2) + "BOZAL" (62) + "JAULA" (65) + BOZAL duplicate (67)
+  - Mapeo de cobertura del mirror vs live site
+
+### Changed (Documentation restructuring)
+- **`docs/` folder created** — consolidación de documentación operacional:
+  - Movidos a `docs/`: `TROUBLESHOOTING.md`, `MIGRATION.md`, `TO_FIX.md`, `MIRROR_GROWING.md`
+  - Nuevo en `docs/`: `SITE_ANALYSIS_FULL.md`
+  - Root `.md` files reducidos de 10 a 3 (solo README, CHANGELOG, ROADMAP)
+
+- **`docs/SITE_ANALYSIS.md`** — consolidación de 3 archivos anteriores:
+  - ~~`SOURCE_VISITING.md`~~ ✓ consolidado
+  - ~~`DATA_VERIFICATION.md`~~ ✓ consolidado  
+  - ~~`kilombo_visitor_report.md`~~ ✓ consolidado
+  - Single source of truth para análisis de server en vivo
+
+### Fixed (Cross-references)
+- `README.md`: actualizado para apuntar a `docs/SITE_ANALYSIS.md`
+- `ROADMAP.md`: actualizado para apuntar a `docs/SITE_ANALYSIS.md`
+- `docs/TO_FIX.md`: actualizado para apuntar a `docs/SITE_ANALYSIS.md`
+- `docs/TROUBLESHOOTING.md`: actualizado para apuntar a `docs/SITE_ANALYSIS.md`
+- `docs/MIGRATION.md`: actualizado para apuntar a `docs/SITE_ANALYSIS.md`
+
+### Summary
+- ✅ Full-site scraping coverage confirmed (61 article IDs discovered)
+- ✅ Mirror site has 99% content parity (missing 3-4 archived articles)
+- ✅ Documentation organized into `docs/` folder (cleaner architecture)
+- ✅ Inventory gap identified & documented for future import
+
+---
+
 ## [0.29.0] — 2026-08-09
 
 ### Added (UX — navegación y descubribilidad)
