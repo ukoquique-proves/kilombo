@@ -1,7 +1,23 @@
 # SITE_ANALYSIS — www.kilombo.top Live Data
 
 **Source:** Automated scrape via `scrape-curl.sh` (2026-08-11)  
-**Data:** SPIP 4.4.15 running on nginx, IP `80.67.181.245`
+**Data:** SPIP 4.4.15 running on nginx, IP `80.67.181.245`  
+**⚠️ COVERAGE LIMITATION:** Only **public published articles** — draft/private articles inaccessible (user lacks SPIP author rights)
+
+---
+
+## Access Model
+
+The scraper authenticates via **YunoHost SSO** but the `kilombo` user account does NOT have SPIP editor/author permissions.
+
+| Content Type | Accessible | Method |
+|---|---|---|
+| Public articles | ✅ YES | RSS feed + archive index + direct URLs |
+| Draft articles | ❌ NO | Requires SPIP author login |
+| Private/restricted articles | ❌ NO | Requires SPIP author login |
+| Site sections/categories | ✅ YES | Direct URL access |
+| Comments (if enabled) | ❌ NO | Likely restricted to authenticated users |
+| Admin panel | ❌ NO | `/ecrire/` returns 302 redirect to login |
 
 ---
 
@@ -11,7 +27,8 @@ The original Kilombo site (`www.kilombo.top`) is publicly accessible at `https:/
 *(Note: `kilombo.top` without `www` redirects to YunoHost SSO admin panel)*
 
 **Key stats:**
-- **54 articles** published across 6 sections
+- **54 published articles** (publicly visible)
+- **Unknown number of drafts/private articles** (not accessible via scraper)
 - **5+ videos** including 4-part "Curso Salud Holística" 
 - **Bilingual:** Spanish / Français
 - **RSS feed:** `https://www.kilombo.top/spip.php?page=backend`

@@ -2,7 +2,28 @@
 
 **Source:** Full site crawl via `scrape-comprehensive.sh` (2026-08-11)  
 **Coverage:** All article archives + RSS + sections  
-**Method:** Archive discovery + exhaustive article download
+**Method:** Archive discovery + exhaustive article download  
+**⚠️ LIMITATION:** Only public articles — draft/private articles inaccessible (user lacks SPIP author rights)
+
+---
+
+## Access Model
+
+The scraper authenticates via YunoHost SSO credentials but the `kilombo` user does NOT have SPIP editor permissions.
+
+**What can be scraped:**
+- ✅ All public/published articles (54 found)
+- ✅ All public sections (6 found)
+- ✅ RSS feed (11 recent articles)
+- ✅ Archive index pages (2023-2025)
+
+**What CANNOT be scraped:**
+- ❌ Draft articles (require SPIP author login)
+- ❌ Private/restricted articles (require SPIP author login)  
+- ❌ Admin panel `/ecrire/` (returns 302 redirect)
+- ❌ Any content only visible to editors/admins
+
+**Implication:** The inventory of 54 articles is **complete for public content** but **unknown drafts may exist** that only admins can see.
 
 ---
 
