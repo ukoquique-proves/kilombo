@@ -146,6 +146,36 @@
   margin-top: 1.25rem;
 }
 
+.article-detail__content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem 0;
+  border-radius: 6px;
+}
+
+.article-detail__content figure {
+  margin: 1.5rem 0;
+  padding: 0;
+}
+
+.article-detail__content figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.article-detail__content blockquote {
+  margin: 1.25rem 0;
+  padding: 0.75rem 0 0.75rem 1rem;
+  border-left: 4px solid #b91c2a;
+  background: rgba(185, 28, 42, 0.05);
+  font-style: italic;
+  color: #444;
+}
+
 .article-detail__source {
   margin-top: 1.25rem;
   padding-top: 1rem;
