@@ -27,14 +27,16 @@ Nivel 1 sin pasar por este documento primero.
 | **Cómo crece** | Se añade una tarjeta nueva a mano en `index.html` cuando hay un nuevo espacio amigo/aliado confirmado | Sigue el proceso de la sección 2 de este documento (selección → JSON → `npm test` → deploy) |
 | **Indicador visual al usuario** | **Pendiente — ver ROADMAP.md §6.** Hoy usa la misma clase `.card` que el Nivel 2, sin distinción visible. No confiar en la URL de destino como única señal. | — |
 
-### Regla de promoción Nivel 1 → Nivel 2
+### El equilibrio buscado (Regla de promoción Nivel 1 → Nivel 2)
 
-Un enlace de Nivel 1 **no** se convierte en Nivel 2 automáticamente ni por
-iniciativa individual de una sesión de trabajo. Se promueve pieza por pieza
-(artículo o vídeo concreto) siguiendo la regla de admisión de la sección 1,
-nunca "todo el sitio de golpe". El objetivo de Kilombo no es espejar la red
-entera 1:1, sino incorporar selectivamente lo que encaja con la línea
-editorial — ver sección 1, regla de admisión, punto 1.
+El sitio espejo tiene el objetivo de **aproximarse a ofrecer lo mismo que ofrece kilombo.top**. Para lograr esto, debe tener *sustancia propia*; no puede ser un simple puente o directorio de enlaces hacia otros sitios. 
+
+Sin embargo, hay un límite estricto: **no se deben violar derechos de propiedad ajenos**. Por lo tanto:
+- Un enlace de Nivel 1 **no** se convierte en Nivel 2 copiando "todo el sitio de golpe".
+- No se clonarán bibliotecas enteras de sitios de terceros.
+- Solo se extraerán y alojarán nativamente (Nivel 2) aquellos artículos, comunicados o vídeos **directamente relacionados a los titulares y subtitulares que el espejo aborda**.
+
+Es una selección curada: el sitio debe ser lo suficientemente complejo y completo para sostener su propio discurso, sin apropiarse del contenido irrelevante o total de espacios aliados. Ver sección 1, regla de admisión, punto 1 para el criterio editorial.
 
 ### Por qué esto importa para cualquier sesión nueva
 
