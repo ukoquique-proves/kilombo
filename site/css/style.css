@@ -442,10 +442,10 @@ a { color: inherit; text-decoration: none; }
   height: 68px;
 }
 
-.section-svg--tierra { color: #6b5d51; }
-.section-svg--gci    { color: #5a7268; }
-.section-svg--pi     { color: #8b0000; }
-.section-svg--nom    { color: #4a6175; }
+.section-svg--tierra { stroke: #6b5d51; }
+.section-svg--gci    { stroke: #5a7268; }
+.section-svg--pi     { stroke: #8b0000; }
+.section-svg--nom    { stroke: #4a6175; }
 
 @media (max-width: 480px) {
   .section-illustration {
