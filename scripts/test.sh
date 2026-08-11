@@ -6,6 +6,7 @@
 #   1. Unit tests — every test/*.test.mjs file (render.mjs, articles.js, ...)
 #   2. JSON data validation for site/assets/data/*.json and site/assets/content/*.json
 #   3. Cross-file URL consistency check (.env.example / index.html / README.md)
+#   4. Index cards check — ensures all index.html cards have Level 1/2 badges
 #
 # Stops at the first failure (set -e) so a broken step is obvious
 # instead of getting buried under later output.
@@ -36,6 +37,12 @@ echo "============================================================"
 echo " 3/3  URL consistency — scripts/check-urls.mjs"
 echo "============================================================"
 node scripts/check-urls.mjs
+
+echo ""
+echo "============================================================"
+echo " 4/4  Index cards badges — scripts/check-badges.mjs"
+echo "============================================================"
+node scripts/check-badges.mjs
 
 echo ""
 echo "✅  All checks passed."
