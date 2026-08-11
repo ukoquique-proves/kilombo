@@ -477,3 +477,81 @@ html = rewrite_relative_urls(html, source_url)
 
 **Verificación del truncado en PI (heurística `<section id=` / `<footer`):**
 La heurística de truncado del bloque `texte surlignable` en PI es fiable para los artículos de las semanas 1–2, pero no ha sido verificada contra todas las variantes de plantilla PI. Antes de importar artículos PI de Week 3+, hacer un spot-check: abrir el HTML crudo del artículo y confirmar que el marcador de fin (`<section id=` o `<footer`) aparece después del cuerpo completo y antes de la barra lateral "meme-rub".
+
+
+---
+
+## 9. Comportamiento Extraño: Credenciales que NO Desbloquean Contenido
+
+### El Problema
+
+El sitio `www.kilombo.top` tiene una característica arquitectónica inusual:
+
+**Los visitantes autenticados con `KILOMBOTOP_USER` / `KILOMBOTOP_PASSWORD` ven EXACTAMENTE el mismo contenido que los visitantes sin credenciales.**
+
+### Por qué Ocurre
+
+1. **Las credenciales son para YunoHost, no para SPIP**
+   - `kilombo` es un usuario del **sistema operativo** (SSH) y del **panel YunoHost** (`/yunohost/admin/`)
+   - `kilombo` NO tiene permisos de **editor/autor en SPIP**
+   - No puede acceder a `www.kilombo.top/ecrire/` (backend SPIP)
+
+2. **SPIP no sabe quién es el usuario autenticado**
+   - YunoHost SSO establece una sesión (`YNH_SSO_...` cookie)
+   - Pero SPIP no sincroniza esa sesión con su propia base de datos de usuarios
+   - Para SPIP, es como si el usuario visitante fuera **anónimo**
+
+3. **Todos los artículos son públicos**
+   - No hay artículos con visibilidad `privado` o `redactor`
+   - No hay contenido restringido a roles SPIP
+   - Todos los 63 artículos están en el nivel de acceso máximo público
+
+### Verificación
+
+```bash
+# Sin autenticación:
+curl -s "https://www.kilombo.top/spip.php?article86" | wc -c
+# → 34856 bytes
+
+# Con autenticación YunoHost:
+curl -s -b /tmp/kilombo-cookies.txt "https://www.kilombo.top/spip.php?article86" | wc -c
+# → 34856 bytes (IDÉNTICO)
+
+# Los visitantes ven el mismo contenido
+```
+
+### Las Credenciales SÍ Sirven Para
+
+- ✅ **Acceso SSH/SFTP** — despliegue a producción (`sync-to-production.sh`)
+- ✅ **Panel YunoHost** — gestión de aplicaciones, usuarios, dominios
+- ✅ **Scraping automatizado** — establecer sesión para verificar acceso
+- ✅ **CI/CD** — push a producción desde workflows
+
+### Las Credenciales NO Sirven Para
+
+- ❌ Desbloquear artículos adicionales
+- ❌ Acceder a contenido privado
+- ❌ Editar SPIP
+- ❌ Cambiar la visibilidad del contenido del visitante
+
+### Implicaciones de Arquitectura
+
+Este diseño refleja que **kilometro.top es un sitio completamente público**. Si en el futuro se quiere:
+
+1. **Restringir contenido a usuarios autenticados** → Necesitarás:
+   - Crear usuarios SPIP reales (no YunoHost)
+   - Asignar visibilidad de artículos a roles SPIP
+   - O agregar una capa de autenticación adicional (API key, contraseña de sitio, etc.)
+
+2. **Mantener el acceso público actual** → Las credenciales siguen siendo útiles solo para:
+   - Operaciones de infraestructura (SSH, deploy, admin panel)
+   - Scraping automatizado (establece sesión para logs y auditoría)
+
+### Conclusión
+
+El "comportamiento extraño" no es un bug — es el resultado previsto de:
+- Un sitio editorial de contenido público (no hay secretos editoriales)
+- Autenticación centralizada en YunoHost (gestión de servidores, no de contenido)
+- Ausencia de reglas de acceso basadas en roles en SPIP (todo es público)
+
+Si esto cambia en el futuro, avisa — habrá que revisar la arquitectura de permisos.
