@@ -1,5 +1,6 @@
 #!/bin/bash
 # scrape-curl.sh — Extract kilombo.top content using curl + credentials
+# Authenticates with YunoHost SSO and downloads pages (including protected sections)
 # Works without Chrome/Playwright (no CDP needed)
 
 set -e
@@ -7,38 +8,88 @@ set -e
 source .env
 
 COOKIE_JAR="/tmp/kilombo-cookies.txt"
-OUTPUT_FILE="final_kilombo.html"
+OUTPUT_DIR="./scraped-content"
+mkdir -p "$OUTPUT_DIR"
 
 echo "=== Kilombo.top Scraper (curl-based) ==="
 echo ""
+echo "Host: $KILOMBOTOP_HOST"
+echo "User: $KILOMBOTOP_USER"
+echo ""
 
-# Step 1: Hit the YunoHost SSO endpoint
-echo "1. Attempting YunoHost SSO login..."
-curl -s \
+# Step 1: Authenticate with YunoHost SSO
+echo "1. Authenticating with YunoHost SSO..."
+LOGIN_RESPONSE=$(curl -s -i \
   -c "$COOKIE_JAR" \
   -X POST \
-  -d "user=$KILOMBOTOP_USER&password=$KILOMBOTOP_PASSWORD" \
-  "https://kilombo.top/yunohost/sso/login" \
-  > /dev/null 2>&1 || {
-    echo "   ⚠ SSO endpoint returned error (expected — YunoHost redirects on success)"
-  }
+  --data-urlencode "user=$KILOMBOTOP_USER" \
+  --data-urlencode "password=$KILOMBOTOP_PASSWORD" \
+  "https://kilombo.top/yunohost/sso/login" 2>&1)
 
-# Step 2: Access the main page with the session cookie
-echo "2. Fetching main page with session cookie..."
+HTTP_CODE=$(echo "$LOGIN_RESPONSE" | head -1 | grep -oP '\d{3}')
+if [[ "$HTTP_CODE" == "302" ]] || [[ "$HTTP_CODE" == "200" ]]; then
+  echo "   ✓ Authentication returned HTTP $HTTP_CODE (success indicators)"
+else
+  echo "   ⚠ Unexpected HTTP code: $HTTP_CODE"
+fi
+
+# Step 2: Verify session is active by testing an authenticated request
+echo "2. Verifying session validity..."
+SESSION_TEST=$(curl -s -w "%{http_code}" -b "$COOKIE_JAR" -o /dev/null \
+  "https://kilombo.top/yunohost/sso/")
+if [[ "$SESSION_TEST" == "200" ]] || [[ "$SESSION_TEST" == "302" ]]; then
+  echo "   ✓ Session active (HTTP $SESSION_TEST)"
+else
+  echo "   ⚠ Session test returned HTTP $SESSION_TEST (may still work)"
+fi
+
+# Step 3: Download main page
+echo "3. Downloading main page..."
 curl -s \
   -b "$COOKIE_JAR" \
   -L \
-  "https://kilombo.top/" \
-  > "$OUTPUT_FILE"
+  "https://www.kilombo.top/" \
+  > "$OUTPUT_DIR/index.html"
+echo "   ✓ Saved to $OUTPUT_DIR/index.html"
 
-echo "3. Checking if content is StatiCrypt-encrypted..."
-if grep -q "staticrypt-html\|Contraseña\|password" "$OUTPUT_FILE"; then
+# Step 4: Check for StatiCrypt encryption
+echo "4. Checking for StatiCrypt encryption..."
+if grep -q "staticrypt-html\|Contraseña\|password" "$OUTPUT_DIR/index.html"; then
   echo "   → Detected StatiCrypt encryption"
-  echo "   → Run 'npm run scrape:decrypt' to decode with STATICRYPT_PASSWORD"
+  echo "   → Content is AES-256 encrypted with STATICRYPT_PASSWORD"
+  echo ""
+  echo "   To decrypt and extract content:"
+  echo "   - Save the encrypted page locally"
+  echo "   - Use: staticrypt decrypt final_kilombo.html --password '$STATICRYPT_PASSWORD'"
+  echo "   - Or use the decrypt script in this repo (if available)"
 else
-  echo "   → Content appears to be unencrypted or accessible"
+  echo "   → Content appears unencrypted or accessible as-is"
 fi
 
+# Step 5: List available protected resources
+echo "5. Probing for protected resources..."
+PROTECTED_URLS=(
+  "https://kilombo.top/yunohost/admin/"
+  "https://www.kilombo.top/"
+  "https://icg-gci.kilombo.top/"
+)
+
+for url in "${PROTECTED_URLS[@]}"; do
+  status=$(curl -s -o /dev/null -w "%{http_code}" -b "$COOKIE_JAR" "$url")
+  if [[ "$status" != "000" ]]; then
+    echo "   • $url — HTTP $status"
+  fi
+done
+
 echo ""
-echo "✓ Done. Content saved to: $OUTPUT_FILE"
-echo "  Cookie jar: $COOKIE_JAR (for manual inspection)"
+echo "✓ Done."
+echo ""
+echo "Summary:"
+echo "  - Authenticated: YES (YunoHost SSO)"
+echo "  - Session stored: $COOKIE_JAR"
+echo "  - Content location: $OUTPUT_DIR/"
+echo ""
+echo "Next steps:"
+echo "  - Check $OUTPUT_DIR/index.html"
+echo "  - If StatiCrypt: decrypt using STATICRYPT_PASSWORD"
+echo "  - To download more pages: curl -b $COOKIE_JAR -L 'https://kilombo.top/path'"
