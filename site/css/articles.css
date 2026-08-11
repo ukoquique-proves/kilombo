@@ -23,9 +23,9 @@
 .article-card {
   display: block;
   padding: 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.13);
+  border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.6);
+  background: #faf8f5;
   color: inherit;
   text-decoration: none;
   position: relative;
@@ -110,9 +110,9 @@
 .article-detail {
   margin: 1.5rem 0 2rem;
   padding: 1.25rem;
-  border: 2px solid rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(0, 0, 0, 0.16);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.55);
+  background: #faf8f5;
 }
 
 .article-detail__meta {
@@ -231,7 +231,7 @@
   padding: 1rem;
   border: 2px dashed rgba(0, 0, 0, 0.25);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.35);
+  background: #faf8f5;
 }
 
 /* ================================================================
@@ -272,7 +272,7 @@
   padding: 0.5rem 0.85rem;
   border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.18);
-  background: rgba(255, 255, 255, 0.7);
+  background: #faf8f5;
   color: #222;
 }
 
