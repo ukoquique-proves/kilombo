@@ -219,6 +219,35 @@ function renderEmptyState(container, msg) {
 }
 
 /**
+ * Wires the fixed progress bar (#progress-bar) to document scroll
+ * position. No-ops if the element isn't on the page. rAF-throttled
+ * so scroll doesn't trigger layout thrashing.
+ */
+function initReadingProgress() {
+  const bar = document.getElementById('progress-bar');
+  if (!bar) return;
+
+  let ticking = false;
+  const update = () => {
+    const scrolled = window.scrollY;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = maxScroll > 0 ? (scrolled / maxScroll) * 100 : 0;
+    bar.style.width = `${progress}%`;
+    ticking = false;
+  };
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(update);
+      ticking = true;
+    }
+  }, { passive: true });
+  window.addEventListener('resize', update);
+
+  update();
+}
+
+/**
  * @param {HTMLElement} list
  * @param {ArticleEntry[]} articles
  */
@@ -342,6 +371,8 @@ async function initDetailPage() {
     // de formato (p, a, strong, em, listas, blockquote, img, ...).
     contentEl.innerHTML = '';
     contentEl.appendChild(sanitizeHtml(a.contentHtml || ''));
+
+    initReadingProgress();
 
     const safeSourceUrl = escapeHtml(a.sourceUrl);
     sourceEl.innerHTML = `

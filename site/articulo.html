@@ -9,22 +9,10 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/articles.css">
-  <style>
-    .scroll-progress-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #b91c2a, #8b0000);
-      width: 0%;
-      z-index: 9999;
-      transition: width 0.1s ease;
-    }
-  </style>
 </head>
 <body data-page="articulo">
 
-<div class="scroll-progress-bar" id="progress-bar"></div>
+<div class="scroll-progress-bar" id="progress-bar" aria-hidden="true"></div>
 
 <header class="site-header">
   <div class="container">
@@ -70,19 +58,5 @@
 </footer>
 
 <script src="js/articles.js" type="module"></script>
-
-<script>
-// Scroll progress bar — tracks reading position in long-form articles
-// Useful when no heading structure exists yet (TO_FIX context)
-const progressBar = document.getElementById('progress-bar');
-if (progressBar) {
-  window.addEventListener('scroll', () => {
-    const scrolled = window.scrollY;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = maxScroll > 0 ? (scrolled / maxScroll) * 100 : 0;
-    progressBar.style.width = progress + '%';
-  });
-}
-</script>
 </body>
 </html>
