@@ -148,11 +148,12 @@ Three methods reach different subsets of articles:
 
 **Example probe (Python):**
 ```python
+import os
 import requests
 s = requests.Session()
 s.post('https://kilombo.top/yunohost/sso/login', data={
     'user': 'kilombo',
-    'password': 'otario2021'
+    'password': os.environ['KILOMBOTOP_PASSWORD']  # Use env var, never hardcode
 })
 for i in range(1, 200):
     r = s.get(f'https://www.kilombo.top/spip.php?article{i}')
