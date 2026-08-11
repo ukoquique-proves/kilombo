@@ -176,13 +176,7 @@
   color: #444;
 }
 
-.article-detail__source {
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px dashed rgba(0, 0, 0, 0.25);
-}
-
-.source-box {
+.article-detail__source-box {
   margin: 1rem 0;
   padding: 1rem;
   background: rgba(185, 28, 42, 0.08);
@@ -191,7 +185,7 @@
   border-radius: 6px;
 }
 
-.source-label {
+.article-detail__source-label {
   font-weight: 700;
   font-size: 0.9rem;
   color: #b91c2a;
@@ -200,7 +194,7 @@
   letter-spacing: 0.5px;
 }
 
-.source-site {
+.article-detail__source-site {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.05rem;
   font-weight: 600;
@@ -208,7 +202,7 @@
   margin-bottom: 0.5rem;
 }
 
-.source-link {
+.article-detail__source-link {
   display: inline-block;
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
@@ -221,12 +215,12 @@
   transition: background 0.15s ease;
 }
 
-.source-link:hover {
+.article-detail__source-link:hover {
   background: rgba(0, 102, 204, 0.15);
   text-decoration: underline;
 }
 
-.source-link::after {
+.article-detail__source-link::after {
   content: " ↗";
   font-size: 0.8em;
 }

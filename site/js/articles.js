@@ -345,10 +345,10 @@ async function initDetailPage() {
 
     const safeSourceUrl = escapeHtml(a.sourceUrl);
     sourceEl.innerHTML = `
-      <div class="source-box">
-        <div class="source-label">📍 Fuente original</div>
-        <div class="source-site">${escapeHtml(a.sourceSite)}</div>
-        <a class="source-link" href="${safeSourceUrl}" target="_blank" rel="noopener noreferrer">${safeSourceUrl}</a>
+      <div class="article-detail__source-box">
+        <div class="article-detail__source-label">📍 Fuente original</div>
+        <div class="article-detail__source-site">${escapeHtml(a.sourceSite)}</div>
+        <a class="article-detail__source-link" href="${safeSourceUrl}" target="_blank" rel="noopener noreferrer">${safeSourceUrl}</a>
       </div>
     `.trim();
 
