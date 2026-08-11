@@ -4,6 +4,149 @@
 
 ---
 
+## FASE INMEDIATA (Próximas 2 sesiones) — Sistema de filtrado interactivo 3-tiers
+
+### v0.32.0 — Transformar badges estáticos en controles funcionales
+
+**Objetivo:** Convertir los badges de lenguaje, estado y tipo en botones interactivos que dan al usuario control real sobre lo que ve. Esto alinea el proyecto con su misión de **empoderamiento del usuario** en lugar de solo proporcionar enlaces a "páginas aburridas mal ordenadas".
+
+#### Filosofía del cambio
+- ❌ **Antes:** Las tarjetas de contenido son solo enlaces (el usuario tiene que seguirlas, sin control)
+- ✅ **Después:** Los badges son botones de filtro; el usuario organiza el contenido según sus preferencias
+
+#### Especificación del sistema de filtrado
+
+**3-tiers de filtrado:**
+
+1. **Idioma** (ES / EN / FR)
+   - Muestra/oculta tarjetas según idioma disponible
+   - Botón toggle: hacer clic marca el idioma como activo/inactivo
+   - Lógica: mostrar tarjeta si contiene **cualquiera** de los idiomas seleccionados (OR)
+   - Persistencia: guardar selección en URL como `?lang=es,en` y sessionStorage
+
+2. **Estado** (Activo / Archivo / Legado)
+   - Muestra/oculta tarjetas según estado de contenido
+   - Botón toggle: Activo vs. Archivo vs. Legado — se puede mezclar
+   - Lógica: mostrar tarjeta si su estado está en la selección (OR)
+   - Persistencia: guardar como `?status=active,archive`
+
+3. **Tipo** (Editorial / Artículos / Oficial / Etc.)
+   - Muestra/oculta tarjetas según clasificación temática
+   - Botón toggle: cada tipo es independiente
+   - Lógica: mostrar tarjeta si su tipo está en la selección (OR)
+   - Persistencia: guardar como `?type=editorial,official`
+
+**Combinación de filtros:** Usar **lógica AND entre tiers, OR dentro de cada tier**
+```
+Mostrar si: (idioma seleccionado) AND (estado seleccionado) AND (tipo seleccionado)
+```
+
+Ejemplo: "Mostrar TODOS los contenidos en ES, que sean ACTIVOS O de ARCHIVO, y sean del tipo EDITORIAL u OFICIAL"
+
+#### Persistencia en URL + sessionStorage
+
+- **URL:** `https://kilombo.top/?lang=es,en&status=active&type=editorial,official`
+- **sessionStorage:** Al cargar la página, el estado persiste en la sesión del navegador (si el usuario recarga o navega dentro del sitio, los filtros se mantienen)
+- **Convención:** Si no hay parámetros, mostrar TODO por defecto (sin restricciones)
+- **Botón "Reset":** Limpiar filtros y volver al estado inicial
+
+#### Indicadores visuales
+
+- Botones de filtro con dos estados visuales: **inactivo** (gris, no seleccionado) vs. **activo** (coloreado, seleccionado)
+- Contador: "Mostrando X de Y tarjetas"
+- Transiciones suaves (fade in/out) al mostrar/ocultar tarjetas
+- Si no hay tarjetas que coincidan con los filtros: mostrar mensaje "No hay contenido que coincida con los filtros seleccionados"
+
+#### Anatomía del marcado HTML
+
+```html
+<!-- ANTES: badge estático -->
+<span class="card-lang">ES / EN / FR</span>
+
+<!-- DESPUÉS: button interactivo con atributos de datos -->
+<button class="filter-badge filter-badge--lang" 
+        data-lang="es,en,fr" 
+        data-active="false"
+        aria-pressed="false"
+        aria-label="Filtrar por idiomas: Español, Inglés, Francés">
+  ES / EN / FR
+</button>
+```
+
+Las tarjetas tendrán atributos `data-lang`, `data-status`, `data-type` para que el JS pueda evaluarlas:
+
+```html
+<a class="card" 
+   data-lang="es,en,fr" 
+   data-status="active" 
+   data-type="editorial,official"
+   href="...">
+  <!-- contenido -->
+</a>
+```
+
+#### Tareas de implementación
+
+- [ ] **v0.32.1 — Refactorizar HTML: convertir badges en botones**
+  - [ ] Actualizar `index.html`: reemplazar `<span class="card-lang">` con `<button class="filter-badge filter-badge--lang">`
+  - [ ] Reemplazar `<span class="card-status">` con `<button class="filter-badge filter-badge--status">`
+  - [ ] Reemplazar `<span class="tag">` con `<button class="filter-badge filter-badge--type">` (para tags de tipo: Editorial, Artículos, Oficial)
+  - [ ] Añadir atributos `data-lang`, `data-status`, `data-type` a cada tarjeta (`<a class="card">`)
+
+- [ ] **v0.32.2 — Estilos CSS para botones de filtro**
+  - [ ] Nueva clase `.filter-badge` base: hereda del estilo de badge existente
+  - [ ] Estado inactivo vs. activo (uso de `[aria-pressed="false"]` y `[aria-pressed="true"]`)
+  - [ ] Cursor pointer, transiciones de color
+  - [ ] Hover/focus estados claros
+  - [ ] No envolver botones con enlaces (`<a>`) — son independientes
+
+- [ ] **v0.32.3 — JavaScript: lógica de filtrado**
+  - [ ] Crear `site/js/filter.mjs` (módulo ES6)
+  - [ ] Función `getFilterState()`: lee URL params + sessionStorage, devuelve estado actual de filtros
+  - [ ] Función `setFilterState(state)`: actualiza URL (history.replaceState) + sessionStorage
+  - [ ] Función `isCardVisible(card, filterState)`: evalúa si la tarjeta debe mostrarse según filtros
+  - [ ] Función `applyFilters()`: itera todas las tarjetas, muestra/oculta según `isCardVisible()`
+  - [ ] Event listeners en botones de filtro: al hacer clic, toggle el filtro, aplica cambios
+  - [ ] Contador de tarjetas visibles en tiempo real
+  - [ ] Mensaje vacío si no hay coincidencias
+
+- [ ] **v0.32.4 — Integración en index.html**
+  - [ ] Importar `filter.mjs` con `<script type="module">`
+  - [ ] Inicializar filtros al cargar la página
+  - [ ] Div para el contador: `<div id="filter-count">Mostrando 12 de 25</div>`
+  - [ ] Div para mensaje vacío: `<div id="filter-empty" style="display:none;">No hay contenido...</div>`
+  - [ ] Botón reset: `<button id="filter-reset">Limpiar filtros</button>`
+
+- [ ] **v0.32.5 — Tests**
+  - [ ] Test: URL con parámetros → filtros aplicados correctamente
+  - [ ] Test: Click en botón de filtro → URL actualizada, tarjetas filtradas
+  - [ ] Test: Navegación (reload) → estado persiste desde sessionStorage
+  - [ ] Test: Combinación de filtros → lógica AND entre tiers, OR dentro de tiers
+  - [ ] Test: sin coincidencias → mostrar mensaje vacío
+  - [ ] Test: reset → volver al estado inicial
+
+- [ ] **v0.32.6 — Documentación**
+  - [ ] Añadir sección en `README.md` explicando cómo usar los filtros
+  - [ ] Documentar para desarrolladores cómo agregar nuevos atributos `data-*` a tarjetas futuras
+  - [ ] Ejemplo: "Si añades una tarjeta nueva, asegúrate de incluir `data-lang`, `data-status`, `data-type` con valores separados por comas"
+
+#### Accesibilidad
+
+- Botones con `aria-pressed` para indicar estado (activo/inactivo)
+- Labels descriptivos en cada botón (`aria-label`)
+- Soporte para navegación con teclado (Tab, Enter, Space)
+- Anunciar cambios dinámicos con `aria-live` en el contador (screen readers)
+
+#### Timeline
+
+- **Sesión 1:** v0.32.1 – v0.32.2 (refactor HTML + CSS, ~2 horas)
+- **Sesión 2:** v0.32.3 – v0.32.5 (JS logic + tests, ~3 horas)
+- **Sesión 3:** v0.32.6 (documentación + ajustes finales, ~1 hora)
+
+**Total:** 2 sesiones de trabajo concentrado
+
+---
+
 ## PRIMEROS PASOS (inmediatos / alta prioridad)
 
 ### 1. Establecer flujo claro de subida de modificaciones al sitio
