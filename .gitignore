@@ -55,6 +55,16 @@ dist/
 *.backup
 site-backup*/
 
+# --------- Temporary scraping & sandbox artifacts ---------
+# These are ephemeral outputs from data collection & testing — never commit
+sandbox/
+scraped-content/
+scraped-full/
+*.html  # temporary HTML files from scraping
+cookie.txt
+cookies.txt
+*.pyc
+
 # --------- Audios / videos / contenido pesado ---------
 # (si se sube contenido grande, usar LFS u otro almacenamiento)
 # assets/audios/*.mp3
