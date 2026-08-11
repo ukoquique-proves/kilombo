@@ -330,11 +330,9 @@ a { color: inherit; text-decoration: none; }
   color: #444;
 }
 
-.card--lang-es .card-lang { background: rgba(27,94,32,0.13);  color: #1b5e20; }
-/* .card--lang-fr rule removed after PI section unification (v0.8.0).
-   Re-enable only if individual lang-FR cards return in the markup. */
-.card--lang-en .card-lang { background: rgba(49,27,146,0.11); color: #311b92; }
-.card--lang-multi .card-lang { background: rgba(74,20,140,0.11); color: #4a148c; }
+.card--lang-es .card-lang { background: #1b5e20;  color: #ffffff; }
+.card--lang-en .card-lang { background: #311b92; color: #ffffff; }
+.card--lang-multi .card-lang { background: #4a148c; color: #ffffff; }
 
 .card-status {
   font-family: var(--font-mono);
@@ -346,15 +344,15 @@ a { color: inherit; text-decoration: none; }
   border-radius: 999px;
 }
 
-.card-status--active  { background: rgba(27,94,32,0.1);    color: #2e7d32; }
-.card-status--archive { background: rgba(230,81,0,0.09);   color: #bf360c; }
-.card-status--legacy  { background: rgba(69,90,100,0.1);   color: #546e7a; }
+.card-status--active  { background: #2e7d32;    color: #ffffff; }
+.card-status--archive { background: #e65100;   color: #ffffff; }
+.card-status--legacy  { background: #455a64;   color: #ffffff; }
 
 /* Tier badges — Level 1 (external link) vs Level 2 (locally mirrored content).
    See MIRROR_GROWING.md §0 for the definition of the two levels.
    Use text labels, not color alone (accessibility rule MIRROR_GROWING §4.6). */
-.card-status--external { background: rgba(0,0,0,0.06);          color: #555;    border: 1px solid rgba(0,0,0,0.12); }
-.card-status--mirrored { background: rgba(49,27,146,0.09);       color: #311b92; border: 1px solid rgba(49,27,146,0.2); }
+.card-status--external { background: #666;          color: #ffffff;    border: 1px solid rgba(0,0,0,0.3); }
+.card-status--mirrored { background: #311b92;       color: #ffffff; border: 1px solid rgba(49,27,146,0.4); }
 
 .card-title {
   font-family: var(--font-serif);
@@ -388,14 +386,14 @@ a { color: inherit; text-decoration: none; }
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
   border: 1px solid transparent;
-  color: #555;
-  background: rgba(0,0,0,0.06);
+  color: #ffffff;
+  background: #666;
 }
 
-.tag--type  { background: rgba(185,28,42,0.08);  color: #8b1320; border-color: rgba(185,28,42,0.16); }
-.tag--lang  { background: rgba(0,0,0,0.08);       color: #333;    border-color: rgba(0,0,0,0.15); }
-.tag--affil { background: rgba(0,0,0,0.05);       color: #555; }
-.tag--scope { background: rgba(185,28,42,0.06);   color: #8b1320; border-color: rgba(185,28,42,0.16); }
+.tag--type  { background: #8b1320;  color: #ffffff; border-color: rgba(185,28,42,0.4); }
+.tag--lang  { background: #333;       color: #ffffff;    border-color: rgba(0,0,0,0.3); }
+.tag--affil { background: #555;       color: #ffffff; }
+.tag--scope { background: #8b1320;   color: #ffffff; border-color: rgba(185,28,42,0.4); }
 
 /* ------------------------------------------------------------------ */
 /* SECTION ILLUSTRATIONS                                                */

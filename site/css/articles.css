@@ -73,14 +73,14 @@
   margin: 0 0 0.75rem;
   font-family: "Courier New", Courier, monospace;
   font-size: 0.72rem;
-  color: #555;
+  color: #ffffff;
 }
 
 .article-card__meta span {
-  background: rgba(0,0,0,0.07);
+  background: #666;
   border-radius: 999px;
   padding: 0.12rem 0.55rem;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.2);
 }
 
 .article-card__title {
@@ -101,10 +101,10 @@
   display: inline-block;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  background: rgba(0,0,0,0.06);
-  border: 1px solid rgba(0,0,0,0.1);
+  background: #555;
+  border: 1px solid rgba(0,0,0,0.2);
   font-size: 0.72rem;
-  color: #555;
+  color: #ffffff;
 }
 
 .article-detail {
@@ -122,14 +122,14 @@
   margin: 0.75rem 0 1.25rem;
   font-family: "Courier New", Courier, monospace;
   font-size: 0.75rem;
-  color: #555;
+  color: #ffffff;
 }
 
 .article-detail__meta span {
-  background: rgba(0,0,0,0.07);
+  background: #666;
   border-radius: 999px;
   padding: 0.12rem 0.55rem;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.2);
 }
 
 .article-detail__content {
