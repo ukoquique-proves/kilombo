@@ -15,9 +15,10 @@ En lugar de modificar `kilombo.top` directamente — lo que obligaría a borrar 
 | | Original | Espejo / nuevo diseño |
 |---|---|---|
 | **URL** | `https://www.kilombo.top/` | `https://ukoquique-proves.github.io/kilombo/` |
-| **Tecnología** | SPIP CMS + base de datos | HTML/CSS/JS estático |
+| **Tecnología** | SPIP 4.4.15 CMS + base de datos | HTML/CSS/JS estático |
 | **Estado** | Sitio en producción activo | Propuesta en desarrollo |
 | **Propósito** | El sitio que existe hoy | El sitio que irá reemplazando al anterior |
+| **Análisis** | Ver [`SOURCE_VISITING.md`](SOURCE_VISITING.md) para datos vivos: 54 artículos, 5+ vídeos, estructura completa | — |
 
 ---
 

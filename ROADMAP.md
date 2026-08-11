@@ -22,6 +22,8 @@
 
 ### 2. Integrar contenido nuevo: sección Plandemismo + videos de `tv.canal7salta.com`
 
+**Referencia de contenido disponible:** [`SOURCE_VISITING.md`](SOURCE_VISITING.md) enumera todos los 54 artículos actuales en www.kilombo.top, 5+ vídeos identificados, estructura SPIP, y URLs de descarga.
+
 La sección **"Nuevo Orden Mundial: plandemismo y domesticación"** debe expandirse incorporando materiales compartidos por los compañeros de `tv.canal7salta.com` (espacio amigo y aliado).
 
 #### Criterios de selección y estructura (indicaciones del cliente):

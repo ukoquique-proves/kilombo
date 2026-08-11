@@ -25,6 +25,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 - [ ] **30. `el-fraude-de-los-pcr` — entrada stub, pendiente de contenido real**
   - El artículo original en `https://www.kilombo.top/spip.php?article37` es solo imágenes (dos PNG: `pcr1.png`, `pcr2.png`), sin texto en el cuerpo SPIP.
+  - (Ver [`SOURCE_VISITING.md`](SOURCE_VISITING.md) línea "article37 | El fraude de los PCR" — confirmado en catálogo vivo del servidor.)
   - Fue importado como stub de dos frases con enlace a la fuente. El campo `status` se ha corregido a `pending-review` para que no se confunda con un import completo.
   - Opciones para resolver el gap:
     1. Transcribir manualmente el texto de las imágenes y cambiar `status` a `imported`.
