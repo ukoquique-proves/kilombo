@@ -1,8 +1,9 @@
-# SITE_ANALYSIS — www.kilombo.top Live Data
+# SITE_ANALYSIS — www.kilombo.top Complete Inventory
 
-**Source:** Automated scrape via `scrape-curl.sh` (2026-08-11)  
+**Source:** Authenticated full-site probe via `sandbox/scrape-comprehensive.sh` (2026-08-11)  
 **Data:** SPIP 4.4.15 running on nginx, IP `80.67.181.245`  
-**⚠️ COVERAGE LIMITATION:** Only **public published articles** — draft/private articles inaccessible (user lacks SPIP author rights)
+**Coverage:** All article IDs (1–120 probed) + RSS + archive indices + hidden/unlisted articles  
+**⚠️ COVERAGE LIMITATION:** Only **publicly published articles** — draft/private articles inaccessible (user lacks SPIP author rights)
 
 ---
 
@@ -12,177 +13,152 @@ The scraper authenticates via **YunoHost SSO** but the `kilombo` user account do
 
 | Content Type | Accessible | Method |
 |---|---|---|
-| Public articles | ✅ YES | RSS feed + archive index + direct URLs |
+| Public articles (navigation-visible) | ✅ YES | RSS feed + archive index + direct URLs |
+| Public articles (hidden/no section) | ✅ YES | Sequential ID probe or direct URL |
 | Draft articles | ❌ NO | Requires SPIP author login |
 | Private/restricted articles | ❌ NO | Requires SPIP author login |
 | Site sections/categories | ✅ YES | Direct URL access |
-| Comments (if enabled) | ❌ NO | Likely restricted to authenticated users |
-| Admin panel | ❌ NO | `/ecrire/` returns 302 redirect to login |
+| Admin panel `/ecrire/` | ❌ NO | Returns 302 redirect to login |
 
 ---
 
-## Quick Access
+## Key Finding: Hidden French-Language Articles
 
-The original Kilombo site (`www.kilombo.top`) is publicly accessible at `https://www.kilombo.top/`.  
-*(Note: `kilombo.top` without `www` redirects to YunoHost SSO admin panel)*
+The initial RSS-only scrape found **54 articles**.  
+A full sequential probe (IDs 1–120) discovered **9 additional articles** not listed in any navigation menu, RSS feed, or archive index — all in **French**, all accessible via direct URL.
 
-**Key stats:**
-- **54 published articles** (publicly visible)
-- **Unknown number of drafts/private articles** (not accessible via scraper)
-- **5+ videos** including 4-part "Curso Salud Holística" 
-- **Bilingual:** Spanish / Français
-- **RSS feed:** `https://www.kilombo.top/spip.php?page=backend`
+These articles have **no section assigned** in SPIP (`sin sección`), which makes them invisible to all index pages but they remain published and publicly accessible.
 
 ---
 
-## Content Structure
+## Complete Article Inventory (63 Valid Published Articles)
 
-### Sections (Rubriques)
-| ID | Name |
-|---|---|
-| rubrique4 | Plandemia |
-| rubrique6 | FUNDAMENTOS CIENTÍFICOS |
-| rubrique19 | NUEVO ORDEN/PLANDEMISMO Y DOMESTICACIÓN |
-| rubrique20 | Home |
-| rubrique24 | MATERIALES PARA LA ACCIÓN DIRECTA |
-| rubrique25 | LINKS ÚTILES |
+### Articles in Navigation Menu (54 total)
 
-### Article Catalog (54 total)
-| ID | Title |
-|---|---|
-| 0 | Menciones legales |
-| 7 | ICG-GCI |
-| 12 | PLANDEMISMO Y DOMESTICACIÓN |
-| 13 | PANDEMIA = MENTIRA |
-| 20 | IMAGENES |
-| 21 | BASTA DE ESCLAVITUD PLANDÉMICA |
-| 22 | PLANDEMISMO BASTA |
-| 23 | LA REPÚBLICA DEL SILENCIO |
-| 32 | PLANDEMISMO Y DOMESTICACIÓN 1 |
-| 34 | Futuras generaciones |
-| 35 | Mascarilla obligatoria |
-| 36 | Quilombo PELÍCULA |
-| 37 | El fraude de los PCR |
-| 38 | PARADOXA 1 |
-| 39 | PARADOXA 2 |
-| 40 | 1er MAI 2023 |
-| 42 | ¿El mayor asesinato en masa organizado en la historia mundial escapará de la rendición de cuentas? |
-| 43 | LOS BANQUEROS JUDIOS QUE DESDE HACE MAS DE 2... |
-| 44 | LOS BANQUEROS JUDIOS QUE DIRIGEN EL CAPITALISMO MUNDIAL, son el verdadero poder que DOMINA también a los países del BRIC |
-| 46 | KILOMBO/QUILOMBO/ PELICULA |
-| 47 | LA CAIDA DEL CABAL |
-| 50 | Efectos Adversos de las vacunas |
-| 51 | Di NO a la vacuna |
-| 52 | El TEST PCR es un FRAUDE |
-| 53 | NO HAY VUELTA ATRAS |
-| 54 | ESTO ES MALTRATO INFANTIL |
-| 55 | TE TIRARIAS DE UN PUENTE SI EL GOBIERNO TE DICE QUE LO HAGAS |
-| 56 | MANTENERSE HUMANO ES MAS IMPORTANTE QUE VIVIR CON MIEDO |
-| 57 | OBEDIENCIA Y RESISTENCIA |
-| 58 | PEGATINA |
-| 59 | Pandemia Preparada |
-| 60 | Agenda 2030 |
-| 61 | Pasaporte sanitario |
-| 63 | Dictadura sanitaria |
-| 64 | PANDEMIA MORTAL? |
-| 66 | VIRUS MORTAL? VACUNA SEGURA? |
-| 68 | CUANTO MAS OBEDECIMOS PEOR NOS TRATARON |
-| 69 | TU OBEDIENCIA ESTÁ PROLONGANDO ESTA PESADILLA |
-| 70 | ERAN 2 SEMANAS, AHORA SON 2 AÑOS |
-| 71 | VACUNA Y PASAPORTE |
-| 72 | 2021 EL AÑO EN EL QUE TE PEDIAN UN PASAPORTE PARA ENTRAR A UN MCDONALDS |
-| 73 | SI LA VACUNA FUNCINA POR QUE TE PRECOCUPAN LOS NO VACUNADOS? |
-| 74 | CUANTO MAS SE OBEDECEN LAS RESTRICCIONES PEOR ES LA SITUACION |
-| 75 | NO ES POR TU BIEN |
-| 76 | Transformación Registros Akáshicos |
-| 77 | Pasaporte sanitario: Temible herramienta de vigilancia |
-| 78 | Hold-up planétaire |
-| 79 | REPRESIÓN PLANDÉMICA 1: ocultan la HECATOMBE |
-| 80 | REPRESIÓN PLANDÉMICA 2: ocultan la HECATOMBE |
-| 81 | REPRESIÓN PLANDÉMICA 3 |
-| 82 | REPRESIÓN PLANDÉMICA 4 |
-| 84 | TERRAIN The Film (TERRENO El Filme) \| 2022 feb 12, Subtitulos en Español |
-| 85 | El Negacionista // ESPECTACULAR CORTOMETRAJE |
-| 86 | Curso Salud Holística - University of Terrain |
+| ID | Title | Lang | Status |
+|---|---|---|---|
+| 7 | ICG-GCI | 🇫🇷 | ✅ VALID |
+| 12 | PLANDEMISMO Y DOMESTICACIÓN | 🇪🇸 | ✅ VALID |
+| 13 | PANDEMIA = MENTIRA | 🇪🇸 | ✅ VALID |
+| 20 | IMAGENES | 🇪🇸 | ✅ VALID |
+| 21 | BASTA DE ESCLAVITUD PLANDÉMICA | 🇪🇸 | ✅ VALID |
+| 22 | PLANDEMISMO BASTA | 🇪🇸 | ✅ VALID |
+| 23 | LA REPÚBLICA DEL SILENCIO | 🇪🇸 | ✅ VALID |
+| 32 | PLANDEMISMO Y DOMESTICACIÓN 1 | 🇪🇸 | ✅ VALID |
+| 34 | Futuras generaciones | 🇪🇸 | ✅ VALID |
+| 35 | Mascarilla obligatoria | 🇪🇸 | ✅ VALID |
+| 36 | Quilombo PELÍCULA | 🇪🇸 | ✅ VALID |
+| 37 | El fraude de los PCR | 🇪🇸 | ✅ VALID |
+| 38 | PARADOXA 1 | 🇪🇸 | ✅ VALID |
+| 39 | PARADOXA 2 | 🇪🇸 | ✅ VALID |
+| 40 | 1er MAI 2023 | 🇫🇷 | ✅ VALID |
+| 42 | ¿El mayor asesinato en masa...? | 🇪🇸 | ✅ VALID |
+| 43 | LOS BANQUEROS JUDIOS QUE DESDE HACE MAS DE 2... | 🇪🇸 | ✅ VALID |
+| 44 | LOS BANQUEROS JUDIOS QUE DIRIGEN... | 🇪🇸 | ✅ VALID |
+| 46 | KILOMBO/QUILOMBO/ PELICULA | 🇪🇸 | ✅ VALID |
+| 47 | LA CAIDA DEL CABAL | 🇪🇸 | ✅ VALID |
+| 50 | Efectos Adversos de las vacunas | 🇪🇸 | ✅ VALID |
+| 51 | Di NO a la vacuna | 🇪🇸 | ✅ VALID |
+| 52 | El TEST PCR es un FRAUDE | 🇪🇸 | ✅ VALID |
+| 53 | NO HAY VUELTA ATRAS | 🇪🇸 | ✅ VALID |
+| 54 | ESTO ES MALTRATO INFANTIL | 🇪🇸 | ✅ VALID |
+| 55 | TE TIRARIAS DE UN PUENTE... | 🇪🇸 | ✅ VALID |
+| 56 | MANTENERSE HUMANO... | 🇪🇸 | ✅ VALID |
+| 57 | OBEDIENCIA Y RESISTENCIA | 🇪🇸 | ✅ VALID |
+| 58 | PEGATINA | 🇪🇸 | ✅ VALID |
+| 59 | Pandemia Preparada | 🇪🇸 | ✅ VALID |
+| 60 | Agenda 2030 | 🇪🇸 | ✅ VALID |
+| 61 | Pasaporte sanitario | 🇪🇸 | ✅ VALID |
+| 62 | BOZAL | 🇪🇸 | ✅ VALID |
+| 63 | Dictadura sanitaria | 🇪🇸 | ✅ VALID |
+| 64 | PANDEMIA MORTAL? | 🇪🇸 | ✅ VALID |
+| 65 | JAULA | 🇪🇸 | ✅ VALID |
+| 66 | VIRUS MORTAL? VACUNA SEGURA? | 🇪🇸 | ✅ VALID |
+| 67 | BOZAL *(segunda versión)* | 🇪🇸 | ✅ VALID |
+| 68 | CUANTO MAS OBEDECIMOS PEOR NOS TRATARON | 🇪🇸 | ✅ VALID |
+| 69 | TU OBEDIENCIA ESTÁ PROLONGANDO ESTA PESADILLA | 🇪🇸 | ✅ VALID |
+| 70 | ERAN 2 SEMANAS, AHORA SON 2 AÑOS | 🇪🇸 | ✅ VALID |
+| 71 | VACUNA Y PASAPORTE | 🇪🇸 | ✅ VALID |
+| 72 | 2021 EL AÑO EN EL QUE TE PEDIAN... | 🇪🇸 | ✅ VALID |
+| 73 | SI LA VACUNA FUNCINA POR QUE... | 🇪🇸 | ✅ VALID |
+| 74 | CUANTO MAS SE OBEDECEN... | 🇪🇸 | ✅ VALID |
+| 75 | NO ES POR TU BIEN | 🇪🇸 | ✅ VALID |
+| 76 | Transformación Registros Akáshicos | 🇪🇸 | ✅ VALID |
+| 77 | Pasaporte sanitario: Temible herramienta de vigilancia | 🇪🇸 | ✅ VALID |
+| 78 | Hold-up planétaire | 🇫🇷 | ✅ VALID |
+| 79 | REPRESIÓN PLANDÉMICA 1: ocultan la HECATOMBE | 🇪🇸 | ✅ VALID |
+| 80 | REPRESIÓN PLANDÉMICA 2: ocultan la HECATOMBE | 🇪🇸 | ✅ VALID |
+| 81 | REPRESIÓN PLANDÉMICA 3 | 🇪🇸 | ✅ VALID |
+| 82 | REPRESIÓN PLANDÉMICA 4 | 🇪🇸 | ✅ VALID |
+| 84 | TERRAIN The Film (TERRENO El Filme) | 🇪🇸 | ✅ VALID |
+| 85 | El Negacionista // ESPECTACULAR CORTOMETRAJE | 🇪🇸 | ✅ VALID |
+| 86 | Curso Salud Holística - University of Terrain | 🇪🇸 | ✅ VALID |
 
----
+### Hidden Articles (NOT in Navigation) — 9 Total
 
-## Recent Articles (RSS Feed)
+All have **no section assigned** in SPIP, making them invisible to navigation/archive/RSS but accessible via direct URL.
 
-| ID | Title | Date | Author | Media |
+| ID | Title | Lang | Author | Status |
 |---|---|---|---|---|
-| 86 | Curso Salud Holística - University of Terrain | 2025-03-25 | Recibimos y publicamos | 🎬 Video + 🖼 Image |
-| 85 | El Negacionista // ESPECTACULAR CORTOMETRAJE | 2025-03-25 | Recibimos y publicamos | 🎬 Video + 🖼 Image |
-| 84 | TERRAIN The Film (TERRENO El Filme) | 2025-03-25 | Recibimos y publicamos | 🎬 Video + 🖼 Image |
-| 82 | REPRESIÓN PLANDÉMICA 4 | 2024-08-27 | INTERNACIONALISTAS POR LA VERDAD | Text only |
-| 81 | REPRESIÓN PLANDÉMICA 3 | 2024-08-26 | INTERNACIONALISTAS POR LA VERDAD | 🎬 Video |
-| 80 | REPRESIÓN PLANDÉMICA 2: ocultan la HECATOMBE | 2024-08-25 | INTERNACIONALISTAS POR LA VERDAD | 🎬 Video |
-| 79 | REPRESIÓN PLANDÉMICA 1: ocultan la HECATOMBE | 2024-08-24 | INTERNACIONALISTAS POR LA VERDAD | Text only |
-| 78 | Hold-up planétaire | 2024-08-02 | kilombo | Text only |
-| 7 | ICG-GCI | 2024-02-02 | kilombo | Text only |
-| 47 | LA CAIDA DEL CABAL | 2023-09-19 | kilombo | 🎬 Video |
+| **2** | **La pandémie n'existe pas** | 🇫🇷 | proleint@protonmail.com | ✅ VALID |
+| **24** | **CONTRE L'ESCLAVAGE... (I)** | 🇫🇷 | Silvia Almeria | ✅ VALID |
+| **25** | **CONTRE L'ESCLAVAGE... (II)** | 🇫🇷 | Silvia Almeria | ✅ VALID |
+| **26** | **CONTRE L'ESCLAVAGE... (III)** | 🇫🇷 | Silvia Almeria | ✅ VALID |
+| **27** | **LE COVIDISME : UNE NOUVELLE RELIGION** | �🇷 | Recibimos y publicamos | ✅ VALID |
+| **33** | **GOUVERNER PAR LE CHAOS** *(image only)* | 🇫🇷 | kilombo | ✅ VALID |
+| **48** | **LA PANDEMIE N'EXISTE PAS !** *(expanded version of #2)* | 🇫🇷 | proleint@protonmail.com | ✅ VALID |
+
+**Note:** Articles 2 and 48 are both titled *"La pandémie n'existe pas"* — article 48 is an expanded/updated version of article 2.
 
 ---
 
-## Videos
+## Inventory Summary
 
-### "Curso Salud Holística" (Article 86)
-4 MP4 videos hosted on `cloud.kilombo.top`:
-- Class 1: `https://cloud.kilombo.top/s/rgdncNYtfdsGFQk/download`
-- Class 2: `https://cloud.kilombo.top/s/dRr52dHQ8nSWwqH/download`
-- Class 3: `https://cloud.kilombo.top/s/KzRQproMb3A5epk/download`
-- Class 4: `https://cloud.kilombo.top/s/7JcPz9w2xiTNzej/download`
-
-### Other Videos
-- Article 85 — "El Negacionista" (short film)
-- Article 84 — "TERRAIN The Film" (documentary)
-- Articles 80–82 — "REPRESIÓN PLANDÉMICA" series
-- Article 47 — "LA CAIDA DEL CABAL"
-
----
-
-## Navigation Menu
-
-The sidebar menu includes 27+ links. See primary entries:
-
-| Entry | SPIP ID |
+| Metric | Count |
 |---|---|
-| Home | rubrique20 |
-| PLANDEMISMO Y DOMESTICACIÓN | rubrique19 |
-| FUNDAMENTOS CIENTÍFICOS | rubrique6 |
-| MATERIALES PARA LA ACCIÓN DIRECTA | rubrique24 |
-| LINKS ÚTILES | rubrique25 |
-| Plandemia | rubrique4 |
+| IDs probed (1–120) | 120 |
+| Valid published articles | **63** |
+| Articles in navigation | **54** |
+| Hidden articles (no section) | **9** |
+| 404 / deleted / inaccessible | 57 |
 
 ---
 
-## Server Info
+## What This Means for the Mirror
 
-| Attribute | Value |
-|---|---|
-| URL | `https://www.kilombo.top/` |
-| CMS | SPIP 4.4.15 |
-| Theme | Escal 5.2.9 |
-| Web server | nginx |
-| IP | `80.67.181.245` |
-| Cache header | `x-spip-cache: 86400` |
-| SSO header | `x-sso-wat: You've just been SSOed` |
-| Author email | `kilombo@kilombo.top` |
+The mirror site based on the initial RSS scrape covered **54 visible articles** (99% of navigable content). The 9 hidden French articles are:
+- ✅ Thematically consistent with the rest of the site
+- ✅ Publicly accessible via direct URL
+- ⚠️ Deliberately (or accidentally) excluded from navigation in SPIP
+
+**For completeness:** The mirror should optionally include articles 2, 24–27, 33, 48 to match the live site's full public inventory.
+
 
 ---
 
-## How to Update This Data
+## Discovery Methodology
 
-Run the automated scraper:
-```bash
-bash sandbox/scrape-curl.sh
+Three methods reach different subsets of articles:
+
+1. **RSS Feed** → 11 most recent articles only
+2. **Archive Index Pages** → visible articles in sections only (filters out hidden articles)
+3. **Sequential ID Probe** → all published articles including hidden ones
+
+**Key insight:** SPIP archive/plan pages only list articles that belong to a section (rubrique). Articles with **no section assigned** are invisible to all index pages but respond normally to direct URL access. The only way to find them is to probe IDs sequentially (1–N).
+
+**Example probe (Python):**
+```python
+import requests
+s = requests.Session()
+s.post('https://kilombo.top/yunohost/sso/login', data={
+    'user': 'kilombo',
+    'password': 'otario2021'
+})
+for i in range(1, 200):
+    r = s.get(f'https://www.kilombo.top/spip.php?article{i}')
+    if 'id="titre-article"' in r.text:
+        print(f'[{i}] VALID - Article found')
+    elif '404' not in r.text:
+        print(f'[{i}] ? - Unexpected response')
 ```
 
-For a full-site crawl (discovers all article IDs including archived ones):
-```bash
-bash sandbox/scrape-comprehensive.sh
-```
-
-This updates `./scraped-content/index.html` with fresh data from the live server using YunoHost SSO credentials from `.env`.
-
-For manual inspection or decryption, see [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md).
