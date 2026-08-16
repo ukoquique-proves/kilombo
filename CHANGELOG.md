@@ -41,6 +41,17 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - Removed 116 committed ephemeral files (temporary test outputs, raw HTML dumps)
 - Repository size reduced by ~6MB in history
 
+### Added (Content Import)
+- **Three articles imported** via the reproducible `scripts/import-article.mjs` flow (dry-run verified, then appended to `site/assets/content/articles.json`):
+  - `plandemismo-y-domesticacion` — https://www.kilombo.top/spip.php?article12
+  - `imagenes` — https://www.kilombo.top/spip.php?article20
+  - `futuras-generaciones` — https://www.kilombo.top/spip.php?article34
+  These were imported conservatively (small batch) to keep the pipeline stable; each entry was validated with `npm test` before committing.
+
+### Fixed (Import tooling)
+- **Fixed JSON write error** introduced during append to `site/assets/content/articles.json` (missing/extra brace). Repaired file and re-ran the full test/validation suite.
+- **Validation:** unit tests, `validate-data.mjs`, `check-urls.mjs` and `check-badges.mjs` all pass after the import.
+
 ---
 
 ## [0.30.0] — 2026-08-11

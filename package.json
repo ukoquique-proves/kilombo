@@ -1,6 +1,6 @@
 {
   "name": "kilombo",
-  "version": "1.0.0",
+  "version": "0.31.0",
   "description": "Portal central de acceso a la red de sitios de Kilombo. Construido como página estática (HTML, CSS, JS) para ser alojado en la infraestructura YunoHost de `kilombo.top`.",
   "type": "module",
   "directories": {
