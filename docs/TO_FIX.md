@@ -115,12 +115,12 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - `kilombo.top` y el espejo GitHub Pages son dos fuentes de verdad en paralelo.
   - Acción futura: crear un checklist de "fase out" que cierre la ventana de doble mantenimiento y archive el flujo de GitHub Pages.
 
-- [ ] **51. Mejoras de UI/diseño — fase 1 (quick wins)**
+- [ ] **51. Mejoras de UI/diseño — fase 1 (quick wins, v0.35.0 EN PROGRESO)**
+  - ✅ **Remoción de clutter visual**: Completado en v0.35.0 — badges simplificados (outline único en lugar de dos píldoras sólidas), tags reducidas (paleta neutra, rojo solo para `--type`), fondos de sección unificados, tipografía refinada.
   - **Favicon**: Crear `site/favicon.svg` basado en la estrella del logo. Añadir enlace en `<head>` de todas las páginas HTML. Alto ROI (identidad visual en pestañas/bookmarks), trivial de implementar.
   - **Open Graph metadata**: Añadir meta tags `og:title`, `og:description`, `og:image`, `og:url` a `articulo.html` y `articulos.html` para que las previsualizaciones en redes sean profesionales. Requiere un `image` en `articles.json` (opcional para ahora, usa un placeholder).
   - **Mission statement breve**: Añadir 2-3 líneas bajo el subtítulo "Publicaciones y archivos internacionalistas" en el header con una frase que capture la identidad del proyecto (ej: "Archivo riguroso de análisis internacionalista para el estudio y la acción política").
-  - **Remoción de clutter visual**: Revisar `site/css/style.css` para eliminar reglas no usadas (ej: `.card:not(a)` nunca coincide hoy, ver TO_FIX #21).
-  - **Timing**: v0.35.0 o cuando tengas un slot libre — bajo riesgo, mejora percibida.
+  - **Timing**: Favicon + OG metadata + mission statement = 2-3 horas máximo. Bajo riesgo, mejora de UX/SEO percibida.
 
 - [ ] **52. Mejoras de UX — fase 2 (medium-term, v0.35.0+)**
   - **Línea de lectura controlada en artículos**: Limitar el ancho de párrafos a ~70-80 caracteres (`max-width: 70ch`) en `articulo.html` para mejorar legibilidad de textos largos. Evita fatiga visual.
