@@ -18,6 +18,7 @@ cache/
 *.tmp
 *.swp
 *~
+*.orig
 
 # Serveo / ngrok / tuneles temporales
 serveo.log
