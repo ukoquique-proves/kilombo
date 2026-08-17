@@ -4,8 +4,12 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Load .env to get STATICRYPT_PASSWORD
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 // Simple AES-256-GCM decryption (staticrypt uses sjcl internally)
 // For now, we'll use a different approach: extract the encrypted data and use Node's crypto
@@ -69,7 +73,12 @@ async function decryptStaticrypt(inputFile, outputFile, password) {
 // Main
 const inputFile = process.argv[2] || './scraped-content/index.html';
 const outputFile = process.argv[3] || './scraped-content/index-decrypted.html';
-const password = process.env.STATICRYPT_PASSWORD || 'otario2021';
+const password = process.env.STATICRYPT_PASSWORD;
+
+if (!password) {
+  console.error('❌ Error: STATICRYPT_PASSWORD not set in .env');
+  process.exit(1);
+}
 
 decryptStaticrypt(inputFile, outputFile, password).catch(err => {
   console.error('Error:', err);

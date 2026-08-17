@@ -13,7 +13,8 @@
     "encrypt": "node scripts/encrypt.mjs",
     "preview": "python3 -m http.server 8080 --directory site",
     "scrape": "bash sandbox/scrape-curl.sh",
-    "scrape:full": "bash sandbox/scrape-comprehensive.sh"
+    "scrape:full": "bash sandbox/scrape-comprehensive.sh",
+    "check-corruption": "node scripts/detect-fixed-column-corruption.mjs"
   },
   "keywords": [],
   "author": "",

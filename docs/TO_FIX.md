@@ -65,6 +65,23 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🟡 Deuda técnica — arquitectura y operaciones
 
+- [ ] **54. Fixed-column corruption en contentHtml — clase de corrupción no detectada previamente**
+  - **Problema**: Dos artículos (`plandemismo-y-domesticacion-11` e `imagenes`) tenían `contentHtml` con saltos de línea embebidos (`\n` literales) que rompían texto a límites de columna fijos (~60-80 caracteres), cortando palabras y frases en mitad. Ejemplo: `"PLANDEM\nISMO"` (PLANDEMISMO roto en dos líneas) o `"ignorancia por los esfuerzos sistemáticos de todos los gobiernos, que consideran es\nta ignorancia…"` (frase rota en medio).
+  - **Causa raíz**: Desconocida, posiblemente debida a:
+    1. Copy-paste de texto pre-envuelto en línea fija (editor de 80 columnas antiguo, terminal, documento PDF)
+    2. JSON stringificación de texto formateado que no preservó el reflow
+    3. Paso de importación anterior que no limpió saltos de línea intra-HTML
+  - **Impacto**: Render correcto (navegador ignora `\n` intra-tag), pero rompe legibilidad de texto plano y cualquier analizador que espere HTML limpio.
+  - **Detección**: NO detectado por `validate-data.mjs` (solo busca `<br>` y hard-breaks). NO detectado por `dewrap.mjs` (solo procesa content dentro de `<p>`, no newlines literales).
+  - **Fix aplicado** (v0.35.0+): 
+    - Patch manual: removidos todos los `\n` intra-párrafo en los 2 artículos afectados
+    - Script de detección `scripts/detect-fixed-column-corruption.mjs` creado para scan futuro (ejecutable vía `npm run check-corruption`)
+    - Resultado post-scan: 0 artículos afectados (solo esos 2, ya reparados)
+  - **Acción preventiva**: En futuras sesiones, antes de hacer merge de un import masivo:
+    1. Ejecutar `npm run check-corruption` para scan de todo `articles.json`
+    2. Si se encuentran artículos afectados, aplicar `npm run check-corruption -- --fix` (experimental, requiere revisión manual)
+    3. O inspeccionar manualmente `contentHtml` en rawdiff para líneas que contengan `\n` literales
+
 - [ ] **29. `test/encrypt-decrypt.test.mjs` — cobertura incompleta del camino criptográfico**
   - El test actual valida el round-trip de `codec.decode()` de staticrypt, pero no ejerce el código manual de `decrypt.mjs` que usa `aesDecrypt()` y la gestión de IV.
   - Este es un gap de priorización alta porque toca el flujo de descifrado real del sitio y podría dejar errores de IV/parseo sin detectar.

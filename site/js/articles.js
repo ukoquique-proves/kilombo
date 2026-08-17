@@ -50,6 +50,8 @@ export function sectionLabel(section) {
       return 'Proletarios Internacionalistas';
     case 'nom':
       return 'NOM / Plandemismo';
+    case 'actualidad':
+      return 'Actualidad';
     case 'general':
       return 'Artículos';
     default:
