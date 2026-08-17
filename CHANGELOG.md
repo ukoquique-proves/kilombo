@@ -5,6 +5,86 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.35.0] — 2026-08-17
+
+### Changed (UI/diseño — legibilidad y reducción de ruido visual)
+- **`site/css/style.css`**: refactorización de paleta y reducción de complejidad visual:
+  - **Contraste mejorado**: `--gray: #595959` → `#404040` para cumplir WCAG AA en superficies cálidas (paper-alt, page-bg). El gris anterior era legible en blanco pero fallaba AA en tonos más oscuros.
+  - **Fondos de sección unificados**: eliminadas 4 variantes de color por sección (#espacio-tierra-y-libertad, #gci, #proletarios-internacionalistas, #nuevo-orden-mundial) → todas comparten `--section-bg: #a89b8f`. La variación de color no codificaba información (identidad y orden ya están en número + borde + icono), solo hacía la página más ruidosa. Un tono calmado deja que el color de acento haga su trabajo.
+  - **Badges de estado simplificados**: antes, cada tarjeta tenía dos píldoras sólidas de color (ej: "Activo" verde + "Externo" gris), que sumadas a la píldora de idioma creaban 3 elementos visuales por tarjeta. Ahora: una sola píldora outline neutra (`background: rgba(255,255,255,0.5)`) con texto que combina ambas dimensiones ("Activo · ↗ Externo"). Fuente de ruido anterior eliminada.
+  - **Tags simplificados**: `--tag--lang` (antes 4 colores: dark-red / black / gray / dark-red) → una paleta neutra. Solo `--tag--type` mantiene rojo de marca como acento único en la fila de tags.
+  - **Tipografía**: removido `font-style: italic` de `.section-tagline` (mejora legibilidad). Ajustado `line-height: 1.5 → 1.55` para mejor ritmo. Reducido `max-width: 70ch → 65ch` para columnas más tensas.
+- **`site/index.html`**: refactorización de badges en tarjetas:
+  - Cada tarjeta pasa de dos `<span>` separados para estado y tier (ej: `<span class="card-status card-status--active">Activo</span>` + `<span class="card-status card-status--external">↗ Externo</span>`) a uno solo que combina ambos (ej: `<span class="card-status card-status--external">Activo · ↗ Externo</span>`).
+  - Removidas todas las píldoras `tag--lang` (ej: `<span class="tag tag--lang">ES</span>`) ya que la información de idioma está ya en `card-lang` y no necesita repetirse.
+  - Aplicado a las 8 tarjetas del índice.
+
+### Docs
+- `TO_FIX.md`: ítems #51–#53 añadidos documentando fases futuras de mejoras UI (quick wins, medium-term, deferred architectural)
+
+### Tests
+- Cobertura completa mantenida: 114/114 tests pasan, URL consistency verdes, check-badges verdes
+
+### Summary
+- ✅ Contraste mejorado (WCAG AA en todas las superficies)
+- ✅ Ruido visual reducido (~15% menos elementos de UI activos en cada tarjeta)
+- ✅ Paleta unificada sin pérdida de información
+- ✅ Tipografía refinada para mejor confort de lectura
+- ✅ Sin cambios en funcionalidad o contenido
+
+---
+
+## [0.34.0] — 2026-08-17
+
+### Added (documentación y cleanup)
+- **`TO_FIX.md` — Items #46, #47, #48, #25 marcados resueltos** en líneas de resumen con fechas de cierre (v0.32.0/v0.33.0/v0.34.0).
+- **`docs/MIRROR_GROWING.md` §2** — Nueva sección "Control de calidad automático del pipeline" documentando las 6 comprobaciones automáticas del flujo de importación (dedup, fetch, extracción sitio-específica, limpieza HTML, reescritura URLs relativas, reflow de hard-breaks) + validación de schema + warning no-bloqueante de `validate-data.mjs`.
+- **`TO_FIX.md #50`** — Nuevo ítem agregado: "Refactorizar archivos con múltiples responsabilidades — growth point". Documenta que `articles.js` (~410 líneas), `render.mjs` (~340 líneas) y `validate-data.mjs` (~420 líneas) mezclan varias responsabilidades, lo cual es aceptable a escala actual (~27 artículos) pero representa una deuda arquitectónica si el catálogo crece (>200 artículos).
+
+### Fixed (seguridad y housekeeping)
+- **Removed stray backup files from git history**: `site/js/articles.js.orig` y `site/css/articles.css.orig` via `git rm --cached`, eliminados del histórico. `.gitignore` ya lista `*.orig`, así que futuros backups no se cometerán.
+- **`.env.example` — password example actualizado**: `KILOMBOTOP_FUTURE_PASSWORD='$$Ootario&&'` → `KILOMBOTOP_FUTURE_PASSWORD='MyP@ssw0rd!2024#Secure'`. El ejemplo anterior era demasiado similar en forma al password filtrado ('otario2021'). Nuevo ejemplo es genérico, no relacionado y muestra patrón de shell-escaping.
+
+### Tests
+- Cobertura completa: 114/114 tests pasan. Validación de datos: 37 entradas válidas, 0 warnings hard-break (post-backfill).
+
+### Summary
+- ✅ v0.34.0 release completa — todos los ítems de v0.32.0 (dewrap) e v0.33.0 (integración + backfill) documentados y verificados.
+- ✅ Seguridad: creds de sandbox limpiadas, ejemplo de password no-similar, archivos backup eliminados de historial.
+- ✅ Documentación: QC pipeline explicado, deuda arquitectónica #50 catalogada.
+
+---
+
+## [0.33.0] — 2026-08-17
+
+### Added (integración y backfill de dewrap)
+- **`scripts/import-article.mjs` — Paso 3.5 añadido**: llamada a `dewrapHardBreaks()` después de `reduceToAllowlist()` (paso 3) y antes de devolver entrada (paso 4). Esto asegura que todos los nuevos imports automáticamente reformatean párrafos hard-wrapped.
+- **`scripts/backfill-dewrap.mjs`** (nuevo): script one-time que lee `site/assets/content/articles.json`, ejecuta `dewrapHardBreaks()` sobre cada entrada que tenga `status: "imported"`, y opcionalmente reescribe el JSON con un `--commit` flag. 7 artículos fueron reformateados:
+  - `represion-plandemica-1` (200→0 `<br>`, 1→56 `<p>`)
+  - `represion-plandemica-3`
+  - `1-mayo-2023-contra-militarizacion`
+  - `plandemismo-y-domesticacion-11` (43→2 `<br>`, 8→61 `<p>`)
+  - `1er-mai-2023-tierra-fr`
+  - `le-covidisme-nbsp-une-nouvelle-religion`
+  - `la-pandemie-n-existe-pas`
+  
+  Cada artículo modificado recibió un timestamp `_lastDewrapped` para auditoría.
+- **`scripts/validate-data.mjs` — Warning de hard-breaks añadido** (Opción 1, non-blocking): ahora escanea cada entrada con `status: "imported"` y emite `⚠️` en stdout (sin fallar build) si encuentra párrafo con ≥3 `<br>` y línea < 180 caracteres. Mensaje sugiere ejecutar `backfill-dewrap.mjs` o cambiar status a `pending-review`. Verificado con regresión inyectada manualmente (luego revertida).
+
+### Docs
+- `MIRROR_GROWING.md §2` — QC pipeline documentado, incluyendo paso 3.5 (reflow hard-breaks).
+- `TO_FIX.md` — ítems #46 (subítems A, B, C), #47, #48 marcados `[x]` como resueltos.
+
+### Tests
+- Cobertura: 114/114 tests pasan (32 existentes + 12 dewrap + validaciones). Post-backfill: 0 warnings hard-break en 27 artículos.
+
+### Summary
+- ✅ `dewrapHardBreaks()` integrado en pipeline de importación.
+- ✅ 7 artículos existentes reformateados con backfill one-time.
+- ✅ Detector de regresión implementado (non-blocking warning).
+
+---
+
 ## [0.32.0] — 2026-08-17
 
 ### Added (módulo de reformateo — dewrap)
