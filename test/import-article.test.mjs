@@ -15,6 +15,7 @@ import {
   stripEventHandlers,
   stripLogoImages,
   convertSpipMarkup,
+  upsertArticle,
 } from '../scripts/import-article.mjs';
 
 const window = new Window();
@@ -34,6 +35,21 @@ test('checkDedup rejects duplicate id', () => {
     checkDedup({ sourceUrl: 'https://kilombo.top/articulo2', id: 'art-1' }, existing),
     'SKIP: id "art-1" ya existe en articles.json'
   );
+});
+
+test('checkDedup allows same sourceUrl replacement when forceUpdate is true', () => {
+  const existing = [{ sourceUrl: 'https://kilombo.top/articulo1', id: 'art-1' }];
+  assert.equal(checkDedup({ sourceUrl: 'https://kilombo.top/articulo1', id: 'art-2' }, existing, true), null);
+});
+
+test('upsertArticle replaces the matching existing entry when forceUpdate is enabled', () => {
+  const existing = [
+    { sourceUrl: 'https://kilombo.top/articulo1', id: 'art-1', title: 'Old' },
+    { sourceUrl: 'https://kilombo.top/articulo2', id: 'art-2', title: 'Other' },
+  ];
+  const updated = upsertArticle(existing, { sourceUrl: 'https://kilombo.top/articulo1', id: 'art-1', title: 'New' }, true);
+  assert.equal(updated.length, 2);
+  assert.equal(updated.find((article) => article.sourceUrl === 'https://kilombo.top/articulo1')?.title, 'New');
 });
 
 test('detectSite recognizes Tierra y Libertad and PI hosts', () => {
@@ -57,9 +73,22 @@ test('stripEventHandlers removes onclick attributes', () => {
   assert.equal(stripEventHandlers(html), '<img src="x.png"><div>text</div>');
 });
 
-test('stripLogoImages removes SPIP logo images', () => {
+test('stripLogoImages removes SPIP logo images (class attr with single or double quotes)', () => {
   const html = '<img src="logo.png" class="spip_logo"><img src="other.png">';
   assert.equal(stripLogoImages(html), '<img src="other.png">');
+
+  const htmlSingleQuoted =
+    "<img src='local/cache-vignettes/L150xH113/foo.jpg' width='150' height='113' alt='' class='spip_logo spip_logos' /><img src='other.png'>";
+  assert.equal(stripLogoImages(htmlSingleQuoted), "<img src='other.png'>");
+});
+
+test('stripLogoImages keeps real content images served from cache-vignettes (regression: TO_FIX, previously stripped by path alone)', () => {
+  // Real editorial photos are resized through the same cache-vignettes/
+  // path as logos, but never carry the spip_logo class — confirmed against
+  // raw scraped SPIP source (article-20.html, article-22.html).
+  const html =
+    "<p>Texto del artículo.</p><img src='local/cache-vignettes/L400xH589/basta_sp-pretexto.jpg-84cb2.jpg?1743630305' width='400' height='589' alt='' /><p>Más texto.</p>";
+  assert.equal(stripLogoImages(html), html);
 });
 
 test('convertSpipMarkup turns SPIP markup into tags', () => {

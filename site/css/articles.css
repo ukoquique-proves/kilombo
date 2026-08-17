@@ -143,8 +143,13 @@
   color: #1a1a1a;
 }
 
-.article-detail__content h2,
-.article-detail__content h3 {
+/* NOTA: sanitizeHtml() (site/js/render.mjs) solo admite h3/h4 en el
+   contenido de artículos — un <h2> escrito a mano en articles.json se
+   descarta al sanear y este selector nunca llega a aplicarse. Al agregar
+   subtítulos a un artículo para cortar bloques largos de texto, usar
+   <h3>/<h4>, no <h2>. */
+.article-detail__content h3,
+.article-detail__content h4 {
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 700;
   margin-top: 1.25rem;
@@ -172,13 +177,47 @@
   line-height: 1.5;
 }
 
+/* Letra capital en el primer párrafo — ancla visual editorial que no
+   depende de que el artículo tenga imágenes. Solo aplica al <p> que abre
+   el artículo, así que artículos muy cortos (2-3 líneas) no quedan
+   desbalanceados por un drop cap desproporcionado. */
+.article-detail__content > p:first-of-type::first-letter {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 900;
+  font-size: 3.4em;
+  line-height: 0.82;
+  float: left;
+  margin: 0.04em 0.1em 0 0;
+  color: #b91c2a;
+}
+
 .article-detail__content blockquote {
-  margin: 1.25rem 0;
-  padding: 0.75rem 0 0.75rem 1rem;
+  position: relative;
+  margin: 1.5rem 0;
+  padding: 0.85rem 1rem 0.85rem 1.5rem;
   border-left: 4px solid #b91c2a;
   background: rgba(185, 28, 42, 0.05);
+  font-family: 'Playfair Display', Georgia, serif;
   font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.55;
   color: #1a1a1a;
+}
+
+/* Comilla decorativa — refuerza el "pull-quote" sin tocar el HTML de
+   entrada (el <blockquote> ya sanitizado no necesita marcado extra).
+   aria-hidden no aplica a contenido CSS generado, así que no añade ruido
+   a lectores de pantalla. */
+.article-detail__content blockquote::before {
+  content: "“";
+  position: absolute;
+  top: -0.1rem;
+  left: 0.35rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: rgba(185, 28, 42, 0.35);
+  line-height: 1;
 }
 
 .article-detail__source-box {

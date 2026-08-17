@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-10 — añadido el aviso de artefacto obsoleto en dist/.
+Última actualización: 2026-08-17 — v0.32.0 añade módulo `dewrap.mjs` y deja pendientes de integración 3 ítems (46, 47, 48).
 
 ---
 
@@ -13,6 +13,54 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     2. Eliminar la línea `KILOMBOTOP_FUTURE_PASSWORD` del `.env`
     3. Verificar acceso: `./sync-to-production.sh` (o el test de login de TROUBLESHOOTING.md)
   - El valor actual del password futuro está en `.env` entre comillas simples para preservar los caracteres especiales (`$$`, `&&`).
+
+- [ ] **46. Integrar `dewrapHardBreaks()` en el pipeline de importación (v0.32.0+)**
+  - **Subítem A: Integración en `scripts/import-article.mjs`**
+    - `dewrap.mjs` existe y está testeado (12 tests pasan). Ahora necesita aplicarse automáticamente en todas las futuras importaciones.
+    - Llamar a `dewrapHardBreaks()` en el paso 3.5 del pipeline: después de `reduceToAllowlist()` (paso 3) pero antes de guardar a JSON (paso 4).
+    - Verificar que la salida siga pasando `validate-data.mjs`.
+  - **Subítem B: Backfill de artículos existentes (7 afectados)**
+    - Crear script `scripts/backfill-dewrap.mjs` que:
+      1. Lea `site/assets/content/articles.json`
+      2. Aplique `dewrapHardBreaks()` a cada entrada donde `status === "imported"` y `contentHtml` tenga ≥3 `<br>`
+      3. Escriba de vuelta a JSON con comentario de auditoría: `"_lastDewrapped": "2026-08-17T..."`
+      4. Ejecute `validate-data.mjs` para confirmar que no hay regresiones
+      5. Reporte qué entradas fueron modificadas (y cuántos chars/párrafos cambiaron)
+    - Artículos afectados identificados en v0.24.0:
+      - `contra-genocidio-guerras-infinitas-pi` (ES) — 1.521 chars hard-wrapped
+      - `contre-genocide-guerres-infinites-pi` (FR) — 1.152 chars hard-wrapped
+      - `falsos-internacionalistas-1` a `falsos-internacionalistas-6` (6 entradas)
+      - `1-mayo-2023-contra-militarizacion` — hard-wrapped
+      - `plandemismo-y-domesticacion-11` — hard-wrapped
+    - Ejecutar: `node scripts/backfill-dewrap.mjs` (dry-run por defecto; `--commit` para aplicar cambios)
+  - **Subítem C: Documentar en MIRROR_GROWING.md**
+    - Ver ítem #47 abajo (nuevas reglas de control de calidad para importaciones).
+
+- [ ] **47. Documentar reglas de control de calidad para importaciones en MIRROR_GROWING.md §2**
+  - Añadir una nueva sección después de §1 (o como §2 revisado) que documente las heurísticas automáticas que `scripts/import-article.mjs` aplica a cada entrada importada. Incluir:
+    - ✅ Dedup verificado (URL y ID no existen ya)
+    - ✅ Fetch exitoso (HTTP 200, contenido > 100 chars)
+    - ✅ Extracción completada (Tierra o PI, según URL)
+    - ✅ Limpieza de HTML (allowlist, XSS, eventos inline)
+    - ✅ Reescritura de URLs (todos los `src`/`href` → absolutos)
+    - ✅ Validación de datos (schema correcto, tipos esperados)
+    - 🔶 **Detector de hard-breaks** (NUEVO — v0.32.0+):
+      - Si `contentHtml` tiene ≥3 `<br>` Y ningún `<p>` contiene "natural" multiple-line patten, marcar `status: "pending-review"` en lugar de `"imported"`
+      - Esto reduce falsos positivos: un artículo con una cita de dos líneas (1-2 `<br>`) no salta el flag; pero un párrafo de 50+ líneas con `<br>` cada 60 chars sí.
+      - Criterio: si el párrafo más corto con `<br>` < 180 chars AND tiene ≥3 breaks consecutivos, es probable hard-wrap.
+      - Validación manual recomendada: revisar antes de cambiar a `"imported"`.
+    - 🟡 **Detector de sidebar/footer residual** (futuro):
+      - Detectar patrones típicos de SPIP que se cuelan en `contentHtml` (anclas `#forum`, bloques de búsqueda "Search/Buscar", listas "meme-rub").
+      - Marcar `status: "pending-review"` si se encuentra cualquiera de estos.
+  - La regla de **"pending-review" como gate de control de calidad** debe quedar explícitamente documentada para que no se dependa de memory de una sesión anterior.
+
+- [ ] **48. Implementar detector de hard-breaks en `scripts/validate-data.mjs` (v0.32.0+)**
+  - Añadir una nueva regla de validación que marque automáticamente artículos sospechosos:
+    - Si entrada `status === "imported"` Y `contentHtml` tiene patrón de hard-breaks probable (≥3 `<br>` en párrafos cortos < 180 chars), lanzar una advertencia durante la validación:
+      - Opción 1 (recomendada): no fallar el `npm test`, pero emitir **warning** en stdout: `⚠️  ${id} — posible hard-wrapped content: ${brCount} breaks en párrafo de ${minLength} chars. Considerar status='pending-review'.`
+      - Opción 2: marcar directamente el entry como `status: "suspicious"` (nuevo estado entre `pending-review` e `imported`) y dejar que CI lo bloquee.
+    - La heurística es la del módulo `dewrap.mjs`: usar `hasEnoughBreaksToAnalyze()` + medir longitud de líneas más cortas.
+    - Objetivo: prevenir que futuras importaciones entren como `"imported"` si contienen contenido sospechoso sin haber sido revisado manualmente.
 
 ---
 
@@ -98,6 +146,21 @@ Solo requiere abrir el puerto 22 desde el panel YunoHost — el cliente puede ha
 ---
 
 ## ✅ Resueltos recientes
+
+- [x] **49. Hardcoded credentials en sandbox/ (SEGURIDAD CRÍTICA)** — ✅ Resuelto v0.32.0.
+  - **Problema**: Cinco archivos en `sandbox/` tenían credenciales YunoHost hardcodeadas en plaintext:
+    - `test_sso.py` — 4 ocurrencias de `'kilombo'` y `'otario2021'`
+    - `check_sso.py` — credenciales hardcodeadas
+    - `fetch_live.py` — credenciales hardcodeadas
+    - `scrape.cjs` — credenciales hardcodeadas (Playwright)
+    - `decrypt-staticrypt.mjs` — fallback default `process.env.STATICRYPT_PASSWORD || 'otario2021'`
+  - **Impacto**: Si el repo público tiene historial de git que incluya estos archivos, la contraseña estaría expuesta.
+  - **Fix**: Todos los archivos ahora leen credenciales desde `.env`:
+    - Python: `os.environ.get('KILOMBOTOP_PASSWORD')` con error si no está seteada
+    - Node.js: `process.env.STATICRYPT_PASSWORD` con validación (no fallback)
+    - `scrape.cjs`: parsea `.env` manualmente y valida ambas contraseñas antes de ejecutar
+  - **Verificación**: `grep -r "otario2021\|password.*=.*'.*'" sandbox/` = no matches
+  - **Git**: `.gitignore` ya tenía `sandbox/` correctamente excluido, pero el riesgo existía localmente
 
 - [x] **44. Las URLs de la red Kilombo tienen 3 fuentes de verdad en paralelo** — ✅ Resuelto v0.28.0.
   - `scripts/check-urls.mjs` continúa como detector de drift, pero el ítem ya no está abierto.

@@ -52,16 +52,30 @@ function isAbsoluteOrExempt(url) {
 /**
  * @param {{ sourceUrl: string, id?: string }} candidate
  * @param {Array<{ sourceUrl: string, id: string }>} existing
+ * @param {boolean} [forceUpdate=false]
  * @returns {string | null} error message if a duplicate is found, else null
  */
-export function checkDedup(candidate, existing) {
-  if (existing.some((a) => a.sourceUrl === candidate.sourceUrl)) {
+export function checkDedup(candidate, existing, forceUpdate = false) {
+  const sameSourceUrl = existing.some((a) => a.sourceUrl === candidate.sourceUrl);
+  if (sameSourceUrl && !forceUpdate) {
     return `SKIP: sourceUrl ya está en articles.json — ${candidate.sourceUrl}`;
   }
-  if (candidate.id && existing.some((a) => a.id === candidate.id)) {
+  if (candidate.id && existing.some((a) => a.id === candidate.id && a.sourceUrl !== candidate.sourceUrl)) {
     return `SKIP: id "${candidate.id}" ya existe en articles.json`;
   }
   return null;
+}
+
+/**
+ * Replaces an existing article entry when forceUpdate is enabled, otherwise
+ * appends the newcomer as a new record.
+ * @param {Array<{ sourceUrl: string, id: string }>} existing
+ * @param {{ sourceUrl: string, id: string }} entry
+ * @param {boolean} [forceUpdate=false]
+ */
+export function upsertArticle(existing, entry, forceUpdate = false) {
+  if (!forceUpdate) return [...existing, entry];
+  return [...existing.filter((a) => a.sourceUrl !== entry.sourceUrl && a.id !== entry.id), entry];
 }
 
 // ================================================================
@@ -147,10 +161,18 @@ export function stripEventHandlers(html) {
 /**
  * Removes SPIP logo/avatar images that aren't editorial content (author
  * headshots, spip_logo thumbnails) which sometimes lead the PI body.
+ * IMPORTANT: only matches on `class="spip_logo..."`, not on the image path.
+ * SPIP routes *every* resized image — logos and real editorial photos alike
+ * — through the same `local/cache-vignettes/...` cache path, so filtering
+ * by path (as an earlier version of this function did) silently strips
+ * legitimate content images too. The `spip_logo` class, by contrast, is
+ * only ever applied by SPIP to logo/avatar images — verified against raw
+ * scraped source: images with real editorial content never carry it, even
+ * when their src is also under cache-vignettes/.
  * @param {string} html
  */
 export function stripLogoImages(html) {
-  return html.replace(/<img\b[^>]*(?:spip_logo|cache-vignettes)[^>]*>/gi, '');
+  return html.replace(/<img\b[^>]*\bclass=(['"])?[^'\">]*\bspip_logo\b[^'\">]*\1?[^>]*>/gi, '');
 }
 
 /**
@@ -221,9 +243,10 @@ export function reduceToAllowlist(html) {
  * @param {{ url: string, section: string, topics: string[], id?: string, status?: string }} opts
  * @param {(url: string) => Promise<string>} fetchHtml injectable for testing
  * @param {Array<{ sourceUrl: string, id: string }>} existingArticles
+ * @param {boolean} [forceUpdate=false]
  */
-export async function buildArticleEntry(opts, fetchHtml, existingArticles) {
-  const dedupError = checkDedup({ sourceUrl: opts.url, id: opts.id }, existingArticles);
+export async function buildArticleEntry(opts, fetchHtml, existingArticles, forceUpdate = false) {
+  const dedupError = checkDedup({ sourceUrl: opts.url, id: opts.id }, existingArticles, forceUpdate);
   if (dedupError) throw new Error(dedupError);
 
   const site = detectSite(opts.url);
@@ -297,9 +320,10 @@ async function main() {
   const id = get('--id');
   const status = get('--status');
   const dryRun = args.includes('--dry-run');
+  const forceUpdate = args.includes('--force-update');
 
   if (!url || !section) {
-    console.error('Uso: node scripts/import-article.mjs --url <sourceUrl> --section <section> --topics a,b [--id x] [--dry-run]');
+    console.error('Uso: node scripts/import-article.mjs --url <sourceUrl> --section <section> --topics a,b [--id x] [--dry-run] [--force-update]');
     process.exit(1);
   }
 
@@ -311,17 +335,19 @@ async function main() {
     return res.text();
   };
 
-  const entry = await buildArticleEntry({ url, section, topics, id, status }, fetchHtml, existing);
+  const entry = await buildArticleEntry({ url, section, topics, id, status }, fetchHtml, existing, forceUpdate);
 
   if (dryRun) {
     console.log(JSON.stringify(entry, null, 2));
-    console.log('\n--dry-run: no se ha escrito nada. Revisar manualmente antes de importar sin --dry-run.');
+    const action = forceUpdate ? 'actualizará' : 'añadirá';
+    console.log(`\n--dry-run: no se ha escrito nada. Revisar manualmente antes de ${action} sin --dry-run.`);
     return;
   }
 
-  existing.push(entry);
-  writeFileSync(ARTICLES_PATH, JSON.stringify(existing, null, 2) + '\n');
-  console.log(`✅  Añadido "${entry.id}" a ${ARTICLES_PATH}`);
+  const finalArticles = upsertArticle(existing, entry, forceUpdate);
+  writeFileSync(ARTICLES_PATH, JSON.stringify(finalArticles, null, 2) + '\n');
+  const actionLabel = forceUpdate ? 'Actualizado' : 'Añadido';
+  console.log(`✅  ${actionLabel} "${entry.id}" a ${ARTICLES_PATH}`);
   console.log(`    Ejecutar 'npm test' antes de hacer commit.`);
 }
 

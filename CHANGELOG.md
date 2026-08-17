@@ -5,6 +5,48 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.32.0] — 2026-08-17
+
+### Added (módulo de reformateo — dewrap)
+- **`site/js/shared/dewrap.mjs`** (nuevo, 165 líneas): módulo ES6 que reflow artículos con párrafos mal formateados. Identifica dos patrones comunes en importaciones SPIP:
+  - **Caso A (hard-wrapped, estilo PDF)**: texto con `<br>` cada 60-100 caracteres, donde cada "línea" es fragmento de oración. Ejemplo: "REPRESIÓN PLANDÉMICA: ocultan la<br>HECATOMBE provocada por las mal<br>llamadas...". El módulo reagrupa en párrafos sintácticamente correctos.
+  - **Caso B (`<br>` como separador de párrafo)**: cada segmento ya es una oración/párrafo completo, solo mal etiquetado. Ejemplo: "Texto completo de una oración.<br>Texto completo de otra oración." El módulo convierte en párrafos reales `<p>...&</p>`.
+  - **Heurística común**: línea < 180 chars = fragmento (une a vecinos); línea ≥ 180 chars = párrafo completo (boundary de ambos lados); 2+ `<br>` consecutivos = siempre boundary.
+  - **Límite de longitud**: párrafos > 600 chars se cortan en límites de oración (nunca mid-word) para evitar bloques gigantescos.
+  - **Preservación**: párrafos bien formados (< 3 `<br>`) se dejan intactos. Contenido fuera de `<p>` (`<blockquote>`, `<ul>`, `<figure>`, etc.) sin tocar. Idempotente: ejecutar dos veces = ejecutar una.
+- **`test/dewrap.test.mjs`** (nuevo, 149 líneas): cobertura exhaustiva del nuevo módulo con 12 tests:
+  - `hasEnoughBreaksToAnalyze` — detecta párrafos con señal suficiente (≥3 `<br>`)
+  - `splitAtSentenceBoundaries` — corta en límites de oración, nunca mid-sentence
+  - `dewrapHardBreaks` — Caso A: agrupa fragmentos hard-wrapped
+  - `dewrapHardBreaks` — Caso B: convierte `<br>` en `</p><p>` entre segmentos largos
+  - `dewrapHardBreaks` — preserva contenido bien formado sin cambios
+  - `dewrapHardBreaks` — deja intacto contenido no-`<p>` (blockquote, ul, figure)
+  - Idempotencia: ejecutar dos veces produce resultado idéntico
+  - Fixtures tomadas de artículos reales en `site/assets/content/articles.json`
+
+### Tests
+- Test suite completa: **114 tests pasan** (32 existentes + 12 nuevos + validaciones de datos)
+  - Todos los tests de `render.test.mjs` siguen pasando
+  - Todos los tests de `articles.test.mjs` siguen pasando
+  - Todos los tests de URL safety siguen pasando
+  - `validate-data.mjs` reporta todas las entradas válidas
+  - `check-urls.mjs` confirma consistencia de URLs
+  - `check-badges.mjs` confirma badges en todas las tarjetas
+
+### Docs
+- `TO_FIX.md` — ítem #29 (cobertura incompleta del camino de descifrado) ahora apunta a este módulo como patrón a seguir para futuros módulos de transformación con pruebas exhaustivas.
+- `MIRROR_GROWING.md` — mención implícita a la fuga de párrafos hard-wrapped en artículos importados; `dewrap.mjs` es el fix automatizado de ese problema sistémico.
+
+### Resumen
+- ✅ Nuevo módulo de transformación de HTML: `dewrap.mjs`
+- ✅ Test suite exhaustiva con 12 tests nuevos
+- ✅ Cobertura de ambos patrones de hard-break encontrados en el corpus existente
+- ✅ Preservación de contenido bien formado
+- ✅ Idempotencia verificada
+- ✅ Listo para integrar en `scripts/import-article.mjs` en futuras importaciones
+
+---
+
 ## [0.31.0] — 2026-08-11
 
 ### Changed (Infrastructure & Documentation)
