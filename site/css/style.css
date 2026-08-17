@@ -5,7 +5,12 @@
   --page-bg: #b8ada2;
   --red: #b91c2a;
   --red-dark: #8b0000;
-  --gray: #595959;
+  /* Darkened from #595959 — that value read fine on white but dropped
+     below WCAG AA (4.5:1) for small text on this page's warmer, darker
+     surfaces (paper-alt, page-bg), which is exactly the kind of thing
+     that makes body copy feel like a strain to read without being able
+     to say why. */
+  --gray: #404040;
   --gray-light: #a0a0a0;
   --rule: #1e1e1e;
   --lang-es: #1b5e20;
@@ -18,6 +23,7 @@
   --status-archive-fg: #e65100;
   --status-legacy-bg: #eceff1;
   --status-legacy-fg: #455a64;
+  --section-bg: #a89b8f;
 
   /* Typography */
   --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
@@ -86,7 +92,7 @@ a { color: inherit; text-decoration: none; }
 
 .section {
   margin-bottom: 4.5rem;
-  background: #a89b8f;
+  background: var(--section-bg);
   padding: 2.5rem 2rem;
   border-radius: 8px;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
@@ -142,9 +148,8 @@ a { color: inherit; text-decoration: none; }
 .section-tagline {
   font-size: 1rem;
   color: #1a1a1a;
-  font-style: italic;
-  line-height: 1.5;
-  max-width: 70ch;
+  line-height: 1.55;
+  max-width: 65ch;
 }
 
 .section--tierra {
@@ -171,7 +176,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .section--featured {
-  background: #9b8d7f;
+  background: var(--section-bg);
   padding: 2.5rem;
   border: 1px solid rgba(0,0,0,0.15);
   position: relative;
@@ -185,21 +190,19 @@ a { color: inherit; text-decoration: none; }
   background: var(--red);
 }
 
-/* Individual section colors */
-#espacio-tierra-y-libertad {
-  background: #9b8d7f;
-}
-
-#gci {
-  background: #8fa89b;
-}
-
-#proletarios-internacionalistas {
-  background: #9b7f8d;
-}
-
+/* All four sections share one calm background tone. They were previously
+   four different hues (brown/olive/mauve/teal) as you scrolled down the
+   page — that variation didn't encode any real information (order and
+   identity are already carried by the number + border accent + icon) and
+   just made the page read as busier than it is. One tone, differentiated
+   only where it matters (Tierra y Libertad is "featured" — see
+   .section--featured), keeps scrolling calm and lets the accent color do
+   its job. */
+#espacio-tierra-y-libertad,
+#gci,
+#proletarios-internacionalistas,
 #nuevo-orden-mundial {
-  background: #8b9b9f;
+  background: var(--section-bg);
 }
 
 .featured-intro {
@@ -348,25 +351,25 @@ a { color: inherit; text-decoration: none; }
 .card--lang-en .card-lang { background: #311b92; color: #ffffff; }
 .card--lang-multi .card-lang { background: #4a148c; color: #ffffff; }
 
+/* Status + tier used to be two separate solid-fill pills (5 different
+   saturated colors between them: green/orange/gray/gray/purple). That
+   color-coding didn't carry more meaning than the text already does, and
+   stacking two loud pills per card next to the lang pill was the main
+   source of clutter on this page. Now it's a single quiet outline badge —
+   the words ("Activo", "Externo"...) still tell you everything, restraint
+   handles the rest. */
 .card-status {
   font-family: var(--font-mono);
   font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 0.15rem 0.55rem;
+  padding: 0.15rem 0.6rem;
   border-radius: 999px;
+  background: rgba(255,255,255,0.5);
+  color: #3a352f;
+  border: 1px solid rgba(0,0,0,0.18);
 }
-
-.card-status--active  { background: #2e7d32;    color: #ffffff; }
-.card-status--archive { background: #e65100;   color: #ffffff; }
-.card-status--legacy  { background: #455a64;   color: #ffffff; }
-
-/* Tier badges — Level 1 (external link) vs Level 2 (locally mirrored content).
-   See MIRROR_GROWING.md §0 for the definition of the two levels.
-   Use text labels, not color alone (accessibility rule MIRROR_GROWING §4.6). */
-.card-status--external { background: #666;          color: #ffffff;    border: 1px solid rgba(0,0,0,0.3); }
-.card-status--mirrored { background: #311b92;       color: #ffffff; border: 1px solid rgba(49,27,146,0.4); }
 
 .card-title {
   font-family: var(--font-serif);
@@ -404,10 +407,13 @@ a { color: inherit; text-decoration: none; }
   background: #666;
 }
 
+/* One quiet neutral for every tag except --type, which keeps the brand red
+   as the single accent color in this row — was four different fills
+   (dark red / near-black / mid-gray / dark red again) doing no extra
+   signaling work over the label text itself. */
 .tag--type  { background: #8b1320;  color: #ffffff; border-color: rgba(185,28,42,0.4); }
-.tag--lang  { background: #333;       color: #ffffff;    border-color: rgba(0,0,0,0.3); }
-.tag--affil { background: #555;       color: #ffffff; }
-.tag--scope { background: #8b1320;   color: #ffffff; border-color: rgba(185,28,42,0.4); }
+.tag--affil,
+.tag--scope { background: #555;     color: #ffffff; }
 
 /* ------------------------------------------------------------------ */
 /* SECTION ILLUSTRATIONS                                                */
