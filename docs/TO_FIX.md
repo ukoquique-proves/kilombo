@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-17 — v0.32.0 integró y aplicó `dewrapHardBreaks()` (#46, #47, #48 resueltos).
+Última actualización: 2026-08-17 — v0.34.0 completo; UI/design improvements (#51-#53) añadido a backlog.
 
 ---
 
@@ -114,6 +114,28 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 - [ ] **26. Ventana de doble mantenimiento**
   - `kilombo.top` y el espejo GitHub Pages son dos fuentes de verdad en paralelo.
   - Acción futura: crear un checklist de "fase out" que cierre la ventana de doble mantenimiento y archive el flujo de GitHub Pages.
+
+- [ ] **51. Mejoras de UI/diseño — fase 1 (quick wins)**
+  - **Favicon**: Crear `site/favicon.svg` basado en la estrella del logo. Añadir enlace en `<head>` de todas las páginas HTML. Alto ROI (identidad visual en pestañas/bookmarks), trivial de implementar.
+  - **Open Graph metadata**: Añadir meta tags `og:title`, `og:description`, `og:image`, `og:url` a `articulo.html` y `articulos.html` para que las previsualizaciones en redes sean profesionales. Requiere un `image` en `articles.json` (opcional para ahora, usa un placeholder).
+  - **Mission statement breve**: Añadir 2-3 líneas bajo el subtítulo "Publicaciones y archivos internacionalistas" en el header con una frase que capture la identidad del proyecto (ej: "Archivo riguroso de análisis internacionalista para el estudio y la acción política").
+  - **Remoción de clutter visual**: Revisar `site/css/style.css` para eliminar reglas no usadas (ej: `.card:not(a)` nunca coincide hoy, ver TO_FIX #21).
+  - **Timing**: v0.35.0 o cuando tengas un slot libre — bajo riesgo, mejora percibida.
+
+- [ ] **52. Mejoras de UX — fase 2 (medium-term, v0.35.0+)**
+  - **Línea de lectura controlada en artículos**: Limitar el ancho de párrafos a ~70-80 caracteres (`max-width: 70ch`) en `articulo.html` para mejorar legibilidad de textos largos. Evita fatiga visual.
+  - **Metadatos de artículo prominentes**: Refactorizar `articulo.html` para mostrar "autor", "fecha original", "contexto" (si existen en JSON) como una tarjeta técnica antes del cuerpo. Actualmente estos campos no se muestran al lector.
+  - **Relacionados temáticos**: Añadir un campo `relatedTopics` a `articles.json` (opcional, lista de IDs) y renderizar 3-5 artículos relacionados al final de cada pieza. Requiere curaduría manual o algoritmo de similitud.
+  - **Timing**: Esperar a que el catálogo crezca (>50 artículos) para justificar la complejidad.
+
+- [ ] **53. Mejoras de UX — fase 3 (deferred, v0.36.0+, arquitectónico)**
+  - **UI adaptativa por rol de artículo**: Algunos artículos son archivos históricos (modo "Biblioteca"), otros son análisis coyunturales (modo "Estimulación/Acción"). Idear un campo `articleRole` en JSON y renderizar CTAs/secciones de debate diferentes según el rol.
+    - Requiere schema migration + lógica condicional en `articulo.html`
+    - Alto esfuerzo, bajo ROI a corto plazo (la acción se vuelve más fácil de captar visualmente, pero no es esencial)
+  - **Bloque de contribución explícito**: Finalizar artículos de análisis con un bloque "¿Qué piensas?" con botones prominentes para "Enviar réplica", "Traducir", "Difundir". Hoy existe en footer, pero no es del-for-this-article.
+    - Requiere backend de contribuciones o integración con formulario externo (Discord, email, Google Form)
+    - Deferred hasta que cliente confirme canal de recepción
+  - **Timing**: v0.36.0+ cuando la plataforma alcance escala (>100 artículos, >10 traductores potenciales).
 
 ---
 
