@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-17 — v0.32.0 añade módulo `dewrap.mjs` y deja pendientes de integración 3 ítems (46, 47, 48).
+Última actualización: 2026-08-17 — v0.32.0 integró y aplicó `dewrapHardBreaks()` (#46, #47, #48 resueltos).
 
 ---
 
@@ -14,53 +14,20 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     3. Verificar acceso: `./sync-to-production.sh` (o el test de login de TROUBLESHOOTING.md)
   - El valor actual del password futuro está en `.env` entre comillas simples para preservar los caracteres especiales (`$$`, `&&`).
 
-- [ ] **46. Integrar `dewrapHardBreaks()` en el pipeline de importación (v0.32.0+)**
-  - **Subítem A: Integración en `scripts/import-article.mjs`**
-    - `dewrap.mjs` existe y está testeado (12 tests pasan). Ahora necesita aplicarse automáticamente en todas las futuras importaciones.
-    - Llamar a `dewrapHardBreaks()` en el paso 3.5 del pipeline: después de `reduceToAllowlist()` (paso 3) pero antes de guardar a JSON (paso 4).
-    - Verificar que la salida siga pasando `validate-data.mjs`.
-  - **Subítem B: Backfill de artículos existentes (7 afectados)**
-    - Crear script `scripts/backfill-dewrap.mjs` que:
-      1. Lea `site/assets/content/articles.json`
-      2. Aplique `dewrapHardBreaks()` a cada entrada donde `status === "imported"` y `contentHtml` tenga ≥3 `<br>`
-      3. Escriba de vuelta a JSON con comentario de auditoría: `"_lastDewrapped": "2026-08-17T..."`
-      4. Ejecute `validate-data.mjs` para confirmar que no hay regresiones
-      5. Reporte qué entradas fueron modificadas (y cuántos chars/párrafos cambiaron)
-    - Artículos afectados identificados en v0.24.0:
-      - `contra-genocidio-guerras-infinitas-pi` (ES) — 1.521 chars hard-wrapped
-      - `contre-genocide-guerres-infinites-pi` (FR) — 1.152 chars hard-wrapped
-      - `falsos-internacionalistas-1` a `falsos-internacionalistas-6` (6 entradas)
-      - `1-mayo-2023-contra-militarizacion` — hard-wrapped
-      - `plandemismo-y-domesticacion-11` — hard-wrapped
-    - Ejecutar: `node scripts/backfill-dewrap.mjs` (dry-run por defecto; `--commit` para aplicar cambios)
-  - **Subítem C: Documentar en MIRROR_GROWING.md**
-    - Ver ítem #47 abajo (nuevas reglas de control de calidad para importaciones).
+- [x] **46. Integrar `dewrapHardBreaks()` en el pipeline de importación (v0.32.0+)** — ✅ Resuelto.
+  - **Subítem A** — ✅ `dewrapHardBreaks()` corre como paso 3.5 en `scripts/import-article.mjs`, después de `reduceToAllowlist()` (paso 3) y antes de devolver la entrada (paso 4). Verificado contra `validate-data.mjs` (114 tests + validación de datos en verde).
+  - **Subítem B** — ✅ `scripts/backfill-dewrap.mjs` creado y ejecutado con `--commit`. 7 artículos reformateados: `represion-plandemica-1` (200→0 `<br>`, 1→56 `<p>`), `represion-plandemica-3`, `1-mayo-2023-contra-militarizacion`, `plandemismo-y-domesticacion-11` (43→2 `<br>`, 8→61 `<p>`), `1er-mai-2023-tierra-fr`, `le-covidisme-nbsp-une-nouvelle-religion`, `la-pandemie-n-existe-pas`. Cada entrada modificada tiene `_lastDewrapped` con timestamp de auditoría.
+    - Nota: 2 artículos de la lista original de v0.24.0 (`contra-genocidio-guerras-infinitas-pi`, `contre-l-8217-esclavage-et-la-fausse-critique-du-capitalisme-en-general-ii`) no se tocaron — sus `<br>` están repartidos entre varios `<p>`, ninguno alcanza el umbral `MIN_BR_COUNT` de `dewrap.mjs` en un solo párrafo, así que no son hard-wraps reales según el criterio del módulo.
+  - **Subítem C** — ✅ documentado en `MIRROR_GROWING.md` §2, "Control de calidad automático del pipeline".
 
-- [ ] **47. Documentar reglas de control de calidad para importaciones en MIRROR_GROWING.md §2**
-  - Añadir una nueva sección después de §1 (o como §2 revisado) que documente las heurísticas automáticas que `scripts/import-article.mjs` aplica a cada entrada importada. Incluir:
-    - ✅ Dedup verificado (URL y ID no existen ya)
-    - ✅ Fetch exitoso (HTTP 200, contenido > 100 chars)
-    - ✅ Extracción completada (Tierra o PI, según URL)
-    - ✅ Limpieza de HTML (allowlist, XSS, eventos inline)
-    - ✅ Reescritura de URLs (todos los `src`/`href` → absolutos)
-    - ✅ Validación de datos (schema correcto, tipos esperados)
-    - 🔶 **Detector de hard-breaks** (NUEVO — v0.32.0+):
-      - Si `contentHtml` tiene ≥3 `<br>` Y ningún `<p>` contiene "natural" multiple-line patten, marcar `status: "pending-review"` en lugar de `"imported"`
-      - Esto reduce falsos positivos: un artículo con una cita de dos líneas (1-2 `<br>`) no salta el flag; pero un párrafo de 50+ líneas con `<br>` cada 60 chars sí.
-      - Criterio: si el párrafo más corto con `<br>` < 180 chars AND tiene ≥3 breaks consecutivos, es probable hard-wrap.
-      - Validación manual recomendada: revisar antes de cambiar a `"imported"`.
-    - 🟡 **Detector de sidebar/footer residual** (futuro):
-      - Detectar patrones típicos de SPIP que se cuelan en `contentHtml` (anclas `#forum`, bloques de búsqueda "Search/Buscar", listas "meme-rub").
-      - Marcar `status: "pending-review"` si se encuentra cualquiera de estos.
-  - La regla de **"pending-review" como gate de control de calidad** debe quedar explícitamente documentada para que no se dependa de memory de una sesión anterior.
+- [x] **47. Documentar reglas de control de calidad para importaciones en MIRROR_GROWING.md §2** — ✅ Resuelto.
+  - Sección añadida documentando las 6 comprobaciones automáticas del pipeline (dedup, fetch, extracción, limpieza HTML, reescritura URLs, reflow de hard-breaks) más la validación de schema y el warning no bloqueante de `validate-data.mjs`.
+  - El detector de sidebar/footer residual (`#forum`, "Buscar", `meme-rub`) fue evaluado contra el contenido real de `articles.json` y **no se implementó**: no se encontraron casos genuinos, solo falsos positivos (la palabra "buscar" en su uso normal). Queda documentado en MIRROR_GROWING.md por si aparece un caso real en el futuro.
 
-- [ ] **48. Implementar detector de hard-breaks en `scripts/validate-data.mjs` (v0.32.0+)**
-  - Añadir una nueva regla de validación que marque automáticamente artículos sospechosos:
-    - Si entrada `status === "imported"` Y `contentHtml` tiene patrón de hard-breaks probable (≥3 `<br>` en párrafos cortos < 180 chars), lanzar una advertencia durante la validación:
-      - Opción 1 (recomendada): no fallar el `npm test`, pero emitir **warning** en stdout: `⚠️  ${id} — posible hard-wrapped content: ${brCount} breaks en párrafo de ${minLength} chars. Considerar status='pending-review'.`
-      - Opción 2: marcar directamente el entry como `status: "suspicious"` (nuevo estado entre `pending-review` e `imported`) y dejar que CI lo bloquee.
-    - La heurística es la del módulo `dewrap.mjs`: usar `hasEnoughBreaksToAnalyze()` + medir longitud de líneas más cortas.
-    - Objetivo: prevenir que futuras importaciones entren como `"imported"` si contienen contenido sospechoso sin haber sido revisado manualmente.
+- [x] **48. Implementar detector de hard-breaks en `scripts/validate-data.mjs` (v0.32.0+)** — ✅ Resuelto (Opción 1).
+  - `validate-data.mjs` ahora escanea cada entrada `status: "imported"` en `content/*.json` y emite un `⚠️` en stdout si encuentra un párrafo con ≥3 `<br>` y una línea < 180 caracteres — sin fallar el build (`npm test` sigue en verde). Mensaje incluye el `id`, el conteo de `<br>` y sugiere `backfill-dewrap.mjs` o cambiar `status` a `pending-review`.
+  - Verificado con una regresión inyectada manualmente (revertida antes de commit): el warning se dispara correctamente y no afecta el exit code.
+  - Datos actuales (post-backfill #46): 0 warnings — los 27 artículos en `articles.json` pasan limpio.
 
 ---
 
@@ -124,9 +91,10 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     4. verificar cifrado local con `npm run encrypt`;
     5. confirmar acceso SSH con `./sync-to-production.sh --dry-run`.
 
-- [ ] **25. Blind spot del generador de contexto compacto**
+- [x] **25. Blind spot del generador de contexto compacto** — ✅ Mitigado.
   - El generador excluye `.github/`, por lo que `deploy.yml` no aparece en los bundles de revisión.
-  - Solución adoptada: incluir `.github/workflows/deploy.yml` manualmente en cualquier sesión que toque `encrypt.mjs`, `deploy.yml` o `sync-to-production.sh`.
+  - Solución adoptada: `deploy.yml` tiene un comentario en su propio encabezado advirtiendo de este blind spot, para que cualquier sesión que abra el archivo directamente vea la advertencia sin depender de este documento. Confirmado presente en el archivo actual.
+  - Sigue siendo responsabilidad de cada sesión incluir `.github/workflows/deploy.yml` manualmente cuando el trabajo toque `encrypt.mjs`, `deploy.yml` o `sync-to-production.sh` — el comentario mitiga el olvido, no lo elimina estructuralmente.
 
 - [ ] **26. Ventana de doble mantenimiento**
   - `kilombo.top` y el espejo GitHub Pages son dos fuentes de verdad en paralelo.

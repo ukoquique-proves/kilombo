@@ -15,6 +15,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isSafeUrl, isAbsoluteOrExempt } from '../site/js/shared/url-safety.mjs';
+import { hasEnoughBreaksToAnalyze } from '../site/js/shared/dewrap.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const VIDEO_DATA_DIR = resolve(__dirname, '../site/assets/data');
@@ -190,6 +191,76 @@ function validateContentHtmlUrls(html) {
   return null;
 }
 
+// ================================================================
+// Hard-wrap warning (TO_FIX #48) — non-fatal, does not affect exit code
+// ================================================================
+// Uses the same MIN_BR_COUNT signal as dewrap.mjs (via the shared
+// hasEnoughBreaksToAnalyze() export) plus a local short-line check, so an
+// "imported" article that somehow bypassed the import-article.mjs
+// dewrapHardBreaks() step (step 3.5) — e.g. a manual JSON edit — gets
+// flagged for review instead of silently shipping as unreadable walls of
+// text. Deliberately a warning, not an error: flagging is a prompt for a
+// human to check `status`, not proof the content is actually broken.
+
+/** Local mirror of dewrap.mjs's LONG_LINE_THRESHOLD — see that module for
+ * the full rationale. Duplicated (not imported) so this warning stays a
+ * simple, independent read of dewrap.mjs's public signal rather than
+ * reaching into its internal reflow logic. */
+const HARD_WRAP_LONG_LINE_THRESHOLD = 180;
+
+/**
+ * @param {string} contentHtml
+ * @returns {{ brCount: number, minLineLength: number } | null}
+ */
+function detectHardWrapWarning(contentHtml) {
+  const paragraphs = contentHtml.match(/<p>([\s\S]*?)<\/p>/gi) || [];
+  for (const block of paragraphs) {
+    const inner = block.replace(/^<p>/i, '').replace(/<\/p>$/i, '');
+    if (!hasEnoughBreaksToAnalyze(inner)) continue;
+
+    const lines = inner
+      .split(/<br\s*\/?>/i)
+      .map((l) => l.replace(/<[^>]+>/g, '').trim())
+      .filter(Boolean);
+    if (lines.length === 0) continue;
+
+    const minLineLength = Math.min(...lines.map((l) => l.length));
+    if (minLineLength < HARD_WRAP_LONG_LINE_THRESHOLD) {
+      const brCount = (inner.match(/<br\s*\/?>/gi) || []).length;
+      return { brCount, minLineLength };
+    }
+  }
+  return null;
+}
+
+/**
+ * Scans already-validated article entries for likely hard-wrapped content
+ * and prints a warning (never fails the build). Kept separate from
+ * validateArticleEntry()/ARTICLE_RULES so a warning can never accidentally
+ * become a blocking error just by editing the rules list.
+ * @param {unknown[]} entries
+ * @param {string} label
+ */
+function warnHardWrappedArticles(entries, label) {
+  let warned = 0;
+  for (const entry of entries) {
+    if (typeof entry !== 'object' || entry === null) continue;
+    const obj = /** @type {Record<string, unknown>} */ (entry);
+    if (obj.status !== 'imported' || typeof obj.contentHtml !== 'string') continue;
+
+    const hit = detectHardWrapWarning(obj.contentHtml);
+    if (hit) {
+      warned++;
+      console.warn(
+        `⚠️  ${label}/${obj.id} — posible hard-wrapped content: ${hit.brCount} breaks ` +
+        `en párrafo de ${hit.minLineLength} chars. Considerar status='pending-review' ` +
+        `o re-ejecutar dewrapHardBreaks() (ver scripts/backfill-dewrap.mjs).`
+      );
+    }
+  }
+  return warned;
+}
+
 /**
  * @param {unknown} entry
  * @param {string} file
@@ -306,6 +377,27 @@ const contentScan = scanDir({
   label: 'content',
   validateEntry: validateArticleEntry,
 });
+
+// Hard-wrap warning pass (TO_FIX #48) — separate from scanDir/validateEntry
+// on purpose: this must never affect totalErrors/exit code, so it reads the
+// content files independently rather than piggybacking on the pass/fail
+// validation loop above.
+let hardWrapWarnings = 0;
+if (existsSync(CONTENT_DIR)) {
+  for (const file of readdirSync(CONTENT_DIR).filter((f) => f.endsWith('.json'))) {
+    try {
+      const data = JSON.parse(readFileSync(join(CONTENT_DIR, file), 'utf8'));
+      if (Array.isArray(data)) {
+        hardWrapWarnings += warnHardWrappedArticles(data, `content/${file}`);
+      }
+    } catch {
+      // Malformed JSON is already reported as an error by scanDir above.
+    }
+  }
+}
+if (hardWrapWarnings > 0) {
+  console.log(`\n${hardWrapWarnings} article(s) flagged for manual formatting review (warning only, does not fail the build).`);
+}
 
 const totalEntries = videoScan.entries + contentScan.entries;
 const totalErrors = videoScan.errors + contentScan.errors;

@@ -107,6 +107,40 @@ Antes de incorporar cualquier material nuevo, verificar:
 - Sin emojis en el cuerpo del texto (pueden usarse en títulos si el original los tiene)
 - Citas textuales van en `<blockquote>` — no entre comillas en un párrafo
 
+### Control de calidad automático del pipeline (`scripts/import-article.mjs`)
+
+Cada entrada importada pasa, en orden, por estas comprobaciones automáticas
+antes de escribirse en `articles.json`. Esta lista es la fuente de verdad
+sobre qué hace el pipeline — no depender de memoria de una sesión anterior:
+
+- ✅ **Dedup** — verifica que `sourceUrl` e `id` no existan ya en `articles.json`
+- ✅ **Fetch exitoso** — HTTP 200 y contenido > 100 caracteres
+- ✅ **Extracción completada** — selectores específicos para Tierra o PI, según `sourceUrl`
+- ✅ **Limpieza de HTML** — `stripEventHandlers()`, `stripLogoImages()`, `convertSpipMarkup()`, y `reduceToAllowlist()` (allowlist de tags — ver arriba)
+- ✅ **Reescritura de URLs** — todo `src`/`href` relativo se convierte a absoluto vía `rewriteRelativeUrls()`
+- ✅ **Reflow de hard-breaks** (v0.32.0+) — `dewrapHardBreaks()` (paso 3.5, después de `reduceToAllowlist()`) reestructura `<br>` de saltos de línea artificiales (texto pegado desde PDF, una línea = un fragmento de oración) en párrafos `<p>` reales. Ver `site/js/shared/dewrap.mjs` para el criterio exacto (umbral de 3+ `<br>` por párrafo, líneas < 180 caracteres se consideran fragmentos y se unen). Un `<p>` con pocos `<br>` (cita de 1-2 líneas, por ejemplo) se deja intacto — no todo salto de línea es un artefacto de formato.
+- ✅ **Validación de datos** — `validate-data.mjs` confirma schema correcto y tipos esperados; falla el build si hay errores
+
+Además, `validate-data.mjs` corre una comprobación no bloqueante después de
+la validación de schema: si una entrada con `status: "imported"` todavía
+tiene un párrafo con 3+ `<br>` y una línea más corta que 180 caracteres —
+es decir, contenido que debería haber pasado por `dewrapHardBreaks()` en el
+import pero no lo hizo (por ejemplo, una edición manual del JSON que se
+saltó el pipeline) — se imprime un **warning** en `npm test`, sin fallar el
+build. Sirve como red de seguridad para detectar contenido mal formateado
+antes de que llegue a producción, aunque el `status` diga `"imported"`.
+Si aparece este warning: revisar la entrada y considerar re-ejecutar
+`node scripts/backfill-dewrap.mjs --commit`, o cambiar manualmente el
+`status` a `"pending-review"` hasta confirmar que el formato es correcto.
+
+**Nota:** un detector de contenido residual de sidebar/footer de SPIP
+(anclas `#forum`, cajas de búsqueda, listas `meme-rub` colándose en
+`contentHtml`) fue evaluado pero no implementado — una comprobación
+preliminar contra el contenido real no encontró casos genuinos (solo
+coincidencias falsas de palabras comunes en español, como "buscar" usado
+en su sentido normal). Si en el futuro se detecta un caso real, documentar
+el patrón exacto aquí antes de automatizar su detección.
+
 ---
 
 ## 3. Proceso de incorporación de un vídeo nuevo
