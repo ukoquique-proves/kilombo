@@ -7,30 +7,49 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [0.35.0] — 2026-08-17
 
+### Fixed (corrupción de contenido & UI refinement)
+- **Fixed-column corruption en `contentHtml`**: dos artículos (`plandemismo-y-domesticacion-11` e `imagenes`) tenían saltos de línea embebidos (`\n` literales) que rompían texto a límites de columna fijos (~60-80 caracteres). Ejemplo: `"PLANDEM\nISMO"` (palabra rota) o frases cortadas en mitad.
+  - **Causa raíz**: Desconocida (posiblemente copy-paste de texto pre-envuelto, JSON stringify, o paso de importación anterior sin limpieza).
+  - **Impacto**: Render correcto (navegador ignora `\n` intra-tag), pero rompe legibilidad plaintext y cualquier analizador de HTML limpio.
+  - **Detección GAP**: NO detectado por `validate-data.mjs` (solo busca `<br>` hard-wraps) ni por `dewrap.mjs` (solo procesa `<p>` content, no newlines literales).
+  - **Fix aplicado**: Removidos todos los `\n` intra-párrafo en ambos artículos vía patch manual.
+  - **Prevención implementada**: Creado `scripts/detect-fixed-column-corruption.mjs` (ejecutable vía `npm run check-corruption`) que usa heurística de línea consistente (60-100 chars) + breaks mid-word para detectar este patrón. Resultado post-scan: 0 artículos afectados (solo esos 2, ya reparados).
+  - **Acción preventiva documentada en TO_FIX #54**: antes de futuras importaciones masivas, ejecutar `npm run check-corruption` para detectar temprano.
+
 ### Changed (UI/diseño — legibilidad y reducción de ruido visual)
 - **`site/css/style.css`**: refactorización de paleta y reducción de complejidad visual:
-  - **Contraste mejorado**: `--gray: #595959` → `#404040` para cumplir WCAG AA en superficies cálidas (paper-alt, page-bg). El gris anterior era legible en blanco pero fallaba AA en tonos más oscuros.
-  - **Fondos de sección unificados**: eliminadas 4 variantes de color por sección (#espacio-tierra-y-libertad, #gci, #proletarios-internacionalistas, #nuevo-orden-mundial) → todas comparten `--section-bg: #a89b8f`. La variación de color no codificaba información (identidad y orden ya están en número + borde + icono), solo hacía la página más ruidosa. Un tono calmado deja que el color de acento haga su trabajo.
-  - **Badges de estado simplificados**: antes, cada tarjeta tenía dos píldoras sólidas de color (ej: "Activo" verde + "Externo" gris), que sumadas a la píldora de idioma creaban 3 elementos visuales por tarjeta. Ahora: una sola píldora outline neutra (`background: rgba(255,255,255,0.5)`) con texto que combina ambas dimensiones ("Activo · ↗ Externo"). Fuente de ruido anterior eliminada.
-  - **Tags simplificados**: `--tag--lang` (antes 4 colores: dark-red / black / gray / dark-red) → una paleta neutra. Solo `--tag--type` mantiene rojo de marca como acento único en la fila de tags.
-  - **Tipografía**: removido `font-style: italic` de `.section-tagline` (mejora legibilidad). Ajustado `line-height: 1.5 → 1.55` para mejor ritmo. Reducido `max-width: 70ch → 65ch` para columnas más tensas.
-- **`site/index.html`**: refactorización de badges en tarjetas:
-  - Cada tarjeta pasa de dos `<span>` separados para estado y tier (ej: `<span class="card-status card-status--active">Activo</span>` + `<span class="card-status card-status--external">↗ Externo</span>`) a uno solo que combina ambos (ej: `<span class="card-status card-status--external">Activo · ↗ Externo</span>`).
-  - Removidas todas las píldoras `tag--lang` (ej: `<span class="tag tag--lang">ES</span>`) ya que la información de idioma está ya en `card-lang` y no necesita repetirse.
-  - Aplicado a las 8 tarjetas del índice.
+  - **Contraste mejorado**: `--gray: #595959` → `#404040` para cumplir WCAG AA en superficies cálidas (paper-alt, page-bg).
+  - **Fondos de sección unificados y aclarados**: 
+    - Primera iteración: 4 variantes de color por sección (#espacio-tierra-y-libertad, #gci, #proletarios-internacionalistas, #nuevo-orden-mundial) → todas comparten `--section-bg: #a89b8f`
+    - Segunda iteración: `--section-bg: #a89b8f` (gris-marrón oscuro) → `#ede8e1` (crema cálido claro). Reduce monotonía (~6-7% diferencia original) → nuevo color es ~10-12% más claro, creando separación visual clara sin peso visual excesivo.
+  - **Badges de estado simplificados**: dos píldoras sólidas por tarjeta ("Activo" + "Externo") → una sola píldora outline (`background: rgba(255,255,255,0.5)`) con texto combinado ("Activo · ↗ Externo").
+  - **Tags simplificados**: `--tag--lang` (4 colores) → una paleta neutra. Solo `--tag--type` mantiene rojo de marca.
+  - **Tipografía**: removido `font-style: italic` de `.section-tagline`. Ajustado `line-height: 1.5 → 1.55`. Reducido `max-width: 70ch → 65ch`.
+- **`site/index.html`**: refactorización de badges en tarjetas (8 tarjetas) — consolidación de `<span>` de estado/tier, removidas píldoras `tag--lang` redundantes.
+- **`site/js/articles.js`**: añadido case para section `"actualidad"` en `sectionLabel()`. Title mejorado: `"IMAGENES"` → `"Imágenes — Plandemismo"`.
+
+### Added (infraestructura de validación)
+- **`scripts/detect-fixed-column-corruption.mjs`** (nuevo): detector de corrupción de texto por newlines embebidos. Heurística: línea consistente 60-100 chars + breaks mid-word = corruption.
+  - Ejecutable vía `npm run check-corruption` (scan sin repair)
+  - Ejecutable vía `npm run check-corruption -- --fix` (experimental repair, requiere revisión manual)
+- **`package.json`**: nuevo script `check-corruption` que invoca el detector.
+- **`TO_FIX.md #51-#54`**:
+  - #51 refinado: "Remoción de clutter visual" completado, 3 quick wins restantes (favicon, OG metadata, mission statement)
+  - #54 nuevo: Fixed-column corruption documentado con causa raíz (desconocida), prevención y acción preventiva
 
 ### Docs
-- `TO_FIX.md`: ítems #51–#53 añadidos documentando fases futuras de mejoras UI (quick wins, medium-term, deferred architectural)
+- `TO_FIX.md`: ítems #51–#53 añadidos previamente (phases 1-3 de mejoras UI)
 
 ### Tests
-- Cobertura completa mantenida: 114/114 tests pasan, URL consistency verdes, check-badges verdes
+- Cobertura completa: 114/114 tests pasan, URL consistency verdes, check-badges verdes
 
 ### Summary
+- ✅ Fixed-column corruption detectado, reparado y prevenido (nuevo detector de clase nueva de corrupción)
 - ✅ Contraste mejorado (WCAG AA en todas las superficies)
 - ✅ Ruido visual reducido (~15% menos elementos de UI activos en cada tarjeta)
+- ✅ Fondos de sección aligerados (crema clara `#ede8e1` en lugar de gris-marrón `#a89b8f`)
 - ✅ Paleta unificada sin pérdida de información
 - ✅ Tipografía refinada para mejor confort de lectura
-- ✅ Sin cambios en funcionalidad o contenido
 
 ---
 
