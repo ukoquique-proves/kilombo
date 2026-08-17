@@ -33,6 +33,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Window } from 'happy-dom';
 import { sanitizeHtml } from '../site/js/render.mjs';
+import { dewrapHardBreaks } from '../site/js/shared/dewrap.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ARTICLES_PATH = resolve(__dirname, '../site/assets/content/articles.json');
@@ -273,6 +274,10 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
   body = convertSpipMarkup(body);
   body = rewriteRelativeUrls(body, opts.url);
   body = reduceToAllowlist(body);
+  // Step 3.5 (TO_FIX #46): reflow hard-wrapped <br> source text into real
+  // <p> paragraphs before writing to JSON. Must run after reduceToAllowlist()
+  // so it only ever sees the same plain p/br markup the sanitizer allows.
+  body = dewrapHardBreaks(body);
 
   if (extracted.isImageOnly && !body.replace(/<[^>]+>/g, '').trim()) {
     body = `<p>${extracted.title}.</p><p>El artículo original consiste en documentos gráficos (imágenes) disponibles en la fuente original. Ver el artículo completo en el enlace de fuente.</p>`;
