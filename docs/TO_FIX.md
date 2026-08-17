@@ -91,6 +91,21 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     4. verificar cifrado local con `npm run encrypt`;
     5. confirmar acceso SSH con `./sync-to-production.sh --dry-run`.
 
+- [ ] **50. Refactorizar archivos con múltiples responsabilidades — growth point**
+  - Varios módulos actualmente mezclan varias responsabilidades en un solo archivo:
+    - `site/js/articles.js` (~410 líneas) — gestión del modelo de datos, filtrado, y renderizado del carrusel de artículos
+    - `site/js/render.mjs` (~340 líneas) — sanitización HTML, renderizado de cards, componentes de filtros, construcción de páginas
+    - `scripts/validate-data.mjs` (~420 líneas) — validación de schema JSON, transformación de datos, warnings de regresión
+  - Esta estructura no es irrazonable a la escala actual (~27 artículos, sitio monolítico con <30KB HTML final), pero representa un crecimiento futuro si:
+    1. El número de artículos crece significativamente (> 200) — la navegación/filtrado necesitará lazy-loading, paginación
+    2. La complejidad del validador crece (detectores adicionales de contenido, auditoría de cambios) — el validador se vuelve un orquestador
+    3. Se añaden nuevos tipos de contenido (videos, audios, líneas de tiempo) — `render.mjs` explota en tamaño
+  - **Acción**: En v0.35.0+, considerar una refactorización modular:
+    - `site/js/models/articles.js` — modelo y lógica de filtrado (deducible del JSON, sin renderizado)
+    - `site/js/components/` — componentes reutilizables (Card, FilterBar, Carousel como módulos separados)
+    - `scripts/validators/` — validadores separados por dominio (schema.mjs, content-qa.mjs, data-format.mjs)
+    - **No es bloqueante hoy**, pero es una deuda técnica de arquitectura que evitará refactorizaciones de emergencia cuando la complejidad se dispare.
+
 - [x] **25. Blind spot del generador de contexto compacto** — ✅ Mitigado.
   - El generador excluye `.github/`, por lo que `deploy.yml` no aparece en los bundles de revisión.
   - Solución adoptada: `deploy.yml` tiene un comentario en su propio encabezado advirtiendo de este blind spot, para que cualquier sesión que abra el archivo directamente vea la advertencia sin depender de este documento. Confirmado presente en el archivo actual.
