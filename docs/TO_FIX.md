@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-17 — v0.34.0 completo; UI/design improvements (#51-#53) añadido a backlog.
+Última actualización: 2026-08-17 — v0.36.0+; ítems #29, #45, #51 cerrados; seguridad URLs (#ctaUrl/#sourceUrl) resuelta.
 
 ---
 
@@ -56,10 +56,9 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - Todos los `.card` en `index.html` son `<a>`. El script no hace nada hoy.
   - Future-proofing intencionado; sin acción necesaria salvo que se añadan cards no-anchor.
 
-- [ ] **45. `dist/` contiene un artefacto cifrado obsoleto y desfasado**
-  - El directorio `dist/` está correctamente ignorado por Git, así que no es un problema del repositorio.
-  - En este estado, el build exportado sigue siendo un artefacto viejo que falta el módulo nuevo `site/js/shared/url-safety.mjs` y el archivo `site/assets/network-urls.json` que sí existen en `site/`.
-  - No debe zipearse, compartirse ni entregarse al cliente hasta regenerar y validar el build correspondiente.
+- [x] **45. `dist/` contiene un artefacto cifrado obsoleto y desfasado** — ✅ Resuelto v0.36.0+.
+  - El directorio `dist/` ha sido eliminado del filesystem local. Era un artefacto gitignoreado (nunca comprometido) pero presente en disco, con un `decrypt.mjs` desactualizado (sessionStorage/IV-offset incorrecto, sin `url-safety.mjs`) que habría fallado silenciosamente si desplegado.
+  - `dist/` nunca debe existir como directorio persistente. El build de deploy se genera on-demand por GitHub Actions (`npm run encrypt` + artefacto de Pages) y no se guarda localmente.
 
 ---
 
@@ -82,10 +81,11 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     2. Si se encuentran artículos afectados, aplicar `npm run check-corruption -- --fix` (experimental, requiere revisión manual)
     3. O inspeccionar manualmente `contentHtml` en rawdiff para líneas que contengan `\n` literales
 
-- [ ] **29. `test/encrypt-decrypt.test.mjs` — cobertura incompleta del camino criptográfico**
-  - El test actual valida el round-trip de `codec.decode()` de staticrypt, pero no ejerce el código manual de `decrypt.mjs` que usa `aesDecrypt()` y la gestión de IV.
-  - Este es un gap de priorización alta porque toca el flujo de descifrado real del sitio y podría dejar errores de IV/parseo sin detectar.
-  - Fix: extraer las funciones de descifrado a un módulo puro importable y añadir un test directo para `decrypt.mjs` que cubra tanto el caso feliz como un fallo de descifrado.
+- [x] **29. `test/decrypt-client.test.mjs` — cobertura incompleta del camino criptográfico** — ✅ Resuelto v0.36.0+.
+  - `fromHex()` y `aesDecrypt()` exportados desde `site/js/decrypt.mjs` y cubiertos con tests directos.
+  - Capa 1 (nuevos): `fromHex` convierte hex a Uint8Array correctamente; `aesDecrypt` construye un envelope con HMAC stub + IV real usando `crypto.subtle.encrypt` directamente (sin staticrypt) y verifica la recuperación — este test habría capturado el bug v0.26.0 antes de shipping; test de regresión del offset incorrecto (`slice(0,32)` vs. correcto `slice(64,96)`) confirma que el viejo bug no puede silenciarse; test de ciphertext demasiado corto lanza excepción.
+  - Capa 2 (sin cambios): los 3 tests de `parseJson()` via staticrypt codec round-trip se mantienen.
+  - Total: 130/130 tests pasan.
 
 - [x] **36. El pipeline de importación de contenido es documentación, no código**
   - La lógica de scraping/limpieza/reescritura de URLs en TROUBLESHOOTING.md §8 ya está implementada en `scripts/import-article.mjs`, eliminando la necesidad de ejecutar solo snippets Python ad hoc.
@@ -132,12 +132,11 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - `kilombo.top` y el espejo GitHub Pages son dos fuentes de verdad en paralelo.
   - Acción futura: crear un checklist de "fase out" que cierre la ventana de doble mantenimiento y archive el flujo de GitHub Pages.
 
-- [ ] **51. Mejoras de UI/diseño — fase 1 (quick wins, v0.35.0 EN PROGRESO)**
-  - ✅ **Remoción de clutter visual**: Completado en v0.35.0 — badges simplificados (outline único en lugar de dos píldoras sólidas), tags reducidas (paleta neutra, rojo solo para `--type`), fondos de sección unificados, tipografía refinada.
-  - **Favicon**: Crear `site/favicon.svg` basado en la estrella del logo. Añadir enlace en `<head>` de todas las páginas HTML. Alto ROI (identidad visual en pestañas/bookmarks), trivial de implementar.
-  - **Open Graph metadata**: Añadir meta tags `og:title`, `og:description`, `og:image`, `og:url` a `articulo.html` y `articulos.html` para que las previsualizaciones en redes sean profesionales. Requiere un `image` en `articles.json` (opcional para ahora, usa un placeholder).
-  - **Mission statement breve**: Añadir 2-3 líneas bajo el subtítulo "Publicaciones y archivos internacionalistas" en el header con una frase que capture la identidad del proyecto (ej: "Archivo riguroso de análisis internacionalista para el estudio y la acción política").
-  - **Timing**: Favicon + OG metadata + mission statement = 2-3 horas máximo. Bajo riesgo, mejora de UX/SEO percibida.
+- [x] **51. Mejoras de UI/diseño — fase 1 (quick wins)** — ✅ Completado v0.36.0.
+  - ✅ **Remoción de clutter visual** (v0.35.0): badges simplificados, tags reducidas, fondos de sección unificados, tipografía refinada.
+  - ✅ **Favicon** (v0.36.0): `site/favicon.svg` creado (estrella roja con trazo blanco). Enlace `<link rel="icon">` añadido en las 4 páginas HTML (`index.html`, `articulos.html`, `articulo.html`, `plandemismo.html`).
+  - ✅ **Open Graph metadata** (v0.36.0): `og:title`, `og:description`, `og:type`, `og:url`, `og:image` + `<meta name="description">` añadidos a las 4 páginas. `plandemismo.html` incluida (se detectó en revisión posterior como omitida inicialmente).
+  - ✅ **Mission statement** (v0.36.0): párrafo `.site-mission` añadido en el header de `index.html` con CSS responsivo.
 
 - [ ] **52. Mejoras de UX — fase 2 (medium-term, v0.35.0+)**
   - **Línea de lectura controlada en artículos**: Limitar el ancho de párrafos a ~70-80 caracteres (`max-width: 70ch`) en `articulo.html` para mejorar legibilidad de textos largos. Evita fatiga visual.

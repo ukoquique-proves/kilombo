@@ -34,17 +34,10 @@ import { fileURLToPath } from 'node:url';
 import { Window } from 'happy-dom';
 import { sanitizeHtml } from '../site/js/render.mjs';
 import { dewrapHardBreaks } from '../site/js/shared/dewrap.mjs';
+import { isAbsoluteOrExempt } from '../site/js/shared/url-safety.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ARTICLES_PATH = resolve(__dirname, '../site/assets/content/articles.json');
-
-/**
- * @param {unknown} url
- * @returns {boolean}
- */
-function isAbsoluteOrExempt(url) {
-  return /^(https?:\/\/|#|mailto:)/i.test(String(url));
-}
 
 // ================================================================
 // 0. Dedup

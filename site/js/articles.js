@@ -9,11 +9,23 @@
 
 import { escapeHtml, sanitizeHtml, renderFilterBar } from './render.mjs';
 import { parseJson } from './decrypt.mjs';
+import { isSafeUrl } from './shared/url-safety.mjs';
 
 // Re-exported so existing imports of renderFilterBar from articles.js
 // (including test/articles.test.mjs) keep working. The implementation now
 // lives in render.mjs, shared with plandemismo.js's tag filter bar.
 export { renderFilterBar };
+
+/**
+ * Returns a safe href value for a sourceUrl: the original URL if it passes
+ * isSafeUrl(), or '#' if the scheme is forbidden (javascript:, data:, etc.).
+ * Extracted so tests can assert the guard without spinning up the full page.
+ * @param {string} url
+ * @returns {string}
+ */
+export function safeHref(url) {
+  return isSafeUrl(url) ? url : '#';
+}
 
 const DATA_PATH = 'assets/content/articles.json';
 
@@ -377,11 +389,12 @@ async function initDetailPage() {
     initReadingProgress();
 
     const safeSourceUrl = escapeHtml(a.sourceUrl);
+    const sourceHref = escapeHtml(safeHref(a.sourceUrl));
     sourceEl.innerHTML = `
       <div class="article-detail__source-box">
         <div class="article-detail__source-label">📍 Fuente original</div>
         <div class="article-detail__source-site">${escapeHtml(a.sourceSite)}</div>
-        <a class="article-detail__source-link" href="${safeSourceUrl}" target="_blank" rel="noopener noreferrer">${safeSourceUrl}</a>
+        <a class="article-detail__source-link" href="${sourceHref}" target="_blank" rel="noopener noreferrer"${!isSafeUrl(a.sourceUrl) ? ' data-unsafe-url-blocked="true"' : ''}>${safeSourceUrl}</a>
       </div>
     `.trim();
 

@@ -405,3 +405,38 @@ test('renderFilterBar — clicking a value button calls onSelect with that value
   assert.equal(selected, 'covid');
 });
 
+
+// ================================================================
+// renderCard — ctaUrl scheme guard (TO_FIX: javascript: in ctaUrl)
+// ================================================================
+
+test('renderCard — javascript: ctaUrl is blocked: href falls back to #', () => {
+  const card = renderCard({ ...baseVideo, ctaUrl: 'javascript:alert(1)' });
+  const a = card.querySelector('a.video-card__cta');
+  assert.equal(a.getAttribute('href'), '#', 'href must be # when ctaUrl is javascript:');
+});
+
+test('renderCard — javascript: ctaUrl sets data-unsafe-url-blocked attribute', () => {
+  const card = renderCard({ ...baseVideo, ctaUrl: 'javascript:alert(1)' });
+  const a = card.querySelector('a.video-card__cta');
+  assert.equal(a.getAttribute('data-unsafe-url-blocked'), 'true');
+});
+
+test('renderCard — data: ctaUrl is blocked: href falls back to #', () => {
+  const card = renderCard({ ...baseVideo, ctaUrl: 'data:text/html,<script>bad</script>' });
+  const a = card.querySelector('a.video-card__cta');
+  assert.equal(a.getAttribute('href'), '#');
+});
+
+test('renderCard — safe ctaUrl is not blocked and has no data-unsafe-url-blocked attr', () => {
+  const card = renderCard({ ...baseVideo, ctaUrl: 'https://tv.canal7salta.com/video/123' });
+  const a = card.querySelector('a.video-card__cta');
+  assert.equal(a.getAttribute('href'), 'https://tv.canal7salta.com/video/123');
+  assert.equal(a.getAttribute('data-unsafe-url-blocked'), null);
+});
+
+test('renderCard — javascript: with mixed case is blocked (JAVASCRIPT:)', () => {
+  const card = renderCard({ ...baseVideo, ctaUrl: 'JAVASCRIPT:alert(1)' });
+  const a = card.querySelector('a.video-card__cta');
+  assert.equal(a.getAttribute('href'), '#');
+});

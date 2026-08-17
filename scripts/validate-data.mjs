@@ -55,8 +55,9 @@ const BASE_RULES = [
     }},
   { name: 'ctaUrl',       type: 'string',  required: true,
     validate: (v) => {
-      try { new URL(String(v)); return null; }
-      catch { return `ctaUrl "${v}" is not a valid URL`; }
+      if (!isSafeUrl(v))           return `ctaUrl "${v}" uses a forbidden scheme (javascript:/data:/vbscript:)`;
+      if (!isAbsoluteOrExempt(v))  return `ctaUrl "${v}" must be an absolute https?:// URL (or # / mailto:)`;
+      return null;
     }},
   { name: 'ctaLabel',     type: 'string',  required: true,
     validate: (v) => String(v).trim() ? null : 'ctaLabel must be non-empty' },
@@ -153,8 +154,9 @@ const ARTICLE_RULES = [
     }},
   { name: 'sourceSite', type: 'string', required: true, validate: (v) => String(v).trim() ? null : 'sourceSite must be non-empty' },
   { name: 'sourceUrl', type: 'string', required: true, validate: (v) => {
-      try { new URL(String(v)); return null; }
-      catch { return `sourceUrl "${v}" is not a valid URL`; }
+      if (!isSafeUrl(v))           return `sourceUrl "${v}" uses a forbidden scheme (javascript:/data:/vbscript:)`;
+      if (!isAbsoluteOrExempt(v))  return `sourceUrl "${v}" must be an absolute https?:// URL (or # / mailto:)`;
+      return null;
     }},
   { name: 'status', type: 'string', required: true, validate: (v) => ARTICLE_STATUS.has(String(v)) ? null : `status must be one of: ${Array.from(ARTICLE_STATUS).join(', ')}` },
   { name: 'contentHtml', type: 'string', required: true, validate: (v) => {

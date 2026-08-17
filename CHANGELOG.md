@@ -5,6 +5,61 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.36.0] — 2026-08-17
+
+### Added (UI improvements — Phase 1 quick wins)
+- **`site/favicon.svg`** (nuevo): Logo de estrella roja con trazo blanco, matching el icono del header. Proporciona identidad visual en pestañas del navegador y bookmarks.
+- **Open Graph metadata** — añadido a las **4 páginas HTML** para mejorar previsualizaciones en redes sociales:
+  - `index.html`: `og:title`, `og:description`, `og:type: website`, `og:url`, `og:image`
+  - `articulos.html`: `og:title`, `og:description`, `og:type: website`, `og:url`, `og:image`
+  - `articulo.html`: `og:title`, `og:description`, `og:type: article`, `og:url`, `og:image`
+  - `plandemismo.html`: `og:title`, `og:description`, `og:type: website`, `og:url`, `og:image` (añadido en revisión posterior — fue omitido en el commit inicial)
+  - Todas las páginas incluyen `<meta name="description">` para SEO
+- **Mission statement** — añadido bajo el subtítulo en el header de `index.html`:
+  > "Archivo riguroso de análisis internacionalista para el estudio y la acción política en la red de espacios compañeros."
+  - Nueva clase CSS `.site-mission` con tipografía responsiva (0.85–1rem), color cálido (`--paper-alt`), max-width 65ch para legibilidad
+
+### Fixed (seguridad — inyección de esquemas en URLs)
+- **`scripts/validate-data.mjs` — `ctaUrl` y `sourceUrl`**: validación con `new URL()` reemplazada por `isSafeUrl` + `isAbsoluteOrExempt`. `new URL()` acepta `javascript:alert(1)` sin lanzar excepción — los dos campos ahora rechazan esquemas peligrosos (`javascript:`, `data:`, `vbscript:`) en CI antes de cualquier deploy.
+- **`site/js/render.mjs` — `renderCard()`**: `href="${escapeHtml(v.ctaUrl)}"` reemplazado por guarda `isSafeUrl(v.ctaUrl) ? escapeHtml(v.ctaUrl) : '#'`. URLs con esquema peligroso caen a `href="#"` y reciben `data-unsafe-url-blocked="true"`.
+- **`site/js/articles.js` — `initDetailPage()`**: importado `isSafeUrl` desde `./shared/url-safety.mjs`; `sourceUrl` ahora pasa por `safeHref()` antes de usarse como `href`. Exportada nueva función pura `safeHref(url)` para testabilidad directa.
+
+### Fixed (código — import duplicado y módulo huérfano)
+- **`scripts/import-article.mjs`**: función privada `isAbsoluteOrExempt()` (líneas 41–47) eliminada — era una copia literal de la ya existente en `site/js/shared/url-safety.mjs`. Ahora importa directamente desde el módulo compartido, cerrando el riesgo de drift entre las dos copias.
+- **`site/js/render.mjs`**: bloque JSDoc huérfano + `import { isSafeUrl }` mal colocado a mitad de archivo (entre `SANITIZE_DROP_ENTIRELY` y `copyNode`) eliminados. Import movido al inicio del archivo junto a los demás imports, donde pertenece.
+
+### Fixed (cobertura de tests — camino criptográfico)
+- **`site/js/decrypt.mjs`**: `fromHex()` y `aesDecrypt()` exportados para permitir tests directos.
+- **`test/decrypt-client.test.mjs`** — reestructurado en dos capas explícitas:
+  - **Capa 1 — tests directos nuevos** (gap de TO_FIX #29):
+    - `fromHex` convierte hex a `Uint8Array` correctamente
+    - `aesDecrypt` construye envelope real con `crypto.subtle.encrypt` (sin staticrypt) y verifica recuperación — test que habría capturado el bug de v0.26.0 antes de shipping
+    - Regresión del offset incorrecto: simula el viejo `slice(0,32)` y afirma que **no** recupera el plaintext
+    - Ciphertext demasiado corto lanza excepción
+  - **Capa 2 — tests de `parseJson()` via staticrypt** (sin cambios, mantenidos)
+
+### Removed
+- **`dist/`** (artefacto local): directorio eliminado. Era un build cifrado obsoleto, gitignoreado y nunca comprometido, con `decrypt.mjs` desactualizado (sessionStorage/IV-offset incorrecto, sin `url-safety.mjs`). TO_FIX #45 cerrado. El build de deploy se genera on-demand por GitHub Actions.
+
+### Changed
+- **`site/css/style.css`** — añadida regla `.site-mission` para estilizar el nuevo párrafo de misión
+
+### Tests
+- Cobertura: **130/130 tests pasan** (125 anteriores + 5 nuevos scheme-rejection en `render.test.mjs` + 6 nuevos `safeHref` en `articles.test.mjs` + 5 nuevos `aesDecrypt`/`fromHex` en `decrypt-client.test.mjs` — conteo final neto tras restructuración)
+- Validación de datos: 37 entradas válidas
+- URL consistency: 7 URLs verificadas
+- Badge check: 8 cards con indicadores correctos
+
+### Summary
+- ✅ Phase 1 UI quick wins: favicon + OG metadata (4 páginas) + mission statement
+- ✅ Seguridad: `javascript:` en `ctaUrl`/`sourceUrl` bloqueado en CI y en render
+- ✅ Calidad de código: import duplicado en `import-article.mjs` eliminado; JSDoc huérfano en `render.mjs` limpiado
+- ✅ Cobertura criptográfica: `aesDecrypt`/`fromHex` directamente testeados (TO_FIX #29 cerrado)
+- ✅ `dist/` eliminado (TO_FIX #45 cerrado)
+- ✅ 130/130 tests pasan
+
+---
+
 ## [0.35.0] — 2026-08-17
 
 ### Fixed (corrupción de contenido & UI refinement)

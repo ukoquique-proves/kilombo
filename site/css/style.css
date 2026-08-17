@@ -90,6 +90,18 @@ a { color: inherit; text-decoration: none; }
   font-style: italic;
 }
 
+.site-mission {
+  font-family: var(--font-sans);
+  font-size: clamp(0.85rem, 1.8vw, 1rem);
+  color: var(--paper-alt);
+  margin-top: 0.75rem;
+  line-height: 1.5;
+  max-width: 65ch;
+  letter-spacing: 0.01em;
+  font-style: normal;
+  font-weight: 400;
+}
+
 .section {
   margin-bottom: 4.5rem;
   background: var(--section-bg);

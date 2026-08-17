@@ -348,10 +348,11 @@ git push → GitHub Actions →
 - [ ] Testear accesibilidad (contrastes, teclado, lectores de pantalla)
 
 ### 9. SEO y metadatos
-- [ ] Meta tags (description, Open Graph, Twitter Cards) por página
-- [ ] Favicon y apple-touch-icon
+- [x] **Favicon** — `site/favicon.svg` (estrella roja, v0.36.0) + `<link rel="icon">` en las 4 páginas HTML ✅
+- [x] **Open Graph + meta description** — `og:title`, `og:description`, `og:type`, `og:url`, `og:image` añadidos a las 4 páginas (v0.36.0) ✅
 - [ ] `sitemap.xml`
 - [ ] `robots.txt`
+- [ ] Twitter Cards (opcional — OG cubre la mayoría de plataformas)
 
 ### 10. Deploy final en `kilombo.top`
 
@@ -392,7 +393,7 @@ El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`,
 | 6. Organización por idiomas dentro de cada sección | Parcial — indicadores Nivel 1/2 ✅ implementados y con test de regresión; pestañas/selector de idioma pendientes | 1 – 2 días |
 | **7. Protección de acceso — StatiCrypt (cifrado AES-256 client-side)** | ✅ Implementado y verificado en GitHub Pages | — |
 | 8. Revisión diseño + UX | Pendiente | 1 día |
-| 9. SEO y metadatos | Pendiente | 0.5 día |
+| 9. SEO y metadatos | Parcial — favicon ✅ + OG metadata ✅ (v0.36.0); sitemap.xml y robots.txt pendientes | 0.25 día |
 | **10. Deploy a `kilombo.top`** | Pendiente — solo requiere abrir puerto 22 desde el panel YunoHost (sin necesitar a los administradores) | 0.5 día |
 | 11–12. Mantenimiento (documentación) | Pendiente | 0.5 día |
 

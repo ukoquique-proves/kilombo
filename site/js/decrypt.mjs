@@ -21,7 +21,7 @@
 const STORAGE_KEY = 'staticrypt_passphrase';
 
 /** hex string → Uint8Array */
-function fromHex(hex) {
+export function fromHex(hex) {
   const buf = new Uint8Array(hex.length / 2);
   for (let i = 0; i < hex.length; i += 2) {
     buf[i / 2] = parseInt(hex.slice(i, i + 2), 16);
@@ -37,7 +37,7 @@ function fromHex(hex) {
  * @param {string} hashedPassword Hex-encoded 256-bit key read from localStorage
  * @returns {Promise<string>}     Decrypted plaintext
  */
-async function aesDecrypt(ciphertext, hashedPassword) {
+export async function aesDecrypt(ciphertext, hashedPassword) {
   const HMAC_HEX_LEN = 64; // HMAC-SHA256 = 32 bytes = 64 hex chars (prepended by staticrypt's encode())
   const IV_HEX_LEN   = 32; // AES-CBC IV = 16 bytes = 32 hex chars
   const iv   = fromHex(ciphertext.slice(HMAC_HEX_LEN, HMAC_HEX_LEN + IV_HEX_LEN));

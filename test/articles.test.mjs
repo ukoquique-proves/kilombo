@@ -21,6 +21,7 @@ import {
   renderFilterBar,
   findRelatedArticles,
   renderRelatedArticles,
+  safeHref,
 } from '../site/js/articles.js';
 
 // ================================================================
@@ -267,3 +268,31 @@ test('filterArticlesByQuery — returns an empty array when nothing matches', ()
 });
 
 
+
+// ================================================================
+// safeHref — sourceUrl scheme guard (TO_FIX: javascript: in sourceUrl)
+// ================================================================
+
+test('safeHref — passes through a safe https URL unchanged', () => {
+  assert.equal(safeHref('https://kilombo.top/article1'), 'https://kilombo.top/article1');
+});
+
+test('safeHref — blocks javascript: scheme and returns #', () => {
+  assert.equal(safeHref('javascript:alert(1)'), '#');
+});
+
+test('safeHref — blocks data: scheme and returns #', () => {
+  assert.equal(safeHref('data:text/html,<script>alert(1)</script>'), '#');
+});
+
+test('safeHref — blocks vbscript: scheme and returns #', () => {
+  assert.equal(safeHref('vbscript:msgbox(1)'), '#');
+});
+
+test('safeHref — blocks javascript: with leading whitespace (evasion attempt)', () => {
+  assert.equal(safeHref('  javascript:alert(1)'), '#');
+});
+
+test('safeHref — blocks javascript: case-insensitively (JAVASCRIPT:)', () => {
+  assert.equal(safeHref('JAVASCRIPT:alert(1)'), '#');
+});

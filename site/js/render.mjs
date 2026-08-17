@@ -9,6 +9,8 @@
  * either run in a browser context or supply a DOM shim (e.g. happy-dom).
  */
 
+import { isSafeUrl } from './shared/url-safety.mjs';
+
 // ================================================================
 // ESCAPING
 // ================================================================
@@ -60,14 +62,6 @@ const SANITIZE_ALLOWED_ATTRS = {
 const SANITIZE_DROP_ENTIRELY = new Set([
   'SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'META', 'NOSCRIPT', 'TEMPLATE', 'SVG',
 ]);
-
-/**
- * Reject href/src values that could execute script (javascript:, data:,
- * vbscript:) or otherwise aren't a normal link/asset reference.
- * @param {string} url
- * @returns {boolean}
- */
-import { isSafeUrl } from './shared/url-safety.mjs';
 
 /**
  * Recursively copy the safe subset of `source`'s children into `target`,
@@ -265,8 +259,8 @@ export const renderCard = (v) => {
           ${buildLangs(v.langs)}
         </div>
         ${todoComment}
-        <a href="${escapeHtml(v.ctaUrl)}" target="_blank" rel="noopener noreferrer"
-           class="${ctaClass}"${v.ctaPlaceholder ? ' data-cta-placeholder="true"' : ''}>${escapeHtml(v.ctaLabel)}</a>
+        <a href="${isSafeUrl(v.ctaUrl) ? escapeHtml(v.ctaUrl) : '#'}" target="_blank" rel="noopener noreferrer"
+           class="${ctaClass}"${v.ctaPlaceholder ? ' data-cta-placeholder="true"' : ''}${!isSafeUrl(v.ctaUrl) ? ' data-unsafe-url-blocked="true"' : ''}>${escapeHtml(v.ctaLabel)}</a>
       </div>`;
 
   return article;
