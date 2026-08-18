@@ -5,6 +5,61 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.37.0] — 2026-08-17
+
+### Added (article imports — pending-review placeholders)
+- **6 articles imported as stubs** with `status: pending-review` + `notes` field for completion guidance:
+  - `quilombo-pelicula` (tierra) — film stub, 1-line body
+  - `kilombo-quilombo-pelicula` (tierra) — film stub, 1-line body  
+  - `transformacion-registros-akashicos` (tierra) — image-only stub, empty body
+  - `el-negacionista-cortometraje` (tierra) — short film, image-only stub
+  - `curso-salud-holistica` (tierra) — course announcement, image-only stub
+  - `terrain-the-film` (nom) — documentary essay, thematic match despite Tierra source URL; cleaned id (`>` artifact) and title
+- **Total articles: 27 → 33** (6 new pending-review entries)
+- All imports done via `scripts/import-article.mjs --file scraped-full/article-N.html --section X` using the new offline import flag
+
+### Added (tooling — offline imports)
+- **`scripts/import-article.mjs` — `--file` flag**: Import from pre-scraped HTML on disk instead of live network fetch. Enables reproducible offline imports against `scraped-full/` snapshots without depending on `kilombo.top` availability. Source URL still used for site detection, dedup, and `sourceUrl` field — only HTML retrieval is swapped.
+
+### Added (UI — section filtering)
+- **`site/js/articles.js` — `filterArticlesBySection()` + `getSectionFromUrl()`**: Section-scoped article list pages via `?section=tierra`, `?section=pi`, `?section=nom`. Filtering logic in `initIndexPage()` reads `section` query param and filters the article list before render.
+- **`site/index.html` — section cards restructured**: All 4 editorial sections (Tierra, PI, NOM, GCI) now link to `articulos.html?section=X` as primary CTA, with external source link (`↗ Fuente`) as secondary button in header. User intent: "clicking on a section should bring the user to the local contents, not to the source".
+
+### Added (UI — Actualidad section)
+- **`site/index.html` — Actualidad section** (Level 2, coming-soon): New section card at top of index for fresh news. Placeholder until real content arrives.
+- **`site/css/style.css` — `.section--actualidad`**: Warm parchment background (`#f5f0e8`) distinct from Archivo's cool near-white. Differentiated visual treatment for "new content" vs "historical archive".
+
+### Changed (UI — Archivo section styling)
+- **`site/css/style.css` — `.section--archivo`**: Cool near-white background (`#e4e4e0`) with dashed border — signals reference index, not editorial content. Distinct from warm Actualidad.
+
+### Fixed (CSS — comment block corruption)
+- **`site/css/style.css`**: Missing `/*` before "Cool near-white..." comment caused `.section--archivo` block to be swallowed into invalid selector. Restored opening comment delimiter.
+
+### Fixed (data quality — article section assignments)
+- **4 misclassified `actualidad` articles moved to `nom`**: The `actualidad` section value was a meaningless stray import artefact (no real "news" section exists). Reassigned to `nom` based on thematic content.
+- **Article 84 assigned to `nom`**: Thematic match (plandemismo content) wins over source URL origin (Tierra host).
+
+### Docs
+- **`docs/TO_FIX.md #55`**: Updated with dry-run results for 6 tierra/nom candidates — conclusion: `tierra` stays at 1 article until real content arrives; no forced stubs or thematic mismatches.
+- **`docs/SITE_ANALYSIS.md`**: Article 84 noted as `nom` content despite Tierra source URL.
+
+### Tests
+- Cobertura: **134/134 tests pasan** (same as v0.36.0, no test changes needed)
+- Validación de datos: **33 entries valid** (27 + 6 new)
+- URL consistency: 7 URLs verificadas
+- Badge check: 11 cards con indicadores correctos
+
+### Summary
+- ✅ 6 pending-review article stubs imported (36, 46, 76, 84, 85, 86)
+- ✅ `--file` flag for offline imports committed
+- ✅ Section-scoped article pages (`?section=X`) working
+- ✅ Actualidad section added as Level 2 coming-soon placeholder
+- ✅ Section cards restructured: internal links primary, external source secondary
+- ✅ CSS comment corruption fixed
+- ✅ 134/134 tests pasan
+
+---
+
 ## [0.36.0] — 2026-08-17
 
 ### Added (UI improvements — Phase 1 quick wins)
