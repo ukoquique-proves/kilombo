@@ -98,12 +98,14 @@ export function detectSite(url) {
 export function extractTierra(html) {
   const titleMatch = html.match(/id="titre-article"[^>]*>([^<]{3,300})/);
   const dateMatch = html.match(/id="date-article"[^>]*>[^<]*<span[^>]*>([^<]+)</);
-  const bodyMatch = html.match(/id="texte-article"[^>]*>([\s\S]+?)<!-- Fin texte-article/);
+  const bodyMatch = html.match(/id="texte-article"[^>]*>([\s\S]*?)(?:<\/div>\s*(?:<!--\s*Fin texte-article|<!--Affichage du post-sciptum|<div id="pied"|$)|<\/div>\s*(?=<section|<footer|$))/i);
   const descriptifMatch = html.match(/id="descriptif-article"[^>]*>([\s\S]+?)<\/div>/);
 
   const rawBody = bodyMatch ? bodyMatch[1] : '';
   const plainTextLength = rawBody.replace(/<[^>]+>/g, '').trim().length;
-  const isImageOnly = plainTextLength < 200;
+  const hasLink = /<a\s+[^>]*href=/i.test(rawBody);
+  const hasMediaLink = /<a\s+[^>]*href=(?:['"])?(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|[^'"\s]+\.(?:mp4|webm|m3u8))/i.test(rawBody);
+  const isImageOnly = plainTextLength < 200 && !hasLink && !hasMediaLink;
 
   return {
     title: titleMatch ? titleMatch[1].trim() : '',
@@ -132,11 +134,13 @@ export function extractPI(html) {
     bodyHtml = endMatch === -1 ? rest : rest.slice(0, endMatch);
   }
   const plainTextLength = bodyHtml.replace(/<[^>]+>/g, '').trim().length;
+  const hasLink = /<a\s+[^>]*href=/i.test(bodyHtml);
+  const hasMediaLink = /<a\s+[^>]*href=(?:['"])?(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|[^'"\s]+\.(?:mp4|webm|m3u8))/i.test(bodyHtml);
 
   return {
     title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '').trim() : '',
     bodyHtml,
-    isImageOnly: plainTextLength < 200,
+    isImageOnly: plainTextLength < 200 && !hasLink && !hasMediaLink,
   };
 }
 

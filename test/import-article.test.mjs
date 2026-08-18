@@ -11,6 +11,7 @@ import { Window } from 'happy-dom';
 import {
   checkDedup,
   detectSite,
+  extractTierra,
   rewriteRelativeUrls,
   stripEventHandlers,
   stripLogoImages,
@@ -57,6 +58,19 @@ test('detectSite recognizes Tierra y Libertad and PI hosts', () => {
   assert.equal(detectSite('https://www.kilombo.top/spip.php?article=1'), 'tierra');
   assert.equal(detectSite('https://proletariosinternacionalistas.kilombo.top/spip.php?article=2'), 'pi');
   assert.equal(detectSite('https://example.com/'), 'unknown');
+});
+
+test('extractTierra does not treat a short link paragraph as image-only content', () => {
+  const html = `
+    <div id="texte-article" class="surlignable">
+      <div class="">
+        <p><a href="https://youtu.be/icuIeOoU_3k" target="_blank">Quilombo película</a></p>
+      </div>
+    </div>
+  `;
+  const extracted = extractTierra(html);
+  assert.equal(extracted.isImageOnly, false);
+  assert.match(extracted.bodyHtml, /https:\/\/youtu\.be\/icuIeOoU_3k/);
 });
 
 test('rewriteRelativeUrls preserves absolute and exempt URLs and rewrites relative ones', () => {

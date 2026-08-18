@@ -5,6 +5,18 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.37.1] — 2026-08-18
+
+### Fixed (source import robustness)
+- **`scripts/import-article.mjs` — extraction hardening**: the Tierra importer no longer assumes every article body ends with the exact SPIP marker `<!-- Fin texte-article -->` and no longer treats a short link-based body as an image-only placeholder.
+- **Regression coverage**: added a new test for the “single YouTube link paragraph” pattern in `test/import-article.test.mjs`, ensuring short source articles with embedded media links are preserved instead of being collapsed into a stub.
+- **Impact**: this fixes the generalized importer failure behind entries like `quilombo-pelicula`, where the source page contained a real link to the movie and the mirror was replacing it with a placeholder due to an overly aggressive image-only heuristic.
+
+### Tests
+- `node --test test/import-article.test.mjs` — **11/11 tests passing**
+
+---
+
 ## [0.37.0] — 2026-08-17
 
 ### Added (article imports — pending-review placeholders)
