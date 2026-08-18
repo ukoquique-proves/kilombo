@@ -5,6 +5,15 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ---
 
+## 🟢 Recientemente cerrados
+
+- [x] **59. Extraction gaps: unextracted media + date regex variant** — v0.39.1 ✅
+  - **Gap 1 (FIXED):** Portfolio images + document links outside body block were silently dropped. Detection added; articles with unextracted media forced to `pending-review` (see `docs/EXTRACTION-GAPS-FIXED.md`)
+  - **Gap 2 (FIXED):** Date regex only matched `id="date-article"` but 51% of articles use `class="date-article"` instead. Regex updated to accept both attributes.
+  - **Testing:** 5 new unit tests added, all 142 tests passing.
+
+---
+
 ## 🔴 Acción pendiente urgente
 
 - [ ] **23. Cambiar `KILOMBOTOP_PASSWORD` por `KILOMBOTOP_FUTURE_PASSWORD` en `.env`**
