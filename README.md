@@ -34,6 +34,27 @@ Toda exclusión de material (cuando proceda) es una decisión del cliente sobre 
 
 ---
 
+## Modificación de la fuente y despliegue
+
+Este repositorio no es el backend original de `kilombo.top`. Es el espejo estático / portal de diseño que se publica desde esta carpeta y luego se sincroniza con la infraestructura YunoHost del cliente.
+
+- El contenido principal se trabaja en el repositorio, bajo `site/`.
+- La vista previa local se hace con un servidor HTTP estático.
+- El despliegue real a producción se ejecuta con `./sync-to-production.sh` usando los valores de `.env`.
+- Los valores de `.env` (host, puerto, usuario y ruta remota) son credenciales de infraestructura para el despliegue del espejo, no para editar el backend SPIP original.
+
+Si el objetivo es cambiar el diseño y el contenido del espejo, se trabaja desde este repositorio y luego se sincroniza con:
+
+```bash
+./sync-to-production.sh
+```
+
+Si el objetivo es editar directamente el sitio original de SPIP en `kilombo.top`, eso requiere acceso SSH al host real y, además, permisos sobre la instancia de SPIP / YunoHost, que no son los mismos que los usados para publicar este portal estático.
+
+Se puede consultar la guía más detallada en [`docs/DEPLOYMENT-AND-SOURCE-EDITING.md`](docs/DEPLOYMENT-AND-SOURCE-EDITING.md).
+
+---
+
 ## Estructura del portal (orden y jerarquía)
 
 El sitio se organiza en **cuatro secciones**, en el siguiente orden de prioridad visual:

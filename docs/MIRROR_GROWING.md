@@ -84,16 +84,24 @@ Antes de incorporar cualquier material nuevo, verificar:
 1. Leer el artículo en la fuente original
 2. Verificar admisión (regla arriba)
 3. Crear la entrada en articles.json:
-   - id:          slug único (kebab-case, sin acentos)
-   - title:       título limpio, sin mayúsculas innecesarias
-   - date:        fecha del original en YYYY-MM-DD (o vacío si no consta)
-   - section:     tierra | gci | pi | nom | general
-   - topics:      array de etiquetas en minúsculas
-   - sourceSite:  nombre legible del sitio de origen
-   - sourceUrl:   URL completa al artículo original
-   - status:      imported | adapted | translated | pending-review
-   - contentHtml: HTML limpio (solo p, a, strong, em, ul, ol, li,
-                  blockquote, h3, h4 — sin script, sin estilos inline)
+   - id:             slug único (kebab-case, sin acentos)
+   - title:          título limpio, sin mayúsculas innecesarias
+   - date:           fecha del original en YYYY-MM-DD (o vacío si no consta)
+   - section:        tierra | gci | pi | nom | general
+   - topics:         array de etiquetas en minúsculas
+   - sourceSite:     nombre legible del sitio de origen
+   - sourceUrl:      URL completa al artículo original
+   - status:         imported | adapted | translated | pending-review
+   - contentHtml:    HTML limpio (solo p, a, strong, em, ul, ol, li,
+                     blockquote, h3, h4 — sin script, sin estilos inline)
+   
+   **OPTIONAL (v0.39.0+) — para artículos con contenido multimedia:**
+   - externalLinks:  array de {type, url, title} — YouTube, IMDb, ok.ru, etc.
+   - metadata:       objeto con director, year, country, duration, language,
+                     subtitles, etc. (véase ARTICLES.schema.md para detalles)
+   - relatedArticles: array de IDs de artículos relacionados (variantes,
+                     secuelas, versiones traducidas del mismo contenido)
+
 4. Ejecutar npm test → si hay errores en validate-data.mjs, corregirlos
 5. Previsualizar localmente con npm run preview
 6. Commit + push → deploy automático

@@ -14,6 +14,42 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     3. Verificar acceso: `./sync-to-production.sh` (o el test de login de TROUBLESHOOTING.md)
   - El valor actual del password futuro está en `.env` entre comillas simples para preservar los caracteres especiales (`$$`, `&&`).
 
+- [ ] **57. Metadata extraction analysis: Articles 36 & 46 (Quilombo PELÍCULA movies) — LOW friction to complete**
+  - **Problem**: Articles 36 & 46 are pending-review stubs. kilombo.top source contains only 1-line bodies but has critical metadata embedded:
+    - Article 36: `<p><a href="https://youtu.be/icuIeOoU_3k" target="_blank">Quilombo película</a></p>`
+    - Article 46: references Portuguese film with English/Spanish subtitles
+    - Missing: synopses, director, year, country, duration, production credits
+  - **Why no automation**: SPIP CMS stores only title, date, body text — no metadata schema. Ficha técnica (credits, year, country) must be:
+    1. Text-mined manually from article body (not applicable — body is 1 line)
+    2. Manually researched from IMDb/Wikipedia/etc.
+    3. Stored in separate JSON field (recommended)
+  - **Extraction pattern**: Zero pattern to generalize — only 2 known stubs, no programmatic extraction possible.
+  - **Recommended approach (LOW-FRICTION)**:
+    1. Extend `articles.json` schema with optional `externalLinks` array + `metadata` object:
+       ```json
+       "externalLinks": [
+         { "type": "youtube", "url": "https://youtu.be/icuIeOoU_3k", "title": "Full film" }
+       ],
+       "metadata": {
+         "director": "Carlos Diegues",
+         "year": 1985,
+         "country": "Brasil",
+         "duration": "120 min"
+       }
+       ```
+    2. Render as metadata card in `articulo.html` detail page
+    3. Manually research & complete articles 36 & 46 (~15 mins total)
+    4. Document pattern in ROADMAP.md for future movie imports
+  - **Effort**: 15 mins vs. weeks (full IMDb integration)
+  - **Status**: Pending user decision on schema extension + priority
+
+- [ ] **XX. Importer: `detectSite()` misclasifica subdominios GCI como `tierra`**
+  - **Problema:** `detectSite()` solo reconoce `'pi'` (Proletarios Internacionalistas) y otherwise treats any `*.kilombo.top` that is not the PI host as `'tierra'`. Esto provoca que dominios del GCI (`icg-gci.kilombo.top`, `in.kilombo.top`, `cdrom.kilombo.top`, `icg-old.kilombo.top`) sean clasificados como `tierra` y pasen por `extractTierra()`.
+  - **Reproducción rápida:** ejecutar el detector/importador contra `icg-gci.kilombo.top` o los otros hosts y observar que devuelve `'tierra'` en lugar de `'unknown'` o un tipo `gci` específico.
+  - **Impacto:** `extractTierra()` espera selectores y estructura del tema SPIP de `www.kilombo.top` (`id="titre-article"`, `id="texte-article"`, `id="date-article"`). GCI es una instancia SPIP separada con plantillas distintas; el importador o bien falla con mensajes como "No se pudo extraer el título automáticamente...", o peor, extrae la región equivocada si algún selector coincide por casualidad. En la práctica, los artículos de GCI no se importan limpiamente.
+  - **Solución sugerida:** actualizar `detectSite()` para reconocer explícitamente los hosts del GCI (o devolver `'unknown'` para hosts no reconocidos) y añadir una extractor `extractGCI()` con selectores adaptados al tema de `icg-gci.kilombo.top` (y `in.kilombo.top` / `cdrom.kilombo.top` cuando proceda). Añadir pruebas unitarias que cubran la detección de host y la extracción por sitio (`test/import-site-detection.test.mjs` / `test/import-extractors.test.mjs`).
+  - **Prioridad:** Alta — evita corrupción silenciosa de imports y pérdidas de contenido al añadir nuevos artículos desde la red GCI.
+
 - [x] **46. Integrar `dewrapHardBreaks()` en el pipeline de importación (v0.32.0+)** — ✅ Resuelto.
   - **Subítem A** — ✅ `dewrapHardBreaks()` corre como paso 3.5 en `scripts/import-article.mjs`, después de `reduceToAllowlist()` (paso 3) y antes de devolver la entrada (paso 4). Verificado contra `validate-data.mjs` (114 tests + validación de datos en verde).
   - **Subítem B** — ✅ `scripts/backfill-dewrap.mjs` creado y ejecutado con `--commit`. 7 artículos reformateados: `represion-plandemica-1` (200→0 `<br>`, 1→56 `<p>`), `represion-plandemica-3`, `1-mayo-2023-contra-militarizacion`, `plandemismo-y-domesticacion-11` (43→2 `<br>`, 8→61 `<p>`), `1er-mai-2023-tierra-fr`, `le-covidisme-nbsp-une-nouvelle-religion`, `la-pandemie-n-existe-pas`. Cada entrada modificada tiene `_lastDewrapped` con timestamp de auditoría.

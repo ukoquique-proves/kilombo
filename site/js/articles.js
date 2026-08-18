@@ -436,6 +436,53 @@ async function initDetailPage() {
     
     contentEl.appendChild(sanitizeHtml(a.contentHtml || ''));
 
+    // Render metadata card if present (for movies, documentaries, etc.)
+    if (a.metadata && (a.metadata.mediaType || a.metadata.director || a.metadata.year)) {
+      const metaCard = document.createElement('div');
+      metaCard.className = 'article-metadata-card';
+      
+      const metaItems = [];
+      if (a.metadata.director) metaItems.push(`<strong>Director:</strong> ${escapeHtml(a.metadata.director)}`);
+      if (a.metadata.year) metaItems.push(`<strong>Año:</strong> ${a.metadata.year}`);
+      if (a.metadata.country) metaItems.push(`<strong>País:</strong> ${escapeHtml(a.metadata.country)}`);
+      if (a.metadata.duration) metaItems.push(`<strong>Duración:</strong> ${escapeHtml(a.metadata.duration)}`);
+      if (a.metadata.language) metaItems.push(`<strong>Idioma:</strong> ${escapeHtml(a.metadata.language)}`);
+      if (a.metadata.subtitles) metaItems.push(`<strong>Subtítulos:</strong> ${escapeHtml(a.metadata.subtitles)}`);
+      
+      metaCard.innerHTML = `
+        <div class="article-metadata-card__header">📽️ Ficha técnica</div>
+        <div class="article-metadata-card__body">
+          ${metaItems.map(item => `<div class="article-metadata-card__item">${item}</div>`).join('')}
+        </div>
+      `;
+      contentEl.appendChild(metaCard);
+    }
+
+    // Render external links if present (YouTube, IMDb, etc.)
+    if (a.externalLinks && a.externalLinks.length > 0) {
+      const linksCard = document.createElement('div');
+      linksCard.className = 'article-external-links-card';
+      
+      const linkItems = a.externalLinks.map(link => {
+        const safeUrl = escapeHtml(safeHref(link.url));
+        const unsafe = !isSafeUrl(link.url);
+        return `
+          <a href="${safeUrl}" class="article-external-links-card__link" target="_blank" rel="noopener noreferrer"${unsafe ? ' data-unsafe-url-blocked="true"' : ''}>
+            <span class="article-external-links-card__type">${escapeHtml(link.type)}</span>
+            <span class="article-external-links-card__title">${escapeHtml(link.title || link.url)}</span>
+          </a>
+        `;
+      }).join('');
+      
+      linksCard.innerHTML = `
+        <div class="article-external-links-card__header">🔗 Enlaces externos</div>
+        <div class="article-external-links-card__body">
+          ${linkItems}
+        </div>
+      `;
+      contentEl.appendChild(linksCard);
+    }
+
     initReadingProgress();
 
     const safeSourceUrl = escapeHtml(a.sourceUrl);

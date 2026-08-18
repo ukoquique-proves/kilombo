@@ -51,6 +51,76 @@ Cada nota es un **task list** para futura edición. El mirror es el mapa de trab
 
 ---
 
+### v0.39.0 — Schema extension: metadata fields for movies, documentaries, media articles
+
+**Objetivo:** Permitir que artículos con contenido multimedia (películas, documentales, vídeos) lleven metadatos estructurados (director, año, país, duración, idioma, subtítulos) y enlaces externos (YouTube, IMDb, ok.ru, etc.), renderizados en el detalle del artículo como tarjetas visuales clara.
+
+#### Filosofía del cambio
+- Muchos artículos importados son referencias a películas, documentales o contenido multimedia que requieren contexto técnico (director, año, país) y múltiples enlaces de visualización en diferentes plataformas.
+- Antes: metadata embebido en el texto del artículo (difícil de mantener, sin estructura)
+- Después: campos JSON opcionales (`externalLinks[]`, `metadata{}`) renderizados como tarjetas visuales en el detalle
+
+#### Implementación (v0.39.0)
+
+- [x] **0.39.1 — Extender schema JSON** — añadir campos opcionales `externalLinks` (array de {type, url, title}) y `metadata` (objeto con director, year, country, duration, language, subtitles, etc.) a la spec en `site/assets/content/articles.json` ✅
+- [x] **0.39.2 — Documentar schema en ARTICLES.schema.md** — guía de referencia TypeScript-style con ejemplos de película completa vs. artículo simple ✅
+- [x] **0.39.3 — Investigar y completar metadatos: Artículos 36 & 46** (Quilombo película, 1984) — ambos stubs que referenciaban el mismo film brasileño ✅
+  - [x] Artículo 36: YouTube link (1 línea) → extracto + ficha técnica completa
+  - [x] Artículo 46: embedded ok.ru players con subtítulos EN/ES → confirm mismo film, variant viewing option
+  - [x] Research completado: Quilombo (1984) dir. Carlos Diegues, drama histórico, Cannes 1984, 110 min, Portuguese, Brasil
+  - [x] Ambos cambios de `status: pending-review` → `status: imported` + full metadata
+- [x] **0.39.4 — Actualizar articles.js** — renderizado condicional de tarjeta de ficha técnica (si `a.metadata` existe) y tarjeta de enlaces externos (si `a.externalLinks` existe) en `initDetailPage()` ✅
+- [x] **0.39.5 — Estilos CSS** — `.article-metadata-card` y `.article-external-links-card` en articles.css con grid layout responsivo, tipografía clara, botones de enlace estilizados ✅
+- [x] **0.39.6 — Tests** — `npm test` pasa con 41/43 artículos (41 imported sin metadata + 2 newly completed con metadata), sin breaking changes ✅
+
+#### Ejemplo: Artículo 36 (Quilombo película)
+
+```json
+{
+  "id": "quilombo-pelicula",
+  "title": "Quilombo — Película",
+  "date": "1984-01-01",
+  "section": "tierra",
+  "topics": ["cine", "quilombo", "historia", "tierra-y-libertad", "brasil", "cinema-novo"],
+  "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
+  "sourceUrl": "https://www.kilombo.top/spip.php?article36",
+  "status": "imported",
+  "contentHtml": "<p>Sinopsis completa...</p>",
+  "externalLinks": [
+    {"type": "youtube", "url": "https://www.youtube.com/watch?v=icuIeOoU_3k", "title": "Quilombo película completa"},
+    {"type": "imdb", "url": "https://www.imdb.com/title/tt0091816", "title": "IMDb: Quilombo (1984)"}
+  ],
+  "metadata": {
+    "mediaType": "film",
+    "director": "Carlos Diegues (Cacá Diegues)",
+    "year": 1984,
+    "country": "Brasil",
+    "duration": "110 min",
+    "language": "Portugués",
+    "subtitles": "English, Spanish",
+    "source": "IMDb, Filmaffinity, research",
+    "filmFestival": "Festival de Cannes 1984 (Selección Oficial)"
+  },
+  "relatedArticles": ["kilombo-quilombo-pelicula"]
+}
+```
+
+#### Impacto en UI
+
+- **Artículo detail page:** Dos tarjetas nuevas aparecen después del contenido HTML pero antes de la fuente:
+  - Tarjeta de ficha técnica (fondo rojo claro, borde izquierdo rojo): director, año, país, duración, idioma, subtítulos
+  - Tarjeta de enlaces externos (fondo azul claro, borde izquierdo azul): botones de enlace a YouTube, IMDb, ok.ru, etc. con tipo visible
+- **Backward compatibility:** Artículos sin metadata o externalLinks no muestran las tarjetas — cero cambios visuales ni breaking changes
+- **Total articulos:** 43 (41 sin metadata + 2 nuevas películas con metadata)
+
+#### Próximos pasos (futuro)
+
+- Usar este patrón para otros artículos multimedia (documentales, audios, vídeos)
+- Extender `relatedArticles` para crear una red visual de referencias cruzadas automáticas entre películas/variantes
+- Considerar schema similar para audios y otros tipos de contenido
+
+---
+
 ### v0.32.0 — Transformar badges estáticos en controles funcionales
 
 **Objetivo:** Convertir los badges de lenguaje, estado y tipo en botones interactivos que dan al usuario control real sobre lo que ve. Esto alinea el proyecto con su misión de **empoderamiento del usuario** en lugar de solo proporcionar enlaces a "páginas aburridas mal ordenadas".

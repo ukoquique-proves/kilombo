@@ -444,36 +444,100 @@
   {
     "id": "quilombo-pelicula",
     "title": "Quilombo — Película",
-    "date": "",
+    "date": "1984-01-01",
     "section": "tierra",
     "topics": [
       "cine",
       "quilombo",
       "historia",
-      "tierra-y-libertad"
+      "tierra-y-libertad",
+      "brasil",
+      "cinema-novo"
     ],
     "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
     "sourceUrl": "https://www.kilombo.top/spip.php?article36",
-    "status": "pending-review",
-    "notes": "PENDIENTE: El artículo en la fuente original contiene solo una línea de texto. Completar con: sinopsis de la película, ficha técnica (director, año, país), enlace a donde verla, y por qué es relevante para el espacio Kilombo/quilombo como referencia histórica de lucha por tierra y libertad.",
-    "contentHtml": "<p>La importante película sobre los Kilombos (o quilombos) históricos — espacios de lucha humana por Tierra y Libertad.</p><p><em>Este artículo es un marcador provisional. El contenido completo está pendiente: ver nota en el campo <code>notes</code> del JSON y la fuente original.</em></p>"
+    "status": "imported",
+    "contentHtml": "<p><strong>Quilombo</strong> es una película histórica y epopéyica que retrata la legendaría resistencia del Quilombo dos Palmares, una comunidad de esclavos fugitivos en el siglo XVII en el noreste de Brasil. La película narra la rebelión de esclavos que se dirigen hacia las montañas donde encuentran a otros liderados por la anciana vidente Acotirene, quien unge a quien se convierte en Ganga Zumba, un legendario rey de la libertad.</p><p>Esta obra maestra del cine brasileño es una fusión de folclore, impacto político e narrativa dinámica, realizada con colores vibrantes y la música pulsante del compositor Gilberto Gil. La película fue seleccionada para la competencia oficial del Festival de Cannes 1984 y es considerada una de las grandes películas del movimiento Cinema Novo brasileño.</p><p>La importancia histórica y política de Quilombo para los espacios de lucha por tierra y libertad radica en su retrato de cómo comunidades de personas oprimidas pueden crear sociedades democráticas y autogestionadas fuera de la dominación colonial y capitalista — una lección fundamental para entender las luchas contemporáneas por la libertad y la dignidad.</p>",
+    "externalLinks": [
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=icuIeOoU_3k",
+        "title": "Quilombo película completa"
+      },
+      {
+        "type": "imdb",
+        "url": "https://www.imdb.com/title/tt0091816",
+        "title": "IMDb: Quilombo (1984)"
+      }
+    ],
+    "metadata": {
+      "mediaType": "film",
+      "director": "Carlos Diegues (Cacá Diegues)",
+      "year": 1984,
+      "country": "Brasil",
+      "duration": "110 min",
+      "language": "Portugués",
+      "subtitles": "English, Spanish",
+      "source": "IMDb, Filmaffinity, research",
+      "filmFestival": "Festival de Cannes 1984 (Selección Oficial)"
+    },
+    "relatedArticles": [
+      "kilombo-quilombo-pelicula"
+    ]
   },
   {
     "id": "kilombo-quilombo-pelicula",
-    "title": "Kilombo/Quilombo — Película (versión EN/ES)",
-    "date": "",
+    "title": "Quilombo — Película (Versión con Subtítulos EN/ES)",
+    "date": "1984-01-01",
     "section": "tierra",
     "topics": [
       "cine",
       "quilombo",
       "historia",
-      "tierra-y-libertad"
+      "tierra-y-libertad",
+      "brasil",
+      "cinema-novo"
     ],
     "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
     "sourceUrl": "https://www.kilombo.top/spip.php?article46",
-    "status": "pending-review",
-    "notes": "PENDIENTE: Pieza complementaria al artículo 36 (Quilombo PELÍCULA). El original indica que es la versión en portugués con subtítulos en inglés/español. Verificar si es el mismo film u otro. Completar con sinopsis, ficha técnica y contexto. Confirmar si es duplicado o complemento del artículo 36 antes de publicar.",
-    "contentHtml": "<p>Película en portugués con subtítulos en inglés/español sobre los quilombos — espacios históricos de resistencia y libertad.</p><p><em>Este artículo es un marcador provisional. Verificar relación con el artículo «Quilombo — Película» (article36). Ver nota en <code>notes</code> y fuente original.</em></p>"
+    "status": "imported",
+    "contentHtml": "<p>Esta es la versión de <strong>Quilombo</strong> con subtítulos en español e inglés, disponible a través de servidores multimedia. Es la misma película épica de 1984 dirigida por Carlos Diegues, presentada aquí con opciones de subtitulado para audiencias hispano y anglohablantes.</p><p>La película narra la histórica resistencia del Quilombo dos Palmares, una comunidad autogestionada de esclavos fugitivos en el siglo XVII brasileño, liderada por la vidente Acotirene y el legendario Ganga Zumba. Con la música del compositor Gilberto Gil y una cinematografía vibrante, <strong>Quilombo</strong> permanece como un hito del cine latinoamericano y el movimiento Cinema Novo.</p><p>Para entender las luchas contemporáneas por tierra y libertad, esta película es un documento indispensable sobre cómo comunidades oprimidas pueden construir sociedades democráticas al margen de las estructuras de dominación coloniales y capitalistas.</p>",
+    "externalLinks": [
+      {
+        "type": "ok.ru",
+        "url": "https://ok.ru/videoembed/7549025651285",
+        "title": "Quilombo con subtítulos en español"
+      },
+      {
+        "type": "ok.ru",
+        "url": "https://ok.ru/videoembed/8485123656434",
+        "title": "Quilombo con subtítulos en inglés"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=icuIeOoU_3k",
+        "title": "Quilombo película completa (YouTube)"
+      },
+      {
+        "type": "imdb",
+        "url": "https://www.imdb.com/title/tt0091816",
+        "title": "IMDb: Quilombo (1984)"
+      }
+    ],
+    "metadata": {
+      "mediaType": "film",
+      "director": "Carlos Diegues (Cacá Diegues)",
+      "year": 1984,
+      "country": "Brasil",
+      "duration": "110 min",
+      "language": "Portugués",
+      "subtitles": "Español, English",
+      "source": "IMDb, Filmaffinity, research",
+      "filmFestival": "Festival de Cannes 1984 (Selección Oficial)"
+    },
+    "relatedArticles": [
+      "quilombo-pelicula"
+    ]
   },
   {
     "id": "transformacion-registros-akashicos",

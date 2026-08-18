@@ -478,3 +478,101 @@
   }
 }
 
+/* ================================================================
+   METADATA CARDS — movies, documentaries, media articles (v0.39.0+)
+   Renders ficha técnica (director, year, country, duration, etc.)
+   and external links (YouTube, IMDb, ok.ru) as styled cards.
+   ================================================================ */
+
+.article-metadata-card {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: rgba(185, 28, 42, 0.08);
+  border: 1px solid rgba(185, 28, 42, 0.25);
+  border-left: 4px solid #b91c2a;
+  border-radius: 6px;
+}
+
+.article-metadata-card__header {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #b91c2a;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.article-metadata-card__body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.article-metadata-card__item {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #1a1a1a;
+}
+
+.article-metadata-card__item strong {
+  font-weight: 600;
+  color: #b91c2a;
+  margin-right: 0.3rem;
+}
+
+.article-external-links-card {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: rgba(0, 102, 204, 0.08);
+  border: 1px solid rgba(0, 102, 204, 0.25);
+  border-left: 4px solid #0066cc;
+  border-radius: 6px;
+}
+
+.article-external-links-card__header {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0066cc;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.article-external-links-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.article-external-links-card__link {
+  display: block;
+  padding: 0.6rem 0.8rem;
+  background: #0066cc;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.article-external-links-card__link:hover {
+  background: #0052a3;
+  transform: translateX(2px);
+}
+
+.article-external-links-card__type {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  text-transform: uppercase;
+}
+
+.article-external-links-card__title {
+  word-break: break-word;
+}
+
