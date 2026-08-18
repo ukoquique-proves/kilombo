@@ -1,6 +1,6 @@
 {
   "name": "kilombo",
-  "version": "0.37.0",
+  "version": "0.39.1",
   "description": "Portal central de acceso a la red de sitios de Kilombo. Construido como página estática (HTML, CSS, JS) para ser alojado en la infraestructura YunoHost de `kilombo.top`.",
   "type": "module",
   "directories": {
@@ -9,6 +9,7 @@
   "scripts": {
     "test": "bash scripts/test.sh",
     "import-article": "node scripts/import-article.mjs",
+    "backfill-dates": "node scripts/backfill-dates.mjs",
     "i18n-coverage": "node scripts/i18n-coverage.mjs",
     "encrypt": "node scripts/encrypt.mjs",
     "preview": "python3 -m http.server 8080 --directory site",

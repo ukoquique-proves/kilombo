@@ -5,6 +5,23 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.39.1] — 2026-08-18
+
+### Fixed
+- **Date backfill (TO_FIX #60):** 15 of 21 articles with `date: ""` recovered their real publication date. The `class="date-article"` regex fix (v0.39.1 Gap 2) only applied to future imports — `scripts/backfill-dates.mjs` (new, dry-run by default, `--commit` to write) re-runs the fixed extraction against local `scraped-full/` snapshots and normalizes ES/FR date strings to `YYYY-MM-DD`. 6 articles remain unresolved (no local snapshot); tracked as TO_FIX #64.
+- **GCI host misclassification (TO_FIX #61):** `detectSite()` now recognizes `icg-gci.kilombo.top`, `in.kilombo.top`, `cdrom.kilombo.top`, `icg-old.kilombo.top` as `'gci'` instead of silently falling through to `'tierra'` and running the wrong SPIP extractor. `buildArticleEntry()` now fails loudly for `'gci'` hosts (no `extractGCI()` exists yet — tracked as TO_FIX #63) instead of risking silent content corruption.
+- **`relatedArticles` field now wired up (TO_FIX #62):** the field was documented in `ARTICLES.schema.md` and populated in `articles.json` but never read by `findRelatedArticles()`. It's now consulted first (ahead of topic-based matches, exempt from the "must share a topic" filter) before falling back to shared-topic ranking.
+- **Version drift:** `package.json` version was `0.37.0` while this changelog and `TO_FIX.md` had already moved to `0.39.x`. Bumped to match.
+
+### Added
+- `scripts/backfill-dates.mjs` + `npm run backfill-dates`.
+- `test/backfill-dates.test.mjs`, plus new coverage in `test/import-article.test.mjs` (GCI detection) and `test/articles.test.mjs` (`relatedArticles`). 153 tests total (up from 142).
+
+### Removed
+- `site/js/articles.js.orig` and `site/css/articles.css.orig` — stray editor backup files removed from the working tree.
+
+---
+
 ## [0.39.0] — 2026-08-17
 
 ### Added (schema extension — multimedia metadata)

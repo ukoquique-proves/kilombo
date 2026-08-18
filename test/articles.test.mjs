@@ -224,6 +224,33 @@ test('findRelatedArticles — returns an empty array when current article has no
   assert.deepEqual(findRelatedArticles(current, pool), []);
 });
 
+test('findRelatedArticles — explicit relatedArticles are included even with zero shared topics', () => {
+  const current = { ...baseArticle, id: 'cur', topics: ['cine'], relatedArticles: ['variant'] };
+  const pool = [
+    current,
+    { ...baseArticle, id: 'variant', topics: ['otro-tema-totalmente-distinto'] },
+  ];
+  const result = findRelatedArticles(current, pool);
+  assert.deepEqual(result.map((a) => a.id), ['variant']);
+});
+
+test('findRelatedArticles — explicit relatedArticles are ranked ahead of topic-based matches', () => {
+  const current = { ...baseArticle, id: 'cur', topics: ['cine'], relatedArticles: ['variant'] };
+  const pool = [
+    current,
+    { ...baseArticle, id: 'variant', topics: [] },
+    { ...baseArticle, id: 'topic-match', topics: ['cine'] },
+  ];
+  const result = findRelatedArticles(current, pool, 2);
+  assert.deepEqual(result.map((a) => a.id), ['variant', 'topic-match']);
+});
+
+test('findRelatedArticles — a dangling relatedArticles id (no matching article) is silently skipped', () => {
+  const current = { ...baseArticle, id: 'cur', topics: [], relatedArticles: ['does-not-exist'] };
+  const pool = [current];
+  assert.deepEqual(findRelatedArticles(current, pool), []);
+});
+
 // ================================================================
 // renderRelatedArticles
 // ================================================================

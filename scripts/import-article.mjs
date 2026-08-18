@@ -76,16 +76,44 @@ export function upsertArticle(existing, entry, forceUpdate = false) {
 // 1–2. Site detection + extraction
 // ================================================================
 
-/** @param {string} url @returns {'tierra' | 'pi' | 'unknown'} */
+// Hosts known to be a *separate* SPIP instance (GCI — Grupo Comunista
+// Internacionalista) that happens to live under the kilombo.top domain.
+// They are NOT Tierra y Libertad and must never be routed through
+// extractTierra() — see TO_FIX.md item "XX" for the corruption this caused.
+const GCI_HOSTS = new Set([
+  'icg-gci.kilombo.top',
+  'in.kilombo.top',
+  'cdrom.kilombo.top',
+  'icg-old.kilombo.top',
+]);
+
+/** @param {string} url @returns {'tierra' | 'pi' | 'gci' | 'unknown'} */
 export function detectSite(url) {
   const host = (() => {
     try { return new URL(url).hostname; } catch { return ''; }
   })();
+  if (GCI_HOSTS.has(host)) return 'gci';
   if (host === 'www.kilombo.top' || host === 'kilombo.top' || (host.endsWith('.kilombo.top') && host !== 'proletariosinternacionalistas.kilombo.top')) {
     return 'tierra';
   }
   if (host === 'proletariosinternacionalistas.kilombo.top') return 'pi';
   return 'unknown';
+}
+
+/**
+ * Extracts the publication date from a Tierra y Libertad SPIP page. Accepts
+ * both the `id="date-article"` and `class="date-article"` template variants
+ * (docs/EXTRACTION-GAPS-FIXED.md Gap 2 — the `class=` variant is used by
+ * ~51% of Tierra pages and was silently missed by the original id-only
+ * regex). Exported separately so scripts/backfill-dates.mjs can re-run the
+ * exact same extraction logic against already-imported articles that
+ * predate this fix, instead of duplicating the regex.
+ * @param {string} html
+ * @returns {string} the raw date string (e.g. "16 de mayo de 2021"), or '' if not found
+ */
+export function extractTierraDate(html) {
+  const dateMatch = html.match(/(?:id|class)="date-article"[^>]*>[^<]*<span[^>]*>([^<]+)</);
+  return dateMatch ? dateMatch[1].trim() : '';
 }
 
 /**
@@ -97,8 +125,7 @@ export function detectSite(url) {
  */
 export function extractTierra(html) {
   const titleMatch = html.match(/id="titre-article"[^>]*>([^<]{3,300})/);
-  // Date regex now accepts both id= and class= variants (TO_FIX #XX)
-  const dateMatch = html.match(/(?:id|class)="date-article"[^>]*>[^<]*<span[^>]*>([^<]+)</);
+  const date = extractTierraDate(html);
   const bodyMatch = html.match(/id="texte-article"[^>]*>([\s\S]*?)(?:<\/div>\s*(?:<!--\s*Fin texte-article|<!--Affichage du post-sciptum|<div id="pied"|$)|<\/div>\s*(?=<section|<footer|$))/i);
   const descriptifMatch = html.match(/id="descriptif-article"[^>]*>([\s\S]+?)<\/div>/);
 
@@ -126,7 +153,7 @@ export function extractTierra(html) {
 
   return {
     title: titleMatch ? titleMatch[1].trim() : '',
-    date: dateMatch ? dateMatch[1].trim() : '',
+    date,
     bodyHtml: isImageOnly && descriptifMatch ? descriptifMatch[1] : rawBody,
     isImageOnly,
     unextractedMediaWarning,
@@ -270,6 +297,20 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
     throw new Error(
       `No se reconoce el sitio de origen para ${opts.url}. ` +
       `Selectores solo definidos para Tierra y PI — ver TROUBLESHOOTING.md §8.`
+    );
+  }
+  if (site === 'gci') {
+    // No extractGCI() exists yet — GCI is a separate SPIP instance/theme
+    // (different from Tierra's) and its selectors haven't been mapped.
+    // Failing loudly here is intentional: previously these hosts were
+    // silently misclassified as 'tierra' and run through extractTierra(),
+    // which either produced "no se pudo extraer el título" errors or,
+    // worse, extracted the wrong DOM region if a selector matched by
+    // chance. See TO_FIX.md item "XX".
+    throw new Error(
+      `${opts.url} es un host de GCI (${new URL(opts.url).hostname}). ` +
+      `No existe todavía un extractor extractGCI() para la plantilla SPIP de GCI — ` +
+      `ver TO_FIX.md item "XX". Importar manualmente por ahora.`
     );
   }
 

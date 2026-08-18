@@ -1,11 +1,27 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-17 — v0.36.0+; ítems #29, #45, #51 cerrados; seguridad URLs (#ctaUrl/#sourceUrl) resuelta.
+Última actualización: 2026-08-18 — v0.39.1; ítems #29, #45, #51, #59, #60, #61, #62 cerrados; seguridad URLs (#ctaUrl/#sourceUrl) resuelta.
 
 ---
 
 ## 🟢 Recientemente cerrados
+
+- [x] **60. Backfill de fechas para artículos ya importados antes del fix del regex `class=`** — v0.39.1 ✅
+  - El fix de #59 (Gap 2) solo corrigió la extracción para importaciones *futuras*. Los 21 artículos ya importados con el regex antiguo seguían con `date: ""` en `articles.json` (51% del catálogo).
+  - `scripts/backfill-dates.mjs` (nuevo, dry-run por defecto, `--commit` para escribir) re-extrae la fecha usando `extractTierraDate()` (la misma lógica ya corregida en `import-article.mjs`) contra los snapshots locales de `scraped-full/article-{N}.html`, matcheados por `sourceUrl`, y normaliza el string ES/FR a `YYYY-MM-DD`.
+  - **Resultado:** 15 de 21 fechas recuperadas y escritas. 6 quedan sin resolver porque su `sourceUrl` (`article24`, `25`, `26`, `27`, `33`, `48`) no tiene snapshot local en `scraped-full/` — necesitan un fetch en vivo contra kilombo.top o revisión manual (ver ítem nuevo abajo).
+  - Tests: `test/backfill-dates.test.mjs` cubre el normalizador de fechas ES/FR.
+
+- [x] **61. `detectSite()` misclasificaba subdominios GCI como `tierra`** — v0.39.1 ✅
+  - `detectSite()` ahora reconoce explícitamente `icg-gci.kilombo.top`, `in.kilombo.top`, `cdrom.kilombo.top`, `icg-old.kilombo.top` como `'gci'` en vez de dejarlos caer en la rama `tierra`.
+  - No existe todavía `extractGCI()` (la plantilla SPIP de GCI no ha sido mapeada), así que `buildArticleEntry()` ahora falla explícitamente con un mensaje claro para hosts `gci` en vez de silenciosamente extraer con los selectores equivocados de `extractTierra()`. Ver ítem pendiente abajo para el extractor real.
+  - Tests: `test/import-article.test.mjs` — `detectSite recognizes GCI subdomains as "gci"` y `buildArticleEntry rejects GCI hosts loudly`.
+
+- [x] **62. `relatedArticles` — campo de schema documentado y poblado en datos, pero nunca leído por el renderer** — v0.39.1 ✅
+  - `ARTICLES.schema.md` documentaba `relatedArticles` como usado para cross-linking de versiones variantes del mismo contenido, y dos entradas reales (`quilombo-pelicula` / `kilombo-quilombo-pelicula`) lo poblaban — pero `findRelatedArticles()` en `site/js/articles.js` solo miraba `topics` compartidos.
+  - `findRelatedArticles()` ahora resuelve `current.relatedArticles` primero (exento del filtro "debe compartir un tema" — un link editorial explícito es más fuerte que el solape de temas) y rellena el resto del `limit` con las coincidencias por tema, como antes.
+  - Tests: 3 nuevos casos en `test/articles.test.mjs` (inclusión con cero temas compartidos, orden por delante de matches por tema, id colgante silenciosamente ignorado).
 
 - [x] **59. Extraction gaps: unextracted media + date regex variant** — v0.39.1 ✅
   - **Gap 1 (FIXED):** Portfolio images + document links outside body block were silently dropped. Detection added; articles with unextracted media forced to `pending-review` (see `docs/EXTRACTION-GAPS-FIXED.md`)
@@ -52,12 +68,21 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - **Effort**: 15 mins vs. weeks (full IMDb integration)
   - **Status**: Pending user decision on schema extension + priority
 
-- [ ] **XX. Importer: `detectSite()` misclasifica subdominios GCI como `tierra`**
-  - **Problema:** `detectSite()` solo reconoce `'pi'` (Proletarios Internacionalistas) y otherwise treats any `*.kilombo.top` that is not the PI host as `'tierra'`. Esto provoca que dominios del GCI (`icg-gci.kilombo.top`, `in.kilombo.top`, `cdrom.kilombo.top`, `icg-old.kilombo.top`) sean clasificados como `tierra` y pasen por `extractTierra()`.
-  - **Reproducción rápida:** ejecutar el detector/importador contra `icg-gci.kilombo.top` o los otros hosts y observar que devuelve `'tierra'` en lugar de `'unknown'` o un tipo `gci` específico.
-  - **Impacto:** `extractTierra()` espera selectores y estructura del tema SPIP de `www.kilombo.top` (`id="titre-article"`, `id="texte-article"`, `id="date-article"`). GCI es una instancia SPIP separada con plantillas distintas; el importador o bien falla con mensajes como "No se pudo extraer el título automáticamente...", o peor, extrae la región equivocada si algún selector coincide por casualidad. En la práctica, los artículos de GCI no se importan limpiamente.
-  - **Solución sugerida:** actualizar `detectSite()` para reconocer explícitamente los hosts del GCI (o devolver `'unknown'` para hosts no reconocidos) y añadir una extractor `extractGCI()` con selectores adaptados al tema de `icg-gci.kilombo.top` (y `in.kilombo.top` / `cdrom.kilombo.top` cuando proceda). Añadir pruebas unitarias que cubran la detección de host y la extracción por sitio (`test/import-site-detection.test.mjs` / `test/import-extractors.test.mjs`).
-  - **Prioridad:** Alta — evita corrupción silenciosa de imports y pérdidas de contenido al añadir nuevos artículos desde la red GCI.
+- [ ] **63. Falta `extractGCI()` — hosts GCI ahora se detectan correctamente pero no se pueden importar todavía**
+  - **Contexto:** #61 (arriba, cerrado v0.39.1) corrigió `detectSite()` para que ya no clasifique erróneamente los hosts GCI como `tierra`. Pero eso solo cambió el fallo de "silencioso e incorrecto" a "explícito y bloqueante" — todavía no existe un extractor real.
+  - **Pendiente:** escribir `extractGCI()` con selectores adaptados a la plantilla SPIP de `icg-gci.kilombo.top` (y `in.kilombo.top` / `cdrom.kilombo.top` cuando proceda) y quitar el `throw` en `buildArticleEntry()` para el caso `site === 'gci'`.
+  - **Prioridad:** Media — ya no hay riesgo de corrupción silenciosa (ver #61), pero los artículos de la red GCI siguen sin poder importarse por el script hasta que se mapee la plantilla.
+
+- [ ] **64. 6 artículos siguen sin fecha — snapshot local no disponible (`scraped-full/article{24,25,26,27,33,48}.html`)**
+  - `scripts/backfill-dates.mjs` (ver #60, cerrado v0.39.1) recuperó 15 de las 21 fechas vacías desde snapshots locales, pero estos 6 IDs no tienen un `scraped-full/article-{N}.html` correspondiente:
+    - `contre-l-8217-esclavage-et-la-fausse-critique-du-capitalisme-en-general-i` (article24)
+    - `contre-l-8217-esclavage-et-la-fausse-critique-du-capitalisme-en-general-ii` (article25)
+    - `contre-l-esclavage-et-la-fausse-critique-du-capitalisme-en-general-iii` (article26)
+    - `le-covidisme-nbsp-une-nouvelle-religion` (article27)
+    - `gouverner-par-le-chaos` (article33)
+    - `la-pandemie-n-existe-pas` (article48)
+  - **Solución:** re-scrapear estas 6 URLs en vivo (`npm run scrape:full` o similar) para poblar `scraped-full/`, luego volver a correr `node scripts/backfill-dates.mjs --commit`. Alternativamente, mirar la fecha manualmente en `www.kilombo.top` si el scrape no está disponible.
+  - **Prioridad:** Baja — cosmético (fecha "—" en la ficha), no bloquea nada funcionalmente.
 
 - [x] **46. Integrar `dewrapHardBreaks()` en el pipeline de importación (v0.32.0+)** — ✅ Resuelto.
   - **Subítem A** — ✅ `dewrapHardBreaks()` corre como paso 3.5 en `scripts/import-article.mjs`, después de `reduceToAllowlist()` (paso 3) y antes de devolver la entrada (paso 4). Verificado contra `validate-data.mjs` (114 tests + validación de datos en verde).

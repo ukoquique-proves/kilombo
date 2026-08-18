@@ -40,6 +40,7 @@ const DATA_PATH = 'assets/content/articles.json';
  * @property {string} sourceUrl
  * @property {string} status         // imported|adapted|translated|pending-review|external-only
  * @property {string} contentHtml
+ * @property {string[]} [relatedArticles]  // optional, IDs of variant presentations of the same content
  */
 
 /** @returns {Promise<ArticleEntry[]>} */
@@ -179,17 +180,32 @@ export function filterArticlesByQuery(articles, query) {
  * Ranks other articles by how many topics they share with the current one.
  * Ties broken by most recent date first. Articles with zero shared topics
  * are excluded — "related" should mean something, not just "other".
+ *
+ * Explicit `current.relatedArticles` (array of article IDs — see
+ * ARTICLES.schema.md, used to cross-link variant presentations of the same
+ * content, e.g. dubbed/subtitled versions of the same film) are always
+ * included first, ahead of anything found via shared topics, and are
+ * exempt from the "must share a topic" filter: an explicit editorial link
+ * is a stronger signal than topic overlap and shouldn't be dropped just
+ * because the two entries happen not to share a topic tag.
  * @param {ArticleEntry} current
  * @param {ArticleEntry[]} all
  * @param {number} [limit]
  * @returns {ArticleEntry[]}
  */
 export function findRelatedArticles(current, all, limit = 3) {
-  const currentTopics = new Set(current.topics || []);
-  if (currentTopics.size === 0) return [];
+  const byId = new Map(all.map((a) => [a.id, a]));
 
-  const scored = all
-    .filter((a) => a.id !== current.id)
+  /** @type {ArticleEntry[]} */
+  const explicit = (current.relatedArticles || [])
+    .map((id) => byId.get(id))
+    .filter((a) => a && a.id !== current.id);
+
+  const currentTopics = new Set(current.topics || []);
+  const explicitIds = new Set(explicit.map((a) => a.id));
+
+  const scored = currentTopics.size === 0 ? [] : all
+    .filter((a) => a.id !== current.id && !explicitIds.has(a.id))
     .map((a) => {
       const shared = (a.topics || []).filter((t) => currentTopics.has(t)).length;
       return { article: a, shared };
@@ -199,9 +215,10 @@ export function findRelatedArticles(current, all, limit = 3) {
       if (y.shared !== x.shared) return y.shared - x.shared;
       // Most recent first; articles without a date sort last.
       return (y.article.date || '').localeCompare(x.article.date || '');
-    });
+    })
+    .map((x) => x.article);
 
-  return scored.slice(0, limit).map((x) => x.article);
+  return [...explicit, ...scored].slice(0, limit);
 }
 
 /**
