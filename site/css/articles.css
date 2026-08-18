@@ -83,6 +83,38 @@
   border: 1px solid rgba(0,0,0,0.2);
 }
 
+/* ================================================================
+   PENDING-REVIEW STATUS BADGE — card level
+   Distinct visual treatment for pending-review articles: amber/warning
+   color, warning emoji, larger weight. Allows visitors to spot stubs
+   at a glance before clicking in.
+   ================================================================ */
+
+.article-card__status-badge {
+  background: #f57c00;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.2);
+  font-weight: 600;
+  animation: pulse-amber 2s ease-in-out infinite;
+}
+
+@keyframes pulse-amber {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(245, 124, 0, 0.4);
+  }
+  50% {
+    opacity: 0.95;
+    box-shadow: 0 0 0 6px rgba(245, 124, 0, 0);
+  }
+}
+
+.article-card__status-badge--pending {
+  background: #f57c00;
+}
+
 .article-card__title {
   margin: 0 0 0.5rem;
   font-family: 'Playfair Display', Georgia, serif;
@@ -131,6 +163,69 @@
   border-radius: 999px;
   padding: 0.12rem 0.55rem;
   border: 1px solid rgba(0,0,0,0.2);
+}
+
+/* ================================================================
+   PENDING-REVIEW STATUS BADGE — detail page
+   Mirrors card-level badge with same warning color treatment.
+   ================================================================ */
+
+.article-detail__status-badge {
+  background: #666;
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+.article-detail__status-badge--pending {
+  background: #f57c00;
+  color: #ffffff;
+  font-weight: 600;
+  animation: pulse-amber 2s ease-in-out infinite;
+}
+
+/* ================================================================
+   PENDING-REVIEW BANNER — prominently warns reader before content
+   Large warning icon, clear language, distinct background color.
+   Placed at the top of article content so it's impossible to miss.
+   ================================================================ */
+
+.article-pending-banner {
+  display: flex;
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem;
+  background: #fff3e0;
+  border: 2px solid #f57c00;
+  border-radius: 6px;
+  border-left: 6px solid #f57c00;
+}
+
+.article-pending-banner__icon {
+  flex: 0 0 auto;
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-top: 0.2rem;
+}
+
+.article-pending-banner__text {
+  flex: 1;
+  font-family: 'Inter', Verdana, Arial, sans-serif;
+}
+
+.article-pending-banner__text strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #e65100;
+  font-weight: 700;
+}
+
+.article-pending-banner__text p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #bf360c;
 }
 
 .article-detail__content {

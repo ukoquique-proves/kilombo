@@ -94,11 +94,20 @@ export function renderArticleCard(a) {
   const status = escapeHtml(a.status);
   const title = escapeHtml(a.title);
 
+  // Mark the card with a data attribute for CSS styling of pending-review
+  if (a.status === 'pending-review') {
+    el.dataset.statusPendingReview = 'true';
+  }
+
+  const statusHtml = a.status === 'pending-review'
+    ? `<span class="article-card__status-badge article-card__status-badge--pending">⚠️ ${status}</span>`
+    : `<span>${status}</span>`;
+
   el.innerHTML = `
       <div class="article-card__meta">
         <span>${date}</span>
         <span>${sec}</span>
-        <span>${status}</span>
+        ${statusHtml}
       </div>
       <h3 class="article-card__title">${title}</h3>
       ${renderTopics(a.topics)}
@@ -387,10 +396,20 @@ async function initDetailPage() {
 
     titleEl.textContent = a.title;
     document.title = `${a.title} — Kilombo`;
+    
+    // Mark the page/body with a data attribute for pending-review styling
+    if (a.status === 'pending-review') {
+      document.body.dataset.articleStatusPendingReview = 'true';
+    }
+    
+    const statusBadge = a.status === 'pending-review'
+      ? `<span class="article-detail__status-badge article-detail__status-badge--pending">⚠️ ${escapeHtml(a.status)}</span>`
+      : `<span>${escapeHtml(a.status)}</span>`;
+    
     metaEl.innerHTML = `
       <span>${escapeHtml(a.date || '—')}</span>
       <span>${escapeHtml(sectionLabel(a.section))}</span>
-      <span>${escapeHtml(a.status)}</span>
+      ${statusBadge}
     `.trim();
 
     // contentHtml viene de un JSON versionado en el repo, pero puede haber
@@ -400,6 +419,21 @@ async function initDetailPage() {
     // URLs javascript:/data:, conservando solo un allowlist de etiquetas
     // de formato (p, a, strong, em, listas, blockquote, img, ...).
     contentEl.innerHTML = '';
+    
+    // If pending-review, prepend a visual banner before the content
+    if (a.status === 'pending-review') {
+      const banner = document.createElement('div');
+      banner.className = 'article-pending-banner';
+      banner.innerHTML = `
+        <div class="article-pending-banner__icon">⚠️</div>
+        <div class="article-pending-banner__text">
+          <strong>Artículo pendiente de revisión</strong>
+          <p>Este contenido ha sido importado como borrador y necesita ser completado, revisado y adaptado antes de su publicación final. El texto a continuación es preliminar y servirá como guía para futuras ediciones.</p>
+        </div>
+      `;
+      contentEl.appendChild(banner);
+    }
+    
     contentEl.appendChild(sanitizeHtml(a.contentHtml || ''));
 
     initReadingProgress();
