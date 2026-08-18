@@ -137,6 +137,16 @@ export function filterArticlesByTopic(articles, topic) {
 }
 
 /**
+ * @param {ArticleEntry[]} articles
+ * @param {string|null} section  null/'' means "no filter, show all"
+ * @returns {ArticleEntry[]}
+ */
+export function filterArticlesBySection(articles, section) {
+  if (!section) return articles;
+  return articles.filter((a) => a.section === section);
+}
+
+/**
  * Case-insensitive substring match against title + topics. Empty/blank
  * query returns every article unchanged.
  * @param {ArticleEntry[]} articles
@@ -223,6 +233,11 @@ function getTopicFromUrl() {
   return params.get('topic') || null;
 }
 
+function getSectionFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('section') || null;
+}
+
 function getQueryFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get('q') || '';
@@ -296,6 +311,7 @@ async function initIndexPage() {
     let activeTopic = getTopicFromUrl();
     if (activeTopic && !topics.includes(activeTopic)) activeTopic = null;
     let activeQuery = getQueryFromUrl();
+    let activeSection = getSectionFromUrl();
     if (searchInput) searchInput.value = activeQuery;
 
     const render = () => {
@@ -304,15 +320,21 @@ async function initIndexPage() {
       else url.searchParams.delete('topic');
       if (activeQuery) url.searchParams.set('q', activeQuery);
       else url.searchParams.delete('q');
+      if (activeSection) url.searchParams.set('section', activeSection);
+      else url.searchParams.delete('section');
       window.history.replaceState({}, '', url);
+
+      const sectionFiltered = filterArticlesBySection(articles, activeSection);
+      const topicsInSection = getAllTopics(sectionFiltered);
+      if (activeTopic && !topicsInSection.includes(activeTopic)) activeTopic = null;
 
       if (filterBarSlot) {
         filterBarSlot.innerHTML = '';
-        filterBarSlot.appendChild(renderFilterBar(topics, activeTopic, applyTopic));
+        filterBarSlot.appendChild(renderFilterBar(topicsInSection, activeTopic, applyTopic));
       }
 
       const filtered = filterArticlesByQuery(
-        filterArticlesByTopic(articles, activeTopic),
+        filterArticlesByTopic(sectionFiltered, activeTopic),
         activeQuery
       );
       renderList(list, filtered);
@@ -330,13 +352,7 @@ async function initIndexPage() {
       });
     }
 
-    if (filterBarSlot && topics.length > 0) {
-      filterBarSlot.appendChild(renderFilterBar(topics, activeTopic, applyTopic));
-    }
-    renderList(
-      list,
-      filterArticlesByQuery(filterArticlesByTopic(articles, activeTopic), activeQuery)
-    );
+    render();
   } catch (e) {
     console.error('[articulos]', e);
     renderEmptyState(list, 'Error cargando el índice de artículos. Intenta recargar la página.');

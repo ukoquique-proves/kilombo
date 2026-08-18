@@ -17,6 +17,7 @@ import {
   renderArticleCard,
   getAllTopics,
   filterArticlesByTopic,
+  filterArticlesBySection,
   filterArticlesByQuery,
   renderFilterBar,
   findRelatedArticles,
@@ -268,6 +269,44 @@ test('filterArticlesByQuery — returns an empty array when nothing matches', ()
 });
 
 
+
+// ================================================================
+// filterArticlesBySection
+// ================================================================
+
+test('filterArticlesBySection — returns all articles when section is null', () => {
+  const articles = [
+    { id: 'a', section: 'tierra', topics: [] },
+    { id: 'b', section: 'pi',     topics: [] },
+  ];
+  assert.deepEqual(filterArticlesBySection(articles, null), articles);
+});
+
+test('filterArticlesBySection — returns all articles when section is empty string', () => {
+  const articles = [
+    { id: 'a', section: 'tierra', topics: [] },
+    { id: 'b', section: 'pi',     topics: [] },
+  ];
+  assert.deepEqual(filterArticlesBySection(articles, ''), articles);
+});
+
+test('filterArticlesBySection — keeps only articles matching the section', () => {
+  const articles = [
+    { id: 'a', section: 'tierra', topics: [] },
+    { id: 'b', section: 'pi',     topics: [] },
+    { id: 'c', section: 'pi',     topics: [] },
+  ];
+  const result = filterArticlesBySection(articles, 'pi');
+  assert.equal(result.length, 2);
+  assert.ok(result.every(a => a.section === 'pi'));
+});
+
+test('filterArticlesBySection — returns empty array for a section no article has', () => {
+  const articles = [
+    { id: 'a', section: 'tierra', topics: [] },
+  ];
+  assert.deepEqual(filterArticlesBySection(articles, 'gci'), []);
+});
 
 // ================================================================
 // safeHref — sourceUrl scheme guard (TO_FIX: javascript: in sourceUrl)
