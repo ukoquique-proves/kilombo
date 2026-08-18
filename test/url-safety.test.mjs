@@ -22,6 +22,18 @@ const unsafeUrls = [
   'vbscript:msgbox("hi")',
 ];
 
+// Browsers strip control characters (tab, newline, CR) from *anywhere* in
+// a URL before parsing its scheme — not just leading whitespace — so
+// these all resolve to a plain "javascript:" URL at render time. A
+// scheme check that only trims a leading \s* misses them.
+const controlCharBypassUrls = [
+  'jav\tascript:alert(1)',
+  'java\nscript:alert(1)',
+  'javascript\r:alert(1)',
+  'j\ta\nv\ra\tscript:alert(1)',
+  '\tjavascript:alert(1)',
+];
+
 const relativeUrls = [
   '/foo/bar',
   'images/pic.png',
@@ -45,4 +57,10 @@ test('isImportableUrl rejects both unsafe and relative URLs', () => {
   assert.equal(isImportableUrl('#anchor'), true);
   assert.equal(isImportableUrl('mailto:test@example.com'), true);
   for (const url of [...unsafeUrls, ...relativeUrls]) assert.equal(isImportableUrl(url), false, `should reject ${url}`);
+});
+
+test('isSafeUrl rejects control-character scheme bypass (tab/newline/CR)', () => {
+  for (const url of controlCharBypassUrls) {
+    assert.equal(isSafeUrl(url), false, `should reject ${JSON.stringify(url)}`);
+  }
 });

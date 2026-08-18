@@ -168,7 +168,11 @@ const ARTICLE_RULES = [
       // instead of relying solely on the runtime sanitizer.
       if (/<script[\s>]/i.test(s)) return 'contentHtml must not contain <script> tags';
       if (/\son\w+\s*=/i.test(s)) return 'contentHtml must not contain inline event-handler attributes (on...=)';
-      if (/(?:href|src)\s*=\s*["']?\s*(?:javascript|data|vbscript):/i.test(s)) {
+      // Normalized the same way isSafeUrl() does: browsers strip control
+      // characters (tab/newline/CR) from anywhere in a URL before parsing
+      // its scheme, so "jav\tascript:" resolves to "javascript:" at
+      // render time even though it doesn't match this pattern literally.
+      if (/(?:href|src)\s*=\s*["']?\s*(?:javascript|data|vbscript):/i.test(s.replace(/[\x00-\x1F\x7F]+/g, ''))) {
         return 'contentHtml must not contain javascript:/data:/vbscript: URLs';
       }
       const urlError = validateContentHtmlUrls(s);

@@ -83,7 +83,8 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - **Fix aplicado** (v0.35.0+): 
     - Patch manual: removidos todos los `\n` intra-párrafo en los 2 artículos afectados
     - Script de detección `scripts/detect-fixed-column-corruption.mjs` creado para scan futuro (ejecutable vía `npm run check-corruption`)
-    - Resultado post-scan: 0 artículos afectados (solo esos 2, ya reparados)
+    - Resultado post-scan (**corregido**, ver nota abajo): 0 artículos afectados (solo esos 2, ya reparados)
+  - **⚠️ Nota de corrección (v0.38.0+)**: el regex original de `detectFixedColumnCorruption()` era `/<p>([^<]*\\n[^<]*)<\/p>/g` — buscaba los dos caracteres literales `\` + `n`, no un salto de línea real. Tras `JSON.parse()`, un `\n` de JSON se convierte en un carácter de newline real (code 10) en el string de JS, así que ese regex nunca coincidía con contenido corrupto real: el scan de "0 artículos afectados" nunca ejecutó una comprobación efectiva, para ningún dataset. Corregido a `/<p>([^<]*\n[^<]*)<\/p>/g` (backslash simple = newline real). Re-ejecutado contra el `articles.json` actual (33 artículos) con el detector corregido: 0 artículos afectados — confirmado esta vez con una comprobación que sí detecta el patrón (ver `test/detect-fixed-column-corruption.test.mjs`, que incluye un fixture con saltos de línea reales y falla si el regex vuelve a regresar al patrón roto).
   - **Acción preventiva**: En futuras sesiones, antes de hacer merge de un import masivo:
     1. Ejecutar `npm run check-corruption` para scan de todo `articles.json`
     2. Si se encuentran artículos afectados, aplicar `npm run check-corruption -- --fix` (experimental, requiere revisión manual)

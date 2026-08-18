@@ -18,6 +18,29 @@
 const UNSAFE_URL_SCHEMES = /^\s*(javascript|data|vbscript):/i;
 const ABSOLUTE_OR_EXEMPT = /^(https?:\/\/|#|mailto:)/i;
 
+// Per the WHATWG URL spec, browsers strip all "C0 control or space" chars
+// — and specifically tab (\t), newline (\n) and carriage return (\r) —
+// from *anywhere* in a URL before parsing its scheme, not just from the
+// start. A string like "jav\tascript:alert(1)" therefore resolves to
+// "javascript:alert(1)" in the browser even though it doesn't match
+// /^\s*javascript:/ literally. Stripping the same characters before
+// testing keeps this check aligned with how the string will actually be
+// interpreted once it lands in the DOM.
+const STRIPPED_CONTROL_CHARS = /[\x00-\x1F\x7F]+/g;
+
+/**
+ * Normalizes a URL the same way a browser does before scheme-sniffing it:
+ * removes control characters (tab, newline, CR, and other C0 controls)
+ * that would otherwise be silently dropped during URL parsing, so a
+ * pattern like `jav\tascript:` can't smuggle a dangerous scheme past a
+ * naive `^javascript:` check.
+ * @param {unknown} url
+ * @returns {string}
+ */
+function normalizeForSchemeCheck(url) {
+  return String(url).replace(STRIPPED_CONTROL_CHARS, '');
+}
+
 /**
  * True if `url` is not a javascript:/data:/vbscript: URL. This is the XSS
  * guard — a failure here means the URL could execute code if inserted into
@@ -26,7 +49,7 @@ const ABSOLUTE_OR_EXEMPT = /^(https?:\/\/|#|mailto:)/i;
  * @returns {boolean}
  */
 export function isSafeUrl(url) {
-  return !UNSAFE_URL_SCHEMES.test(String(url));
+  return !UNSAFE_URL_SCHEMES.test(normalizeForSchemeCheck(url));
 }
 
 /**

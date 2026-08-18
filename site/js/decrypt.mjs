@@ -62,7 +62,7 @@ export async function aesDecrypt(ciphertext, hashedPassword) {
  * @param {string} jsonText  Raw text from fetch()
  * @returns {Promise<any>}   Parsed JSON value (array, object, …)
  * @throws  If the content is encrypted but no password is found in
- *          sessionStorage (user bypassed the login page).
+ *          localStorage (user bypassed the login page).
  */
 export async function parseJson(jsonText) {
   let parsed;

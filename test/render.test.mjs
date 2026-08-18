@@ -310,6 +310,14 @@ test('sanitizeHtml — strips data: URLs from href', () => {
   assert.ok(!html.includes('data:'), 'must not contain a data: URL');
 });
 
+test('sanitizeHtml — strips javascript: URLs hidden with embedded control characters', () => {
+  // Browsers strip tab/newline/CR from anywhere in a URL before parsing
+  // its scheme, so "jav\tascript:" resolves to "javascript:" at render
+  // time even though it isn't a literal prefix match.
+  const html = fragmentToHtml(sanitizeHtml('<a href="jav\tascript:alert(1)">click</a>'));
+  assert.ok(!html.includes('href='), 'tab-obfuscated javascript: href must be dropped');
+});
+
 test('sanitizeHtml — keeps allowed formatting tags and safe links', () => {
   const html = fragmentToHtml(
     sanitizeHtml('<p>Text with <strong>bold</strong> and <a href="https://example.com">a link</a>.</p>')
@@ -439,4 +447,10 @@ test('renderCard — javascript: with mixed case is blocked (JAVASCRIPT:)', () =
   const card = renderCard({ ...baseVideo, ctaUrl: 'JAVASCRIPT:alert(1)' });
   const a = card.querySelector('a.video-card__cta');
   assert.equal(a.getAttribute('href'), '#');
+});
+
+test('renderCard — javascript: hidden with an embedded tab is blocked', () => {
+  const card = renderCard({ ...baseVideo, ctaUrl: 'jav\tascript:alert(1)' });
+  const a = card.querySelector('a.video-card__cta');
+  assert.equal(a.getAttribute('href'), '#', 'tab-obfuscated javascript: must not slip through');
 });

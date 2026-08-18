@@ -40,9 +40,14 @@ const ARTICLES_PATH = resolve(__dirname, '../site/assets/content/articles.json')
  * @param {string} html
  * @returns {{ found: boolean, lineCount: number, avgLineLength: number, examples: string[] }}
  */
-function detectFixedColumnCorruption(html) {
-  // Extract all text that appears inside <p> tags that contains \n
-  const pTagMatches = html.match(/<p>([^<]*\\n[^<]*)<\/p>/g) || [];
+export function detectFixedColumnCorruption(html) {
+  // Extract all text that appears inside <p> tags that contains a real
+  // embedded newline character. NOTE: after JSON.parse(), a JSON \n escape
+  // decodes to an actual newline (charCode 10) in the JS string — so this
+  // must match on /\n/ (a real newline), not /\\n/ (the two literal
+  // characters backslash+n). The previous /\\n/ pattern never matched any
+  // real corrupted content and always reported "0 articles affected".
+  const pTagMatches = html.match(/<p>([^<]*\n[^<]*)<\/p>/g) || [];
 
   if (pTagMatches.length === 0) {
     return { found: false, lineCount: 0, avgLineLength: 0, examples: [] };
@@ -91,7 +96,7 @@ function detectFixedColumnCorruption(html) {
  * @param {string} html
  * @returns {string}
  */
-function repairFixedColumnCorruption(html) {
+export function repairFixedColumnCorruption(html) {
   // Replace all \n characters inside <p> tags with spaces
   // This is a simple repair; a more sophisticated approach would preserve
   // paragraph breaks if they occurred at blank lines, but this corpus
@@ -148,7 +153,13 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error('❌ Error:', err.message);
-  process.exit(1);
-});
+// Guarded like the other CLI scripts in scripts/ (import-article.mjs,
+// i18n-coverage.mjs) so importing this module — e.g. from a test file —
+// doesn't immediately scan (or, with --fix, overwrite) the real
+// articles.json as a side effect of the import itself.
+if (fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((err) => {
+    console.error('❌ Error:', err.message);
+    process.exit(1);
+  });
+}
