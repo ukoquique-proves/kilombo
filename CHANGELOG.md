@@ -5,6 +5,75 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.39.0] — 2026-08-17
+
+### Added (schema extension — multimedia metadata)
+- **`site/assets/content/articles.json` — schema extension**: three optional fields added for multimedia articles (films, documentaries, media):
+  - `externalLinks[]` — array of {type, url, title} for alternate viewing platforms (YouTube, IMDb, ok.ru, etc.)
+  - `metadata{}` — structured metadata (director, year, country, duration, language, subtitles, source, etc.) displayed as ficha técnica card
+  - `relatedArticles[]` — array of article IDs referencing variant presentations of the same content (translations, alternate viewing options)
+  - All fields are optional; backward compatible with 41 existing articles that lack them
+
+- **`site/assets/content/ARTICLES.schema.md`** (nuevo): TypeScript-style schema reference documentation with:
+  - Field specifications and validation rules
+  - Complete example (Quilombo film article with all optional fields)
+  - Example of minimal article (no metadata, backward compatible)
+  - Guidance for future multimedia imports
+
+- **`site/js/articles.js` — `initDetailPage()`**: conditional rendering pipeline:
+  - If `a.metadata` exists: render `.article-metadata-card` after `contentHtml` with director, year, country, duration, language, subtitles in responsive grid layout
+  - If `a.externalLinks` exists: render `.article-external-links-card` with prominently styled link buttons (type badges: youtube, imdb, ok.ru, etc.)
+  - Both cards render AFTER content but BEFORE source attribution
+  - Articles without these fields render unchanged (zero breaking changes)
+
+- **`site/css/articles.css`** — two new card styles:
+  - `.article-metadata-card` — red theme (#ffe0e0 background, #c41e3a left border), responsive 2-column grid for label+value pairs, clear typography
+  - `.article-external-links-card` — blue theme (#e3f2fd background, #1976d2 left border), flex layout with prominent link buttons, hover effects, type badges
+
+### Changed (documentation — v0.39.0 impact)
+- **`ROADMAP.md`**: added v0.39.0 section after v0.38.0 with:
+  - Philosophy: handling multimedia articles (films, docs) that need structured metadata + multi-platform links
+  - Implementation status: 6 sub-tasks all completed (schema extension, articles 36 & 46 research & completion, UI rendering, tests, documentation)
+  - Example JSON structure (Quilombo 1984 film)
+  - UI impact on article detail pages
+  - Backward compatibility guarantees
+  - Future roadmap (schema extension pattern for other multimedia types)
+
+- **`docs/MIRROR_GROWING.md` § 2.3**: updated article incorporation process step 3 to document optional v0.39.0 fields:
+  - Listed `externalLinks`, `metadata`, `relatedArticles` as optional fields for multimedia articles
+  - Reference to `ARTICLES.schema.md` for detailed specification
+  - Example use case: film articles with director/year/country/links
+
+### Completed (articles 36 & 46 — Quilombo film)
+- **Article 36 `quilombo-pelicula`**: 
+  - Research completed: Quilombo (1984), dir. Carlos Diegues, 110 min, Portuguese, Brasil, Cannes Film Festival 1984
+  - Status changed: `pending-review` → `imported`
+  - Added: externalLinks (YouTube, IMDb), full metadata, expanded contentHtml with film synopsis, relatedArticles reference to article 46
+  - Added: full ficha técnica in metadata (director: "Carlos Diegues (Cacá Diegues)", year: 1984, country: "Brasil", duration: "110 min", language: "Portugués", subtitles: "English, Spanish")
+
+- **Article 46 `kilombo-quilombo-pelicula`**:
+  - Confirmed: same film as article 36, but different presentation (embedded ok.ru players with Spanish/English subtitles vs. YouTube link)
+  - Status changed: `pending-review` → `imported`
+  - Added: externalLinks (2x ok.ru, YouTube, IMDb), same metadata as 36, expanded contentHtml explaining it's the subtitled variant, relatedArticles reference to article 36
+  - Treated as separate articles (cross-referenced via relatedArticles) rather than merged, preserving both viewing options
+
+### Tests
+- **`npm test` result**: all 142 unit tests + data validation + URL consistency + badge checks passing
+- **Data validation**: 43 articles valid (41 imported without metadata + 2 newly completed movies with full metadata)
+- **URL consistency**: 7 URLs verified across sources
+- **Badge checks**: 11 cards with correct Level 1 / Level 2 indicators
+- **No breaking changes**: 41 articles without metadata unaffected; 2 new metadata-enhanced articles render correctly with new cards
+
+### Summary
+- ✅ Schema extended for multimedia articles (optional fields maintain backward compatibility)
+- ✅ Articles 36 & 46 (Quilombo film) researched, completed, and imported with full metadata
+- ✅ Metadata card + external links card rendering implemented in article detail pages
+- ✅ Documentation created and integrated (ARTICLES.schema.md, ROADMAP.md v0.39.0, MIRROR_GROWING.md updated)
+- ✅ 142/142 tests passing, 43 total articles (41 + 2 new), no breaking changes
+- ✅ UI visually renders films with director/year/country/duration/links (if metadata present)
+
+---
+
 ## [0.37.1] — 2026-08-18
 
 ### Fixed (source import robustness)
