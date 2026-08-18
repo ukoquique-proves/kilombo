@@ -4,7 +4,52 @@
 
 ---
 
-## FASE INMEDIATA (Próximas 3 sesiones) — Sistema de filtrado interactivo 3-tiers
+## FASE INMEDIATA (Próximas 3 sesiones) — Visual distinction for draft content + System de filtrado interactivo 3-tiers
+
+### v0.38.0 — Visual signals for incomplete content (pending-review articles)
+
+**Objetivo:** El espejo sirve como guía para **futuras ediciones**, no como publicación final. Los artículos importados como borradores (sin contenido completo o con imágenes que necesitan descripción) llevan etiqueta `status: pending-review` + notas sobre qué falta. Esta versión hace que esa etiqueta sea **visualmente imposible de pasar por alto** — no solo texto, sino un indicador visual claro en listas y en páginas de detalle.
+
+#### Filosofía del cambio
+- **Principio:** La incompletitud no es un "error" sino una invitación a la acción futura. El mirror preserva los candidatos y marca explícitamente qué necesita completarse.
+- **Implementación:** 
+  - En tarjetas de lista: badge de color ámbar (#f57c00) con emoji ⚠️ + animación de pulso
+  - En página de detalle: badge + banner prominente antes del contenido explicando que es un borrador
+  - Notas en JSON (`notes` field) guían qué falta (sinopsis, ficha técnica, enlaces, contexto)
+
+#### Especificación visual
+
+**Card level (articulos.html):**
+- Status `pending-review` → badge naranja (#f57c00) con ⚠️ emoji
+- Texto: "⚠️ pending-review" (en lugar del texto plano "pending-review")
+- Animación: pulso suave (opacidad + box-shadow) cada 2 segundos
+- Contraste: es lo primero que ves en la tarjeta, visualmente distinto de otros status
+
+**Detail page (articulo.html):**
+- Status badge: mismo color ámbar, misma animación
+- Banner prominente encima del contenido:
+  - Título: "⚠️ Artículo pendiente de revisión"
+  - Texto: "Este contenido ha sido importado como borrador y necesita ser completado, revisado y adaptado antes de su publicación final. El texto a continuación es preliminar y servirá como guía para futuras ediciones."
+  - Fondo: naranja claro (#fff3e0), borde izquierdo grueso naranja (#f57c00)
+  - Icono grande, tipografía clara para lectura rápida
+
+#### Casos de uso del mirror como guía
+
+Los 6 artículos importados en v0.37.0 ejemplifican esto:
+
+- **36, 46 (películas):** stubs de 1 frase → Notas indican: añadir sinopsis, ficha técnica, cómo/dónde verlas, por qué relevantes para Tierra y Libertad
+- **76, 85, 86 (image-only):** imágenes sin texto → Notas: transcribir texto de imágenes o añadir descripción, fecha, contexto
+- **84 (ensayo plandemismo):** único con texto real (~800 chars) → Notas: limpiar artefactos, estructurar mejor, añadir contexto sobre el documental
+
+Cada nota es un **task list** para futura edición. El mirror es el mapa de trabajo.
+
+- [x] **0.38.1 — Implementar marcado visual en cards** — badge naranja con emoji ⚠️, animación de pulso ✅
+- [x] **0.38.2 — Implementar banner en detail page** — naranja claro, texto descriptivo ✅
+- [x] **0.38.3 — Añadir animación CSS (pulse-amber)** ✅
+- [x] **0.38.4 — Testear en articulos.html y articulo.html** ✅
+- [x] **0.38.5 — Verificar contrast ratio (WCAG AA)** — naranja #f57c00 sobre texto blanco cumple ✅
+
+---
 
 ### v0.32.0 — Transformar badges estáticos en controles funcionales
 
@@ -384,7 +429,8 @@ El deploy se hace al final de cada sesión de trabajo con `./end-of-session.sh`,
 
 | Bloque | Estado | Tiempo estimado |
 |--------|--------|-----------------|
-| **0. Sistema de filtrado interactivo 3-tiers (v0.32)** | Pendiente — spec completa, sin empezar (ver `FASE INMEDIATA` al inicio de este documento) | 3 sesiones (~6h) |
+| **0. Señalización visual para artículos pendientes (v0.38.0)** | ✅ Completado — badges ámbar + animación + banner en detalle | — |
+| **0b. Sistema de filtrado interactivo 3-tiers (v0.32)** | Pendiente — spec completa, sin empezar | 3 sesiones (~6h) |
 | **1. Flujo de subida / deploy** | ✅ GitHub Pages activo (`ukoquique-proves.github.io/kilombo/`) — deploy a `kilombo.top` aplazado a fase futura | — |
 | **2. Plandemismo + videos Canal7 (Actualidad + SIDA→COVID)** | ✅ Construido y poblado — pendiente URLs reales y subtítulos FR | — |
 | **3. Transcripción + publicación audios WhatsApp** | Pendiente | 2 – 7 días |
