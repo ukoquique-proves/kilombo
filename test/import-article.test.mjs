@@ -109,3 +109,63 @@ test('convertSpipMarkup turns SPIP markup into tags', () => {
   const html = 'Hola {{bold}} y {italic}';
   assert.equal(convertSpipMarkup(html), 'Hola <strong>bold</strong> y <em>italic</em>');
 });
+
+test('extractTierra extracts date using id="date-article" (original regex)', () => {
+  const html = `
+    <div id="date-article"><span>15 de agosto de 2021</span></div>
+    <div id="texte-article"><p>Body</p></div>
+  `;
+  const extracted = extractTierra(html);
+  assert.equal(extracted.date, '15 de agosto de 2021');
+});
+
+test('extractTierra extracts date using class="date-article" (new regex variant, Gap 2 fix)', () => {
+  const html = `
+    <div class="date-article">Artículo puesto en línea el <span class="majuscules">8 de junio de 2021</span></div>
+    <div id="texte-article"><p>Body</p></div>
+  `;
+  const extracted = extractTierra(html);
+  assert.equal(extracted.date, '8 de junio de 2021');
+});
+
+test('extractTierra detects unextracted portfolio images (Gap 1 fix)', () => {
+  const html = `
+    <div id="titre-article">Test Article</div>
+    <div id="texte-article">
+      <p>Simple text with <a href="doc.pdf">PDF link</a></p>
+    </div>
+    <div class="portfolio">
+      <img src="image-1.jpg" alt="">
+      <img src="image-2.jpg" alt="">
+      <img src="image-3.jpg" alt="">
+    </div>
+  `;
+  const extracted = extractTierra(html);
+  assert.ok(extracted.unextractedMediaWarning);
+  assert.match(extracted.unextractedMediaWarning, /3 imágenes de galería/);
+});
+
+test('extractTierra detects document link with insufficient context text (Gap 1 fix)', () => {
+  const html = `
+    <div id="titre-article">Document Article</div>
+    <div id="texte-article">
+      <p><a href="document.pdf">Descargar</a></p>
+    </div>
+  `;
+  const extracted = extractTierra(html);
+  assert.ok(extracted.unextractedMediaWarning);
+  assert.match(extracted.unextractedMediaWarning, /enlace a descarga/);
+});
+
+test('extractTierra does NOT flag unextracted media for articles with substantial context', () => {
+  const html = `
+    <div id="titre-article">Normal Article</div>
+    <div id="texte-article">
+      <p>This is a substantial article with lots of real text content that provides context.</p>
+      <p>Multiple paragraphs ensure enough text is extracted to justify any attached PDF or media.</p>
+      <p><a href="supplementary.pdf">Ver documento completo</a> para más detalles.</p>
+    </div>
+  `;
+  const extracted = extractTierra(html);
+  assert.ok(!extracted.unextractedMediaWarning);
+});

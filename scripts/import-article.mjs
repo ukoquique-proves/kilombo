@@ -93,11 +93,12 @@ export function detectSite(url) {
  * SPIP page. See TROUBLESHOOTING.md §8 for why the generic `class="texte"`
  * selector fails (it matches the sidebar too).
  * @param {string} html
- * @returns {{ title: string, date: string, bodyHtml: string, isImageOnly: boolean }}
+ * @returns {{ title: string, date: string, bodyHtml: string, isImageOnly: boolean, unextractedMediaWarning?: string }}
  */
 export function extractTierra(html) {
   const titleMatch = html.match(/id="titre-article"[^>]*>([^<]{3,300})/);
-  const dateMatch = html.match(/id="date-article"[^>]*>[^<]*<span[^>]*>([^<]+)</);
+  // Date regex now accepts both id= and class= variants (TO_FIX #XX)
+  const dateMatch = html.match(/(?:id|class)="date-article"[^>]*>[^<]*<span[^>]*>([^<]+)</);
   const bodyMatch = html.match(/id="texte-article"[^>]*>([\s\S]*?)(?:<\/div>\s*(?:<!--\s*Fin texte-article|<!--Affichage du post-sciptum|<div id="pied"|$)|<\/div>\s*(?=<section|<footer|$))/i);
   const descriptifMatch = html.match(/id="descriptif-article"[^>]*>([\s\S]+?)<\/div>/);
 
@@ -105,13 +106,30 @@ export function extractTierra(html) {
   const plainTextLength = rawBody.replace(/<[^>]+>/g, '').trim().length;
   const hasLink = /<a\s+[^>]*href=/i.test(rawBody);
   const hasMediaLink = /<a\s+[^>]*href=(?:['"])?(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|[^'"\s]+\.(?:mp4|webm|m3u8))/i.test(rawBody);
+  
+  // Gap 1: Check for unextracted media (portfolio images outside body, document links)
+  // This forces pending-review even if bodyMatch contains a link, because the
+  // real content (images or PDF) lives outside the extracted text block.
+  const portfolioImages = html.match(/<div[^>]*class="[^"]*portfolio[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+  const unextractedImgCount = portfolioImages ? (portfolioImages[1].match(/<img/gi) || []).length : 0;
+  const hasDocumentLink = /<a[^>]*href=(?:['"])?[^'"\s]*\.(?:pdf|doc|docx|xls|xlsx|zip|rar|7z)['"']?/i.test(rawBody);
+  const documentLinkWithoutContext = hasDocumentLink && plainTextLength < 100;
+  const hasUnextractedMedia = unextractedImgCount > 0 || documentLinkWithoutContext;
+
   const isImageOnly = plainTextLength < 200 && !hasLink && !hasMediaLink;
+  
+  let unextractedMediaWarning;
+  if (hasUnextractedMedia && !isImageOnly) {
+    // Article has text, but there's a document link or external gallery that wasn't extracted
+    unextractedMediaWarning = `Documento adjunto (${unextractedImgCount > 0 ? unextractedImgCount + ' imágenes de galería' : 'enlace a descarga'}) no extraído de la sección de cuerpo.`;
+  }
 
   return {
     title: titleMatch ? titleMatch[1].trim() : '',
     date: dateMatch ? dateMatch[1].trim() : '',
     bodyHtml: isImageOnly && descriptifMatch ? descriptifMatch[1] : rawBody,
     isImageOnly,
+    unextractedMediaWarning,
   };
 }
 
@@ -281,7 +299,21 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
   }
 
   const id = opts.id || slugify(extracted.title);
-  const status = opts.status || (extracted.isImageOnly ? 'pending-review' : 'imported');
+  
+  // Gap 2: If unextractedMediaWarning exists, force pending-review regardless of 
+  // the normal isImageOnly heuristic. This ensures articles with galleries, 
+  // embedded PDFs, or other unextracted content get flagged for human review.
+  let status = opts.status;
+  if (!status) {
+    if (extracted.unextractedMediaWarning) {
+      status = 'pending-review';
+      console.warn(`⚠️  ${id}: ${extracted.unextractedMediaWarning} — marcado como pending-review`);
+    } else {
+      status = extracted.isImageOnly ? 'pending-review' : 'imported';
+    }
+  }
+
+  const notes = extracted.unextractedMediaWarning ? [extracted.unextractedMediaWarning] : undefined;
 
   return {
     id,
@@ -293,6 +325,7 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
     sourceUrl: opts.url,
     status,
     contentHtml: body,
+    ...(notes && { notes }),
   };
 }
 
