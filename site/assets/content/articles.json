@@ -440,5 +440,77 @@
     "sourceUrl": "https://www.kilombo.top/spip.php?article34",
     "status": "pending-review",
     "contentHtml": "<p>Como deshumanizan a los niños en las escuelas.</p>"
+  },
+  {
+    "id": "quilombo-pelicula",
+    "title": "Quilombo — Película",
+    "date": "",
+    "section": "tierra",
+    "topics": ["cine", "quilombo", "historia", "tierra-y-libertad"],
+    "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
+    "sourceUrl": "https://www.kilombo.top/spip.php?article36",
+    "status": "pending-review",
+    "notes": "PENDIENTE: El artículo en la fuente original contiene solo una línea de texto. Completar con: sinopsis de la película, ficha técnica (director, año, país), enlace a donde verla, y por qué es relevante para el espacio Kilombo/quilombo como referencia histórica de lucha por tierra y libertad.",
+    "contentHtml": "<p>La importante película sobre los Kilombos (o quilombos) históricos — espacios de lucha humana por Tierra y Libertad.</p><p><em>Este artículo es un marcador provisional. El contenido completo está pendiente: ver nota en el campo <code>notes</code> del JSON y la fuente original.</em></p>"
+  },
+  {
+    "id": "kilombo-quilombo-pelicula",
+    "title": "Kilombo/Quilombo — Película (versión EN/ES)",
+    "date": "",
+    "section": "tierra",
+    "topics": ["cine", "quilombo", "historia", "tierra-y-libertad"],
+    "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
+    "sourceUrl": "https://www.kilombo.top/spip.php?article46",
+    "status": "pending-review",
+    "notes": "PENDIENTE: Pieza complementaria al artículo 36 (Quilombo PELÍCULA). El original indica que es la versión en portugués con subtítulos en inglés/español. Verificar si es el mismo film u otro. Completar con sinopsis, ficha técnica y contexto. Confirmar si es duplicado o complemento del artículo 36 antes de publicar.",
+    "contentHtml": "<p>Película en portugués con subtítulos en inglés/español sobre los quilombos — espacios históricos de resistencia y libertad.</p><p><em>Este artículo es un marcador provisional. Verificar relación con el artículo «Quilombo — Película» (article36). Ver nota en <code>notes</code> y fuente original.</em></p>"
+  },
+  {
+    "id": "transformacion-registros-akashicos",
+    "title": "Transformación — Registros Akáshicos",
+    "date": "",
+    "section": "tierra",
+    "topics": ["salud-alternativa", "espiritualidad", "transformacion"],
+    "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
+    "sourceUrl": "https://www.kilombo.top/spip.php?article76",
+    "status": "pending-review",
+    "notes": "PENDIENTE: El artículo original consiste únicamente en imágenes (documentos gráficos). Completar con: transcripción o descripción del contenido de las imágenes, contexto sobre los Registros Akáshicos y su relación con la línea editorial del espacio Tierra y Libertad.",
+    "contentHtml": "<p>Materiales sobre transformación y Registros Akáshicos.</p><p><em>Este artículo es un marcador provisional. El contenido original son imágenes — pendiente de transcripción o descripción. Ver nota en <code>notes</code> y fuente original.</em></p>"
+  },
+  {
+    "id": "terrain-the-film",
+    "title": "TERRAIN — El Filme (2022)",
+    "date": "2022-02-12",
+    "section": "nom",
+    "topics": ["plandemismo", "cine", "medicina-oficial", "plandemia", "control-social"],
+    "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
+    "sourceUrl": "https://www.kilombo.top/spip.php?article84",
+    "status": "pending-review",
+    "notes": "PENDIENTE: El artículo contiene el cuerpo del análisis pero el título en la fuente incluye metadatos embebidos ('2022 feb 12, Subtitulos en Español') que deberían limpiarse y trasladarse a campos separados. Añadir: enlace directo al documental, información sobre dónde verlo con subtítulos en español, y contexto sobre el argumento central del film (crítica al dogmatismo de la medicina oficial como arma del terrorismo de Estado).",
+    "contentHtml": "<p>El dogmatismo de la medicina medicamentosa oficial, consagrada como verdadera religión dogmática universal, es el arma central del TERRORISMO DE ESTADO, como lo fue durante la plandemia para encerrar, tapar bocas, destruir actividades productivas y matar gente. Por eso se aconseja no solo ver estos videos que desmontan dicha «ciencia», sino estudiar a fondo el tema, controlar las fuentes y verificar lo afirmado con la experiencia real en cada lugar.</p><p><em>Este artículo es un marcador provisional. Ver nota en <code>notes</code> para el contenido pendiente de completar.</em></p>"
+  },
+  {
+    "id": "el-negacionista-cortometraje",
+    "title": "El Negacionista — Cortometraje",
+    "date": "",
+    "section": "tierra",
+    "topics": ["cine", "negacionismo", "plandemia", "cortometraje"],
+    "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
+    "sourceUrl": "https://www.kilombo.top/spip.php?article85",
+    "status": "pending-review",
+    "notes": "PENDIENTE: El artículo original consiste únicamente en imágenes. Completar con: sinopsis del cortometraje, ficha técnica (director, duración, año), enlace para verlo, y contexto sobre su tema central (negacionismo de la plandemia).",
+    "contentHtml": "<p>Cortometraje sobre el negacionismo de la plandemia.</p><p><em>Este artículo es un marcador provisional. El contenido original son imágenes — pendiente de transcripción o descripción. Ver nota en <code>notes</code> y fuente original.</em></p>"
+  },
+  {
+    "id": "curso-salud-holistica",
+    "title": "Curso de Salud Holística — University of Terrain",
+    "date": "",
+    "section": "tierra",
+    "topics": ["salud-alternativa", "educacion", "salud-holistica"],
+    "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
+    "sourceUrl": "https://www.kilombo.top/spip.php?article86",
+    "status": "pending-review",
+    "notes": "PENDIENTE: El artículo original consiste únicamente en imágenes. Completar con: descripción del curso, temario, institución organizadora (University of Terrain), enlace de acceso, y relación con la línea de salud natural/holística del espacio Tierra y Libertad.",
+    "contentHtml": "<p>Curso de Salud Holística ofrecido por la University of Terrain.</p><p><em>Este artículo es un marcador provisional. El contenido original son imágenes — pendiente de transcripción o descripción. Ver nota en <code>notes</code> y fuente original.</em></p>"
   }
 ]
