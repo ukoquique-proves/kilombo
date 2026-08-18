@@ -48,6 +48,14 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     3. Reemplazar la entrada por otro artículo equivalente con texto completo.
     4. Documentar explícitamente que las imágenes son el contenido intencionado y cambiar `status` a `external-only`.
 
+- [ ] **55. Sección `tierra` con un solo artículo — candidatos evaluados y descartados**
+  - Dry-run ejecutado contra los 6 candidatos de `scraped-full/` identificados en `import-tierra-articles-prompt.md` (articles 36, 46, 76, 84, 85, 86) usando el nuevo flag `--file`. Resultado:
+    - **36, 46** (Quilombo / Kilombo PELÍCULA): stubs de 1 frase. Importables en sección `tierra` por temática, pero `contentHtml` es insuficiente — mismo problema que #30.
+    - **76** (Registros Akáshicos), **85** (El Negacionista), **86** (Curso Salud Holística): image-only stubs, cuerpo vacío extraído. `status: pending-review` si se importan.
+    - **84** (TERRAIN The Film): único candidato con cuerpo de texto real (~800 chars), pero el contenido es un ensayo anti-vacunas/plandemismo — pertenece a `nom`, no `tierra`. Además tiene artefacto `>` en el primer párrafo que requiere limpieza manual antes de importar.
+  - **Conclusión**: `tierra` tendrá 1 artículo hasta que haya contenido con texto real de esa línea editorial. No forzar stubs ni artículos temáticamente `nom` para inflar el conteo.
+  - **Acción pendiente**: cuando haya nuevos artículos publicados en `www.kilombo.top` con cuerpo de texto y temática no-plandemismo (fundamentos científicos, análisis político, historia del movimiento), importarlos con `--file scraped-full/article-N.html --section tierra`.
+
 ---
 
 ## 🟡 Notas de mantenimiento

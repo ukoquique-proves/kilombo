@@ -313,6 +313,7 @@ async function main() {
     return i === -1 ? undefined : args[i + 1];
   };
   const url = get('--url');
+  const file = get('--file');
   const section = get('--section');
   const topics = (get('--topics') || '').split(',').map((t) => t.trim()).filter(Boolean);
   const id = get('--id');
@@ -321,17 +322,24 @@ async function main() {
   const forceUpdate = args.includes('--force-update');
 
   if (!url || !section) {
-    console.error('Uso: node scripts/import-article.mjs --url <sourceUrl> --section <section> --topics a,b [--id x] [--dry-run] [--force-update]');
+    console.error('Uso: node scripts/import-article.mjs --url <sourceUrl> --section <section> --topics a,b [--id x] [--file path] [--dry-run] [--force-update]');
     process.exit(1);
   }
 
   const existing = JSON.parse(readFileSync(ARTICLES_PATH, 'utf-8'));
 
-  const fetchHtml = async (u) => {
-    const res = await fetch(u, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-    if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${u}`);
-    return res.text();
-  };
+  // --file reads pre-scraped HTML from disk instead of fetching over the
+  // network. `opts.url` is still the real sourceUrl — used for site
+  // detection, dedup, and the sourceUrl field — only the HTML retrieval
+  // is swapped out. Keeps imports reproducible offline against
+  // scraped-full/ snapshots instead of depending on kilombo.top being up.
+  const fetchHtml = file
+    ? async (_u) => readFileSync(file, 'utf-8')
+    : async (u) => {
+        const res = await fetch(u, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${u}`);
+        return res.text();
+      };
 
   const entry = await buildArticleEntry({ url, section, topics, id, status }, fetchHtml, existing, forceUpdate);
 
