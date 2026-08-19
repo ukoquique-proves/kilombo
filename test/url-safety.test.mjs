@@ -40,15 +40,23 @@ const relativeUrls = [
   '../other.html',
 ];
 
+// Local asset paths under assets/ are exempt — they resolve correctly
+// relative to every page in the site (all pages are at root level).
+const localAssetUrls = [
+  'assets/images/futuras-generaciones.jpg',
+  'assets/audios/grabacion.mp3',
+];
+
 test('isSafeUrl accepts safe links and rejects unsafe schemes', () => {
   for (const url of safeUrls) assert.equal(isSafeUrl(url), true, `should accept ${url}`);
   for (const url of unsafeUrls) assert.equal(isSafeUrl(url), false, `should reject ${url}`);
 });
 
-test('isAbsoluteOrExempt accepts absolute http(s), anchors and mailto', () => {
+test('isAbsoluteOrExempt accepts absolute http(s), anchors, mailto and local assets/', () => {
   assert.equal(isAbsoluteOrExempt('https://kilombo.top/foo'), true);
   assert.equal(isAbsoluteOrExempt('#anchor'), true);
   assert.equal(isAbsoluteOrExempt('mailto:test@example.com'), true);
+  for (const url of localAssetUrls) assert.equal(isAbsoluteOrExempt(url), true, `should accept local asset ${url}`);
   for (const url of relativeUrls) assert.equal(isAbsoluteOrExempt(url), false, `should reject relative ${url}`);
 });
 
