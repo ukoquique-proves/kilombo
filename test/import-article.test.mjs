@@ -63,13 +63,14 @@ test('detectSite recognizes Tierra y Libertad and PI hosts', () => {
 
 test('detectSite recognizes GCI subdomains as "gci", not "tierra" (TO_FIX #XX)', () => {
   assert.equal(detectSite('https://icg-gci.kilombo.top/spip.php?article=1'), 'gci');
-  assert.equal(detectSite('https://in.kilombo.top/spip.php?article=1'), 'gci');
-  assert.equal(detectSite('https://cdrom.kilombo.top/spip.php?article=1'), 'gci');
-  assert.equal(detectSite('https://icg-old.kilombo.top/spip.php?article=1'), 'gci');
+  assert.equal(detectSite('https://in.kilombo.top/spip.php?article=1'), 'gci-in');
+  assert.equal(detectSite('https://cdrom.kilombo.top/spip.php?article=1'), 'gci-static');
+  assert.equal(detectSite('https://icg-old.kilombo.top/spip.php?article=1'), 'gci-static');
 });
 
 test('buildArticleEntry rejects GCI hosts loudly instead of silently misextracting via extractTierra (TO_FIX #XX)', async () => {
   const fetchHtml = async () => '<html><body>should never be fetched</body></html>';
+  // icg-gci: SPIP official site
   await assert.rejects(
     () => buildArticleEntry(
       { url: 'https://icg-gci.kilombo.top/spip.php?article=1', section: 'gci', topics: [] },
@@ -77,6 +78,24 @@ test('buildArticleEntry rejects GCI hosts loudly instead of silently misextracti
       []
     ),
     /extractGCI|no existe todavía/i
+  );
+  // in.kilombo.top: separate multilingual SPIP
+  await assert.rejects(
+    () => buildArticleEntry(
+      { url: 'https://in.kilombo.top/spip.php?article=1', section: 'gci', topics: [] },
+      fetchHtml,
+      []
+    ),
+    /extracto|spip__3/i
+  );
+  // cdrom: static webapp, not SPIP
+  await assert.rejects(
+    () => buildArticleEntry(
+      { url: 'https://cdrom.kilombo.top/page.html', section: 'gci', topics: [] },
+      fetchHtml,
+      []
+    ),
+    /webapp estática|my_webapp/i
   );
 });
 

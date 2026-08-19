@@ -152,7 +152,7 @@ Acceso WebDAV verificado: `https://cloud.kilombo.top/remote.php/dav/files/kilomb
 
 ### Contenido público sin contraseña
 
-Los seis sitios SPIP de la red son **completamente públicos** sin autenticación — todos los artículos publicados son accesibles por scraping anónimo. Ver `TROUBLESHOOTING.md` §7 para más detalle sobre este punto.
+Las 4 instancias SPIP de la red más las 2 webapps estáticas son **completamente públicas** sin autenticación — todos los artículos publicados son accesibles por scraping anónimo. Ver `TROUBLESHOOTING.md` §7 para más detalle sobre este punto.
 
 ---
 
@@ -197,7 +197,7 @@ KILOMBO/
 │       └── deploy.yml     ← GitHub Actions: publica site/ en GitHub Pages en cada push a main
 │
 ├── INICIO/                ← Documentación de fase de diagnóstico
-│   ├── ROADMAP.md         ← Hoja de ruta de 5 fases
+│   ├── ROADMAP-fase-diagnostico.md ← Hoja de ruta de 5 fases
 │   ├── inventario-inicial-kilombo.md
 │   └── pasos-trabajo-kilombo.md
 │

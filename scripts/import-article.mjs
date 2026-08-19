@@ -76,23 +76,32 @@ export function upsertArticle(existing, entry, forceUpdate = false) {
 // 1–2. Site detection + extraction
 // ================================================================
 
-// Hosts known to be a *separate* SPIP instance (GCI — Grupo Comunista
-// Internacionalista) that happens to live under the kilombo.top domain.
-// They are NOT Tierra y Libertad and must never be routed through
-// extractTierra() — see TO_FIX.md item "XX" for the corruption this caused.
-const GCI_HOSTS = new Set([
-  'icg-gci.kilombo.top',
-  'in.kilombo.top',
-  'cdrom.kilombo.top',
-  'icg-old.kilombo.top',
-]);
+// GCI network hosts — three technically distinct categories under kilombo.top.
+// None of these are Tierra y Libertad (www.kilombo.top) and must never be
+// routed through extractTierra() — see TO_FIX.md #61 for the corruption this caused.
+//
+// Category breakdown (from TROUBLESHOOTING.md §2 infrastructure table):
+//   gci       — icg-gci.kilombo.top   (YunoHost app: spip__4 — SPIP instance)
+//   gci-in    — in.kilombo.top        (YunoHost app: spip__3 — separate SPIP instance,
+//                                      multilingual: EN, Kurdish, Persian, Arabic, etc.)
+//   gci-static — cdrom.kilombo.top    (YunoHost app: my_webapp — static webapp, NOT SPIP)
+//              — icg-old.kilombo.top  (YunoHost app: my_webapp — static webapp, NOT SPIP)
+//
+// All four return a distinct type so buildArticleEntry() can give a precise
+// error message instead of a generic "GCI host, no extractor" message.
 
-/** @param {string} url @returns {'tierra' | 'pi' | 'gci' | 'unknown'} */
+const GCI_SPIP_OFFICIAL = 'icg-gci.kilombo.top';
+const GCI_SPIP_IN       = 'in.kilombo.top';
+const GCI_STATIC_HOSTS  = new Set(['cdrom.kilombo.top', 'icg-old.kilombo.top']);
+
+/** @param {string} url @returns {'tierra' | 'pi' | 'gci' | 'gci-in' | 'gci-static' | 'unknown'} */
 export function detectSite(url) {
   const host = (() => {
     try { return new URL(url).hostname; } catch { return ''; }
   })();
-  if (GCI_HOSTS.has(host)) return 'gci';
+  if (host === GCI_SPIP_OFFICIAL) return 'gci';
+  if (host === GCI_SPIP_IN)       return 'gci-in';
+  if (GCI_STATIC_HOSTS.has(host)) return 'gci-static';
   if (host === 'www.kilombo.top' || host === 'kilombo.top' || (host.endsWith('.kilombo.top') && host !== 'proletariosinternacionalistas.kilombo.top')) {
     return 'tierra';
   }
@@ -300,17 +309,30 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
     );
   }
   if (site === 'gci') {
-    // No extractGCI() exists yet — GCI is a separate SPIP instance/theme
-    // (different from Tierra's) and its selectors haven't been mapped.
-    // Failing loudly here is intentional: previously these hosts were
-    // silently misclassified as 'tierra' and run through extractTierra(),
-    // which either produced "no se pudo extraer el título" errors or,
-    // worse, extracted the wrong DOM region if a selector matched by
-    // chance. See TO_FIX.md item "XX".
+    // icg-gci.kilombo.top — SPIP instance (app: spip__4). No extractGCI()
+    // exists yet; its SPIP template selectors haven't been mapped.
+    // Failing loudly is intentional — see TO_FIX.md #63.
     throw new Error(
-      `${opts.url} es un host de GCI (${new URL(opts.url).hostname}). ` +
-      `No existe todavía un extractor extractGCI() para la plantilla SPIP de GCI — ` +
-      `ver TO_FIX.md item "XX". Importar manualmente por ahora.`
+      `${opts.url} es el sitio oficial del GCI (icg-gci.kilombo.top, instancia SPIP spip__4). ` +
+      `No existe todavía extractGCI() para su plantilla — ver TO_FIX.md #63. Importar manualmente.`
+    );
+  }
+  if (site === 'gci-in') {
+    // in.kilombo.top — SPIP instance (app: spip__3), multilingual (EN/Kurdish/Persian/Arabic+).
+    // Separate SPIP installation from icg-gci; its template selectors haven't been mapped.
+    // See TO_FIX.md #63.
+    throw new Error(
+      `${opts.url} es la plataforma internacional del GCI (in.kilombo.top, instancia SPIP spip__3, ` +
+      `multilingüe EN/Kurdish/Persian/Arabic). No existe extracto para su plantilla — ` +
+      `ver TO_FIX.md #63. Importar manualmente.`
+    );
+  }
+  if (site === 'gci-static') {
+    // cdrom.kilombo.top / icg-old.kilombo.top — static webapps (my_webapp), NOT SPIP.
+    // No SPIP selectors apply at all; content must be scraped with different tooling.
+    throw new Error(
+      `${opts.url} es una webapp estática del GCI (${new URL(opts.url).hostname}, app: my_webapp — no es SPIP). ` +
+      `El extractor SPIP no aplica aquí. Ver TO_FIX.md #63 y TROUBLESHOOTING.md §2 para detalles de infraestructura.`
     );
   }
 

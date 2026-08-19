@@ -1,6 +1,8 @@
 # MISSING ARTICLES INVENTORY
 ## 62 Pre-Scraped HTML Files Analysis
 
+> Nota histórica: este documento es un análisis preliminar y bruto del inventario inicial. La versión autoritativa y corregida para la clasificación final es `IMPORT-STRATEGY.md`, que ya reorganizó los candidatos reales y marcó la sección correcta para los artículos importados.
+
 **Analysis Date:** 2025  
 **Total Files Analyzed:** 105 HTML files in `scraped-full/`  
 **Already Imported:** 31 articles (IDs: 2, 12, 20, 24, 25, 26, 27, 33, 34, 36, 37, 40, 41, 43, 44, 46, 48, 49, 50, 51, 52, 53, 54, 76, 79, 80, 81, 82, 84, 85, 86)  
@@ -36,7 +38,7 @@ These articles have >500 characters of real text content and should be priority 
 |---|---|---|---|---|---|
 | 21 | BASTA DE ESCLAVITUD PLANDÉMICA | 996 | 18 | general | Manifesto against pandemic repression; references PDF document; calls for resistance against pandemic-related restrictions |
 | 23 | LA REPÚBLICA DEL SILENCIO | 5440 | 18 | general | Historical analysis comparing post-WWII Paris liberation with contemporary censorship; existentialist critique of media manipulation and intellectual suppression |
-| 32 | PLANDEMISMO Y DOMESTICACIÓN 1 | 5500 | nom | general | Os Cangaceiros/PI piece on pandemic-driven domestication; explores how plandemism used as control mechanism; part of serialized analysis |
+| 32 | PLANDEMISMO Y DOMESTICACIÓN 1 | 5500 | 16 | nom | Os Cangaceiros/PI piece on pandemic-driven domestication; explores how plandemism used as control mechanism; part of serialized analysis |
 | 38 | PARADOXA 1 | 1808 | 18 | general | Explores bio-energetic theories; discusses electrokinetic properties of water and body; alternative health/consciousness framework |
 | 39 | PARADOXA 2 | 13770 | 18 | general | **Longest article** — Deep dive into control experiments, infection mythology, bioelectric laws; comprehensive alternative scientific framework |
 | 42 | ¿El mayor asesinato en masa organizado en la historia mundial escapará de la rendición de cuentas? | 4869 | 16 | general | Genocide accountability analysis; examines organized mass killings and international justice mechanisms |

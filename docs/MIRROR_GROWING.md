@@ -344,7 +344,9 @@ Los textos del GCI son más largos y requieren más trabajo de adaptación. Trae
 
 ### 7.4 Artículo ya en el espejo — referencia de ejemplo
 
-El único artículo actualmente en `articles.json` es:
+**Historical note:** Este fue el primer artículo incorporado, cuando el catálogo tenía una sola entrada. Hoy hay 41 artículos en el espejo.
+
+El artículo original (único entonces en `articles.json`) era:
 
 ```
 id:        israel-mohamad-safa-siempre-victimas

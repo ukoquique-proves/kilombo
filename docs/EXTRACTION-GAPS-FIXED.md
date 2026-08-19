@@ -68,7 +68,7 @@ const dateMatch = html.match(/id="date-article"[^>]*>[^<]*<span[^>]*>([^<]+)</);
 
 However, SPIP has template variants. On many Tierra pages, the markup uses `class="date-article"` instead. Same semantic meaning, different syntax.
 
-**Result:** 21 out of 43 articles (51%) have empty date fields, because the regex never matched.
+**Result:** 21 out of 41 articles (51%) have empty date fields, because the regex never matched.
 
 ### Root Cause
 
@@ -111,7 +111,7 @@ All 16 import-article tests pass (11 existing + 5 new).
 ### Full Test Suite
 
 - **142/142** unit tests passing
-- **43 articles** valid in data validation
+- **41 articles** valid in data validation
 - **7 URLs** consistent across sources
 - **11 cards** with correct Level 1/2 badges
 
@@ -145,7 +145,7 @@ The fixes are **detection + classification improvements**, not data corrections.
 ### For Existing Data
 
 - 21 articles with empty dates + 1 with unextracted media are recorded but not automatically corrected
-- Add to `docs/TO_FIX.md` as a future enhancement: "Backfill date extraction on articles with empty date field using new regex variant"
+- **Note:** The date backfill for these 21 articles was implemented in v0.39.1 via `scripts/backfill-dates.mjs`. See `TO_FIX.md #60` and `docs/PENDING-REVIEW.md` for current pending-review status.
 
 ---
 

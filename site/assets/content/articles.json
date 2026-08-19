@@ -101,7 +101,10 @@
     "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
     "sourceUrl": "https://www.kilombo.top/spip.php?article37",
     "status": "pending-review",
-    "contentHtml": "<p>Lo que no te dicen de los test PCR.</p><p>El artículo original consiste en documentos gráficos (imágenes) disponibles en la fuente original. Ver el artículo completo en el enlace de fuente.</p>"
+    "contentHtml": "<p>Lo que no te dicen de los test PCR.</p><p>El artículo original consiste en documentos gráficos (imágenes) disponibles en la fuente original. Ver el artículo completo en el enlace de fuente.</p>",
+    "notes": [
+      "PENDIENTE: El artículo original en la fuente (spip.php?article37) consiste únicamente en dos imágenes PNG (pcr1.png, pcr2.png) — no hay texto extraíble. Opciones: (1) transcribir manualmente el texto de las imágenes, (2) solicitar el texto fuente al cliente, (3) reemplazar por un artículo equivalente con texto completo, (4) cambiar status a 'external-only' si las imágenes son el contenido intencionado."
+    ]
   },
   {
     "id": "contra-genocidio-guerras-infinitas-pi",
@@ -378,7 +381,10 @@
     "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
     "sourceUrl": "https://www.kilombo.top/spip.php?article33",
     "status": "pending-review",
-    "contentHtml": "<p>Comment devenir les maîtres du monde&nbsp;? En centralisant l’ordre et le pouvoir autour d’une minorité et en semant te désordre dans le peuple, ramené au niveau de pantins paniqués. La méthode&nbsp;? L’ingénierie sociale&nbsp;: infiltration des esprits, analyse de nos moindres faits et gestes, contrôle des comportements à distance, marketing de l’intime et autres réjouissances qui font de nous de bons consommateurs. Ce texte prolonge l’essai politique insurrectionnel signé du Comité invisible et attribué aux inculpés dans l’affaire de Tarnac. Publié d’abord sur le web et y ayant suscité enthousiasme débridé ou agacement hystérique (Le Nouvel Observateur), il a été pour cette édition revu et corrigé par les auteurs. Volontairement anonymes, ceux-ci prônent une résistance constructive&nbsp;: \" Créer, c’est résister. Résister, c’est créer. \"</p>"
+    "contentHtml": "<p>Comment devenir les maîtres du monde&nbsp;? En centralisant l’ordre et le pouvoir autour d’une minorité et en semant te désordre dans le peuple, ramené au niveau de pantins paniqués. La méthode&nbsp;? L’ingénierie sociale&nbsp;: infiltration des esprits, analyse de nos moindres faits et gestes, contrôle des comportements à distance, marketing de l’intime et autres réjouissances qui font de nous de bons consommateurs. Ce texte prolonge l’essai politique insurrectionnel signé du Comité invisible et attribué aux inculpés dans l’affaire de Tarnac. Publié d’abord sur le web et y ayant suscité enthousiasme débridé ou agacement hystérique (Le Nouvel Observateur), il a été pour cette édition revu et corrigé par les auteurs. Volontairement anonymes, ceux-ci prônent une résistance constructive&nbsp;: \" Créer, c’est résister. Résister, c’est créer. \"</p>",
+    "notes": [
+      "PENDIENTE: El cuerpo extraído es solo el descriptif SPIP (presentación editorial), no el artículo completo. No hay snapshot local (scraped-full/article-33.html ausente). Pasos: (1) acceder a la fuente en vivo y revisar si hay cuerpo de texto real; (2) si hay texto: re-importar con --force-update; (3) si es solo presentación de enlace externo: mover a externalLinks[] y cambiar status a imported. Nota: fecha también vacía (TO_FIX #64), resolver en el mismo paso."
+    ]
   },
   {
     "id": "la-pandemie-n-existe-pas",
@@ -424,7 +430,10 @@
     "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
     "sourceUrl": "https://www.kilombo.top/spip.php?article20",
     "status": "pending-review",
-    "contentHtml": "<p>PLANDEMIA</p><figure><a href=\"https://www.kilombo.top/IMG/jpg/external-content.duckduckgo.com.jpg.jpg\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://www.kilombo.top/local/cache-vignettes/L400xH225/external-content.duckduckgo.com.jpg-7ca6c.jpg?1743599407\" alt=\"\"></a></figure><figure><a href=\"https://www.kilombo.top/IMG/jpg/stop_sp_6_1_copia.jpg.jpg\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://www.kilombo.top/local/cache-vignettes/L400xH536/stop_sp_6_1_copia.jpg-f5950.jpg?1743599407\" alt=\"\"></a></figure><figure><a href=\"https://www.kilombo.top/IMG/jpg/stop_sp_6_2_copia.jpg.jpg\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://www.kilombo.top/local/cache-vignettes/L400xH599/stop_sp_6_2_copia.jpg-cf2b5.jpg?1743599407\" alt=\"\"></a></figure>"
+    "contentHtml": "<p>PLANDEMIA</p><figure><a href=\"https://www.kilombo.top/IMG/jpg/external-content.duckduckgo.com.jpg.jpg\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://www.kilombo.top/local/cache-vignettes/L400xH225/external-content.duckduckgo.com.jpg-7ca6c.jpg?1743599407\" alt=\"\"></a></figure><figure><a href=\"https://www.kilombo.top/IMG/jpg/stop_sp_6_1_copia.jpg.jpg\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://www.kilombo.top/local/cache-vignettes/L400xH536/stop_sp_6_1_copia.jpg-f5950.jpg?1743599407\" alt=\"\"></a></figure><figure><a href=\"https://www.kilombo.top/IMG/jpg/stop_sp_6_2_copia.jpg.jpg\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://www.kilombo.top/local/cache-vignettes/L400xH599/stop_sp_6_2_copia.jpg-cf2b5.jpg?1743599407\" alt=\"\"></a></figure>",
+    "notes": [
+      "PENDIENTE: El artículo original es una galería de 3 imágenes JPG sobre plandemia. Las imágenes están extraídas pero los atributos alt están vacíos — incumple accesibilidad WCAG AA. Completar: (1) añadir texto alt descriptivo a cada imagen; (2) evaluar si el título es suficiente o merece uno más específico; (3) considerar si solo imágenes sin texto justifica status imported o conviene external-only."
+    ]
   },
   {
     "id": "futuras-generaciones",
@@ -439,7 +448,10 @@
     "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
     "sourceUrl": "https://www.kilombo.top/spip.php?article34",
     "status": "pending-review",
-    "contentHtml": "<p>Como deshumanizan a los niños en las escuelas.</p>"
+    "contentHtml": "<p>Como deshumanizan a los niños en las escuelas.</p>",
+    "notes": [
+      "PENDIENTE: Cuerpo extraído es una sola frase (53 chars) — el artículo original probablemente contiene imágenes, vídeo o documento externo que el extractor no encontró. No hay snapshot local (scraped-full/article-34.html ausente). Pasos: (1) acceder a la fuente en vivo y revisar contenido real; (2) si hay texto: re-importar con --force-update; (3) si hay vídeo: añadir enlace en externalLinks[]; (4) si es imagen: transcribir o añadir descripción contextual."
+    ]
   },
   {
     "id": "quilombo-pelicula",

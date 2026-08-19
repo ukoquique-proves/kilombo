@@ -94,7 +94,7 @@ These articles have **no section assigned** in SPIP (`sin sección`), which make
 | 85 | El Negacionista // ESPECTACULAR CORTOMETRAJE | 🇪🇸 | ✅ VALID |
 | 86 | Curso Salud Holística - University of Terrain | 🇪🇸 | ✅ VALID |
 
-### Hidden Articles (NOT in Navigation) — 9 Total
+### Hidden Articles (NOT in Navigation) — 7 Total
 
 All have **no section assigned** in SPIP, making them invisible to navigation/archive/RSS but accessible via direct URL.
 
@@ -117,24 +117,21 @@ All have **no section assigned** in SPIP, making them invisible to navigation/ar
 | Metric | Count |
 |---|---|
 | IDs probed (1–120) | 120 |
-| Valid published articles | **63** |
+| Valid published articles | **61** |
 | Articles in navigation | **54** |
-| Hidden articles (no section) | **9** |
+| Hidden articles (no section) | **7** |
 | 404 / deleted / inaccessible | 57 |
 
 ---
 
 ## What This Means for the Mirror
 
-The mirror site based on the initial RSS scrape covered **54 visible articles** (99% of navigable content). The 9 hidden French articles are:
+The mirror site based on the initial RSS scrape covered **54 visible articles** (99% of navigable content). The 7 hidden French articles are:
 - ✅ Thematically consistent with the rest of the site
 - ✅ Publicly accessible via direct URL
 - ⚠️ Deliberately (or accidentally) excluded from navigation in SPIP
 
 **For completeness:** The mirror should optionally include articles 2, 24–27, 33, 48 to match the live site's full public inventory.
-
-
----
 
 ## Discovery Methodology
 

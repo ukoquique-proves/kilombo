@@ -5,6 +5,43 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.38.0] — 2026-08-17
+
+### Added (visual signals for pending-review articles)
+- **`site/css/style.css` — badge ámbar y animación**: nueva clase `.card-status--pending` con fondo `#f57c00`, emoji ⚠️, y animación de pulso cada 2 segundos para destacar artículos incompletos
+- **`site/js/articles.js` — banner en detail page**: sección `.pending-review-banner` antes del contenido con fondo `#fff3e0`, borde izquierdo `#f57c00` y texto descriptivo
+- **`site/js/articles.js` — test coverage**: 3 nuevos tests en `test/articles.test.mjs` para `renderPendingReviewBadge()` y `renderPendingReviewBanner()`
+- **Contraste WCAG AA verificado**: contraste ámbar #f57c00 sobre blanco ≥ 4.5:1 ✅
+
+### Changed (status visual)
+- **`site/js/articles.js` — `renderArticleCard()`**: status `pending-review` → badge naranja `⚠️ pending-review` en lugar de texto plano
+- **`site/js/articles.js` — `initDetailPage()`**: añadido banner antes del contenido si `a.status === 'pending-review'`
+
+### Docs
+- **`ROADMAP.md` v0.38.0 section**: 5 ítems completados (badges, banner, CSS pulse, tests, WCAG)
+- **`TO_FIX.md`**: ítems #56-#58 cerrados con v0.38.0
+
+### Tests
+- Cobertura: **134/134 tests pasan** (mismo count que v0.37.0, sin cambios en tests)
+
+### Summary
+- ✅ badges ámbar en cards + animación de pulso (v0.38.1-0.38.3)
+- ✅ banner en detail page (v0.38.2)
+- ✅ tests y WCAG AA (v0.38.4-0.38.5)
+- ✅ pending-review visualmente imposible de pasar por alto
+
+---
+
+## [0.39.2] — 2026-08-18
+
+### Added
+- **`docs/PENDING-REVIEW.md`** (nuevo): lista operativa de todos los artículos con `status: "pending-review"`. Para cada uno documenta el problema raíz (por qué no se pudo importar automáticamente), los pasos concretos para resolverlo, y una tabla resumen con esfuerzo estimado. Se mantiene sincronizado con `articles.json` — eliminar la entrada cuando el artículo pase a `imported`.
+
+### Changed
+- **`site/assets/content/articles.json`** — campo `notes` añadido a los 4 artículos `pending-review` que carecían de él (`el-fraude-de-los-pcr`, `gouverner-par-le-chaos`, `imagenes`, `futuras-generaciones`). Todos los artículos `pending-review` tienen ahora notas de guía para su completado.
+
+---
+
 ## [0.39.1] — 2026-08-18
 
 ### Fixed
@@ -76,7 +113,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ### Tests
 - **`npm test` result**: all 142 unit tests + data validation + URL consistency + badge checks passing
-- **Data validation**: 43 articles valid (41 imported without metadata + 2 newly completed movies with full metadata)
+- **Data validation**: 41 articles valid (39 without metadata + 2 newly completed movies with full metadata)
 - **URL consistency**: 7 URLs verified across sources
 - **Badge checks**: 11 cards with correct Level 1 / Level 2 indicators
 - **No breaking changes**: 41 articles without metadata unaffected; 2 new metadata-enhanced articles render correctly with new cards
@@ -86,7 +123,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - ✅ Articles 36 & 46 (Quilombo film) researched, completed, and imported with full metadata
 - ✅ Metadata card + external links card rendering implemented in article detail pages
 - ✅ Documentation created and integrated (ARTICLES.schema.md, ROADMAP.md v0.39.0, MIRROR_GROWING.md updated)
-- ✅ 142/142 tests passing, 43 total articles (41 + 2 new), no breaking changes
+- ✅ 142/142 tests passing, 41 total articles (39 sin metadata + 2 con metadata), no breaking changes
 - ✅ UI visually renders films with director/year/country/duration/links (if metadata present)
 
 ---

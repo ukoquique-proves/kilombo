@@ -68,10 +68,17 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - **Effort**: 15 mins vs. weeks (full IMDb integration)
   - **Status**: Pending user decision on schema extension + priority
 
-- [ ] **63. Falta `extractGCI()` — hosts GCI ahora se detectan correctamente pero no se pueden importar todavía**
-  - **Contexto:** #61 (arriba, cerrado v0.39.1) corrigió `detectSite()` para que ya no clasifique erróneamente los hosts GCI como `tierra`. Pero eso solo cambió el fallo de "silencioso e incorrecto" a "explícito y bloqueante" — todavía no existe un extractor real.
-  - **Pendiente:** escribir `extractGCI()` con selectores adaptados a la plantilla SPIP de `icg-gci.kilombo.top` (y `in.kilombo.top` / `cdrom.kilombo.top` cuando proceda) y quitar el `throw` en `buildArticleEntry()` para el caso `site === 'gci'`.
-  - **Prioridad:** Media — ya no hay riesgo de corrupción silenciosa (ver #61), pero los artículos de la red GCI siguen sin poder importarse por el script hasta que se mapee la plantilla.
+- [ ] **63. Implementar extractores para la red GCI — 3 categorías técnicas distintas**
+  - **Contexto:** #61 (cerrado v0.39.1) corrigió `detectSite()` para que ya no clasifique los hosts GCI como `tierra`, evitando corrupción silenciosa. La v0.40.x (fix-plan Block A) refinó además la detección en 3 categorías técnicas reales, acordes a la infraestructura documentada en `TROUBLESHOOTING.md §2`:
+    - **`'gci'`** → `icg-gci.kilombo.top` — instancia SPIP separada (app YunoHost: `spip__4`). Mismo motor SPIP que Tierra pero plantilla/tema distinto; los selectores de `extractTierra()` no son válidos aquí.
+    - **`'gci-in'`** → `in.kilombo.top` — instancia SPIP separada (app: `spip__3`), multilingüe (EN, Kurdish, Persian, Arabic, etc.). También SPIP, también plantilla propia.
+    - **`'gci-static'`** → `cdrom.kilombo.top` y `icg-old.kilombo.top` — webapps estáticas (app: `my_webapp`). **No son instancias SPIP en absoluto.** El contenido es HTML estático servido directamente; los selectores SPIP no aplican en absoluto para estas.
+  - **Pendiente por categoría:**
+    1. `'gci'` — mapear la plantilla SPIP de `icg-gci.kilombo.top` y escribir `extractGCI()` con sus selectores reales.
+    2. `'gci-in'` — mapear la plantilla SPIP de `in.kilombo.top` y escribir `extractGCIIn()` (o generalizar `extractGCI()` si la plantilla es la misma).
+    3. `'gci-static'` — `cdrom` e `icg-old` requieren un enfoque completamente distinto: no extractor SPIP sino un scraper de HTML estático adaptado a su estructura.
+  - En los tres casos, quitar el `throw` en `buildArticleEntry()` para la categoría correspondiente una vez que el extractor esté listo y testeado.
+  - **Prioridad:** Media — ya no hay riesgo de corrupción silenciosa. Los artículos de la red GCI siguen sin poder importarse por el script hasta que se mapee al menos una de las tres categorías.
 
 - [ ] **64. 6 artículos siguen sin fecha — snapshot local no disponible (`scraped-full/article{24,25,26,27,33,48}.html`)**
   - `scripts/backfill-dates.mjs` (ver #60, cerrado v0.39.1) recuperó 15 de las 21 fechas vacías desde snapshots locales, pero estos 6 IDs no tienen un `scraped-full/article-{N}.html` correspondiente:

@@ -10,11 +10,11 @@ interface Article {
   id: string;           // Unique identifier (slug: lowercase alphanumeric + hyphens, max 80 chars)
   title: string;        // Article title
   date: string;         // ISO 8601 date (YYYY-MM-DD), or empty string for undated articles
-  section: string;      // Section: "general", "tierra", "nom" (nuevo orden/plandemismo)
+  section: string;      // Section: "general" | "tierra" | "nom" | "pi" | "gci"
   topics: string[];     // Topic tags for filtering
   sourceSite: string;   // Source attribution
   sourceUrl: string;    // URL to original article
-  status: string;       // "imported" (complete) or "pending-review" (stub)
+  status: string;       // "imported" | "adapted" | "translated" | "pending-review" | "external-only"
   contentHtml: string;  // Sanitized HTML body (allowlist: p, a, strong, em, blockquote, br, etc.)
 
   // OPTIONAL INTERNAL FIELDS
@@ -52,9 +52,9 @@ interface ArticleMetadata {
 | Field | Rules |
 |-------|-------|
 | `id` | Required, unique, lowercase alphanumeric + hyphens, max 80 chars |
-| `status` | "imported" or "pending-review"; pending-review articles are visually distinct |
+| `status` | One of: "imported" | "adapted" | "translated" | "pending-review" | "external-only". Values in active use today are primarily "imported" and "pending-review"; the others are reserved for future editorial states. |
 | `contentHtml` | Required; must pass allowlist validation (no scripts, event handlers, styles) |
-| `date` | Required for "imported", optional for "pending-review" |
+| `date` | Optional in the validator for every article; if present it must be a valid ISO date in `YYYY-MM-DD` format. |
 | `externalLinks` | Optional; present on media/complete articles, omitted on text-only imports |
 | `metadata` | Optional; typically paired with `externalLinks` |
 | `sourceUrl` | Required, must be absolute HTTP(S) URL, unique per article |
@@ -67,7 +67,7 @@ interface ArticleMetadata {
 {
   "id": "quilombo-pelicula",
   "title": "Quilombo — Película",
-  "date": "1984",
+  "date": "1984-01-01",
   "section": "tierra",
   "topics": ["cine", "quilombo", "historia"],
   "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",

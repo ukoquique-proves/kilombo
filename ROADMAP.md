@@ -71,7 +71,7 @@ Cada nota es un **task list** para futura edición. El mirror es el mapa de trab
   - [x] Ambos cambios de `status: pending-review` → `status: imported` + full metadata
 - [x] **0.39.4 — Actualizar articles.js** — renderizado condicional de tarjeta de ficha técnica (si `a.metadata` existe) y tarjeta de enlaces externos (si `a.externalLinks` existe) en `initDetailPage()` ✅
 - [x] **0.39.5 — Estilos CSS** — `.article-metadata-card` y `.article-external-links-card` en articles.css con grid layout responsivo, tipografía clara, botones de enlace estilizados ✅
-- [x] **0.39.6 — Tests** — `npm test` pasa con 41/43 artículos (41 imported sin metadata + 2 newly completed con metadata), sin breaking changes ✅
+- [x] **0.39.6 — Tests** — `npm test` pasa con 41 artículos (39 sin metadata + 2 con metadata), sin breaking changes ✅
 
 #### Ejemplo: Artículo 36 (Quilombo película)
 
@@ -111,7 +111,7 @@ Cada nota es un **task list** para futura edición. El mirror es el mapa de trab
   - Tarjeta de ficha técnica (fondo rojo claro, borde izquierdo rojo): director, año, país, duración, idioma, subtítulos
   - Tarjeta de enlaces externos (fondo azul claro, borde izquierdo azul): botones de enlace a YouTube, IMDb, ok.ru, etc. con tipo visible
 - **Backward compatibility:** Artículos sin metadata o externalLinks no muestran las tarjetas — cero cambios visuales ni breaking changes
-- **Total articulos:** 43 (41 sin metadata + 2 nuevas películas con metadata)
+- **Total articulos:** 41 (39 sin metadata + 2 con metadata)
 
 #### Próximos pasos (futuro)
 
