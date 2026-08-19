@@ -1,5 +1,7 @@
 # Pasos de trabajo para Kilombo
 
+> **Nota:** este documento es el desglose práctico paso a paso. Para la hoja de ruta de alto nivel por fases sobre el mismo trabajo sin/con credenciales, ver `ROADMAP-fase-diagnostico.md`.
+
 ## 1. Trabajo que se puede hacer sin credenciales
 
 Estas tareas se pueden realizar de forma inicial aunque no se tenga acceso al panel de administración.

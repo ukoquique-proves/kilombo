@@ -5,31 +5,6 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
-## [0.38.0] — 2026-08-17
-
-### Added (visual signals for pending-review articles)
-- **`site/css/style.css` — badge ámbar y animación**: nueva clase `.card-status--pending` con fondo `#f57c00`, emoji ⚠️, y animación de pulso cada 2 segundos para destacar artículos incompletos
-- **`site/js/articles.js` — banner en detail page**: sección `.pending-review-banner` antes del contenido con fondo `#fff3e0`, borde izquierdo `#f57c00` y texto descriptivo
-- **`site/js/articles.js` — test coverage**: 3 nuevos tests en `test/articles.test.mjs` para `renderPendingReviewBadge()` y `renderPendingReviewBanner()`
-- **Contraste WCAG AA verificado**: contraste ámbar #f57c00 sobre blanco ≥ 4.5:1 ✅
-
-### Changed (status visual)
-- **`site/js/articles.js` — `renderArticleCard()`**: status `pending-review` → badge naranja `⚠️ pending-review` en lugar de texto plano
-- **`site/js/articles.js` — `initDetailPage()`**: añadido banner antes del contenido si `a.status === 'pending-review'`
-
-### Docs
-- **`ROADMAP.md` v0.38.0 section**: 5 ítems completados (badges, banner, CSS pulse, tests, WCAG)
-- **`TO_FIX.md`**: ítems #56-#58 cerrados con v0.38.0
-
-### Tests
-- Cobertura: **134/134 tests pasan** (mismo count que v0.37.0, sin cambios en tests)
-
-### Summary
-- ✅ badges ámbar en cards + animación de pulso (v0.38.1-0.38.3)
-- ✅ banner en detail page (v0.38.2)
-- ✅ tests y WCAG AA (v0.38.4-0.38.5)
-- ✅ pending-review visualmente imposible de pasar por alto
-
 ---
 
 ## [0.39.2] — 2026-08-18
@@ -56,6 +31,20 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ### Removed
 - `site/js/articles.js.orig` and `site/css/articles.css.orig` — stray editor backup files removed from the working tree.
+
+---
+
+## [0.37.1] — 2026-08-18
+
+> **Nota sobre el número de versión:** esta entrada comparte fecha con 0.39.2 y 0.39.1 pero tiene un número de versión menor porque continuó la rama de fixes 0.37.x (importador) en paralelo a la rama 0.39.x (schema multimedia), antes de que ambas convergieran. Se ordena aquí por fecha, no por número de versión — ver también la nota equivalente en TO_FIX.md si aplica.
+
+### Fixed (source import robustness)
+- **`scripts/import-article.mjs` — extraction hardening**: the Tierra importer no longer assumes every article body ends with the exact SPIP marker `<!-- Fin texte-article -->` and no longer treats a short link-based body as an image-only placeholder.
+- **Regression coverage**: added a new test for the “single YouTube link paragraph” pattern in `test/import-article.test.mjs`, ensuring short source articles with embedded media links are preserved instead of being collapsed into a stub.
+- **Impact**: this fixes the generalized importer failure behind entries like `quilombo-pelicula`, where the source page contained a real link to the movie and the mirror was replacing it with a placeholder due to an overly aggressive image-only heuristic.
+
+### Tests
+- `node --test test/import-article.test.mjs` — **11/11 tests passing**
 
 ---
 
@@ -128,15 +117,30 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
-## [0.37.1] — 2026-08-18
+## [0.38.0] — 2026-08-17
 
-### Fixed (source import robustness)
-- **`scripts/import-article.mjs` — extraction hardening**: the Tierra importer no longer assumes every article body ends with the exact SPIP marker `<!-- Fin texte-article -->` and no longer treats a short link-based body as an image-only placeholder.
-- **Regression coverage**: added a new test for the “single YouTube link paragraph” pattern in `test/import-article.test.mjs`, ensuring short source articles with embedded media links are preserved instead of being collapsed into a stub.
-- **Impact**: this fixes the generalized importer failure behind entries like `quilombo-pelicula`, where the source page contained a real link to the movie and the mirror was replacing it with a placeholder due to an overly aggressive image-only heuristic.
+### Added (visual signals for pending-review articles)
+- **`site/css/style.css` — badge ámbar y animación**: nueva clase `.card-status--pending` con fondo `#f57c00`, emoji ⚠️, y animación de pulso cada 2 segundos para destacar artículos incompletos
+- **`site/js/articles.js` — banner en detail page**: sección `.pending-review-banner` antes del contenido con fondo `#fff3e0`, borde izquierdo `#f57c00` y texto descriptivo
+- **`site/js/articles.js` — test coverage**: 3 nuevos tests en `test/articles.test.mjs` para `renderPendingReviewBadge()` y `renderPendingReviewBanner()`
+- **Contraste WCAG AA verificado**: contraste ámbar #f57c00 sobre blanco ≥ 4.5:1 ✅
+
+### Changed (status visual)
+- **`site/js/articles.js` — `renderArticleCard()`**: status `pending-review` → badge naranja `⚠️ pending-review` en lugar de texto plano
+- **`site/js/articles.js` — `initDetailPage()`**: añadido banner antes del contenido si `a.status === 'pending-review'`
+
+### Docs
+- **`ROADMAP.md` v0.38.0 section**: 5 ítems completados (badges, banner, CSS pulse, tests, WCAG)
+- **`TO_FIX.md`**: ítems #56-#58 cerrados con v0.38.0
 
 ### Tests
-- `node --test test/import-article.test.mjs` — **11/11 tests passing**
+- Cobertura: **134/134 tests pasan** (mismo count que v0.37.0, sin cambios en tests)
+
+### Summary
+- ✅ badges ámbar en cards + animación de pulso (v0.38.1-0.38.3)
+- ✅ banner en detail page (v0.38.2)
+- ✅ tests y WCAG AA (v0.38.4-0.38.5)
+- ✅ pending-review visualmente imposible de pasar por alto
 
 ---
 

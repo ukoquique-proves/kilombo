@@ -1,5 +1,7 @@
 # Hoja de ruta – Kilombo
 
+> **Nota:** este documento es la hoja de ruta de alto nivel por fases. Para el desglose práctico paso a paso del mismo trabajo sin/con credenciales, ver `pasos-trabajo-kilombo.md`.
+
 ## Objetivo general
 Revisar, organizar, mejorar y actualizar el conjunto de sitios de Kilombo, partiendo del análisis del espacio público y avanzando hacia la publicación y mantenimiento del contenido.
 

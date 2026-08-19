@@ -91,7 +91,8 @@ Antes de incorporar cualquier material nuevo, verificar:
    - topics:         array de etiquetas en minúsculas
    - sourceSite:     nombre legible del sitio de origen
    - sourceUrl:      URL completa al artículo original
-   - status:         imported | adapted | translated | pending-review
+   - status:         ver enum completo y valores en uso real en
+                     `site/assets/content/ARTICLES.schema.md` (fuente única de verdad)
    - contentHtml:    HTML limpio (solo p, a, strong, em, ul, ol, li,
                      blockquote, h3, h4 — sin script, sin estilos inline)
    
@@ -391,4 +392,3 @@ Semana 4+:
 - `TO_FIX.md` — problemas abiertos que afectan al contenido actual
 - `scripts/validate-data.mjs` — schema completo de artículos y vídeos
 - `site/js/render.mjs` — allowlist de etiquetas HTML permitidas en contentHtml
-

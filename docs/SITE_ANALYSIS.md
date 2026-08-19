@@ -25,13 +25,13 @@ The scraper authenticates via **YunoHost SSO** but the `kilombo` user account do
 ## Key Finding: Hidden French-Language Articles
 
 The initial RSS-only scrape found **54 articles**.  
-A full sequential probe (IDs 1–120) discovered **9 additional articles** not listed in any navigation menu, RSS feed, or archive index — all in **French**, all accessible via direct URL.
+A full sequential probe (IDs 1–120) discovered **7 additional articles** not listed in any navigation menu, RSS feed, or archive index — all in **French**, all accessible via direct URL.
 
 These articles have **no section assigned** in SPIP (`sin sección`), which makes them invisible to all index pages but they remain published and publicly accessible.
 
 ---
 
-## Complete Article Inventory (63 Valid Published Articles)
+## Complete Article Inventory (61 Valid Published Articles)
 
 ### Articles in Navigation Menu (54 total)
 
@@ -159,4 +159,3 @@ for i in range(1, 200):
     elif '404' not in r.text:
         print(f'[{i}] ? - Unexpected response')
 ```
-

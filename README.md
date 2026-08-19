@@ -201,6 +201,17 @@ KILOMBO/
 │   ├── inventario-inicial-kilombo.md
 │   └── pasos-trabajo-kilombo.md
 │
+├── docs/                  ← Documentación operativa y de referencia
+│   ├── MIGRATION.md               ← Relación entre kilombo.top (SPIP) y el portal espejo (GitHub Pages)
+│   ├── TROUBLESHOOTING.md         ← Diagnóstico de acceso al servidor + flujo de publicación en GitHub Pages
+│   ├── TO_FIX.md                  ← Bugs y pendientes activos
+│   ├── SITE_ANALYSIS.md           ← Inventario en vivo del sitio origen (www.kilombo.top)
+│   ├── MIRROR_GROWING.md          ← Guía de crecimiento del espejo (qué importar y cómo)
+│   ├── PENDING-REVIEW.md          ← Artículos con status: pending-review y sus pasos de resolución
+│   ├── EXTRACTION-GAPS-FIXED.md   ← Historial de gaps de extracción corregidos
+│   ├── DEPLOYMENT-AND-SOURCE-EDITING.md ← Notas de despliegue y edición de fuente
+│   └── BUILD-TRIGGER.md           ← Notas sobre disparo de build
+│
 ├── .env                   ← Credenciales y referencias externas (NO SUBIR A REPO PÚBLICO)
 ├── .env.example           ← Plantilla de .env (segura, para subir al repo)
 ├── end-of-session.sh      ← Ejecutar al terminar cada sesión: push a GitHub + deploy a kilombo.top
@@ -208,9 +219,6 @@ KILOMBO/
 ├── sync-to-production.sh  ← Deploy manual a kilombo.top via rsync/scp
 ├── README.md              ← Este archivo
 ├── ROADMAP.md             ← Hoja de ruta técnica (pasos numerados)
-├── MIGRATION.md           ← Relación entre kilombo.top (SPIP) y el portal espejo (GitHub Pages)
-├── TROUBLESHOOTING.md     ← Diagnóstico de acceso al servidor + flujo de publicación en GitHub Pages
-├── TO_FIX.md              ← Bugs y pendientes activos
 └── CHANGELOG.md           ← Historial de versiones
 ```
 
@@ -239,7 +247,7 @@ Antes de publicar, asegúrate de que el repositorio cumple estas condiciones:
 
 ### Modelo de confianza del contenido — `articles.json`
 
-Los campos simples de un artículo (`title`, `date`, `status`, `sourceSite`, cada `topic`) siempre pasan por `escapeHtml()` antes de insertarse en el DOM. El campo `contentHtml` es HTML enriquecido — pensado para párrafos, enlaces, listas — así que **no** se puede simplemente escapar como texto plano; en su lugar pasa por `sanitizeHtml()` (`site/js/render.mjs`), que reduce el HTML a un allowlist de etiquetas de formato y elimina `<script>`, atributos de evento y URLs `javascript:`/`data:`. `scripts/validate-data.mjs` aplica una comprobación equivalente en `npm test`, así que un `contentHtml` peligroso falla el build antes de llegar a producción, no solo en el navegador. Aun así: dado que el esquema permite `status: imported|adapted|translated` desde `sourceUrl` externas, cualquier `contentHtml` importado debe revisarse editorialmente antes de mergear a `main` — el saneado técnico evita XSS, no sustituye la revisión de contenido.
+Los campos simples de un artículo (`title`, `date`, `status`, `sourceSite`, cada `topic`) siempre pasan por `escapeHtml()` antes de insertarse en el DOM. El campo `contentHtml` es HTML enriquecido — pensado para párrafos, enlaces, listas — así que **no** se puede simplemente escapar como texto plano; en su lugar pasa por `sanitizeHtml()` (`site/js/render.mjs`), que reduce el HTML a un allowlist de etiquetas de formato y elimina `<script>`, atributos de evento y URLs `javascript:`/`data:`. `scripts/validate-data.mjs` aplica una comprobación equivalente en `npm test`, así que un `contentHtml` peligroso falla el build antes de llegar a producción, no solo en el navegador. Aun así: dado que el esquema permite varios valores de `status` (ver enum completo en `site/assets/content/ARTICLES.schema.md`) para artículos provenientes de `sourceUrl` externas, cualquier `contentHtml` importado debe revisarse editorialmente antes de mergear a `main` — el saneado técnico evita XSS, no sustituye la revisión de contenido.
 
 ---
 

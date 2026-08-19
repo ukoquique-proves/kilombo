@@ -61,14 +61,14 @@ test('detectSite recognizes Tierra y Libertad and PI hosts', () => {
   assert.equal(detectSite('https://example.com/'), 'unknown');
 });
 
-test('detectSite recognizes GCI subdomains as "gci", not "tierra" (TO_FIX #XX)', () => {
+test('detectSite recognizes GCI subdomains as "gci", not "tierra" (TO_FIX #61)', () => {
   assert.equal(detectSite('https://icg-gci.kilombo.top/spip.php?article=1'), 'gci');
   assert.equal(detectSite('https://in.kilombo.top/spip.php?article=1'), 'gci-in');
   assert.equal(detectSite('https://cdrom.kilombo.top/spip.php?article=1'), 'gci-static');
   assert.equal(detectSite('https://icg-old.kilombo.top/spip.php?article=1'), 'gci-static');
 });
 
-test('buildArticleEntry rejects GCI hosts loudly instead of silently misextracting via extractTierra (TO_FIX #XX)', async () => {
+test('buildArticleEntry rejects GCI hosts loudly instead of silently misextracting via extractTierra (TO_FIX #61)', async () => {
   const fetchHtml = async () => '<html><body>should never be fetched</body></html>';
   // icg-gci: SPIP official site
   await assert.rejects(

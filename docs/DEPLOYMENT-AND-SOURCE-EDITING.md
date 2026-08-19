@@ -2,6 +2,8 @@
 
 This note explains how the project is meant to be edited and deployed, and how it differs from editing the original SPIP site on `kilombo.top`.
 
+> **See also:** `docs/MIGRATION.md` (why the mirror exists and how the incremental migration to `kilombo.top` works) and `docs/TROUBLESHOOTING.md` §4 (concrete steps to resolve SSH/port-22 access and the SPIP admin permission blocker). This document focuses on the day-to-day "which workflow do I use" decision; those two cover the underlying infrastructure detail.
+
 ## 1) What the repo is
 
 This repository is not the original SPIP application. It is a static mirror / portal that reuses and reshapes content from the Kilombo network.
@@ -22,23 +24,9 @@ This is the deployment path expected by the project.
 
 ## 2) What the credentials in `.env` are for
 
-The environment file contains the credentials used for the production mirror deployment and infrastructure access.
+The environment file (`KILOMBOTOP_HOST`, `KILOMBOTOP_PORT`, `KILOMBOTOP_USER`, `KILOMBOTOP_PASSWORD`, `KILOMBOTOP_REMOTE_PATH`) contains the credentials used for the production mirror deployment (SSH/rsync/scp to the live site, YunoHost infrastructure operations). They are not the same as the content source credentials for the original SPIP content management backend.
 
-Relevant values in `.env`:
-
-- `KILOMBOTOP_HOST=kilombo.top`
-- `KILOMBOTOP_PORT=22`
-- `KILOMBOTOP_USER=kilombo`
-- `KILOMBOTOP_PASSWORD=...`
-- `KILOMBOTOP_REMOTE_PATH=/var/www/kilombo.top`
-
-These are used for:
-
-- SSH deployment
-- rsync/scp sync to the live site
-- YunoHost infrastructure operations
-
-They are not the same as the content source credentials for the original SPIP content management backend.
+For the full picture of why this deployment path exists and what it depends on (admin permissions already confirmed, the one pending step being port 22), see `docs/MIGRATION.md` §"¿Necesitamos a los administradores del servidor?".
 
 ## 3) Intended deployment workflow
 
@@ -108,16 +96,9 @@ Use direct SSH/server access when:
 
 ## 7) Check whether port 22 is open
 
-The project expects SSH on port 22 to be accessible.
+The project expects SSH on port 22 to be accessible; the deployment script will abort if it is not.
 
-The script will abort if it is not.
-
-From the project docs, the expected access path is:
-
-- `https://kilombo.top/yunohost/admin/`
-- go to Tools → Firewall → TCP 22
-
-If port 22 is closed, the deployment script will not be able to run.
+For the current status and the concrete options to resolve this (opening the port via the YunoHost panel, running from the server's local network, or using Nextcloud as a temporary file bridge), see `docs/TROUBLESHOOTING.md` §4 "Bloqueo A".
 
 ## 8) Recommended next step
 
