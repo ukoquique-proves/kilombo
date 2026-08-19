@@ -555,3 +555,61 @@ El "comportamiento extraño" no es un bug — es el resultado previsto de:
 - Ausencia de reglas de acceso basadas en roles en SPIP (todo es público)
 
 Si esto cambia en el futuro, avisa — habrá que revisar la arquitectura de permisos.
+
+---
+
+## §9. Validación de alt y existencia de archivos locales en validate-data.mjs — problema de testing pendiente
+
+**Fecha:** 2026-08-19
+**Estado:** Parcialmente resuelto — las reglas están definidas pero sin tests unitarios
+
+### Contexto
+
+Al importar el artículo `futuras-generaciones` con una imagen local (`assets/images/futuras-generaciones.jpg`), se detectaron tres gaps arquitectónicos en el pipeline de validación:
+
+1. `validate-data.mjs` no valida el atributo `alt` en etiquetas `<img>` — imágenes con `alt=""` o sin `alt` pasan CI silenciosamente (violación WCAG AA)
+2. `validate-data.mjs` no verifica que los archivos `assets/images/...` referenciados en `contentHtml` existan realmente en disco — un archivo no committeado pasaría CI y llegaría a producción como imagen rota
+3. La exención `assets/` en `url-safety.mjs` era demasiado amplia (`assets/` genérico → permitía `assets/js/`, `assets/content/`, etc.)
+
+### Qué se hizo
+
+- **url-safety.mjs:** exención narrowed de `assets/` a `assets/(?:images|audios|subtitles|transcripts)/` ✅ — con tests en `test/url-safety.test.mjs` ✅
+- **validate-data.mjs — alt + file-existence:** funciones `validateContentHtmlAlt()` y `validateContentHtmlAssetRefs()` escritas y funcionan correctamente cuando se prueban manualmente. Las reglas están integradas en `validateArticleEntry()`.
+
+### El problema de testing que quedó sin resolver
+
+`validate-data.mjs` es un **script puro sin exports**. Intentar escribir tests unitarios para las nuevas funciones internas chocó con dos obstáculos:
+
+**Opción A — subprocess con patch de articles.json:**
+El test escribe temporalmente un articles.json con datos malos, ejecuta `node scripts/validate-data.mjs` como subprocess, y restaura el original. Falló por dos razones:
+- `node:test` ejecuta tests top-level en paralelo aunque se use `{ concurrency: false }` — los writes/restores de tests distintos se solapan y el subprocess lee el estado incorrecto
+- `validate-data.mjs` escribe los errores en `console.error` (stderr) no en stdout — `execSync` sin `stdio: 'pipe'` solo captura stdout, así que los errores no llegaban al assert
+
+Cuando se combinó stdout+stderr con `stdio: 'pipe'`, el problema de concurrencia hacía que el "baseline" test viera errores del test anterior.
+
+**Opción B — exportar las funciones:**
+Añadir `export function validateContentHtmlAlt(...)` al script requeriría reestructurarlo para separar la lógica del CLI del módulo, sin romper el comportamiento de `node scripts/validate-data.mjs` directo. Factible pero no trivial.
+
+### Próximos pasos
+
+Cualquiera de estas dos rutas resuelve el problema:
+
+**Ruta 1 (recomendada, más limpia):** Refactorizar `validate-data.mjs` para separar la lógica en un módulo importable (`scripts/validate-helpers.mjs`) y el CLI en una capa fina. Las funciones exportadas se testean directamente con `node:test` sin subprocesses. Esfuerzo: ~1h.
+
+**Ruta 2 (mínima):** En el test de subprocess, usar `t.test()` síncronamente (sin `async/await`) y capturar stdout+stderr con `spawnSync` en lugar de `execSync`, con `stdio: 'pipe'` explícito. Esfuerzo: ~20min, pero más frágil.
+
+Mientras tanto, las reglas están activas en `validate-data.mjs` y se pueden verificar manualmente con:
+```bash
+# Verificar que el artículo con imagen local pasa
+node scripts/validate-data.mjs
+
+# Verificar manualmente la regla de alt (ejemplo con curl + patch temporal)
+# Ver el script de test que se intentó: la lógica de withHtml() es correcta,
+# solo falla la infraestructura de test.
+```
+
+### Estado actual del artículo afectado
+
+`futuras-generaciones` tiene alt texto descriptivo y el archivo `site/assets/images/futuras-generaciones.jpg` existe en disco y está committeado — pasa la validación correctamente hoy.
+
+El artículo `imagenes` (PENDING-REVIEW.md §3) tiene `alt=""` en sus tres imágenes — seguirá pasando CI hasta que se implementen los tests y se active la regla formalmente. Documentado en `docs/PENDING-REVIEW.md`.

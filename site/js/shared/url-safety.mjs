@@ -16,7 +16,7 @@
 // and test/url-safety.test.mjs can assert the two consumers stay in sync.
 
 const UNSAFE_URL_SCHEMES = /^\s*(javascript|data|vbscript):/i;
-const ABSOLUTE_OR_EXEMPT = /^(https?:\/\/|#|mailto:|assets\/)/i;
+const ABSOLUTE_OR_EXEMPT = /^(https?:\/\/|#|mailto:|assets\/(?:images|audios|subtitles|transcripts)\/)/i;
 
 // Per the WHATWG URL spec, browsers strip all "C0 control or space" chars
 // — and specifically tab (\t), newline (\n) and carriage return (\r) —

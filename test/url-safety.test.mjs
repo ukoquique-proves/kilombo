@@ -40,11 +40,21 @@ const relativeUrls = [
   '../other.html',
 ];
 
-// Local asset paths under assets/ are exempt — they resolve correctly
-// relative to every page in the site (all pages are at root level).
+// Local asset paths under known media subdirectories are exempt — they
+// resolve correctly relative to every page in the site (all pages are at
+// root level). Only known subdirs are accepted; assets/js/ or
+// assets/content/ would still be rejected.
 const localAssetUrls = [
   'assets/images/futuras-generaciones.jpg',
   'assets/audios/grabacion.mp3',
+  'assets/subtitles/video-fr.vtt',
+  'assets/transcripts/audio-01.md',
+];
+
+const rejectedLocalUrls = [
+  'assets/js/malicious.js',
+  'assets/content/articles.json',
+  'assets/data/plandemismo.json',
 ];
 
 test('isSafeUrl accepts safe links and rejects unsafe schemes', () => {
@@ -58,6 +68,7 @@ test('isAbsoluteOrExempt accepts absolute http(s), anchors, mailto and local ass
   assert.equal(isAbsoluteOrExempt('mailto:test@example.com'), true);
   for (const url of localAssetUrls) assert.equal(isAbsoluteOrExempt(url), true, `should accept local asset ${url}`);
   for (const url of relativeUrls) assert.equal(isAbsoluteOrExempt(url), false, `should reject relative ${url}`);
+  for (const url of rejectedLocalUrls) assert.equal(isAbsoluteOrExempt(url), false, `should reject non-media asset ${url}`);
 });
 
 test('isImportableUrl rejects both unsafe and relative URLs', () => {
