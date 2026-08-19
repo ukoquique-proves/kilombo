@@ -447,11 +447,8 @@
     ],
     "sourceSite": "Espacio Tierra y Libertad (kilombo.top)",
     "sourceUrl": "https://www.kilombo.top/spip.php?article34",
-    "status": "pending-review",
-    "contentHtml": "<p>Como deshumanizan a los niños en las escuelas.</p>",
-    "notes": [
-      "PENDIENTE: Cuerpo extraído es una sola frase (53 chars) — el artículo original probablemente contiene imágenes, vídeo o documento externo que el extractor no encontró. No hay snapshot local (scraped-full/article-34.html ausente). Pasos: (1) acceder a la fuente en vivo y revisar contenido real; (2) si hay texto: re-importar con --force-update; (3) si hay vídeo: añadir enlace en externalLinks[]; (4) si es imagen: transcribir o añadir descripción contextual."
-    ]
+    "status": "imported",
+    "contentHtml": "<p><strong>ALGO NO TIENE SENTIDO...</strong></p>\n<p>Quieren fabricar una futura generación de esclavos (aún más esclavos), que estén programados desde sus primeros pasos para autoconfinarse, autolimitarse, mutilar sus propias libertades y tener miedo del contacto humano.</p>\n<p>Los niños tienen que jugar juntos, relacionarse, ver los rostros y las emociones de sus amigos y de los adultos. Si no, la infancia no tiene ningún sentido.</p>\n<figure>\n<img src=\"https://www.kilombo.top/IMG/jpg/external-content.duckduckgo.com.jpg.jpg\"\n alt=\"Niños en clase con mascarilla y separados por distancia social — aislados unos de otros\">\n</figure>\n<figure>\n<img src=\"https://www.kilombo.top/local/cache-vignettes/L400xH225/external-content.duckduckgo.com.jpg-7ca6c.jpg?1743599407\"\n alt=\"Adultos en una terraza de bar sin mascarilla, conversando libremente y en contacto cercano — el contraste con los niños en clase\">\n</figure>\n<p><strong>EL ESTADO NO ES DUEÑO DE NUESTROS HIJOS<br>¡DEJAD A LOS NIÑOS EN PAZ!</strong></p>"
   },
   {
     "id": "quilombo-pelicula",

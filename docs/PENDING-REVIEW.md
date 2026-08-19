@@ -65,23 +65,9 @@ Actualizar este archivo siempre que:
 
 ---
 
-## 4. Futuras generaciones
+## 4. ~~Futuras generaciones~~ — ✅ COMPLETADO
 
-| Campo | Valor |
-|---|---|
-| **id** | `futuras-generaciones` |
-| **Fuente** | https://www.kilombo.top/spip.php?article34 |
-| **Sección** | `nom` |
-| **Temas** | control-social, educacion, domesticacion |
-
-**Problema:** El cuerpo extraído es una sola frase: *"Como deshumanizan a los niños en las escuelas."* (53 caracteres). El artículo original probablemente consiste en imágenes, un vídeo embebido, o un documento externo — el extractor no encontró texto real. No hay snapshot local (`scraped-full/article-34.html` no existe).
-
-**Qué hace falta:**
-1. Acceder a la fuente en vivo y revisar el contenido real del artículo.
-2. Si hay texto: re-importar con `--force-update`.
-3. Si es vídeo: añadir enlace en `externalLinks[]` con `type: "youtube"` o similar.
-4. Si es imagen: transcribir o añadir descripción contextual.
-5. Nota: este artículo también tiene fecha recuperada (2023-02-27) del backfill — verificar que es correcta contra la fuente.
+Artículo completado el 2026-08-19. Contenido incorporado desde la fuente original (texto + imágenes con alt text descriptivo). `status` cambiado a `imported`.
 
 ---
 
@@ -166,7 +152,7 @@ Actualizar este archivo siempre que:
 | 1 | `el-fraude-de-los-pcr` | Solo imágenes, sin texto | Medio — transcripción manual |
 | 2 | `gouverner-par-le-chaos` | Solo descriptif, sin snapshot local | Bajo — re-fetch en vivo |
 | 3 | `imagenes` | Galería de imágenes, alt vacíos | Bajo — añadir alt text |
-| 4 | `futuras-generaciones` | Una frase, sin snapshot local | Bajo — re-fetch en vivo |
+| 4 | `futuras-generaciones` | ✅ Completado | — |
 | 5 | `transformacion-registros-akashicos` | Solo imágenes | Medio — transcripción manual |
 | 6 | `terrain-the-film` | Texto ok, faltan metadatos y enlace | Bajo — investigación + JSON |
 | 7 | `el-negacionista-cortometraje` | Solo imágenes | Medio — investigación + transcripción |
