@@ -18,7 +18,7 @@ En lugar de modificar `kilombo.top` directamente — lo que obligaría a borrar 
 | **Tecnología** | SPIP 4.4.15 CMS + base de datos | HTML/CSS/JS estático |
 | **Estado** | Sitio en producción activo | Propuesta en desarrollo |
 | **Propósito** | El sitio que existe hoy | El sitio que irá reemplazando al anterior |
-| **Análisis** | Ver [`docs/SITE_ANALYSIS.md`](../docs/SITE_ANALYSIS.md) para datos vivos: 54 artículos, 5+ vídeos, estructura completa | — |
+| **Análisis** | Ver [`docs/SITE_ANALYSIS.md`](../docs/SITE_ANALYSIS.md) para datos vivos: 41 artículos, 5+ vídeos, estructura completa | — |
 
 ---
 
@@ -72,6 +72,33 @@ YunoHost ya sirve sitios estáticos en el mismo servidor: `cdrom.kilombo.top` e 
 Lo único que hay que hacer en el servidor es crear una app `my_webapp` apuntando al dominio raíz `kilombo.top` desde el panel YunoHost (ítem `YunoHost-C` en `TO_FIX.md`). Una tarea de 5 minutos cuando el equipo esté disponible.
 
 SPIP seguirá corriendo en `www.kilombo.top` si hace falta mantener el CMS editorial — el portal raíz y el CMS pueden coexistir en subdominios distintos.
+
+---
+
+## Modelo de cifrado por destino — por qué GitHub Pages y kilombo.top reciben contenido distinto
+
+Esto es intencional y está diseñado así, pero es fácil confundirse porque los dos deploys se hacen desde el mismo repo. Aquí está la lógica:
+
+| | GitHub Pages | `kilombo.top` |
+|---|---|---|
+| **Qué se sube** | `dist/` — salida de `npm run encrypt` | `site/` — fuente sin cifrar |
+| **Quién puede leer el contenido** | Solo quien tenga la contraseña StatiCrypt | Quien acceda al servidor (acceso controlado por YunoHost) |
+| **Cómo funciona** | El visitante ve un formulario de contraseña; el descifrado ocurre en el navegador con AES-256-CBC | El servidor sirve HTML/JS/JSON en claro directamente |
+| **Para qué sirve** | Preview semiprivado — comparte la URL con quien quieras sin exponer el contenido a buscadores o scrapers | Producción real — el servidor ya tiene su propia capa de acceso (YunoHost SSO / firewall) |
+
+### Por qué es correcto así
+
+`kilombo.top` ya tiene control de acceso en la capa de servidor (YunoHost). Subir el contenido cifrado ahí añadiría fricción innecesaria — el cliente tendría que introducir la contraseña StatiCrypt cada vez que cargue su propio sitio.
+
+GitHub Pages, en cambio, es público por diseño de la plataforma — cualquier URL de `github.io` es indexable. StatiCrypt en `dist/` evita que el contenido quede expuesto mientras el espejo está en desarrollo.
+
+### Lo que esto significa en la práctica
+
+- `npm run encrypt` + GitHub Actions → `dist/` → GitHub Pages (cifrado, semiprivado)
+- `./sync-to-production.sh` → `site/` → `kilombo.top` (sin cifrar, producción)
+- **Nunca** subir `dist/` a `kilombo.top` ni `site/` a GitHub Pages directamente
+
+Si en algún momento se quiere que `kilombo.top` también tenga protección por contraseña (por ejemplo durante una fase de desarrollo en producción), se puede redirigir `sync-to-production.sh` para que suba `dist/` en lugar de `site/` — pero eso requiere decisión explícita, no es el comportamiento por defecto.
 
 ---
 

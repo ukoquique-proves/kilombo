@@ -109,7 +109,7 @@ Añadir la función después de `extractPI()`, antes de la sección
  *   - Date: <abbr class="published" title="YYYY-MM-DDT..."> (already ISO)
  *   - Body: <div class="texte surlignable clearfix"> … </div><!--.content-->
  * @param {string} html
- * @returns {{ title: string, date: string, bodyHtml: string, isImageOnly: boolean }}
+ * @returns {{ title: string, date: string, bodyHtml: string, isImageOnly: boolean, unextractedMediaWarning?: string }}
  */
 export function extractGCI(html) {
   // Title — strip any inner tags (e.g. <img> used as article header image)
@@ -122,23 +122,49 @@ export function extractGCI(html) {
   const dateMatch = html.match(/<abbr[^>]*class="published"[^>]*title="(\d{4}-\d{2}-\d{2})/);
   const date = dateMatch ? dateMatch[1] : '';
 
-  // Body — truncate at <!--.content--> marker or <footer / <aside
+  // Body — truncate at </div><!--.content--> marker (regex, tolerant of
+  // whitespace/newlines between the tag and the comment) or fall back to
+  // <footer / <aside.
   const bodyStart = html.search(/class="texte surlignable clearfix"/);
   let bodyHtml = '';
   if (bodyStart !== -1) {
     const afterDiv = html.indexOf('>', bodyStart) + 1;
-    const endMarker = html.indexOf('</div><!--.content-->', afterDiv);
-    bodyHtml = endMarker !== -1
-      ? html.slice(afterDiv, endMarker)
-      : html.slice(afterDiv, html.search(/<footer|<aside/i));
+    const rest = html.slice(afterDiv);
+    const endMatch = rest.match(/<\/div>\s*<!--\.content-->/);
+    bodyHtml = endMatch
+      ? rest.slice(0, endMatch.index)
+      : rest.slice(0, rest.search(/<footer|<aside/i));
   }
 
   const plainTextLength = bodyHtml.replace(/<[^>]+>/g, '').trim().length;
-  const isImageOnly = plainTextLength < 200 && !/<a\s+[^>]*href=/i.test(bodyHtml);
+  const hasLink = /<a\s+[^>]*href=/i.test(bodyHtml);
+  const hasMediaLink = /<a\s+[^>]*href=(?:['"])?(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|[^'"\s]+\.(?:mp4|webm|m3u8))/i.test(bodyHtml);
 
-  return { title, date, bodyHtml, isImageOnly };
+  // Gap check — same principle as extractTierra(): a portfolio-style image
+  // gallery or a document link that appears too thin to have real context
+  // means the real content lives outside the captured body, so we force
+  // pending-review even if bodyHtml looks non-empty.
+  const portfolioImages = html.match(/<div[^>]*class="[^"]*portfolio[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+  const unextractedImgCount = portfolioImages ? (portfolioImages[1].match(/<img/gi) || []).length : 0;
+  const hasDocumentLink = /<a[^>]*href=(?:['"])?[^'"\s]*\.(?:pdf|doc|docx|xls|xlsx|zip|rar|7z)['"']?/i.test(bodyHtml);
+  const documentLinkWithoutContext = hasDocumentLink && plainTextLength < 100;
+  const hasUnextractedMedia = unextractedImgCount > 0 || documentLinkWithoutContext;
+
+  const isImageOnly = plainTextLength < 200 && !hasLink && !hasMediaLink;
+
+  let unextractedMediaWarning;
+  if (hasUnextractedMedia && !isImageOnly) {
+    unextractedMediaWarning = `Documento adjunto (${unextractedImgCount > 0 ? unextractedImgCount + ' imágenes de galería' : 'enlace a descarga'}) no extraído de la sección de cuerpo.`;
+  }
+
+  return { title, date, bodyHtml, isImageOnly, unextractedMediaWarning };
 }
 ```
+
+**Mejoras respecto al borrador original del plan:**
+- La terminación del cuerpo usa regex (`/<\/div>\s*<!--\.content-->/`) en lugar de `indexOf()` — tolera espacios/saltos de línea entre el tag y el comentario, que el HTML real de SPIP tiene de forma inconsistente.
+- `isImageOnly` incluye `hasLink` y `hasMediaLink` — artículos con enlace a YouTube/vídeo no se colapsan en stubs aunque tengan poco texto.
+- `unextractedMediaWarning` añadido — misma lógica de detección de galerías y PDFs adjuntos que `extractTierra()`. El tipo de retorno queda idéntico al de `extractTierra()`, por lo que `buildArticleEntry()` no necesita tratamiento especial.
 
 ---
 
