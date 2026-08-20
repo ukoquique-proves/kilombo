@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import { Window } from 'happy-dom';
 import {
   checkDedup,
+  checkFinalIdCollision,
   detectSite,
   extractTierra,
   rewriteRelativeUrls,
@@ -42,6 +43,41 @@ test('checkDedup rejects duplicate id', () => {
 test('checkDedup allows same sourceUrl replacement when forceUpdate is true', () => {
   const existing = [{ sourceUrl: 'https://kilombo.top/articulo1', id: 'art-1' }];
   assert.equal(checkDedup({ sourceUrl: 'https://kilombo.top/articulo1', id: 'art-2' }, existing, true), null);
+});
+
+test('checkFinalIdCollision — returns null when no collision exists', () => {
+  const existing = [{ id: 'existing-article', sourceUrl: 'https://example.com/1' }];
+  assert.equal(checkFinalIdCollision('new-article', 'https://example.com/2', existing), null);
+});
+
+test('checkFinalIdCollision — returns error when auto-slugified id collides with different sourceUrl', () => {
+  const existing = [{ id: 'titulo-articulo', sourceUrl: 'https://example.com/1' }];
+  const result = checkFinalIdCollision('titulo-articulo', 'https://example.com/2', existing);
+  assert.ok(result !== null);
+  assert.ok(result.includes('titulo-articulo'));
+  assert.ok(result.includes('--id'));
+});
+
+test('checkFinalIdCollision — returns null when forceUpdate is true even with collision', () => {
+  const existing = [{ id: 'titulo-articulo', sourceUrl: 'https://example.com/1' }];
+  assert.equal(checkFinalIdCollision('titulo-articulo', 'https://example.com/2', existing, true), null);
+});
+
+test('buildArticleEntry throws when auto-slugified id collides with existing article', async () => {
+  const mockHtml = `
+    <div id="titre-article">Título Artículo</div>
+    <div id="texte-article"><p>Contenido suficiente para no ser image-only.</p></div>
+  `;
+  const fetchHtml = async () => mockHtml;
+  const existing = [{ id: 'titulo-articulo', sourceUrl: 'https://www.kilombo.top/spip.php?article99' }];
+  await assert.rejects(
+    () => buildArticleEntry(
+      { url: 'https://www.kilombo.top/spip.php?article100', section: 'tierra', topics: [] },
+      fetchHtml,
+      existing
+    ),
+    /titulo-articulo/
+  );
 });
 
 test('upsertArticle replaces the matching existing entry when forceUpdate is enabled', () => {

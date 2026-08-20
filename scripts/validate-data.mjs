@@ -134,9 +134,22 @@ function validateVideoEntry(entry, file, index) {
 
 const ARTICLE_STATUS = new Set(['imported', 'adapted', 'translated', 'pending-review', 'external-only']);
 
+// ARTICLES.schema.md documents id as "lowercase alphanumeric + hyphens, max
+// 80 chars" — matches scripts/import-article.mjs's slugify() output exactly,
+// so a well-formed id here should always be producible by the same pipeline
+// that generates it. Catches manual JSON edits that don't go through slugify().
+const ID_FORMAT_RE = /^[a-z0-9-]+$/;
+const ID_MAX_LENGTH = 80;
+
 /** @type {FieldRule[]} */
 const ARTICLE_RULES = [
-  { name: 'id', type: 'string', required: true, validate: (v) => String(v).trim() ? null : 'id must be non-empty' },
+  { name: 'id', type: 'string', required: true, validate: (v) => {
+      const s = String(v);
+      if (!s.trim()) return 'id must be non-empty';
+      if (s.length > ID_MAX_LENGTH) return `id must be at most ${ID_MAX_LENGTH} chars (got ${s.length})`;
+      if (!ID_FORMAT_RE.test(s)) return 'id must be lowercase alphanumeric + hyphens only (matches scripts/import-article.mjs slugify() output)';
+      return null;
+    }},
   { name: 'title', type: 'string', required: true, validate: (v) => String(v).trim() ? null : 'title must be non-empty' },
   { name: 'date', type: 'string', required: false, validate: (v) => {
       // Permite vacío, pero si hay contenido, exige YYYY-MM-DD.
@@ -177,6 +190,65 @@ const ARTICLE_RULES = [
       }
       const urlError = validateContentHtmlUrls(s);
       if (urlError) return urlError;
+      return null;
+    }},
+];
+
+// Optional media fields (TO_FIX #39.x / v0.39.1): documented in
+// ARTICLES.schema.md and rendered by site/js/articles.js's initDetailPage(),
+// but previously never validated here — a malformed metadata/externalLinks
+// value could pass `npm test` and only surface at render time. Added as a
+// CI-time safety net so a bad import is caught before deploy, not after.
+/** @type {FieldRule[]} */
+const ARTICLE_OPTIONAL_RULES = [
+  { name: 'relatedArticles', type: 'array', required: false, validate: (v) => {
+      if (!Array.isArray(v)) return 'relatedArticles must be an array';
+      for (const id of v) {
+        if (typeof id !== 'string' || !id.trim()) return 'each relatedArticles entry must be a non-empty string (article id)';
+      }
+      return null;
+    }},
+  { name: 'externalLinks', type: 'array', required: false, validate: (v) => {
+      if (!Array.isArray(v)) return 'externalLinks must be an array';
+      for (const link of v) {
+        if (typeof link !== 'object' || link === null || Array.isArray(link)) {
+          return 'each externalLinks entry must be an object';
+        }
+        if (typeof link.type !== 'string' || !link.type.trim()) {
+          return 'each externalLinks entry must have a non-empty "type" string';
+        }
+        if (typeof link.url !== 'string' || !link.url.trim()) {
+          return 'each externalLinks entry must have a non-empty "url" string';
+        }
+        if (!isSafeUrl(link.url)) {
+          return `externalLinks url "${link.url}" uses a forbidden scheme (javascript:/data:/vbscript:)`;
+        }
+        if (!isAbsoluteOrExempt(link.url)) {
+          return `externalLinks url "${link.url}" must be an absolute https?:// URL (or # / mailto:)`;
+        }
+        if ('title' in link && typeof link.title !== 'string') {
+          return 'externalLinks.title must be a string if present';
+        }
+      }
+      return null;
+    }},
+  // metadata is a free-form bag per ARTICLES.schema.md ([key: string]: any),
+  // but the fields it documents by name (year in particular) are rendered
+  // unescaped-adjacent in articles.js, so their *type* is worth pinning down
+  // even though the object as a whole stays open-ended.
+  { name: 'metadata', type: 'object', required: false, validate: (v) => {
+      if (typeof v !== 'object' || v === null || Array.isArray(v)) return 'metadata must be an object';
+      const obj = /** @type {Record<string, unknown>} */ (v);
+      const stringFields = ['mediaType', 'director', 'country', 'duration', 'language', 'subtitles', 'source', 'filmFestival'];
+      for (const f of stringFields) {
+        if (f in obj && typeof obj[f] !== 'string') return `metadata.${f} must be a string if present`;
+      }
+      if ('year' in obj) {
+        const y = obj.year;
+        if (typeof y !== 'number' || !Number.isFinite(y) || y < 1800 || y > 2100) {
+          return `metadata.year must be a number between 1800 and 2100 if present (got ${JSON.stringify(y)})`;
+        }
+      }
       return null;
     }},
 ];
@@ -283,7 +355,7 @@ function validateArticleEntry(entry, file, index) {
 
   const obj = /** @type {Record<string, unknown>} */ (entry);
 
-  for (const rule of ARTICLE_RULES) {
+  for (const rule of [...ARTICLE_RULES, ...ARTICLE_OPTIONAL_RULES]) {
     const value = obj[rule.name];
     const present = rule.name in obj;
 
@@ -384,6 +456,45 @@ const contentScan = scanDir({
   validateEntry: validateArticleEntry,
 });
 
+// ================================================================
+// id uniqueness (per file) — ARTICLES.schema.md documents id as "unique"
+// but per-entry validateArticleEntry() has no visibility across entries to
+// enforce that. A collision was previously only prevented by
+// scripts/import-article.mjs's checkDedup(), and only for the explicit
+// --id flag — an auto-slugified id was never checked at all (see
+// checkFinalIdCollision() in import-article.mjs). This is the CI-time
+// safety net: it catches a collision regardless of how the JSON got
+// edited (script or by hand), before deploy.yml runs `npm test`.
+// ================================================================
+let idUniquenessErrors = 0;
+if (existsSync(CONTENT_DIR)) {
+  for (const file of readdirSync(CONTENT_DIR).filter((f) => f.endsWith('.json'))) {
+    let data;
+    try {
+      data = JSON.parse(readFileSync(join(CONTENT_DIR, file), 'utf8'));
+    } catch {
+      continue; // already reported as a JSON parse error above
+    }
+    if (!Array.isArray(data)) continue;
+
+    const seen = new Map(); // id -> first index seen
+    for (let i = 0; i < data.length; i++) {
+      const entry = data[i];
+      if (typeof entry !== 'object' || entry === null || typeof entry.id !== 'string') continue;
+      if (seen.has(entry.id)) {
+        console.error(
+          `❌  content/${file}[${i}].id: duplicate id "${entry.id}" ` +
+          `(first seen at index ${seen.get(entry.id)}) — ids must be unique, ` +
+          `see ARTICLES.schema.md`
+        );
+        idUniquenessErrors++;
+      } else {
+        seen.set(entry.id, i);
+      }
+    }
+  }
+}
+
 // Hard-wrap warning pass (TO_FIX #48) — separate from scanDir/validateEntry
 // on purpose: this must never affect totalErrors/exit code, so it reads the
 // content files independently rather than piggybacking on the pass/fail
@@ -406,7 +517,7 @@ if (hardWrapWarnings > 0) {
 }
 
 const totalEntries = videoScan.entries + contentScan.entries;
-const totalErrors = videoScan.errors + contentScan.errors;
+const totalErrors = videoScan.errors + contentScan.errors + idUniquenessErrors;
 const totalFiles = videoScan.files + contentScan.files;
 
 if (totalFiles === 0) {

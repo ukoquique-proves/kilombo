@@ -61,6 +61,38 @@ export function checkDedup(candidate, existing, forceUpdate = false) {
 }
 
 /**
+ * Second, later-stage id collision check. checkDedup() above only knows
+ * about an explicit --id when it runs (before extraction), so an
+ * auto-slugified id (opts.id omitted → slugify(extracted.title)) was
+ * never actually checked against existing ids — two different source
+ * articles with similar titles could silently collide, and
+ * articles.find(x => x.id === id) on the detail page would then always
+ * resolve to whichever one happens to appear first in the array, making
+ * the second one permanently unreachable with no error anywhere.
+ *
+ * Called once the final id is known (after slugify), right before the
+ * entry is returned. Kept as a separate function (rather than folded into
+ * checkDedup) because it runs at a different point in the pipeline and
+ * checks a different, already-final value.
+ * @param {string} id
+ * @param {string} sourceUrl
+ * @param {Array<{ sourceUrl: string, id: string }>} existing
+ * @param {boolean} [forceUpdate=false]
+ * @returns {string | null} error message if a duplicate is found, else null
+ */
+export function checkFinalIdCollision(id, sourceUrl, existing, forceUpdate = false) {
+  const collision = existing.find((a) => a.id === id && a.sourceUrl !== sourceUrl);
+  if (collision && !forceUpdate) {
+    return (
+      `SKIP: el id auto-generado "${id}" ya existe en articles.json ` +
+      `(usado por sourceUrl "${collision.sourceUrl}"). ` +
+      `Pasa --id <slug-unico> explícitamente para desambiguar.`
+    );
+  }
+  return null;
+}
+
+/**
  * Replaces an existing article entry when forceUpdate is enabled, otherwise
  * appends the newcomer as a new record.
  * @param {Array<{ sourceUrl: string, id: string }>} existing
@@ -362,7 +394,15 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
   }
 
   const id = opts.id || slugify(extracted.title);
-  
+
+  // Only needed when the id was auto-generated: an explicit --id was
+  // already checked by checkDedup() above. See checkFinalIdCollision()
+  // docstring for why this second check exists.
+  if (!opts.id) {
+    const idCollisionError = checkFinalIdCollision(id, opts.url, existingArticles, forceUpdate);
+    if (idCollisionError) throw new Error(idCollisionError);
+  }
+
   // Gap 2: If unextractedMediaWarning exists, force pending-review regardless of 
   // the normal isImageOnly heuristic. This ensures articles with galleries, 
   // embedded PDFs, or other unextracted content get flagged for human review.

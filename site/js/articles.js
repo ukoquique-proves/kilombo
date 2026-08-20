@@ -460,7 +460,7 @@ async function initDetailPage() {
       
       const metaItems = [];
       if (a.metadata.director) metaItems.push(`<strong>Director:</strong> ${escapeHtml(a.metadata.director)}`);
-      if (a.metadata.year) metaItems.push(`<strong>Año:</strong> ${a.metadata.year}`);
+      if (a.metadata.year) metaItems.push(`<strong>Año:</strong> ${escapeHtml(a.metadata.year)}`);
       if (a.metadata.country) metaItems.push(`<strong>País:</strong> ${escapeHtml(a.metadata.country)}`);
       if (a.metadata.duration) metaItems.push(`<strong>Duración:</strong> ${escapeHtml(a.metadata.duration)}`);
       if (a.metadata.language) metaItems.push(`<strong>Idioma:</strong> ${escapeHtml(a.metadata.language)}`);
