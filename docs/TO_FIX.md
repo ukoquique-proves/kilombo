@@ -7,6 +7,17 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🟢 Recientemente cerrados
 
+- [x] **66. create-article.mjs — end-to-end SPIP article creation verified (v0.40.1)** — ✅ VERIFIED
+  - **Status:** Full end-to-end success — `sandbox/create-article.mjs` successfully created Article ID 87 ("FINAL TEST") in the live SPIP dashboard on 2026-08-21.
+  - **Location:** `sandbox/create-article.mjs` (gitignored, not committed to repo — intentional, as per `scripts/import-article.mjs` pattern for test/sandbox tools)
+  - **Verification performed:**
+    - `--inspect` mode: Dumped live SPIP form selectors (TITLE_SELECTOR, BODY_SELECTOR, SECTION_SELECTOR)
+    - `--dry-run` mode: Verified form fields filled and autosave triggered
+    - `--create` mode (live): Created Article ID 87 with title "FINAL TEST" and body text from stdin
+    - Confirmed presence: Article visible in SPIP admin panel at `/ecrire/?exec=articles&id_article=87` with status "en curso de redacción"
+  - **What this proves:** SPIP web backend (Workflow A from DEPLOYMENT-AND-SOURCE-EDITING.md) is fully functional and requires no SSH access.
+  - **What this does NOT prove:** Static mirror deployment (Workflow B) — that still requires port 22.
+
 - [x] **65. GitHub token exposed in .git/config URL and git history (SECURITY)** — v0.40.2 ✅ COMPLETED
   - **Original problem:** GitHub token visible in:
     1. `.git/config` remote URL (stripped from working tree, persists in .git)
