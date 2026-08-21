@@ -30,9 +30,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - **Verification:** Article confirmed visible in SPIP admin panel at `/ecrire/?exec=articles&id_article=87`, status "en curso de redacción", body text populated from stdin input.
 - **Selectors:** All form element selectors (TITLE_SELECTOR, BODY_SELECTOR, SECTION_SELECTOR) verified correct and matched against live SPIP form structure.
 - **Docs:** `docs/DEPLOYMENT-AND-SOURCE-EDITING.md` updated to clarify distinction between (1) static mirror deployment via SSH (blocked by firewall) and (2) SPIP content editing via web backend (working, no SSH required).
+- **Cleanup:** `sandbox/delete-article.mjs` created (saved, not committed) to verify article deletion workflow. Full test cycle completed:
+  - `--inspect` confirmed radio selectors exist and are properly named
+  - `--dry-run` verified form state changes without submission
+  - `--trash` successfully moved Article 87 to trash/poubelle status
+  - Confirms SPIP content management (creation and deletion) is fully operational
 
 ### Changed
-- **`docs/TO_FIX.md`** — #65 status updated to reflect verification complete; technical debt re-prioritized
+- **`docs/TO_FIX.md`** — #66 added for delete-article.mjs verification; #65 status updated to reflect verification complete; technical debt re-prioritized
 
 ---
 
