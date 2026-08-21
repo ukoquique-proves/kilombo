@@ -5,6 +5,37 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.40.2] — 2026-08-21
+
+### Security: GitHub Token Rotation (URGENT — Completed)
+- **Status:** COMPLETED — old GitHub token (revoked), new GitHub token (installed and verified working).
+- **Action taken:** 
+  - Old token immediately revoked on GitHub Settings → Developer settings → Personal access tokens after confirmation it was the exposed token from git history (TO_FIX #65).
+  - New token generated with repo + workflow permissions, copied to `.env` (already .gitignore'd).
+  - Verified: `gh repo view` confirms authentication working.
+- **Documentation:** `docs/TOKEN-REVOCATION-STEPS.md` (new) provides step-by-step guide for future rotation events.
+- **Related issues closed:** TO_FIX #49 (URGENT token revocation) — CLOSED
+
+### Changed
+- **`package.json`** — version bumped to 0.40.2 (from 0.39.1)
+- **`docs/TO_FIX.md`** — #49 marked CLOSED, #65 status updated to reflect token action completed
+
+---
+
+## [0.40.1] — 2026-08-21
+
+### Verification: create-article.mjs Full End-to-End Success
+- **Status:** VERIFIED — `create-article.mjs` has successfully created a real article in the SPIP dashboard and confirmed it sitting in "en curso de redacción" status.
+- **Test:** Article ID 87, titled "FINAL TEST", created with `node sandbox/create-article.mjs --create` on 2026-08-21.
+- **Verification:** Article confirmed visible in SPIP admin panel at `/ecrire/?exec=articles&id_article=87`, status "en curso de redacción", body text populated from stdin input.
+- **Selectors:** All form element selectors (TITLE_SELECTOR, BODY_SELECTOR, SECTION_SELECTOR) verified correct and matched against live SPIP form structure.
+- **Docs:** `docs/DEPLOYMENT-AND-SOURCE-EDITING.md` updated to clarify distinction between (1) static mirror deployment via SSH (blocked by firewall) and (2) SPIP content editing via web backend (working, no SSH required).
+
+### Changed
+- **`docs/TO_FIX.md`** — #65 status updated to reflect verification complete; technical debt re-prioritized
+
+---
+
 ## [0.39.3] — 2026-08-21
 
 ### Attempted (Article publishing directly to kilombo.top)

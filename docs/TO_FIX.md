@@ -7,6 +7,21 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🟢 Recientemente cerrados
 
+- [x] **65. GitHub token exposed in .git/config URL and git history (SECURITY)** — v0.40.2 ✅ COMPLETED
+  - **Original problem:** GitHub token visible in:
+    1. `.git/config` remote URL (stripped from working tree, persists in .git)
+    2. Git history `git log` (prior commits reference the token in commit messages during troubleshooting)
+  - **Token lifecycle:**
+    - Token generated initially for OAuth flow testing
+    - Exposed in git history during diagnostic work
+    - Repo remained private, minimizing blast radius
+    - **Action taken (v0.40.2):** Old token **immediately revoked** on GitHub Settings → Developer settings → Personal access tokens (2026-08-21), new token generated and verified working
+  - **Mitigation (long-term, deferred):**
+    - If repo goes public: `git filter-repo --path-regex '.git/config' --path-glob '*.md'` to remove token references from history
+    - Current status (private repo): low risk while private; high priority for remediation if visibility changes
+  - **Lessons learned:** See `docs/TOKEN-REVOCATION-STEPS.md` for step-by-step rotation guide
+  - **Status:** ✅ CLOSED — token revoked, new token active, workflow verified
+
 - [x] **60. Backfill de fechas para artículos ya importados antes del fix del regex `class=`** — v0.39.1 ✅
   - El fix de #59 (Gap 2) solo corrigió la extracción para importaciones *futuras*. Los 21 artículos ya importados con el regex antiguo seguían con `date: ""` en `articles.json` (51% del catálogo).
   - `scripts/backfill-dates.mjs` (nuevo, dry-run por defecto, `--commit` para escribir) re-extrae la fecha usando `extractTierraDate()` (la misma lógica ya corregida en `import-article.mjs`) contra los snapshots locales de `scraped-full/article-{N}.html`, matcheados por `sourceUrl`, y normaliza el string ES/FR a `YYYY-MM-DD`.
