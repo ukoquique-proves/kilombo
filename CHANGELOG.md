@@ -5,6 +5,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.39.3] — 2026-08-21
+
+### Attempted (Article publishing directly to kilombo.top)
+- Intentado publicar directamente un artículo de prueba en el CMS SPIP de `kilombo.top` a petición del usuario.
+- **Vía navegador:** El intento vía navegador automatizado falló por un error de inicialización del entorno (imposibilidad de arrancar el navegador en la sesión actual).
+- **Vía SSH/CLI:** El intento de acceso directo al servidor fue rechazado debido a que el puerto 22 en `kilombo.top` se encuentra cerrado/bloqueado por firewall (requiere apertura manual en YunoHost según indica `sync-to-production.sh`).
+- Se realizó una publicación previa en el repositorio GitHub que posteriormente fue revertida al aclarar que el objetivo era la publicación directa en el sitio SPIP original.
+
 ---
 
 ## [0.39.2] — 2026-08-18
