@@ -5,6 +5,161 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.42.3] — 2026-08-22
+
+### NEW: Actualidad Section + Automated Publishing Workflow
+
+**Status:** ✅ COMPLETE — Ready for production use
+
+Made "Actualidad" a real editorial section (like tierra, gci, pi, nom) and created **completely separate automation** for publishing rewritten articles from the editorial workspace directly to the mirror site.
+
+### What Changed
+
+#### 1. Actualidad Section Implementation
+
+- **Real section** with articles display (not just placeholder)
+- Link in index.html: `articulos.html?section=actualidad`
+- Lightning bolt icon (red accent #b91c2a)
+- Appears **first in navigation** (highest priority)
+- Can filter/search articles by section like others
+- Updated schema: `section` now includes `"actualidad"`
+
+#### 2. Automated Publishing Workflow
+
+**Completely separate system** (independent from editorial workflow):
+
+- **`publish.sh`** — One-command deployment (shell wrapper)
+- **`publish-to-actualidad.mjs`** — Node.js automation engine
+- **Safety checks** — Validates with npm test before committing
+- **Conflict detection** — Rejects duplicate IDs/sourceUrls
+- **Automatic archiving** — Timestamped records in ARCHIVE/published/
+
+**Workflow:**
+
+```
+Editorial Team: Create IN_PROGRESS/ → Validate → Move to READY/
+Publishing Team: Run ./publish.sh → Automation handles rest
+Result: Articles live in Actualidad with 0 manual Git operations
+```
+
+### Files Added
+
+**Automation Scripts:**
+- `articulos_en_trabajo/publish.sh` (executable)
+- `articulos_en_trabajo/publish-to-actualidad.mjs` (executable)
+- `articulos_en_trabajo/ARCHIVE/published/` (archive directory)
+
+**Documentation:**
+- `articulos_en_trabajo/AUTOMATION_README.md` (quick start)
+- `articulos_en_trabajo/AUTOMATION_PUBLISH_ACTUALIDAD.md` (full technical spec)
+
+### Files Modified
+
+**KILOMBO Project:**
+- `site/index.html` — Actualidad section now real (not placeholder)
+- `site/css/style.css` — Added `.section-svg--actualidad` styling
+- `site/assets/content/ARTICLES.schema.md` — Added `actualidad` to section values
+- `articulos_en_trabajo/SCHEMA_REFERENCE.md` — Updated section documentation
+
+### How to Use
+
+```bash
+# 1. Editorial team prepares articles
+cd /root/JOB-sda2/KILOMBO-SITE/articulos_en_trabajo
+# Create IN_PROGRESS/[slug].md with notes
+# Rebuild into IN_PROGRESS/[slug].json
+# Validate: npm test (from KILOMBO root)
+# Move to READY/[slug].json
+
+# 2. Publishing team deploys
+./publish.sh
+
+# 3. Done! Articles live at:
+# https://kilombo.top/articulos.html?section=actualidad
+```
+
+### Automation Features
+
+✅ Merge multiple articles in one commit  
+✅ Auto-set `section: "actualidad"` for all  
+✅ Full validation before publishing  
+✅ Conflict detection (duplicate IDs/URLs)  
+✅ Git commit + push (triggers automatic deploy)  
+✅ Timestamped archiving  
+✅ Clear error messages + rollback on failure  
+
+### Architecture
+
+**Two completely separate systems:**
+
+1. **Editorial Workflow** (manual)
+   - Location: `/articulos_en_trabajo/IN_PROGRESS/` → `READY/`
+   - Process: Read → Rebuild → Validate → Move
+   - Tools: EDITORIAL_GUIDELINES.md, SCHEMA_REFERENCE.md
+   - Output: Well-structured JSON files
+
+2. **Publishing Automation** (automatic)
+   - Location: `/articulos_en_trabajo/`
+   - Trigger: `./publish.sh`
+   - Process: Merge → Validate → Commit → Archive
+   - Output: Live articles in Actualidad section
+
+### Safety & Quality
+
+- **Full validation** — npm test runs before any commit
+- **Conflict prevention** — Rejects duplicates
+- **Automatic archiving** — Preserves history
+- **Error handling** — Clear messages, no partial commits
+- **Rollback** — Reverts articles.json if test fails
+- **No manual Git** — All operations automated
+
+### Sections Now Available
+
+| Section | Purpose | Priority | Icon | 
+|---------|---------|----------|------|
+| **Actualidad** | Current events, breaking news | ⭐⭐⭐⭐⭐ | ⚡ |
+| **Tierra y Libertad** | Foundational analysis | ⭐⭐⭐⭐ | 🌅 |
+| **GCI** | Programmatic texts | ⭐⭐⭐ | 🌍 |
+| **PI** | International analysis | ⭐⭐⭐ | ✊ |
+| **NOM** | Social control, conspiracy | ⭐⭐⭐ | 👁️ |
+| **General** | Miscellaneous | ⭐⭐ | — |
+
+### Documentation
+
+- `AUTOMATION_README.md` — Quick start (start here!)
+- `AUTOMATION_PUBLISH_ACTUALIDAD.md` — Full technical documentation
+- `EDITORIAL_GUIDELINES.md` — Writing standards
+- `SCHEMA_REFERENCE.md` — JSON schema reference
+- `QUICK_START.md` — Editorial workflow TL;DR
+
+### Next Steps
+
+1. ✅ Actualidad section live on mirror site
+2. ✅ Automation ready to deploy
+3. Start converting articles from `/nuevos_articulos/`:
+   - Follow EDITORIAL_GUIDELINES.md
+   - Rebuild in IN_PROGRESS/
+   - Move to READY/ when validated
+4. Batch publish with `./publish.sh`
+5. Monitor deployment and live site
+
+### Integration
+
+- Works with existing articles.json (no breaking changes)
+- Respects all existing sections
+- Actualidad becomes the "breaking news" section
+- GitHub Actions deployment automatic on each publish
+- Mirror site updates instantly
+
+### Impact on TO_FIX Items
+
+- **TO_FIX #[pending]** — Article publishing backlog (15 articles in `/nuevos_articulos/`)
+  - Now has clear editorial process
+  - Automated publication workflow
+  - Ready for immediate use
+
+---
+
 ## [0.42.2] — 2026-08-22
 
 ### NEW: Article Publishing Workflow — Editorial Rebuilding System
