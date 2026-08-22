@@ -58,6 +58,35 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🔴 Acción pendiente urgente
 
+- [ ] **67. Docs desincronizados sobre el acceso al backend SPIP (`/ecrire/`) — necesita decisión, no solo redacción**
+  - **La contradicción concreta:** `README.md`, `docs/TROUBLESHOOTING.md` y `docs/SITE_ANALYSIS.md` afirman (con ❌ verificado) que `kilombo` NO es admin SPIP y que `/ecrire/` redirige a login. Pero `docs/DEPLOYMENT-AND-SOURCE-EDITING.md` y el ítem #66 (v0.40.1) afirman lo contrario: `create-article.mjs` inició sesión en `/ecrire/` y creó el artículo real ID 87 — acceso confirmado, sin necesidad de SSH.
+  - **Por qué pasó:** el commit que verificó #66 actualizó `DEPLOYMENT-AND-SOURCE-EDITING.md` pero no tocó los otros tres documentos, que describen el estado previo (bloqueado).
+  - **Hipótesis sin confirmar:** `create-article.mjs` prueba `KILOMBOTOP_PASSWORD || KILOMBOTOP_FUTURE_PASSWORD` (ver #23). Es posible que el login exitoso de #66 haya usado una credencial distinta a la que se probó cuando se escribieron README/TROUBLESHOOTING/SITE_ANALYSIS — pero esto no está confirmado en ningún lado.
+  - **`DEPLOYMENT-AND-SOURCE-EDITING.md` además se contradice internamente:** sus secciones §0/§11 (nuevas, v0.40.2) dicen que editar el SPIP original ya funciona sin SSH (Workflow A); sus secciones §5–6 (antiguas, nunca revisadas) siguen diciendo que eso "requiere acceso SSH... la cuenta y privilegios correctos".
+  - **Qué hace falta antes de "corregir" el texto:**
+    1. Confirmar contra el servidor real cuál credencial funciona hoy contra `/ecrire/` en cada instancia SPIP (Tierra y Libertad, P.I., GCI, ICR).
+    2. Decidir si el acceso es general (todas las instancias) o selectivo (solo algunas).
+    3. Documentar la decisión en un lugar único (DEPLOYMENT-AND-SOURCE-EDITING.md).
+    4. Actualizar README/TROUBLESHOOTING/SITE_ANALYSIS para que todas apunten al mismo lugar.
+  - **Acción inmediata:** documentado aquí; no reescribir la tablas de acceso hasta confirmar la hipótesis.
+
+- [ ] **68. Gestión de create/edit/delete en kilombo.top desde el agente — arquitectura y por qué hace falta código dedicado**
+  - **La pregunta:** ¿cómo se van a manejar, de forma repetible, futuras creaciones/modificaciones/borrados de artículos en el SPIP real, ejecutados por el agente IA, sin tocar el sitio a mano cada vez?
+  - **Por qué SÍ hace falta código especial (no basta con pedirle al agente que "lo haga"):**
+    1. SPIP no expone una API REST para `/ecrire/` — es un panel de administración para humanos, detrás del login propio de SPIP (o SSO de YunoHost en algunas instancias). La única forma programática es automatizar el navegador (Playwright).
+    2. El formulario de artículo de SPIP 4.4 **autoguarda por campo al perder el foco (blur)**, no con un botón único de "Guardar" — así que un script tiene que rellenar y desenfocar cada campo individualmente y esperar red inactiva.
+    3. Los selectores reales de cada formulario cambian entre plantillas de las 4 instancias SPIP. Cada script necesita su propio modo `--inspect` para confirmarlos contra el HTML real antes de actuar.
+    4. Sin un script versionado, cada sesión reinventa el flujo ad-hoc — que es cómo se originaron bugs en historial anterior.
+  - **Qué existe hoy:**
+    - `sandbox/create-article.mjs` — crear artículo (verificado, #66).
+    - `sandbox/delete-article.mjs` — mover artículo a `poubelle`/papelera (nuevo, verificado contra servidor, selectores confirmados).
+  - **Qué falta para tener el ciclo completo:**
+    - `sandbox/update-article.mjs` — editar un artículo existente (título/cuerpo/sección) sin recrearlo. No existe.
+    - Extractor GCI (#63) — bloquea poder aplicar estos scripts a instancias GCI/ICR, no solo Tierra y Libertad.
+    - Refactor: `create-article.mjs` y `delete-article.mjs` duplican la función `login()` línea por línea. Antes de añadir `update-article.mjs` (un tercer duplicado), extraer un módulo compartido (`sandbox/spip-session.mjs`) con el login + detección SSO/SPIP.
+  - **Patrón de seguridad a mantener:** `--inspect` (solo lectura) → `--dry-run` (rellena/marca sin enviar) → ejecución real. Mismo orden que impone `create-article.mjs` y que replica `delete-article.mjs`.
+  - **Estado:** documentado, no cerrado. `update-article.mjs` y refactor de `spip-session.mjs` son trabajo pendiente.
+
 - [ ] **23. Cambiar `KILOMBOTOP_PASSWORD` por `KILOMBOTOP_FUTURE_PASSWORD` en `.env`**
   - En cuanto el cliente confirme que el nuevo password está activo en el servidor, ejecutar:
     1. Copiar el valor de `KILOMBOTOP_FUTURE_PASSWORD` a `KILOMBOTOP_PASSWORD` en `.env`
