@@ -2,7 +2,7 @@
 
 **Date:** August 22, 2026  
 **Status:** ✅ Fully verified  
-**Consolidated from:** SPIP-BACKEND-ACCESS.md, SPIP-VERIFICATION-GAPS.md, SPIP-ARTICLE-MANAGEMENT.md, DEPLOYMENT-AND-SOURCE-EDITING.md  
+**Consolidated from:** SPIP-BACKEND-ACCESS.md, SPIP-VERIFICATION-GAPS.md, SPIP-ARTICLE-MANAGEMENT.md (all deleted — content now here)  
 
 ---
 
@@ -239,7 +239,7 @@ Article creation via SPIP web interface **does not require SSH or port 22 access
 
 **For infrastructure details:** See `docs/TROUBLESHOOTING.md` — covers SSH/port 22 access and YunoHost configuration.
 
-**For workflow decisions:** See `docs/DEPLOYMENT-AND-SOURCE-EDITING.md` — explains when to use SPIP editing (Workflow A) vs. mirror editing (Workflow B).
+**For workflow decisions:** See `docs/SPIP-ACCESS.md` (this file) — explains when to use SPIP editing (Workflow A) vs. mirror editing (Workflow B).
 
 **For article publishing workflow:** See `docs/ARTICLE-PUBLISHING-WORKFLOW.md` — complete 3-phase editorial process from source reading to deployment.
 

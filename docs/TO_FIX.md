@@ -29,7 +29,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     - `--dry-run` mode: Verified form fields filled and autosave triggered
     - `--create` mode (live): Created Article ID 87 with title "FINAL TEST" and body text from stdin
     - Confirmed presence: Article visible in SPIP admin panel at `/ecrire/?exec=articles&id_article=87` with status "en curso de redacción"
-  - **What this proves:** SPIP web backend (Workflow A from DEPLOYMENT-AND-SOURCE-EDITING.md) is fully functional and requires no SSH access.
+  - **What this proves:** SPIP web backend (Workflow A from `docs/SPIP-ACCESS.md`) is fully functional and requires no SSH access.
   - **What this does NOT prove:** Static mirror deployment (Workflow B) — that still requires port 22.
 
 - [x] **65. GitHub token exposed in .git/config URL and git history (SECURITY)** — v0.40.2 ✅ COMPLETED
@@ -89,27 +89,27 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 ## 🔴 Acción pendiente urgente
 
 - [x] **67. Docs desincronizados sobre el acceso al backend SPIP (`/ecrire/`) — RESUELTO (v0.42.0)**
-  - **La contradicción:** README.md, TROUBLESHOOTING.md, SITE_ANALYSIS.md afirmaban ❌ "kilombo NO es admin SPIP". DEPLOYMENT-AND-SOURCE-EDITING.md afirmaba ✅ "acceso SPIP funciona".
+  - **La contradicción:** README.md, TROUBLESHOOTING.md, SITE_ANALYSIS.md afirmaban ❌ "kilombo NO es admin SPIP". `docs/SPIP-ACCESS.md` (anterior `DEPLOYMENT-AND-SOURCE-EDITING.md`) afirmaba ✅ "acceso SPIP funciona".
   - **Root cause:** Diagnóstico agosto 3 falló usando credenciales incorrectas (usuario `admin` en lugar de `kilombo`). Conclusión apresurada: "no funciona". Pero verificación agosto 21 con `create-article.mjs` creó Article #87 exitosamente, probando que SÍ funciona.
   - **Resolución (v0.42.0, agosto 22):**
     1. Creado script `scripts/test-spip-access.mjs` para verificar conectividad a todas las instancias SPIP
     2. Resultado: 4/4 instancias accesibles (HTTP 302 + SSO redirect)
-    3. Creado `docs/SPIP-BACKEND-ACCESS.md` como single source of truth
+    3. Creado `docs/SPIP-ACCESS.md` como single source of truth
     4. Actualizado README.md: SPIP backend ahora ✅ (was ❌)
     5. Actualizado TROUBLESHOOTING.md: punto 3 ahora ✅ (was ❌)
-    6. Todos los documentos ahora referencian SPIP-BACKEND-ACCESS.md para consistencia
+    6. Todos los documentos ahora referencian `docs/SPIP-ACCESS.md` para consistencia
   - **Verificación:** 
     - HTTP test: `node scripts/test-spip-access.mjs` → 4/4 reachable ✅
     - Functional test: `create-article.mjs --create` → Article ID 87 created ✅
   - **Implicación:** Workflow A (direct SPIP editing without SSH) ahora está completamente documentado y verificado
-  - **La contradicción concreta:** `README.md`, `docs/TROUBLESHOOTING.md` y `docs/SITE_ANALYSIS.md` afirman (con ❌ verificado) que `kilombo` NO es admin SPIP y que `/ecrire/` redirige a login. Pero `docs/DEPLOYMENT-AND-SOURCE-EDITING.md` y el ítem #66 (v0.40.1) afirman lo contrario: `create-article.mjs` inició sesión en `/ecrire/` y creó el artículo real ID 87 — acceso confirmado, sin necesidad de SSH.
-  - **Por qué pasó:** el commit que verificó #66 actualizó `DEPLOYMENT-AND-SOURCE-EDITING.md` pero no tocó los otros tres documentos, que describen el estado previo (bloqueado).
+  - **La contradicción concreta:** `README.md`, `docs/TROUBLESHOOTING.md` y `docs/SITE_ANALYSIS.md` afirman (con ❌ verificado) que `kilombo` NO es admin SPIP y que `/ecrire/` redirige a login. Pero `docs/SPIP-ACCESS.md` (anterior `DEPLOYMENT-AND-SOURCE-EDITING.md`) y el ítem #66 (v0.40.1) afirman lo contrario: `create-article.mjs` inició sesión en `/ecrire/` y creó el artículo real ID 87 — acceso confirmado, sin necesidad de SSH.
+  - **Por qué pasó:** el commit que verificó #66 actualizó `docs/SPIP-ACCESS.md` (anterior `DEPLOYMENT-AND-SOURCE-EDITING.md`) pero no tocó los otros tres documentos, que describen el estado previo (bloqueado).
   - **Hipótesis sin confirmar:** `create-article.mjs` prueba `KILOMBOTOP_PASSWORD || KILOMBOTOP_FUTURE_PASSWORD` (ver #23). Es posible que el login exitoso de #66 haya usado una credencial distinta a la que se probó cuando se escribieron README/TROUBLESHOOTING/SITE_ANALYSIS — pero esto no está confirmado en ningún lado.
-  - **`DEPLOYMENT-AND-SOURCE-EDITING.md` además se contradice internamente:** sus secciones §0/§11 (nuevas, v0.40.2) dicen que editar el SPIP original ya funciona sin SSH (Workflow A); sus secciones §5–6 (antiguas, nunca revisadas) siguen diciendo que eso "requiere acceso SSH... la cuenta y privilegios correctos".
+  - **`docs/SPIP-ACCESS.md` además se contradice internamente:** sus secciones §0/§11 (nuevas, v0.40.2) dicen que editar el SPIP original ya funciona sin SSH (Workflow A); sus secciones §5–6 (antiguas, nunca revisadas) siguen diciendo que eso "requiere acceso SSH... la cuenta y privilegios correctos".
   - **Qué hace falta antes de "corregir" el texto:**
     1. Confirmar contra el servidor real cuál credencial funciona hoy contra `/ecrire/` en cada instancia SPIP (Tierra y Libertad, P.I., GCI, ICR).
     2. Decidir si el acceso es general (todas las instancias) o selectivo (solo algunas).
-    3. Documentar la decisión en un lugar único (DEPLOYMENT-AND-SOURCE-EDITING.md).
+    3. Documentar la decisión en un lugar único (`docs/SPIP-ACCESS.md`).
     4. Actualizar README/TROUBLESHOOTING/SITE_ANALYSIS para que todas apunten al mismo lugar.
   - **Acción inmediata:** documentado aquí; no reescribir la tablas de acceso hasta confirmar la hipótesis.
 

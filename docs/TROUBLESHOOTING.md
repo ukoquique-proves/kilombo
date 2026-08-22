@@ -12,7 +12,7 @@ El servidor está en pie y respondiendo. Estado actual de acceso:
 
 1. **Credenciales resueltas** — usuario `kilombo`, contraseña en `.env` como `KILOMBOTOP_PASSWORD`. Ambas APIs de YunoHost autentican correctamente.
 2. **Puerto SSH (22) cerrado a nivel de firewall** — no hay acceso directo por SSH/SFTP desde máquinas externas. Es el único bloqueo activo para `sync-to-production.sh`.
-3. **✅ `kilombo` SÍ es administrador con acceso a SPIP** — el usuario tiene acceso al panel YunoHost y al backend de SPIP en todas las cuatro instancias SPIP (`/ecrire/`). Esto fue verificado por: (a) creación exitosa de Article ID 87 el 2026-08-21, y (b) prueba de conectividad a todas las instancias el 2026-08-22. Ver `docs/SPIP-BACKEND-ACCESS.md` para detalles completos.
+3. **✅ `kilombo` SÍ es administrador con acceso a SPIP** — el usuario tiene acceso al panel YunoHost y al backend de SPIP en todas las cuatro instancias SPIP (`/ecrire/`). Esto fue verificado por: (a) creación exitosa de Article ID 87 el 2026-08-21, y (b) prueba de conectividad a todas las instancias el 2026-08-22. Ver `docs/SPIP-ACCESS.md` para detalles completos.
 
 **Nota anterior (desactualizada):** La documentación original del 2026-08-03 afirmaba que "kilombo no es administrador SPIP" basándose en una prueba fallida de credenciales. Eso fue incorrecto — el usuario de username era `kilombo`, no `admin` o `kilombo@kilombo.top`.
 

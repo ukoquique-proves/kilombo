@@ -511,7 +511,7 @@ Determined that `kilombo` user has **FULL ADMIN access**. This resolves the long
   - **Test Result (CORRECTED):** User successfully reaches admin_plugin → FULL ADMIN
 
 ### Changed
-- **`docs/SPIP-BACKEND-ACCESS.md`** — Complete rewrite with corrected evidence
+- **`docs/SPIP-ACCESS.md`** — Single source of truth for SPIP access (consolidated from deleted `SPIP-BACKEND-ACCESS.md`)
   - Now the **single source of truth** for all SPIP access documentation
   - Documented 3 independent test results:
     1. HTTP Reachability: 4/4 instances respond ✅
@@ -532,7 +532,7 @@ Determined that `kilombo` user has **FULL ADMIN access**. This resolves the long
 
 ### Impact on TO_FIX Items
 - **TO_FIX #67** (documentation contradiction) — ✅ RESOLVED
-  - Single source of truth established (SPIP-BACKEND-ACCESS.md)
+  - Single source of truth established (`docs/SPIP-ACCESS.md`, formerly `SPIP-BACKEND-ACCESS.md`)
   - All conflicting docs now reference authoritative file
   - Evidence-based findings eliminate guesswork
 
@@ -721,7 +721,7 @@ See `docs/TO_FIX.md` for active issues and priority roadmap:
   - `article_edit` (creation) — responds to Playwright clicks ✅
   - `instituer_article` (status-change) — requires different trigger mechanism ❌
 - **What this proves:** SPIP web backend fully functional for article creation. Deletion blocked by form autosave mechanism mismatch (see TO_FIX #69). No SSH required for either operation.
-- **Docs:** `docs/DEPLOYMENT-AND-SOURCE-EDITING.md` updated with Workflow A/B clarification; `docs/TOKEN-REVOCATION-STEPS.md` created.
+- **Docs:** `docs/SPIP-ACCESS.md` (consolidated from `DEPLOYMENT-AND-SOURCE-EDITING.md`) updated with Workflow A/B clarification; `docs/TOKEN-REVOCATION-STEPS.md` created.
 
 ### Changed
 - **`docs/TO_FIX.md`** — #69 added for delete-article.mjs autosave blocker; #66 marked VERIFIED (partial); #65 marked COMPLETED

@@ -51,7 +51,7 @@ Si el objetivo es cambiar el diseño y el contenido del espejo, se trabaja desde
 
 Si el objetivo es editar directamente el sitio original de SPIP en `kilombo.top`, eso requiere acceso SSH al host real y, además, permisos sobre la instancia de SPIP / YunoHost, que no son los mismos que los usados para publicar este portal estático.
 
-Se puede consultar la guía más detallada en [`docs/DEPLOYMENT-AND-SOURCE-EDITING.md`](docs/DEPLOYMENT-AND-SOURCE-EDITING.md).
+Se puede consultar la guía más detallada en [`docs/SPIP-ACCESS.md`](docs/SPIP-ACCESS.md).
 
 ---
 
@@ -141,7 +141,7 @@ La contraseña del usuario `kilombo` en `kilombo.top` autentica correctamente co
 **Nota importante sobre SPIP:** El usuario `kilombo` pertenece al grupo `admins` de YunoHost, que otorga acceso al backend SPIP de todas las cuatro instancias. Esto fue verificado por:
 1. Test de conectividad: script `test-spip-access.mjs` confirma 4/4 instancias reachables
 2. Test funcional: `create-article.mjs` creó Article #87 exitosamente el 2026-08-21
-3. Documentación: Ver `docs/SPIP-BACKEND-ACCESS.md` para detalles técnicos completos
+3. Documentación: Ver `docs/SPIP-ACCESS.md` para detalles técnicos completos
 
 **Por qué funciona ahora (era incorrecto antes):**
 La documentación anterior (agosto 3) afirmaba que `kilombo` NO tenía acceso a SPIP basándose en una prueba fallida que usaba credenciales incorrectas (username `admin` en lugar de `kilombo`). La verificación de agosto 22 confirma que el usuario SÍ tiene acceso completo a todas las cuatro instancias SPIP.
@@ -210,7 +210,7 @@ KILOMBO/
 │   ├── MIRROR_GROWING.md          ← Guía de crecimiento del espejo (qué importar y cómo)
 │   ├── PENDING-REVIEW.md          ← Artículos con status: pending-review y sus pasos de resolución
 │   ├── EXTRACTION-GAPS-FIXED.md   ← Historial de gaps de extracción corregidos
-│   └── DEPLOYMENT-AND-SOURCE-EDITING.md ← Notas de despliegue y edición de fuente
+│   └── SPIP-ACCESS.md ← Acceso y gestión de artículos SPIP (consolidated source of truth)
 │
 ├── .env                   ← Credenciales y referencias externas (NO SUBIR A REPO PÚBLICO)
 ├── .env.example           ← Plantilla de .env (segura, para subir al repo)
