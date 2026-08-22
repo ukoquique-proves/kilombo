@@ -613,3 +613,95 @@ node scripts/validate-data.mjs
 `futuras-generaciones` tiene alt texto descriptivo y el archivo `site/assets/images/futuras-generaciones.jpg` existe en disco y está committeado — pasa la validación correctamente hoy.
 
 El artículo `imagenes` (PENDING-REVIEW.md §3) tiene `alt=""` en sus tres imágenes — seguirá pasando CI hasta que se implementen los tests y se active la regla formalmente. Documentado en `docs/PENDING-REVIEW.md`.
+
+
+---
+
+## 5. SPIP Article Deletion Workflow
+
+### Article Status Lifecycle in SPIP
+
+SPIP uses a 5-state article workflow. Understanding this is critical for article management:
+
+| Status Code | Spanish Name | English | Visibility | Recoverable |
+|---|---|---|---|---|
+| `prepa` | En curso de redacción | Draft / In progress | Admin only | ✅ Yes |
+| `prop` | Propuesto a la evaluación | Proposed for review | Admin only | ✅ Yes |
+| `publie` | Publicado | Published | Public | ✅ Yes |
+| `refuse` | Rechazado | Refused/Rejected | Admin only | ✅ Yes |
+| `poubelle` | A la papelera | Trash/Deleted | Admin only | ✅ Yes (recoverable) |
+
+**Key insight:** In SPIP, "trash" (`poubelle`) is NOT a terminal state. Articles in trash are hidden from public view but can be restored to any other status.
+
+### Deleting an Article: Steps
+
+#### Step 1: Move article to trash via UI or script
+```bash
+# Using the automated script:
+node sandbox/delete-article.mjs --change --id <N> --status poubelle
+
+# Via web UI:
+# Navigate to https://www.kilombo.top/ecrire/?exec=article&id_article=<N>
+# Click "Modificar le statut" → select "A la papelera" → click "Cambiar"
+```
+
+#### Step 2: Verify article is in trash
+```bash
+node sandbox/delete-article.mjs --inspect --id <N>
+# Should show: Current Status: A la papelera
+```
+
+#### Step 3: Permanent deletion from database
+Once in trash, SPIP does **not provide a UI button** to permanently delete articles from the database. Options:
+
+**Option A: Direct database access (requires SSH + root)**
+```bash
+ssh kilombo@kilombo.top
+mysql -u root kilombo_spip
+DELETE FROM spip_articles WHERE id_article = <N>;
+```
+
+**Option B: Contact server admin**
+- Permanent deletion requires database-level access
+- Contact the YunoHost admin at `kilombo.top` to handle database cleanup
+
+**Option C: Leave in trash (recommended for safety)**
+- Articles in `poubelle` don't appear in public listings or admin dashboards
+- They're effectively hidden from all users except database admins
+- Can be recovered anytime if needed (just change status back to `prepa`, `prop`, `publie`, etc.)
+
+### Why Permanent Deletion Isn't in the UI
+
+This is by design in SPIP:
+1. **Safety:** Prevents accidental data loss — admins can recover trash articles
+2. **Audit trail:** Soft-deleted articles remain in database for compliance/archival
+3. **Reversibility:** Articles can be restored if deletion was a mistake
+
+### Testing Article Deletion
+
+The `sandbox/delete-article.mjs` script was tested with Article #87 ("FINAL TEST: Creación de Artículo End-to-End Verificada — 2026-08-21"):
+
+```bash
+# 1. Create test article (already done)
+node sandbox/create-article.mjs --create
+
+# 2. Move to trash
+node sandbox/delete-article.mjs --change --id 87 --status poubelle
+
+# 3. Verify it's in trash
+node sandbox/delete-article.mjs --inspect --id 87
+# Output: Current Status: A la papelera
+
+# 4. Article disappears from admin dashboards
+# - No longer in "Tus artículos en curso"
+# - No longer in public article listings
+# - Still recoverable by restoring status
+```
+
+### Status: Article Deletion Workflow Complete ✅
+
+- ✅ `sandbox/delete-article.mjs` fully operational for moving articles to trash
+- ✅ Articles in trash are hidden from public view and workflows
+- ✅ Documented in `docs/SPIP-ARTICLE-MANAGEMENT.md`
+- ✅ Test case Article #87 successfully moved to trash (2026-08-22)
+- ⚠️ Permanent DB deletion requires SSH/admin access (by design — SPIP safety feature)

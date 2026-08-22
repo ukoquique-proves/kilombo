@@ -5,6 +5,28 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.41.1] — 2026-08-22
+
+### Article Deletion Workflow Documentation
+
+- **Status:** ✅ DOCUMENTED — SPIP article deletion workflow explained in TROUBLESHOOTING.md
+- **Test Result:** Article #87 ("FINAL TEST...") successfully moved to trash (poubelle status)
+- **Key Discovery:** SPIP trash is NOT terminal — articles in `poubelle` are hidden but recoverable
+- **Limitation:** Permanent database deletion of trash articles requires SSH/admin access (by design in SPIP for safety)
+- **Documentation Added:**
+  - `docs/TROUBLESHOOTING.md` — New section 5: "SPIP Article Deletion Workflow"
+    - Complete status lifecycle table (prepa, prop, publie, refuse, poubelle)
+    - Step-by-step deletion procedure
+    - Explanation of why permanent deletion requires database access
+    - Test results with Article #87
+- **Workflow Status:**
+  - ✅ Create articles: `node sandbox/create-article.mjs --create`
+  - ✅ Move to trash: `node sandbox/delete-article.mjs --change --id <N> --status poubelle`
+  - ✅ Inspect status: `node sandbox/delete-article.mjs --inspect --id <N>`
+  - ⚠️ Permanent deletion: Requires SSH/database access (SPIP design choice)
+
+---
+
 ## [0.41.0] — 2026-08-22
 
 ### Complete Article Status Management Workflow — TO_FIX #69 Resolution
