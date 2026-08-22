@@ -3,7 +3,7 @@
 # scripts/test.sh
 # =========================================================
 # Single entry point for the project's checks. Runs, in order:
-#   1. Unit tests — every test/*.test.mjs file (render.mjs, articles.js, ...)
+#   1. Unit tests — all test/*.test.mjs files (9 files, 157 tests)
 #   2. JSON data validation for site/assets/data/*.json and site/assets/content/*.json
 #   3. Cross-file URL consistency check (.env.example / index.html / README.md)
 #   4. Index cards check — ensures all index.html cards have Level 1/2 badges
@@ -22,7 +22,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${HERE}"
 
 echo "============================================================"
-echo " 1/4  Unit tests — test/render.test.mjs, test/articles.test.mjs"
+echo " 1/4  Unit tests — all test/*.test.mjs files"
 echo "============================================================"
 node --test
 
