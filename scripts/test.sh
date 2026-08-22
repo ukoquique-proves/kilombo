@@ -22,19 +22,19 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${HERE}"
 
 echo "============================================================"
-echo " 1/3  Unit tests — test/render.test.mjs, test/articles.test.mjs"
+echo " 1/4  Unit tests — test/render.test.mjs, test/articles.test.mjs"
 echo "============================================================"
 node --test
 
 echo ""
 echo "============================================================"
-echo " 2/3  Data validation — scripts/validate-data.mjs"
+echo " 2/4  Data validation — scripts/validate-data.mjs"
 echo "============================================================"
 node scripts/validate-data.mjs
 
 echo ""
 echo "============================================================"
-echo " 3/3  URL consistency — scripts/check-urls.mjs"
+echo " 3/4  URL consistency — scripts/check-urls.mjs"
 echo "============================================================"
 node scripts/check-urls.mjs
 
