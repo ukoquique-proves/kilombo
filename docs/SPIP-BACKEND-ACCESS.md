@@ -8,7 +8,7 @@
 
 ## The Critical Finding
 
-The `klimbo` user on Tierra y Libertad has **FULL ADMIN access**:
+The `kilombo` user on Tierra y Libertad has **FULL ADMIN access**:
 
 | Capability | Evidence | Result |
 |-----------|----------|--------|
@@ -75,8 +75,8 @@ All four SPIP instances respond to HTTPS requests:
 **Conclusion:** Article creation workflow **FULLY FUNCTIONAL** ✅
 
 **What This Proves:**
-- `klimbo` can authenticate successfully
-- `klimbo` has editor-level access to SPIP backend
+- `kilombo` can authenticate successfully
+- `kilombo` has full admin access to SPIP backend
 - Article lifecycle (create, draft state, visible in listings) works correctly
 
 ---

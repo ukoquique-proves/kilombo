@@ -73,9 +73,9 @@ This now:
 We know:
 - ✅ `kilombo` can create articles (proven by Article #87)
 - ✅ `kilombo` can edit/publish articles
-- ❓ Does `klimbo` have admin_plugin access (plugin management)?
-- ❓ Does `klimbo` have configuration access (site settings)?
-- ❓ Does `klimbo` have user management access?
+- ❓ Does `kilombo` have admin_plugin access (plugin management)?
+- ❓ Does `kilombo` have configuration access (site settings)?
+- ❓ Does `kilombo` have user management access?
 
 SPIP distinguishes multiple privilege levels:
 
@@ -89,7 +89,7 @@ We've only proven **Editor-level access**. Full admin access requires different 
 
 ### Why This Matters
 
-If `klimbo` is editor-only, then TO_FIX #63 (GCI extractors requiring plugin/module management) may be unreachable. If admin, then `klimbo` can do much more.
+If `kilombo` is editor-only, then TO_FIX #63 (GCI extractors requiring plugin/module management) may be unreachable. If admin, then `kilombo` can do much more.
 
 ### Solution Implemented in v0.42.0+
 
@@ -182,7 +182,7 @@ await loginPage.goto(`${BASE_URL}/ecrire/?exec=admin_plugin`);
 
 1. Run updated `create-article.mjs` to confirm persistence verification works
 2. Extend `create-article.mjs` to test admin_plugin access
-3. Document actual privilege tier for `klimbo` user
+3. Document actual privilege tier for `kilombo` user
 4. Update TO_FIX #66 with "persistence verified" status
 5. Determine if TO_FIX #63 (GCI extractors) is feasible with current privilege level
 

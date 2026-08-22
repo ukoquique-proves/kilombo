@@ -310,7 +310,7 @@ async function main() {
   console.log('Interpretation:');
   console.log('  FULL ADMIN — "kilombo" can manage plugins and site configuration');
   console.log('  EDITOR — "kilombo" can create/edit articles but not manage plugins');
-  console.log('  LIMITED — "klimbo" has restricted access (check with admin)\n');
+  console.log('  LIMITED — "kilombo" has restricted access (check with admin)\n');
   console.log('='.repeat(80) + '\n');
 
   process.exit(adminAccessCount > 0 || editorAccessCount > 0 ? 0 : 1);

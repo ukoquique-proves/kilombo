@@ -9,33 +9,35 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ### CRITICAL: SPIP Privilege Tier Verified — TO_FIX #67 RESOLVED
 
-**Status:** ✅ FULLY VERIFIED with evidence-based testing
+**Status:** ✅ FULLY VERIFIED with evidence-based testing (Bug found and corrected in v0.42.1)
 
-Determined that `klimbo` user has **EDITOR-LEVEL access only** (not admin). This resolves the long-standing contradiction between docs that said access was blocked vs. access that worked for article creation.
+Determined that `kilombo` user has **FULL ADMIN access**. This resolves the long-standing contradiction between docs that said access was blocked vs. access that worked for article creation.
+
+**NOTE:** Initial test (v0.42.0) had credential typo ('klimbo' instead of 'kilombo') that invalidated the "editor-level" result. Corrected test in v0.42.1 confirms full admin privileges.
 
 ### Added
 - **`sandbox/test-admin-plugin-access.mjs`** (new, not committed) — Narrow read-only probe to determine privilege tier
-  - Uses correct credentials (KILOMBOTOP_PASSWORD from .env, not hardcoded fallback)
+  - Uses correct credentials (KILOMBOTOP_PASSWORD from .env, with correct username spelling)
   - Tests `https://www.kilombo.top/ecrire/?exec=admin_plugin` access
   - Returns: exit 0 (admin), exit 1 (editor), exit 2 (no access)
-  - **Test Result:** User redirected to login after auth = EDITOR-LEVEL ONLY
+  - **Test Result (CORRECTED):** User successfully reaches admin_plugin → FULL ADMIN
 
 ### Changed
-- **`docs/SPIP-BACKEND-ACCESS.md`** — Complete rewrite with evidence-based findings
+- **`docs/SPIP-BACKEND-ACCESS.md`** — Complete rewrite with corrected evidence
   - Now the **single source of truth** for all SPIP access documentation
   - Documented 3 independent test results:
     1. HTTP Reachability: 4/4 instances respond ✅
     2. Article Creation: Article #87 persists to DB ✅
-    3. Privilege Tier: exec=admin_plugin denied ❌ (editor-level only)
-  - Clear table of what `klimbo` CAN and CANNOT do
-  - Explicit implications for GCI extractors (must use scraper, not plugin)
+    3. Privilege Tier: exec=admin_plugin accessible ✅ (full admin confirmed with corrected credentials)
+  - Clear table of what `kilombo` CAN do (all admin features)
+  - Explicit implications for GCI extractors (plugin-based extraction IS FEASIBLE)
 
 ### Verified
-- ✅ Article creation workflow fully functional (editor-level sufficient)
+- ✅ Article creation workflow fully functional (full admin privileges)
 - ✅ Article status management fully functional (create → publish → trash → restore)
 - ✅ Persistence verification automated in v0.42.0+ (URL change + article list presence)
-- ❌ Admin plugin access DENIED (no admin privileges)
-- ❌ GCI plugin-based extraction NOT FEASIBLE (requires admin access not available)
+- ✅ Admin plugin access CONFIRMED (full admin, not editor-level)
+- ✅ GCI plugin-based extraction FEASIBLE (admin privileges available)
 
 ### Fixed
 - Identified credential bug in old sandbox scripts: `check-trash.mjs` and `delete-from-trash.mjs` used hardcoded `admin`/`demo` credentials instead of KILOMBOTOP_PASSWORD — would produce misleading test results. Replaced with single correct-credential test.
@@ -45,6 +47,20 @@ Determined that `klimbo` user has **EDITOR-LEVEL access only** (not admin). This
   - Single source of truth established (SPIP-BACKEND-ACCESS.md)
   - All conflicting docs now reference authoritative file
   - Evidence-based findings eliminate guesswork
+
+- **TO_FIX #63** (GCI extractors) — ⏳ REVERT RE-SCOPING
+  - Original assumption: plugin-based extraction if admin available
+  - Revised: admin access IS AVAILABLE (full admin privileges confirmed)
+  - New approach: plugin-based extraction IS FEASIBLE (original approach valid)
+
+- **TO_FIX #66** (article creation) — ✅ CONFIRMED WORKING
+  - Persistence verification now automated
+  - Full lifecycle (create, publish, trash, restore) proven functional
+
+### Technical Notes
+- **Credential Quality:** Test uses KILOMBOTOP_PASSWORD (same credentials that successfully create articles) — not hardcoded fallback
+- **SPIP Behavior:** Admin access to exec=admin_plugin confirmed with SPIP's &bonjour=oui welcome flag
+- **Test Reusability:** Script can be extended to test all 4 SPIP instances and other admin features
 
 - **TO_FIX #63** (GCI extractors) — ⏳ REASSIGNED
   - Original assumption: plugin-based extraction if admin available
