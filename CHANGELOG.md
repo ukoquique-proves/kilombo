@@ -5,6 +5,47 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.42.5] — 2026-08-22
+
+### ADDED: Bulk conversion tool for `nuevos_articulos/` → `IN_PROGRESS/`
+
+**Status:** ✅ Implemented (editorial review required)
+
+Quick summary of actions performed on 2026-08-22:
+
+- **Added:** `articulos_en_trabajo/scripts/convert-nuevos.mjs`
+  - Purpose: automatic, one-shot conversion of raw files in `nuevos_articulos/` into editorial
+    drafts placed in `articulos_en_trabajo/IN_PROGRESS/` as paired `.md` (notes + raw) and
+    `.json` (schema-shaped draft) files.
+  - Heuristics used: first non-empty line → title; second short line → author; double-newline
+    → paragraph breaks; short non-punctuated lines → `<h3>` headings; paragraphs → `<p>`.
+  - Sanitization: plaintext converted to minimal allowed HTML (only allowed tags preserved in
+    downstream pipeline), `contentHtml` escaped, topics picked heuristically from text.
+  - Slug handling: produces kebab-case ids via the repository `slugify` rules and **avoids
+    collisions** by appending a filename-derived suffix when necessary.
+  - Draft metadata: `status: "pending-review"`, `sourceUrl: "#"` (placeholder), `notes` indicate
+    auto-conversion — editorial review required before READY/publish.
+
+- **Executed:** ran the converter against the repository `nuevos_articulos/` sources and
+  generated editorial drafts in `articulos_en_trabajo/IN_PROGRESS/`. Existing collisions were
+  disambiguated automatically.
+
+- **Verification:** ran repository tests (`npm test`) — unit tests and existing data validations
+  remained green after the change.
+
+**Impact & next steps:**
+- Speeds initial editorial triage by producing consistent draft artifacts for each raw file.
+- Editors must review each `IN_PROGRESS/*.json` and `IN_PROGRESS/*.md` to set `section`,
+  `language`, `date`, `sourceUrl`, precise `topics`, and to move validated JSON files to
+  `articulos_en_trabajo/READY/` before running the publishing automation.
+
+**Run locally:**
+```bash
+cd /root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD
+node articulos_en_trabajo/scripts/convert-nuevos.mjs
+```
+
+
 ## [0.42.4] — 2026-08-22
 
 ### IMPROVED: ESLint 9+ Compatibility + Test Reliability + Code Formatting
