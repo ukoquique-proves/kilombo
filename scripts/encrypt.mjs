@@ -107,6 +107,18 @@ const STATICRYPT_FLAGS = [
   `--config .staticrypt.json`,
   `--directory ${DIST_DIR}`,
   `--remember 0`,
+  // Custom template: same as staticrypt's default password_template.html,
+  // except the "Recordar en esta sesión" checkbox defaults to checked.
+  // Without this, staticrypt only writes the decrypted hashedPassword to
+  // localStorage if the visitor manually ticks that box (see
+  // node_modules/staticrypt/lib/staticryptJs.js — handleDecryptionOfPageFromHash).
+  // The HTML page itself decrypts fine either way, but articles.js's later
+  // fetch() of assets/content/articles.json relies on that localStorage key
+  // (via decrypt.mjs) to decrypt the JSON — if it's missing, that fetch fails
+  // and articles.js shows the generic "Error cargando el índice de artículos"
+  // message. Defaulting the checkbox to checked fixes this for everyone,
+  // instead of depending on visitors noticing an easy-to-miss checkbox.
+  `--template scripts/templates/kilombo-password.html`,
   `--template-title "Kilombo — Acceso restringido"`,
   `--template-instructions "Este espejo es de acceso privado. Introduce la contraseña para continuar."`,
   `--template-placeholder "Contraseña"`,
