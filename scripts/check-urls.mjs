@@ -59,14 +59,15 @@ const extractNetworkUrls = (text) => {
   const matches = text.match(/https?:\/\/[^\s"'<>)]+/g) || [];
   return new Set(
     matches
-      .map((u) => u
-        .replace(/[`)\].,;:]+$/, '')
-        .replace(/\/+$/, '')
-      )
+      .map((u) => u.replace(/[`)\].,;:]+$/, '').replace(/\/+$/, ''))
       .filter((u) => {
         if (!u.includes('kilombo.top')) return false;
-        try { new URL(u); return true; }
-        catch { return false; }
+        try {
+          new URL(u);
+          return true;
+        } catch {
+          return false;
+        }
       })
   );
 };
@@ -77,8 +78,8 @@ const extractNetworkUrls = (text) => {
 
 const sources = {
   '.env.example': '.env.example',
-  'index.html':   'site/index.html',
-  'README.md':    'README.md',
+  'index.html': 'site/index.html',
+  'README.md': 'README.md',
 };
 
 /** @type {Record<string, Set<string>>} */
@@ -126,7 +127,9 @@ for (const url of networkUrls) {
 console.log('');
 
 if (hasDiscrepancy) {
-  console.error('⚠️   URL discrepancies found — update the flagged sources to match network-urls.json.');
+  console.error(
+    '⚠️   URL discrepancies found — update the flagged sources to match network-urls.json.'
+  );
   console.error('    See TO_FIX.md #44 for context.');
   process.exit(1);
 } else {

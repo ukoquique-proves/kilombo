@@ -244,7 +244,10 @@ test('renderCard — XSS in ctaUrl is escaped (attribute breakout)', () => {
   // must have the quotes escaped so the attribute boundary is not broken.
   const serialised = a.outerHTML;
   // &quot; must appear in the serialised href, proving the quote was escaped
-  assert.ok(serialised.includes('&quot;'), 'double-quote in href must be &quot; in serialised HTML');
+  assert.ok(
+    serialised.includes('&quot;'),
+    'double-quote in href must be &quot; in serialised HTML'
+  );
   // The injected attribute name must NOT appear as a real attribute on the element
   assert.equal(a.getAttribute('onmouseover'), null, 'onmouseover must not be a real attribute');
 });
@@ -306,7 +309,9 @@ test('sanitizeHtml — strips javascript: URLs from href/src', () => {
 });
 
 test('sanitizeHtml — strips data: URLs from href', () => {
-  const html = fragmentToHtml(sanitizeHtml('<a href="data:text/html,<script>alert(1)</script>">x</a>'));
+  const html = fragmentToHtml(
+    sanitizeHtml('<a href="data:text/html,<script>alert(1)</script>">x</a>')
+  );
   assert.ok(!html.includes('data:'), 'must not contain a data: URL');
 });
 
@@ -320,7 +325,9 @@ test('sanitizeHtml — strips javascript: URLs hidden with embedded control char
 
 test('sanitizeHtml — keeps allowed formatting tags and safe links', () => {
   const html = fragmentToHtml(
-    sanitizeHtml('<p>Text with <strong>bold</strong> and <a href="https://example.com">a link</a>.</p>')
+    sanitizeHtml(
+      '<p>Text with <strong>bold</strong> and <a href="https://example.com">a link</a>.</p>'
+    )
   );
   assert.ok(html.includes('<strong>bold</strong>'));
   assert.ok(html.includes('<a'));
@@ -375,7 +382,10 @@ test('filterVideosByTag — returns all videos when tag is null/empty', () => {
 });
 
 test('filterVideosByTag — keeps only videos that include the tag', () => {
-  assert.deepEqual(filterVideosByTag(videoSet, 'sida').map((v) => v.id), ['v1']);
+  assert.deepEqual(
+    filterVideosByTag(videoSet, 'sida').map((v) => v.id),
+    ['v1']
+  );
 });
 
 test('filterVideosByTag — returns an empty array for a tag no video has', () => {
@@ -407,12 +417,13 @@ test('renderFilterBar — marks the active value with is-active and aria-pressed
 
 test('renderFilterBar — clicking a value button calls onSelect with that value', () => {
   let selected = 'not-called';
-  const el = renderFilterBar(['covid'], null, (v) => { selected = v; });
+  const el = renderFilterBar(['covid'], null, (v) => {
+    selected = v;
+  });
   const btn = [...el.querySelectorAll('button')].find((b) => b.textContent === 'covid');
   btn.click();
   assert.equal(selected, 'covid');
 });
-
 
 // ================================================================
 // renderCard — ctaUrl scheme guard (TO_FIX: javascript: in ctaUrl)

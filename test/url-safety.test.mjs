@@ -34,11 +34,7 @@ const controlCharBypassUrls = [
   '\tjavascript:alert(1)',
 ];
 
-const relativeUrls = [
-  '/foo/bar',
-  'images/pic.png',
-  '../other.html',
-];
+const relativeUrls = ['/foo/bar', 'images/pic.png', '../other.html'];
 
 // Local asset paths under known media subdirectories are exempt — they
 // resolve correctly relative to every page in the site (all pages are at
@@ -66,16 +62,20 @@ test('isAbsoluteOrExempt accepts absolute http(s), anchors, mailto and local ass
   assert.equal(isAbsoluteOrExempt('https://kilombo.top/foo'), true);
   assert.equal(isAbsoluteOrExempt('#anchor'), true);
   assert.equal(isAbsoluteOrExempt('mailto:test@example.com'), true);
-  for (const url of localAssetUrls) assert.equal(isAbsoluteOrExempt(url), true, `should accept local asset ${url}`);
-  for (const url of relativeUrls) assert.equal(isAbsoluteOrExempt(url), false, `should reject relative ${url}`);
-  for (const url of rejectedLocalUrls) assert.equal(isAbsoluteOrExempt(url), false, `should reject non-media asset ${url}`);
+  for (const url of localAssetUrls)
+    assert.equal(isAbsoluteOrExempt(url), true, `should accept local asset ${url}`);
+  for (const url of relativeUrls)
+    assert.equal(isAbsoluteOrExempt(url), false, `should reject relative ${url}`);
+  for (const url of rejectedLocalUrls)
+    assert.equal(isAbsoluteOrExempt(url), false, `should reject non-media asset ${url}`);
 });
 
 test('isImportableUrl rejects both unsafe and relative URLs', () => {
   assert.equal(isImportableUrl('https://kilombo.top/foo'), true);
   assert.equal(isImportableUrl('#anchor'), true);
   assert.equal(isImportableUrl('mailto:test@example.com'), true);
-  for (const url of [...unsafeUrls, ...relativeUrls]) assert.equal(isImportableUrl(url), false, `should reject ${url}`);
+  for (const url of [...unsafeUrls, ...relativeUrls])
+    assert.equal(isImportableUrl(url), false, `should reject ${url}`);
 });
 
 test('isSafeUrl rejects control-character scheme bypass (tab/newline/CR)', () => {

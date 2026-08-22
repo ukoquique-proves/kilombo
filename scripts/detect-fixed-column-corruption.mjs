@@ -77,9 +77,7 @@ export function detectFixedColumnCorruption(html) {
   // Heuristic: if avg line length is consistent (std dev < avg * 0.3) and
   // falls in the 60-100 char range, it's likely fixed-column wrapping
   const isFixedColumn =
-    avgLineLength >= 50 &&
-    avgLineLength <= 100 &&
-    maxLen - minLen < avgLineLength * 0.4;
+    avgLineLength >= 50 && avgLineLength <= 100 && maxLen - minLen < avgLineLength * 0.4;
 
   return {
     found: isFixedColumn,
@@ -147,9 +145,7 @@ async function main() {
     writeFileSync(ARTICLES_PATH, JSON.stringify(articles, null, 2) + '\n');
     console.log(`✅ Repaired ${corruptedCount} article(s). Run 'npm test' to validate.`);
   } else {
-    console.log(
-      '\nTo repair, run: node scripts/detect-fixed-column-corruption.mjs --fix'
-    );
+    console.log('\nTo repair, run: node scripts/detect-fixed-column-corruption.mjs --fix');
   }
 }
 

@@ -95,4 +95,4 @@ for (const c of changes) {
 
 writeFileSync(ARTICLES_PATH, JSON.stringify(articles, null, 2) + '\n');
 console.log(`\n✅  Wrote ${changes.length} reformatted article(s) to ${ARTICLES_PATH}`);
-console.log('    Run \'npm test\' before committing.');
+console.log("    Run 'npm test' before committing.");

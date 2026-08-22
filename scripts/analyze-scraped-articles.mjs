@@ -41,11 +41,12 @@ const importedIds = [
   'imagenes',
   'transformacion-registros-akashicos',
   'israel-mohamad-safa-siempre-victimas',
-  'contra-genocidio-guerras-infinitas-pi'
+  'contra-genocidio-guerras-infinitas-pi',
 ];
 
-const files = fs.readdirSync(scrapedDir)
-  .filter(f => f.endsWith('.html'))
+const files = fs
+  .readdirSync(scrapedDir)
+  .filter((f) => f.endsWith('.html'))
   .sort();
 
 const results = [];
@@ -55,31 +56,31 @@ for (const file of files) {
   const html = fs.readFileSync(filePath, 'utf-8');
   const dom = new JSDOM(html);
   const doc = dom.window.document;
-  
+
   // Extract article ID from spip.php?article=XXX
   const articleMatch = html.match(/spip\.php\?article(\d+)/);
   if (!articleMatch) continue;
-  
+
   const articleId = articleMatch[1];
-  
+
   // Extract title from id="titre-article"
   const titleEl = doc.getElementById('titre-article');
   const title = titleEl ? titleEl.textContent.trim() : '(no title)';
-  
+
   // Extract content from id="texte-article" (SPIP format for Tierra)
   let contentEl = doc.getElementById('texte-article');
-  
+
   // Fallback: check for class-based selectors for PI articles
   if (!contentEl) {
     const div = doc.querySelector('.texte.surlignable.clearfix');
     if (div) contentEl = div;
   }
-  
+
   // Fallback: id="descriptif-article"
   if (!contentEl) {
     contentEl = doc.getElementById('descriptif-article');
   }
-  
+
   // If still no content, try generic article container
   if (!contentEl) {
     const divs = doc.querySelectorAll('div[id*="article"], div[class*="article"]');
@@ -91,7 +92,7 @@ for (const file of files) {
       }
     }
   }
-  
+
   // Extract plaintext length
   let bodyText = '';
   if (contentEl) {
@@ -101,11 +102,12 @@ for (const file of files) {
       .trim();
   }
   const textLength = bodyText.length;
-  
+
   // Count images
-  const imgCount = (contentEl ? contentEl.querySelectorAll('img').length : 0) +
-                   (doc.querySelectorAll('img[src*="local"]').length || 0);
-  
+  const imgCount =
+    (contentEl ? contentEl.querySelectorAll('img').length : 0) +
+    (doc.querySelectorAll('img[src*="local"]').length || 0);
+
   // Determine readiness
   let readiness = 'skip';
   if (textLength > 500) {
@@ -117,25 +119,57 @@ for (const file of files) {
   } else if (textLength < 50 && textLength > 0) {
     readiness = 'stub';
   }
-  
+
   // Infer section from title keywords
   const titleLower = title.toLowerCase();
   let section = 'general';
-  
-  const nomKeywords = ['plandemismo', 'vacunas', 'covid', 'plandemia', 'control', 'oms', 'grafeno', 'terror', 'represión', 'represion', 'plandémica', 'plandémica'];
-  const piKeywords = ['proletarios', 'internacionalistas', 'capitalismo', 'clase', 'imperialismo', 'genocidio', 'falsos internacionalistas', 'guerra'];
-  const tierraKeywords = ['tierra', 'libertad', 'quilombo', 'película', 'film', 'cine', 'película', 'terrain', 'land'];
-  
-  if (nomKeywords.some(k => titleLower.includes(k))) {
+
+  const nomKeywords = [
+    'plandemismo',
+    'vacunas',
+    'covid',
+    'plandemia',
+    'control',
+    'oms',
+    'grafeno',
+    'terror',
+    'represión',
+    'represion',
+    'plandémica',
+    'plandémica',
+  ];
+  const piKeywords = [
+    'proletarios',
+    'internacionalistas',
+    'capitalismo',
+    'clase',
+    'imperialismo',
+    'genocidio',
+    'falsos internacionalistas',
+    'guerra',
+  ];
+  const tierraKeywords = [
+    'tierra',
+    'libertad',
+    'quilombo',
+    'película',
+    'film',
+    'cine',
+    'película',
+    'terrain',
+    'land',
+  ];
+
+  if (nomKeywords.some((k) => titleLower.includes(k))) {
     section = 'nom';
-  } else if (piKeywords.some(k => titleLower.includes(k))) {
+  } else if (piKeywords.some((k) => titleLower.includes(k))) {
     section = 'pi';
-  } else if (tierraKeywords.some(k => titleLower.includes(k))) {
+  } else if (tierraKeywords.some((k) => titleLower.includes(k))) {
     section = 'tierra';
   }
-  
+
   const isImported = importedIds.includes(articleId);
-  
+
   // Only collect missing articles
   if (!isImported) {
     results.push({
@@ -146,7 +180,7 @@ for (const file of files) {
       readiness,
       section,
       file,
-      bodyPreview: bodyText.substring(0, 150)
+      bodyPreview: bodyText.substring(0, 150),
     });
   }
 }
@@ -161,14 +195,16 @@ console.log('|---|---|---|---|---|---|---|');
 for (const r of results) {
   const title = r.title.replace(/\|/g, '\\|').substring(0, 60);
   const preview = r.bodyPreview.replace(/\|/g, '\\|').substring(0, 40);
-  console.log(`| ${r.articleId} | ${title}... | ${r.textLength} | ${r.imgCount} | ${r.readiness} | ${r.section} | ${preview}... |`);
+  console.log(
+    `| ${r.articleId} | ${title}... | ${r.textLength} | ${r.imgCount} | ${r.readiness} | ${r.section} | ${preview}... |`
+  );
 }
 
 // Summary stats
-const readyCount = results.filter(r => r.readiness === 'ready').length;
-const stubCount = results.filter(r => r.readiness === 'stub').length;
-const imageOnlyCount = results.filter(r => r.readiness === 'image-only').length;
-const skipCount = results.filter(r => r.readiness === 'skip').length;
+const readyCount = results.filter((r) => r.readiness === 'ready').length;
+const stubCount = results.filter((r) => r.readiness === 'stub').length;
+const imageOnlyCount = results.filter((r) => r.readiness === 'image-only').length;
+const skipCount = results.filter((r) => r.readiness === 'skip').length;
 
 console.log('\n## Summary\n');
 console.log(`- **Total missing**: ${results.length}`);
@@ -178,7 +214,7 @@ console.log(`- **Image-only**: ${imageOnlyCount}`);
 console.log(`- **Skip**: ${skipCount}`);
 console.log(`\n**Section breakdown:**`);
 const bySection = {};
-results.forEach(r => {
+results.forEach((r) => {
   bySection[r.section] = (bySection[r.section] || 0) + 1;
 });
 Object.entries(bySection).forEach(([section, count]) => {

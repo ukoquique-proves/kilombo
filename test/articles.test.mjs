@@ -144,7 +144,10 @@ test('filterArticlesByTopic — returns all articles when topic is null/empty', 
 
 test('filterArticlesByTopic — keeps only articles that include the topic', () => {
   const result = filterArticlesByTopic(articleSet, 'salud');
-  assert.deepEqual(result.map((a) => a.id), ['a1']);
+  assert.deepEqual(
+    result.map((a) => a.id),
+    ['a1']
+  );
 });
 
 test('filterArticlesByTopic — returns an empty array for a topic no article has', () => {
@@ -171,7 +174,9 @@ test('renderFilterBar — marks the active topic button with is-active and aria-
 
 test('renderFilterBar — clicking a topic button calls onSelect with that topic', () => {
   let selected = 'not-called';
-  const el = renderFilterBar(['pandemia'], null, (topic) => { selected = topic; });
+  const el = renderFilterBar(['pandemia'], null, (topic) => {
+    selected = topic;
+  });
   const btn = [...el.querySelectorAll('button')].find((b) => b.textContent === 'pandemia');
   btn.click();
   assert.equal(selected, 'pandemia');
@@ -179,7 +184,9 @@ test('renderFilterBar — clicking a topic button calls onSelect with that topic
 
 test('renderFilterBar — clicking "Todos" calls onSelect with null', () => {
   let selected = 'not-called';
-  const el = renderFilterBar(['pandemia'], 'pandemia', (topic) => { selected = topic; });
+  const el = renderFilterBar(['pandemia'], 'pandemia', (topic) => {
+    selected = topic;
+  });
   const btn = [...el.querySelectorAll('button')].find((b) => b.textContent === 'Todos');
   btn.click();
   assert.equal(selected, null);
@@ -198,7 +205,10 @@ test('findRelatedArticles — ranks by number of shared topics, most first', () 
     { ...baseArticle, id: 'no-shared', topics: ['medios'], date: '2026-01-01' },
   ];
   const result = findRelatedArticles(current, pool);
-  assert.deepEqual(result.map((a) => a.id), ['two-shared', 'one-shared']);
+  assert.deepEqual(
+    result.map((a) => a.id),
+    ['two-shared', 'one-shared']
+  );
 });
 
 test('findRelatedArticles — never includes the current article itself', () => {
@@ -231,7 +241,10 @@ test('findRelatedArticles — explicit relatedArticles are included even with ze
     { ...baseArticle, id: 'variant', topics: ['otro-tema-totalmente-distinto'] },
   ];
   const result = findRelatedArticles(current, pool);
-  assert.deepEqual(result.map((a) => a.id), ['variant']);
+  assert.deepEqual(
+    result.map((a) => a.id),
+    ['variant']
+  );
 });
 
 test('findRelatedArticles — explicit relatedArticles are ranked ahead of topic-based matches', () => {
@@ -242,7 +255,10 @@ test('findRelatedArticles — explicit relatedArticles are ranked ahead of topic
     { ...baseArticle, id: 'topic-match', topics: ['cine'] },
   ];
   const result = findRelatedArticles(current, pool, 2);
-  assert.deepEqual(result.map((a) => a.id), ['variant', 'topic-match']);
+  assert.deepEqual(
+    result.map((a) => a.id),
+    ['variant', 'topic-match']
+  );
 });
 
 test('findRelatedArticles — a dangling relatedArticles id (no matching article) is silently skipped', () => {
@@ -288,14 +304,15 @@ test('filterArticlesByQuery — matches against the title, case-insensitively', 
 
 test('filterArticlesByQuery — matches against topics too', () => {
   const result = filterArticlesByQuery(articleSet, 'medios');
-  assert.deepEqual(result.map((a) => a.id), ['a2']);
+  assert.deepEqual(
+    result.map((a) => a.id),
+    ['a2']
+  );
 });
 
 test('filterArticlesByQuery — returns an empty array when nothing matches', () => {
   assert.deepEqual(filterArticlesByQuery(articleSet, 'inexistente-xyz'), []);
 });
-
-
 
 // ================================================================
 // filterArticlesBySection
@@ -304,7 +321,7 @@ test('filterArticlesByQuery — returns an empty array when nothing matches', ()
 test('filterArticlesBySection — returns all articles when section is null', () => {
   const articles = [
     { id: 'a', section: 'tierra', topics: [] },
-    { id: 'b', section: 'pi',     topics: [] },
+    { id: 'b', section: 'pi', topics: [] },
   ];
   assert.deepEqual(filterArticlesBySection(articles, null), articles);
 });
@@ -312,7 +329,7 @@ test('filterArticlesBySection — returns all articles when section is null', ()
 test('filterArticlesBySection — returns all articles when section is empty string', () => {
   const articles = [
     { id: 'a', section: 'tierra', topics: [] },
-    { id: 'b', section: 'pi',     topics: [] },
+    { id: 'b', section: 'pi', topics: [] },
   ];
   assert.deepEqual(filterArticlesBySection(articles, ''), articles);
 });
@@ -320,18 +337,16 @@ test('filterArticlesBySection — returns all articles when section is empty str
 test('filterArticlesBySection — keeps only articles matching the section', () => {
   const articles = [
     { id: 'a', section: 'tierra', topics: [] },
-    { id: 'b', section: 'pi',     topics: [] },
-    { id: 'c', section: 'pi',     topics: [] },
+    { id: 'b', section: 'pi', topics: [] },
+    { id: 'c', section: 'pi', topics: [] },
   ];
   const result = filterArticlesBySection(articles, 'pi');
   assert.equal(result.length, 2);
-  assert.ok(result.every(a => a.section === 'pi'));
+  assert.ok(result.every((a) => a.section === 'pi'));
 });
 
 test('filterArticlesBySection — returns empty array for a section no article has', () => {
-  const articles = [
-    { id: 'a', section: 'tierra', topics: [] },
-  ];
+  const articles = [{ id: 'a', section: 'tierra', topics: [] }];
   assert.deepEqual(filterArticlesBySection(articles, 'gci'), []);
 });
 

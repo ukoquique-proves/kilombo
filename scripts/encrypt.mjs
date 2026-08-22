@@ -48,23 +48,22 @@
  * GitHub Actions secret. The deploy step uploads dist/ (not site/).
  */
 
-import { execSync }                                                  from 'node:child_process';
-import { readFileSync, writeFileSync, readdirSync, existsSync,
-         mkdirSync, cpSync }                                         from 'node:fs';
-import { resolve, dirname, join, relative }                          from 'node:path';
-import { fileURLToPath }                                             from 'node:url';
-import { createRequire }                                             from 'node:module';
+import { execSync } from 'node:child_process';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync } from 'node:fs';
+import { resolve, dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT      = resolve(__dirname, '..');
-const SITE_DIR  = join(ROOT, 'site');
-const DIST_DIR  = join(ROOT, 'dist');
+const ROOT = resolve(__dirname, '..');
+const SITE_DIR = join(ROOT, 'site');
+const DIST_DIR = join(ROOT, 'dist');
 
 // ── Load staticrypt internals via CJS require ────────────────────────────────
-const require      = createRequire(import.meta.url);
+const require = createRequire(import.meta.url);
 const cryptoEngine = require('../node_modules/staticrypt/lib/cryptoEngine.js');
-const codec        = require('../node_modules/staticrypt/lib/codec.js');
-const { encode }   = codec.init(cryptoEngine);
+const codec = require('../node_modules/staticrypt/lib/codec.js');
+const { encode } = codec.init(cryptoEngine);
 
 // ── Password & salt ──────────────────────────────────────────────────────────
 const password = process.env.STATICRYPT_PASSWORD;
@@ -102,11 +101,7 @@ console.log(`✅  Copied site/ → dist/\n`);
 // Because dist/ is always freshly copied from site/ (Step 0), the HTML files
 // here are always plaintext — double-encryption is structurally impossible.
 
-const HTML_PAGES = [
-  'plandemismo.html',
-  'articulos.html',
-  'articulo.html',
-];
+const HTML_PAGES = ['plandemismo.html', 'articulos.html', 'articulo.html'];
 
 const STATICRYPT_FLAGS = [
   `--config .staticrypt.json`,
@@ -123,8 +118,8 @@ const STATICRYPT_FLAGS = [
 ].join(' ');
 
 for (const page of HTML_PAGES) {
-  const srcPath  = join(SITE_DIR, page);   // used only to check existence
-  const distPath = join(DIST_DIR, page);   // what we actually encrypt
+  const srcPath = join(SITE_DIR, page); // used only to check existence
+  const distPath = join(DIST_DIR, page); // what we actually encrypt
 
   if (!existsSync(srcPath)) {
     console.warn(`⚠️   Skipping ${page} — not found in site/`);
@@ -132,10 +127,11 @@ for (const page of HTML_PAGES) {
   }
 
   try {
-    execSync(
-      `npx staticrypt ${distPath} ${STATICRYPT_FLAGS}`,
-      { cwd: ROOT, stdio: 'pipe', env: { ...process.env } }
-    );
+    execSync(`npx staticrypt ${distPath} ${STATICRYPT_FLAGS}`, {
+      cwd: ROOT,
+      stdio: 'pipe',
+      env: { ...process.env },
+    });
     console.log(`✅  HTML encrypted: ${page}`);
   } catch (err) {
     console.error(`❌  Failed to encrypt ${page}:`);
@@ -149,10 +145,7 @@ for (const page of HTML_PAGES) {
 // guard below is a safety net for unusual edge cases only — in normal usage
 // these files are always plaintext at this point.
 
-const JSON_DIRS = [
-  join(DIST_DIR, 'assets', 'data'),
-  join(DIST_DIR, 'assets', 'content'),
-];
+const JSON_DIRS = [join(DIST_DIR, 'assets', 'data'), join(DIST_DIR, 'assets', 'content')];
 
 async function encryptJsonFile(filePath) {
   const plaintext = readFileSync(filePath, 'utf8');
@@ -164,7 +157,9 @@ async function encryptJsonFile(filePath) {
       console.warn(`⚠️   Already encrypted, skipping: ${relative(ROOT, filePath)}`);
       return;
     }
-  } catch { /* not valid JSON — treat as plaintext and attempt to encrypt */ }
+  } catch {
+    /* not valid JSON — treat as plaintext and attempt to encrypt */
+  }
 
   const ciphertext = await encode(plaintext, password, salt);
   writeFileSync(filePath, JSON.stringify({ encrypted: true, ciphertext }), 'utf8');
@@ -174,7 +169,7 @@ async function encryptJsonFile(filePath) {
 const jsonPromises = [];
 for (const dir of JSON_DIRS) {
   if (!existsSync(dir)) continue;
-  for (const file of readdirSync(dir).filter(f => f.endsWith('.json') && !f.startsWith('.'))) {
+  for (const file of readdirSync(dir).filter((f) => f.endsWith('.json') && !f.startsWith('.'))) {
     jsonPromises.push(encryptJsonFile(join(dir, file)));
   }
 }

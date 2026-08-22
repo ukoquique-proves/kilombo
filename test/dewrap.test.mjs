@@ -48,7 +48,8 @@ test('splitAtSentenceBoundaries: short text passes through as one chunk', () => 
 });
 
 test('splitAtSentenceBoundaries: never cuts mid-sentence', () => {
-  const text = 'Primera frase larga que ocupa bastante espacio en el texto de prueba. ' +
+  const text =
+    'Primera frase larga que ocupa bastante espacio en el texto de prueba. ' +
     'Segunda frase también con contenido considerable para superar el umbral fijado. ' +
     'Tercera frase final para cerrar el bloque de prueba.';
   const chunks = splitAtSentenceBoundaries(text, 80);
@@ -108,7 +109,11 @@ const LONG_SEGMENTS_FIXTURE =
 test('dewrapHardBreaks: Case B converts <br> between long segments into paragraph breaks', () => {
   const out = dewrapHardBreaks(LONG_SEGMENTS_FIXTURE);
   assert.ok(!/<br/i.test(out), 'no <br> should remain');
-  assert.equal((out.match(/<p>/g) || []).length, 4, 'each already-complete segment becomes its own <p>');
+  assert.equal(
+    (out.match(/<p>/g) || []).length,
+    4,
+    'each already-complete segment becomes its own <p>'
+  );
 });
 
 test('dewrapHardBreaks: Case B preserves every word (no content loss)', () => {
@@ -121,7 +126,8 @@ test('dewrapHardBreaks: Case B preserves every word (no content loss)', () => {
 // ================================================================
 
 test('dewrapHardBreaks: leaves a normal well-formed article untouched', () => {
-  const clean = '<p>Un párrafo normal y bien formado.</p><p>Otro párrafo distinto, también correcto.</p>';
+  const clean =
+    '<p>Un párrafo normal y bien formado.</p><p>Otro párrafo distinto, también correcto.</p>';
   assert.equal(dewrapHardBreaks(clean), clean);
 });
 
@@ -133,7 +139,8 @@ test('dewrapHardBreaks: leaves a <p> with only an occasional <br> untouched', ()
 });
 
 test('dewrapHardBreaks: leaves non-<p> content (blockquote, figure, ul) untouched', () => {
-  const html = '<blockquote><p>Una cita textual larga que no debería tocarse aunque tenga varias líneas de extensión considerable.</p></blockquote>' +
+  const html =
+    '<blockquote><p>Una cita textual larga que no debería tocarse aunque tenga varias líneas de extensión considerable.</p></blockquote>' +
     '<ul><li>Item uno</li><li>Item dos</li></ul>';
   assert.equal(dewrapHardBreaks(html), html);
 });

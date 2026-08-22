@@ -69,7 +69,9 @@ function main() {
   console.log(`Cobertura i18n — ${articles.length} artículos en total\n`);
 
   if (missingLang.length) {
-    console.log(`❓  Sin \`lang\` asignado (${missingLang.length}) — no se puede evaluar cobertura hasta rellenar:`);
+    console.log(
+      `❓  Sin \`lang\` asignado (${missingLang.length}) — no se puede evaluar cobertura hasta rellenar:`
+    );
     for (const a of missingLang) console.log(`    - ${a.id}  (${a.title.slice(0, 60)})`);
     console.log('');
   }
@@ -77,14 +79,18 @@ function main() {
   if (pairs.length) {
     console.log(`✅  Pares de traducción confirmados (${pairs.length}):`);
     for (const { from, to } of pairs) {
-      console.log(`    - ${from.id} [${from.lang}]  →  translationOf: ${to.id} [${to.lang || '?'}]`);
+      console.log(
+        `    - ${from.id} [${from.lang}]  →  translationOf: ${to.id} [${to.lang || '?'}]`
+      );
     }
     console.log('');
   }
 
   if (unpaired.length) {
     console.log(`🟡  Con \`lang\` pero sin traducción registrada (${unpaired.length}):`);
-    console.log(`    (puede ser intencional — ver MIRROR_GROWING.md §5.3 antes de asumir que es un hueco real)`);
+    console.log(
+      `    (puede ser intencional — ver MIRROR_GROWING.md §5.3 antes de asumir que es un hueco real)`
+    );
     for (const a of unpaired) console.log(`    - ${a.id} [${a.lang}]  (${a.title.slice(0, 60)})`);
     console.log('');
   }

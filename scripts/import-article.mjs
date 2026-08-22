@@ -54,7 +54,10 @@ export function checkDedup(candidate, existing, forceUpdate = false) {
   if (sameSourceUrl && !forceUpdate) {
     return `SKIP: sourceUrl ya está en articles.json — ${candidate.sourceUrl}`;
   }
-  if (candidate.id && existing.some((a) => a.id === candidate.id && a.sourceUrl !== candidate.sourceUrl)) {
+  if (
+    candidate.id &&
+    existing.some((a) => a.id === candidate.id && a.sourceUrl !== candidate.sourceUrl)
+  ) {
     return `SKIP: id "${candidate.id}" ya existe en articles.json`;
   }
   return null;
@@ -123,18 +126,26 @@ export function upsertArticle(existing, entry, forceUpdate = false) {
 // error message instead of a generic "GCI host, no extractor" message.
 
 const GCI_SPIP_OFFICIAL = 'icg-gci.kilombo.top';
-const GCI_SPIP_IN       = 'in.kilombo.top';
-const GCI_STATIC_HOSTS  = new Set(['cdrom.kilombo.top', 'icg-old.kilombo.top']);
+const GCI_SPIP_IN = 'in.kilombo.top';
+const GCI_STATIC_HOSTS = new Set(['cdrom.kilombo.top', 'icg-old.kilombo.top']);
 
 /** @param {string} url @returns {'tierra' | 'pi' | 'gci' | 'gci-in' | 'gci-static' | 'unknown'} */
 export function detectSite(url) {
   const host = (() => {
-    try { return new URL(url).hostname; } catch { return ''; }
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return '';
+    }
   })();
   if (host === GCI_SPIP_OFFICIAL) return 'gci';
-  if (host === GCI_SPIP_IN)       return 'gci-in';
+  if (host === GCI_SPIP_IN) return 'gci-in';
   if (GCI_STATIC_HOSTS.has(host)) return 'gci-static';
-  if (host === 'www.kilombo.top' || host === 'kilombo.top' || (host.endsWith('.kilombo.top') && host !== 'proletariosinternacionalistas.kilombo.top')) {
+  if (
+    host === 'www.kilombo.top' ||
+    host === 'kilombo.top' ||
+    (host.endsWith('.kilombo.top') && host !== 'proletariosinternacionalistas.kilombo.top')
+  ) {
     return 'tierra';
   }
   if (host === 'proletariosinternacionalistas.kilombo.top') return 'pi';
@@ -167,25 +178,35 @@ export function extractTierraDate(html) {
 export function extractTierra(html) {
   const titleMatch = html.match(/id="titre-article"[^>]*>([^<]{3,300})/);
   const date = extractTierraDate(html);
-  const bodyMatch = html.match(/id="texte-article"[^>]*>([\s\S]*?)(?:<\/div>\s*(?:<!--\s*Fin texte-article|<!--Affichage du post-sciptum|<div id="pied"|$)|<\/div>\s*(?=<section|<footer|$))/i);
+  const bodyMatch = html.match(
+    /id="texte-article"[^>]*>([\s\S]*?)(?:<\/div>\s*(?:<!--\s*Fin texte-article|<!--Affichage du post-sciptum|<div id="pied"|$)|<\/div>\s*(?=<section|<footer|$))/i
+  );
   const descriptifMatch = html.match(/id="descriptif-article"[^>]*>([\s\S]+?)<\/div>/);
 
   const rawBody = bodyMatch ? bodyMatch[1] : '';
   const plainTextLength = rawBody.replace(/<[^>]+>/g, '').trim().length;
   const hasLink = /<a\s+[^>]*href=/i.test(rawBody);
-  const hasMediaLink = /<a\s+[^>]*href=(?:['"])?(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|[^'"\s]+\.(?:mp4|webm|m3u8))/i.test(rawBody);
-  
+  const hasMediaLink =
+    /<a\s+[^>]*href=(?:['"])?(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|[^'"\s]+\.(?:mp4|webm|m3u8))/i.test(
+      rawBody
+    );
+
   // Gap 1: Check for unextracted media (portfolio images outside body, document links)
   // This forces pending-review even if bodyMatch contains a link, because the
   // real content (images or PDF) lives outside the extracted text block.
-  const portfolioImages = html.match(/<div[^>]*class="[^"]*portfolio[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
-  const unextractedImgCount = portfolioImages ? (portfolioImages[1].match(/<img/gi) || []).length : 0;
-  const hasDocumentLink = /<a[^>]*href=(?:['"])?[^'"\s]*\.(?:pdf|doc|docx|xls|xlsx|zip|rar|7z)['"']?/i.test(rawBody);
+  const portfolioImages = html.match(
+    /<div[^>]*class="[^"]*portfolio[^"]*"[^>]*>([\s\S]*?)<\/div>/i
+  );
+  const unextractedImgCount = portfolioImages
+    ? (portfolioImages[1].match(/<img/gi) || []).length
+    : 0;
+  const hasDocumentLink =
+    /<a[^>]*href=(?:['"])?[^'"\s]*\.(?:pdf|doc|docx|xls|xlsx|zip|rar|7z)['"']?/i.test(rawBody);
   const documentLinkWithoutContext = hasDocumentLink && plainTextLength < 100;
   const hasUnextractedMedia = unextractedImgCount > 0 || documentLinkWithoutContext;
 
   const isImageOnly = plainTextLength < 200 && !hasLink && !hasMediaLink;
-  
+
   let unextractedMediaWarning;
   if (hasUnextractedMedia && !isImageOnly) {
     // Article has text, but there's a document link or external gallery that wasn't extracted
@@ -221,7 +242,10 @@ export function extractPI(html) {
   }
   const plainTextLength = bodyHtml.replace(/<[^>]+>/g, '').trim().length;
   const hasLink = /<a\s+[^>]*href=/i.test(bodyHtml);
-  const hasMediaLink = /<a\s+[^>]*href=(?:['"])?(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|[^'"\s]+\.(?:mp4|webm|m3u8))/i.test(bodyHtml);
+  const hasMediaLink =
+    /<a\s+[^>]*href=(?:['"])?(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|[^'"\s]+\.(?:mp4|webm|m3u8))/i.test(
+      bodyHtml
+    );
 
   return {
     title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '').trim() : '',
@@ -330,14 +354,18 @@ export function reduceToAllowlist(html) {
  * @param {boolean} [forceUpdate=false]
  */
 export async function buildArticleEntry(opts, fetchHtml, existingArticles, forceUpdate = false) {
-  const dedupError = checkDedup({ sourceUrl: opts.url, id: opts.id }, existingArticles, forceUpdate);
+  const dedupError = checkDedup(
+    { sourceUrl: opts.url, id: opts.id },
+    existingArticles,
+    forceUpdate
+  );
   if (dedupError) throw new Error(dedupError);
 
   const site = detectSite(opts.url);
   if (site === 'unknown') {
     throw new Error(
       `No se reconoce el sitio de origen para ${opts.url}. ` +
-      `Selectores solo definidos para Tierra y PI — ver TROUBLESHOOTING.md §8.`
+        `Selectores solo definidos para Tierra y PI — ver TROUBLESHOOTING.md §8.`
     );
   }
   if (site === 'gci') {
@@ -346,7 +374,7 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
     // Failing loudly is intentional — see TO_FIX.md #63.
     throw new Error(
       `${opts.url} es el sitio oficial del GCI (icg-gci.kilombo.top, instancia SPIP spip__4). ` +
-      `No existe todavía extractGCI() para su plantilla — ver TO_FIX.md #63. Importar manualmente.`
+        `No existe todavía extractGCI() para su plantilla — ver TO_FIX.md #63. Importar manualmente.`
     );
   }
   if (site === 'gci-in') {
@@ -355,8 +383,8 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
     // See TO_FIX.md #63.
     throw new Error(
       `${opts.url} es la plataforma internacional del GCI (in.kilombo.top, instancia SPIP spip__3, ` +
-      `multilingüe EN/Kurdish/Persian/Arabic). No existe extracto para su plantilla — ` +
-      `ver TO_FIX.md #63. Importar manualmente.`
+        `multilingüe EN/Kurdish/Persian/Arabic). No existe extracto para su plantilla — ` +
+        `ver TO_FIX.md #63. Importar manualmente.`
     );
   }
   if (site === 'gci-static') {
@@ -364,7 +392,7 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
     // No SPIP selectors apply at all; content must be scraped with different tooling.
     throw new Error(
       `${opts.url} es una webapp estática del GCI (${new URL(opts.url).hostname}, app: my_webapp — no es SPIP). ` +
-      `El extractor SPIP no aplica aquí. Ver TO_FIX.md #63 y TROUBLESHOOTING.md §2 para detalles de infraestructura.`
+        `El extractor SPIP no aplica aquí. Ver TO_FIX.md #63 y TROUBLESHOOTING.md §2 para detalles de infraestructura.`
     );
   }
 
@@ -374,7 +402,7 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
   if (!extracted.title) {
     throw new Error(
       `No se pudo extraer el título automáticamente de ${opts.url}. ` +
-      `En PI, el título de series suele estar en el primer <p> del cuerpo — revisar manualmente.`
+        `En PI, el título de series suele estar en el primer <p> del cuerpo — revisar manualmente.`
     );
   }
 
@@ -403,8 +431,8 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
     if (idCollisionError) throw new Error(idCollisionError);
   }
 
-  // Gap 2: If unextractedMediaWarning exists, force pending-review regardless of 
-  // the normal isImageOnly heuristic. This ensures articles with galleries, 
+  // Gap 2: If unextractedMediaWarning exists, force pending-review regardless of
+  // the normal isImageOnly heuristic. This ensures articles with galleries,
   // embedded PDFs, or other unextracted content get flagged for human review.
   let status = opts.status;
   if (!status) {
@@ -424,7 +452,10 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
     date: 'date' in extracted ? extracted.date || '' : '',
     section: opts.section,
     topics: opts.topics,
-    sourceSite: site === 'tierra' ? 'Espacio Tierra y Libertad (kilombo.top)' : 'Proletarios Internacionalistas',
+    sourceSite:
+      site === 'tierra'
+        ? 'Espacio Tierra y Libertad (kilombo.top)'
+        : 'Proletarios Internacionalistas',
     sourceUrl: opts.url,
     status,
     contentHtml: body,
@@ -436,7 +467,8 @@ export async function buildArticleEntry(opts, fetchHtml, existingArticles, force
 function slugify(title) {
   return title
     .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
     .slice(0, 80);
@@ -455,14 +487,19 @@ async function main() {
   const url = get('--url');
   const file = get('--file');
   const section = get('--section');
-  const topics = (get('--topics') || '').split(',').map((t) => t.trim()).filter(Boolean);
+  const topics = (get('--topics') || '')
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean);
   const id = get('--id');
   const status = get('--status');
   const dryRun = args.includes('--dry-run');
   const forceUpdate = args.includes('--force-update');
 
   if (!url || !section) {
-    console.error('Uso: node scripts/import-article.mjs --url <sourceUrl> --section <section> --topics a,b [--id x] [--file path] [--dry-run] [--force-update]');
+    console.error(
+      'Uso: node scripts/import-article.mjs --url <sourceUrl> --section <section> --topics a,b [--id x] [--file path] [--dry-run] [--force-update]'
+    );
     process.exit(1);
   }
 
@@ -481,12 +518,19 @@ async function main() {
         return res.text();
       };
 
-  const entry = await buildArticleEntry({ url, section, topics, id, status }, fetchHtml, existing, forceUpdate);
+  const entry = await buildArticleEntry(
+    { url, section, topics, id, status },
+    fetchHtml,
+    existing,
+    forceUpdate
+  );
 
   if (dryRun) {
     console.log(JSON.stringify(entry, null, 2));
     const action = forceUpdate ? 'actualizará' : 'añadirá';
-    console.log(`\n--dry-run: no se ha escrito nada. Revisar manualmente antes de ${action} sin --dry-run.`);
+    console.log(
+      `\n--dry-run: no se ha escrito nada. Revisar manualmente antes de ${action} sin --dry-run.`
+    );
     return;
   }
 

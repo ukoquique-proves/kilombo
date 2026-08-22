@@ -10,7 +10,7 @@
     "test": "bash scripts/test.sh",
     "lint": "eslint site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs",
     "lint:fix": "eslint site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs --fix",
-    "format": "prettier --write site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs .eslintrc.json .prettierrc.json",
+    "format": "prettier --write site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs eslint.config.js .prettierrc.json",
     "format:check": "prettier --check site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs",
     "build": "npm run encrypt",
     "dev": "npm run preview",

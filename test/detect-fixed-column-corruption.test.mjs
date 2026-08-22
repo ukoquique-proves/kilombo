@@ -15,7 +15,10 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { detectFixedColumnCorruption, repairFixedColumnCorruption } from '../scripts/detect-fixed-column-corruption.mjs';
+import {
+  detectFixedColumnCorruption,
+  repairFixedColumnCorruption,
+} from '../scripts/detect-fixed-column-corruption.mjs';
 
 // Mirrors the real-world pattern from TO_FIX.md #54: text copy-pasted from
 // a fixed-width source (PDF, 80-column terminal, etc.), wrapped with a
@@ -29,12 +32,17 @@ const hardWrappedHtml =
 
 test('detectFixedColumnCorruption finds a real embedded-newline hard-wrap', () => {
   const result = detectFixedColumnCorruption(hardWrappedHtml);
-  assert.equal(result.found, true, 'must detect embedded real newlines, not just literal backslash-n text');
+  assert.equal(
+    result.found,
+    true,
+    'must detect embedded real newlines, not just literal backslash-n text'
+  );
   assert.equal(result.lineCount, 5);
 });
 
 test('detectFixedColumnCorruption does not false-positive on clean, unwrapped content', () => {
-  const clean = '<p>Este es un párrafo normal, sin saltos de línea embebidos, de longitud razonable para una prueba unitaria.</p>';
+  const clean =
+    '<p>Este es un párrafo normal, sin saltos de línea embebidos, de longitud razonable para una prueba unitaria.</p>';
   const result = detectFixedColumnCorruption(clean);
   assert.equal(result.found, false);
 });
@@ -42,7 +50,8 @@ test('detectFixedColumnCorruption does not false-positive on clean, unwrapped co
 test('detectFixedColumnCorruption ignores the literal two-character sequence backslash+n (not a real newline)', () => {
   // A string that contains the literal characters \ and n, but no actual
   // newline — this must NOT be treated as corruption.
-  const literalBackslashN = '<p>texto con la secuencia literal \\n+n que no es un salto de linea real en absoluto.</p>';
+  const literalBackslashN =
+    '<p>texto con la secuencia literal \\n+n que no es un salto de linea real en absoluto.</p>';
   const result = detectFixedColumnCorruption(literalBackslashN);
   assert.equal(result.found, false);
 });

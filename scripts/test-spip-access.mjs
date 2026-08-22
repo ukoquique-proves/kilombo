@@ -72,8 +72,10 @@ async function loadEnv() {
       if (key && rest.length > 0) {
         let value = rest.join('=').trim();
         // Remove surrounding quotes if present
-        if ((value.startsWith("'") && value.endsWith("'")) || 
-            (value.startsWith('"') && value.endsWith('"'))) {
+        if (
+          (value.startsWith("'") && value.endsWith("'")) ||
+          (value.startsWith('"') && value.endsWith('"'))
+        ) {
           value = value.slice(1, -1);
         }
         env[key] = value;
@@ -161,8 +163,8 @@ async function main() {
       ? result.statusCode === 401
         ? '✅ Reachable (login required)'
         : result.statusCode === 200
-        ? '✅ Reachable (logged in)'
-        : '✅ Reachable (redirect/SSO)'
+          ? '✅ Reachable (logged in)'
+          : '✅ Reachable (redirect/SSO)'
       : `❌ Not reachable (${result.error})`;
 
     results.push({
@@ -190,9 +192,7 @@ async function main() {
   console.log(`Summary: ${accessibleCount}/${results.length} instances reachable`);
   if (allAccessible) {
     console.log('✅ All SPIP backends are reachable.');
-    console.log(
-      '   Whether the current credentials are a SPIP admin requires login testing.'
-    );
+    console.log('   Whether the current credentials are a SPIP admin requires login testing.');
   } else {
     console.log('❌ Some instances are not reachable.');
   }

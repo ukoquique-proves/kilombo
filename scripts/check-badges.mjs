@@ -16,11 +16,13 @@ let hasError = false;
 cards.forEach((card, i) => {
   const isExternal = card.querySelector('.card-status--external');
   const isMirrored = card.querySelector('.card-status--mirrored');
-  
+
   if (!isExternal && !isMirrored) {
     const title = card.querySelector('.card-title')?.textContent.trim() || 'Unknown card';
     console.error(`❌ Error: Card "${title}" (index ${i}) missing Level 1 / Level 2 badge.`);
-    console.error(`   It must include either <span class="card-status card-status--external">↗ Externo</span> or <span class="card-status card-status--mirrored">⬡ Espejo</span>`);
+    console.error(
+      `   It must include either <span class="card-status card-status--external">↗ Externo</span> or <span class="card-status card-status--mirrored">⬡ Espejo</span>`
+    );
     hasError = true;
   }
 });

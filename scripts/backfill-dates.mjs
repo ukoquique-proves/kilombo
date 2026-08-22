@@ -51,15 +51,37 @@ const commit = process.argv.includes('--commit');
 // ── Date string → YYYY-MM-DD ─────────────────────────────────────────────
 
 const MONTHS_ES = {
-  enero: '01', febrero: '02', marzo: '03', abril: '04', mayo: '05', junio: '06',
-  julio: '07', agosto: '08', septiembre: '09', setiembre: '09', octubre: '10',
-  noviembre: '11', diciembre: '12',
+  enero: '01',
+  febrero: '02',
+  marzo: '03',
+  abril: '04',
+  mayo: '05',
+  junio: '06',
+  julio: '07',
+  agosto: '08',
+  septiembre: '09',
+  setiembre: '09',
+  octubre: '10',
+  noviembre: '11',
+  diciembre: '12',
 };
 
 const MONTHS_FR = {
-  janvier: '01', février: '02', fevrier: '02', mars: '03', avril: '04', mai: '05',
-  juin: '06', juillet: '07', août: '08', aout: '08', septembre: '09',
-  octobre: '10', novembre: '11', décembre: '12', decembre: '12',
+  janvier: '01',
+  février: '02',
+  fevrier: '02',
+  mars: '03',
+  avril: '04',
+  mai: '05',
+  juin: '06',
+  juillet: '07',
+  août: '08',
+  aout: '08',
+  septembre: '09',
+  octobre: '10',
+  novembre: '11',
+  décembre: '12',
+  decembre: '12',
 };
 
 /**
@@ -102,26 +124,38 @@ for (const article of articles) {
 
   const m = (article.sourceUrl || '').match(/[?&]article(\d+)\b/);
   if (!m) {
-    unresolved.push({ id: article.id, reason: `sourceUrl has no ?article{N} — ${article.sourceUrl}` });
+    unresolved.push({
+      id: article.id,
+      reason: `sourceUrl has no ?article{N} — ${article.sourceUrl}`,
+    });
     continue;
   }
 
   const snapshotPath = resolve(SCRAPED_DIR, `article-${m[1]}.html`);
   if (!existsSync(snapshotPath)) {
-    unresolved.push({ id: article.id, reason: `no local snapshot at scraped-full/article-${m[1]}.html — needs live re-fetch` });
+    unresolved.push({
+      id: article.id,
+      reason: `no local snapshot at scraped-full/article-${m[1]}.html — needs live re-fetch`,
+    });
     continue;
   }
 
   const html = readFileSync(snapshotPath, 'utf-8');
   const rawDate = extractTierraDate(html);
   if (!rawDate) {
-    unresolved.push({ id: article.id, reason: `snapshot found (article-${m[1]}.html) but no date-article markup matched` });
+    unresolved.push({
+      id: article.id,
+      reason: `snapshot found (article-${m[1]}.html) but no date-article markup matched`,
+    });
     continue;
   }
 
   const iso = normalizeDate(rawDate);
   if (!iso) {
-    unresolved.push({ id: article.id, reason: `extracted raw date "${rawDate}" (article-${m[1]}.html) but couldn't parse it — unrecognized month/format` });
+    unresolved.push({
+      id: article.id,
+      reason: `extracted raw date "${rawDate}" (article-${m[1]}.html) but couldn't parse it — unrecognized month/format`,
+    });
     continue;
   }
 
@@ -152,7 +186,9 @@ if (resolved.length === 0) {
 }
 
 if (!commit) {
-  console.log(`\n${resolved.length} date(s) would be filled in, ${unresolved.length} left unresolved.`);
+  console.log(
+    `\n${resolved.length} date(s) would be filled in, ${unresolved.length} left unresolved.`
+  );
   console.log('--dry-run: no changes written. Re-run with --commit to apply.');
   process.exit(0);
 }

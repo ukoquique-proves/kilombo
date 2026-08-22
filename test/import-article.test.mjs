@@ -42,7 +42,10 @@ test('checkDedup rejects duplicate id', () => {
 
 test('checkDedup allows same sourceUrl replacement when forceUpdate is true', () => {
   const existing = [{ sourceUrl: 'https://kilombo.top/articulo1', id: 'art-1' }];
-  assert.equal(checkDedup({ sourceUrl: 'https://kilombo.top/articulo1', id: 'art-2' }, existing, true), null);
+  assert.equal(
+    checkDedup({ sourceUrl: 'https://kilombo.top/articulo1', id: 'art-2' }, existing, true),
+    null
+  );
 });
 
 test('checkFinalIdCollision — returns null when no collision exists', () => {
@@ -60,7 +63,10 @@ test('checkFinalIdCollision — returns error when auto-slugified id collides wi
 
 test('checkFinalIdCollision — returns null when forceUpdate is true even with collision', () => {
   const existing = [{ id: 'titulo-articulo', sourceUrl: 'https://example.com/1' }];
-  assert.equal(checkFinalIdCollision('titulo-articulo', 'https://example.com/2', existing, true), null);
+  assert.equal(
+    checkFinalIdCollision('titulo-articulo', 'https://example.com/2', existing, true),
+    null
+  );
 });
 
 test('buildArticleEntry throws when auto-slugified id collides with existing article', async () => {
@@ -69,13 +75,16 @@ test('buildArticleEntry throws when auto-slugified id collides with existing art
     <div id="texte-article"><p>Contenido suficiente para no ser image-only.</p></div>
   `;
   const fetchHtml = async () => mockHtml;
-  const existing = [{ id: 'titulo-articulo', sourceUrl: 'https://www.kilombo.top/spip.php?article99' }];
+  const existing = [
+    { id: 'titulo-articulo', sourceUrl: 'https://www.kilombo.top/spip.php?article99' },
+  ];
   await assert.rejects(
-    () => buildArticleEntry(
-      { url: 'https://www.kilombo.top/spip.php?article100', section: 'tierra', topics: [] },
-      fetchHtml,
-      existing
-    ),
+    () =>
+      buildArticleEntry(
+        { url: 'https://www.kilombo.top/spip.php?article100', section: 'tierra', topics: [] },
+        fetchHtml,
+        existing
+      ),
     /titulo-articulo/
   );
 });
@@ -85,15 +94,25 @@ test('upsertArticle replaces the matching existing entry when forceUpdate is ena
     { sourceUrl: 'https://kilombo.top/articulo1', id: 'art-1', title: 'Old' },
     { sourceUrl: 'https://kilombo.top/articulo2', id: 'art-2', title: 'Other' },
   ];
-  const updated = upsertArticle(existing, { sourceUrl: 'https://kilombo.top/articulo1', id: 'art-1', title: 'New' }, true);
+  const updated = upsertArticle(
+    existing,
+    { sourceUrl: 'https://kilombo.top/articulo1', id: 'art-1', title: 'New' },
+    true
+  );
   assert.equal(updated.length, 2);
-  assert.equal(updated.find((article) => article.sourceUrl === 'https://kilombo.top/articulo1')?.title, 'New');
+  assert.equal(
+    updated.find((article) => article.sourceUrl === 'https://kilombo.top/articulo1')?.title,
+    'New'
+  );
 });
 
 test('detectSite recognizes Tierra y Libertad and PI hosts', () => {
   assert.equal(detectSite('https://kilombo.top/spip.php?article=1'), 'tierra');
   assert.equal(detectSite('https://www.kilombo.top/spip.php?article=1'), 'tierra');
-  assert.equal(detectSite('https://proletariosinternacionalistas.kilombo.top/spip.php?article=2'), 'pi');
+  assert.equal(
+    detectSite('https://proletariosinternacionalistas.kilombo.top/spip.php?article=2'),
+    'pi'
+  );
   assert.equal(detectSite('https://example.com/'), 'unknown');
 });
 
@@ -108,29 +127,32 @@ test('buildArticleEntry rejects GCI hosts loudly instead of silently misextracti
   const fetchHtml = async () => '<html><body>should never be fetched</body></html>';
   // icg-gci: SPIP official site
   await assert.rejects(
-    () => buildArticleEntry(
-      { url: 'https://icg-gci.kilombo.top/spip.php?article=1', section: 'gci', topics: [] },
-      fetchHtml,
-      []
-    ),
+    () =>
+      buildArticleEntry(
+        { url: 'https://icg-gci.kilombo.top/spip.php?article=1', section: 'gci', topics: [] },
+        fetchHtml,
+        []
+      ),
     /extractGCI|no existe todavía/i
   );
   // in.kilombo.top: separate multilingual SPIP
   await assert.rejects(
-    () => buildArticleEntry(
-      { url: 'https://in.kilombo.top/spip.php?article=1', section: 'gci', topics: [] },
-      fetchHtml,
-      []
-    ),
+    () =>
+      buildArticleEntry(
+        { url: 'https://in.kilombo.top/spip.php?article=1', section: 'gci', topics: [] },
+        fetchHtml,
+        []
+      ),
     /extracto|spip__3/i
   );
   // cdrom: static webapp, not SPIP
   await assert.rejects(
-    () => buildArticleEntry(
-      { url: 'https://cdrom.kilombo.top/page.html', section: 'gci', topics: [] },
-      fetchHtml,
-      []
-    ),
+    () =>
+      buildArticleEntry(
+        { url: 'https://cdrom.kilombo.top/page.html', section: 'gci', topics: [] },
+        fetchHtml,
+        []
+      ),
     /webapp estática|my_webapp/i
   );
 });
@@ -149,7 +171,8 @@ test('extractTierra does not treat a short link paragraph as image-only content'
 });
 
 test('rewriteRelativeUrls preserves absolute and exempt URLs and rewrites relative ones', () => {
-  const html = '<a href="/foo">link</a><img src="images/x.png"><a href="#anchor">ok</a><a href="mailto:test@example.com">email</a>';
+  const html =
+    '<a href="/foo">link</a><img src="images/x.png"><a href="#anchor">ok</a><a href="mailto:test@example.com">email</a>';
   const result = rewriteRelativeUrls(html, 'https://kilombo.top/dir/page.html');
   assert.ok(result.includes('href="https://kilombo.top/foo"'));
   assert.ok(result.includes('src="https://kilombo.top/dir/images/x.png"'));

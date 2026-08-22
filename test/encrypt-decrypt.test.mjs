@@ -38,14 +38,14 @@ import { createRequire } from 'node:module';
 // ── Load staticrypt internals (same path as encrypt.mjs) ─────────────────────
 const require = createRequire(import.meta.url);
 const cryptoEngine = require('../node_modules/staticrypt/lib/cryptoEngine.js');
-const codec        = require('../node_modules/staticrypt/lib/codec.js');
-const { encode }   = codec.init(cryptoEngine);
+const codec = require('../node_modules/staticrypt/lib/codec.js');
+const { encode } = codec.init(cryptoEngine);
 
 // ── Test fixtures ─────────────────────────────────────────────────────────────
 const TEST_PASSWORD = 'test-password-kilombo';
-const TEST_SALT     = '15efb88b5789d0133e0f8771165ee709'; // same salt as .staticrypt.json
-const TEST_PAYLOAD  = JSON.stringify([
-  { id: 'test-article', title: 'Artículo de prueba', section: 'general' }
+const TEST_SALT = '15efb88b5789d0133e0f8771165ee709'; // same salt as .staticrypt.json
+const TEST_PAYLOAD = JSON.stringify([
+  { id: 'test-article', title: 'Artículo de prueba', section: 'general' },
 ]);
 
 // ── Decrypt helpers (use staticrypt's own codec.decode to stay in sync) ───────
@@ -74,7 +74,7 @@ async function parseJsonWithKey(jsonText, password, salt) {
 
 test('encrypt — encode() produces a valid envelope', async () => {
   const ciphertext = await encode(TEST_PAYLOAD, TEST_PASSWORD, TEST_SALT);
-  const envelope   = JSON.parse(JSON.stringify({ encrypted: true, ciphertext, salt: TEST_SALT }));
+  const envelope = JSON.parse(JSON.stringify({ encrypted: true, ciphertext, salt: TEST_SALT }));
 
   assert.equal(envelope.encrypted, true, 'envelope must have encrypted: true');
   assert.ok(typeof envelope.ciphertext === 'string', 'ciphertext must be a string');
@@ -85,26 +85,29 @@ test('encrypt — encode() produces a valid envelope', async () => {
 });
 
 test('encrypt → decrypt round-trip recovers original plaintext', async () => {
-  const ciphertext   = await encode(TEST_PAYLOAD, TEST_PASSWORD, TEST_SALT);
+  const ciphertext = await encode(TEST_PAYLOAD, TEST_PASSWORD, TEST_SALT);
   const envelopeText = JSON.stringify({ encrypted: true, ciphertext, salt: TEST_SALT });
 
   const recovered = await parseJsonWithKey(envelopeText, TEST_PASSWORD, TEST_SALT);
 
-  assert.deepEqual(recovered, JSON.parse(TEST_PAYLOAD),
-    'decrypted value must deeply equal the original payload');
+  assert.deepEqual(
+    recovered,
+    JSON.parse(TEST_PAYLOAD),
+    'decrypted value must deeply equal the original payload'
+  );
 });
 
 test('round-trip preserves unicode and special characters', async () => {
-  const payload   = JSON.stringify({ title: 'Siempre víctimas — «Israel»', tags: ['&', '<', '>'] });
-  const ct        = await encode(payload, TEST_PASSWORD, TEST_SALT);
-  const envText   = JSON.stringify({ encrypted: true, ciphertext: ct, salt: TEST_SALT });
+  const payload = JSON.stringify({ title: 'Siempre víctimas — «Israel»', tags: ['&', '<', '>'] });
+  const ct = await encode(payload, TEST_PASSWORD, TEST_SALT);
+  const envText = JSON.stringify({ encrypted: true, ciphertext: ct, salt: TEST_SALT });
   const recovered = await parseJsonWithKey(envText, TEST_PASSWORD, TEST_SALT);
 
   assert.deepEqual(recovered, JSON.parse(payload), 'unicode/special chars must survive round-trip');
 });
 
 test('wrong password produces a decryption error', async () => {
-  const ciphertext   = await encode(TEST_PAYLOAD, TEST_PASSWORD, TEST_SALT);
+  const ciphertext = await encode(TEST_PAYLOAD, TEST_PASSWORD, TEST_SALT);
   const envelopeText = JSON.stringify({ encrypted: true, ciphertext, salt: TEST_SALT });
 
   await assert.rejects(
@@ -114,7 +117,7 @@ test('wrong password produces a decryption error', async () => {
 });
 
 test('parseJson no-op: plain JSON passes through unchanged', async () => {
-  const plain  = JSON.stringify([{ id: 'abc', title: 'Plain' }]);
+  const plain = JSON.stringify([{ id: 'abc', title: 'Plain' }]);
   const result = await parseJsonWithKey(plain, TEST_PASSWORD, TEST_SALT);
 
   assert.deepEqual(result, JSON.parse(plain), 'unencrypted JSON must pass through as-is');

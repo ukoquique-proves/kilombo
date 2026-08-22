@@ -105,11 +105,7 @@ function testHttpAccess(url) {
           const hasSSOHeader = !!res.headers['x-sso-wat'];
 
           // Follow redirects
-          if (
-            res.statusCode >= 300 &&
-            res.statusCode < 400 &&
-            res.headers.location
-          ) {
+          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
             const nextUrl = res.headers.location;
             // Avoid infinite redirect loops
             if (
@@ -233,16 +229,9 @@ async function main() {
       deniedCount++;
     }
 
-    const statusIcon =
-      access.level === 'granted'
-        ? '✅'
-        : access.level === 'denied'
-        ? '❌'
-        : '⚠️ ';
+    const statusIcon = access.level === 'granted' ? '✅' : access.level === 'denied' ? '❌' : '⚠️ ';
 
-    console.log(
-      `${statusIcon} ${test.name.padEnd(40)} — ${access.reason.padEnd(50)}`
-    );
+    console.log(`${statusIcon} ${test.name.padEnd(40)} — ${access.reason.padEnd(50)}`);
 
     if (verbose && result.redirectChain.length > 0) {
       for (const [i, redirect] of result.redirectChain.entries()) {
@@ -267,15 +256,15 @@ async function main() {
   console.log('Summary:');
   console.log(`  ✅ Granted access: ${editorAccessCount + adminAccessCount}`);
   console.log(`  ❌ Denied access: ${deniedCount}`);
-  console.log(`  ⚠️  Unreachable/unknown: ${results.length - (editorAccessCount + adminAccessCount + deniedCount)}\n`);
+  console.log(
+    `  ⚠️  Unreachable/unknown: ${results.length - (editorAccessCount + adminAccessCount + deniedCount)}\n`
+  );
 
   // Privilege tier interpretation
   let privilegeTier = 'unknown';
   if (adminAccessCount > 0) {
     privilegeTier = 'FULL ADMIN';
-    console.log(
-      '🔑 Privilege Tier: FULL ADMIN (has access to plugin/config management)'
-    );
+    console.log('🔑 Privilege Tier: FULL ADMIN (has access to plugin/config management)');
   } else if (editorAccessCount > 0) {
     privilegeTier = 'EDITOR';
     console.log(

@@ -29,56 +29,97 @@ const CONTENT_DIR = resolve(__dirname, '../site/assets/content');
 
 /** @type {FieldRule[]} */
 const BASE_RULES = [
-  { name: 'id',           type: 'string',  required: true,
-    validate: (v) => String(v).trim() ? null : 'id must be non-empty' },
-  { name: 'country',      type: 'string',  required: true },
-  { name: 'countryLabel', type: 'string',  required: true },
-  { name: 'year',         type: 'number',  required: true,
-    validate: (v) => (v >= 1900 && v <= 2100) ? null : `year ${v} is out of range` },
-  { name: 'tags',         type: 'array',   required: true,
-    validate: (v) => Array.isArray(v) && v.length > 0 ? null : 'tags must be a non-empty array' },
-  { name: 'category',     type: 'string',  required: true },
-  { name: 'title',        type: 'string',  required: true,
-    validate: (v) => String(v).trim() ? null : 'title must be non-empty' },
-  { name: 'desc',         type: 'string',  required: true,
-    validate: (v) => String(v).trim() ? null : 'desc must be non-empty' },
-  { name: 'langs',        type: 'array',   required: true,
+  {
+    name: 'id',
+    type: 'string',
+    required: true,
+    validate: (v) => (String(v).trim() ? null : 'id must be non-empty'),
+  },
+  { name: 'country', type: 'string', required: true },
+  { name: 'countryLabel', type: 'string', required: true },
+  {
+    name: 'year',
+    type: 'number',
+    required: true,
+    validate: (v) => (v >= 1900 && v <= 2100 ? null : `year ${v} is out of range`),
+  },
+  {
+    name: 'tags',
+    type: 'array',
+    required: true,
+    validate: (v) => (Array.isArray(v) && v.length > 0 ? null : 'tags must be a non-empty array'),
+  },
+  { name: 'category', type: 'string', required: true },
+  {
+    name: 'title',
+    type: 'string',
+    required: true,
+    validate: (v) => (String(v).trim() ? null : 'title must be non-empty'),
+  },
+  {
+    name: 'desc',
+    type: 'string',
+    required: true,
+    validate: (v) => (String(v).trim() ? null : 'desc must be non-empty'),
+  },
+  {
+    name: 'langs',
+    type: 'array',
+    required: true,
     validate: (v) => {
       if (!Array.isArray(v) || v.length === 0) return 'langs must be a non-empty array';
       for (const chip of v) {
         if (typeof chip !== 'object' || chip === null) return 'each lang entry must be an object';
-        if (typeof chip.chip !== 'string' || !chip.chip.trim()) return 'each lang must have a non-empty chip string';
-        if (typeof chip.label !== 'string' || !chip.label.trim()) return 'each lang must have a non-empty label string';
-        if ('title' in chip && typeof chip.title !== 'string') return 'lang.title must be a string if present';
+        if (typeof chip.chip !== 'string' || !chip.chip.trim())
+          return 'each lang must have a non-empty chip string';
+        if (typeof chip.label !== 'string' || !chip.label.trim())
+          return 'each lang must have a non-empty label string';
+        if ('title' in chip && typeof chip.title !== 'string')
+          return 'lang.title must be a string if present';
       }
       return null;
-    }},
-  { name: 'ctaUrl',       type: 'string',  required: true,
+    },
+  },
+  {
+    name: 'ctaUrl',
+    type: 'string',
+    required: true,
     validate: (v) => {
-      if (!isSafeUrl(v))           return `ctaUrl "${v}" uses a forbidden scheme (javascript:/data:/vbscript:)`;
-      if (!isAbsoluteOrExempt(v))  return `ctaUrl "${v}" must be an absolute https?:// URL (or # / mailto:)`;
+      if (!isSafeUrl(v))
+        return `ctaUrl "${v}" uses a forbidden scheme (javascript:/data:/vbscript:)`;
+      if (!isAbsoluteOrExempt(v))
+        return `ctaUrl "${v}" must be an absolute https?:// URL (or # / mailto:)`;
       return null;
-    }},
-  { name: 'ctaLabel',     type: 'string',  required: true,
-    validate: (v) => String(v).trim() ? null : 'ctaLabel must be non-empty' },
+    },
+  },
+  {
+    name: 'ctaLabel',
+    type: 'string',
+    required: true,
+    validate: (v) => (String(v).trim() ? null : 'ctaLabel must be non-empty'),
+  },
 ];
 
 /** Optional fields with type checks */
 /** @type {FieldRule[]} */
 const OPTIONAL_RULES = [
-  { name: 'idAlt',        type: 'string',  required: false },
-  { name: 'subtitlesFr',  type: 'string',  required: false },
-  { name: 'featured',     type: 'boolean', required: false },
-  { name: 'cornerLabel',  type: 'string',  required: false },
+  { name: 'idAlt', type: 'string', required: false },
+  { name: 'subtitlesFr', type: 'string', required: false },
+  { name: 'featured', type: 'boolean', required: false },
+  { name: 'cornerLabel', type: 'string', required: false },
   { name: 'ctaPlaceholder', type: 'boolean', required: false },
-  { name: 'keypoints',    type: 'array',   required: false,
+  {
+    name: 'keypoints',
+    type: 'array',
+    required: false,
     validate: (v) => {
       if (!Array.isArray(v)) return 'keypoints must be an array';
       for (const kp of v) {
         if (typeof kp !== 'string' || !kp.trim()) return 'each keypoint must be a non-empty string';
       }
       return null;
-    }},
+    },
+  },
 ];
 
 // ================================================================
@@ -132,7 +173,13 @@ function validateVideoEntry(entry, file, index) {
 // Schema definition — ARTÍCULOS (JSON → contentHtml)
 // ================================================================
 
-const ARTICLE_STATUS = new Set(['imported', 'adapted', 'translated', 'pending-review', 'external-only']);
+const ARTICLE_STATUS = new Set([
+  'imported',
+  'adapted',
+  'translated',
+  'pending-review',
+  'external-only',
+]);
 
 // ARTICLES.schema.md documents id as "lowercase alphanumeric + hyphens, max
 // 80 chars" — matches scripts/import-article.mjs's slugify() output exactly,
@@ -143,36 +190,87 @@ const ID_MAX_LENGTH = 80;
 
 /** @type {FieldRule[]} */
 const ARTICLE_RULES = [
-  { name: 'id', type: 'string', required: true, validate: (v) => {
+  {
+    name: 'id',
+    type: 'string',
+    required: true,
+    validate: (v) => {
       const s = String(v);
       if (!s.trim()) return 'id must be non-empty';
-      if (s.length > ID_MAX_LENGTH) return `id must be at most ${ID_MAX_LENGTH} chars (got ${s.length})`;
-      if (!ID_FORMAT_RE.test(s)) return 'id must be lowercase alphanumeric + hyphens only (matches scripts/import-article.mjs slugify() output)';
+      if (s.length > ID_MAX_LENGTH)
+        return `id must be at most ${ID_MAX_LENGTH} chars (got ${s.length})`;
+      if (!ID_FORMAT_RE.test(s))
+        return 'id must be lowercase alphanumeric + hyphens only (matches scripts/import-article.mjs slugify() output)';
       return null;
-    }},
-  { name: 'title', type: 'string', required: true, validate: (v) => String(v).trim() ? null : 'title must be non-empty' },
-  { name: 'date', type: 'string', required: false, validate: (v) => {
+    },
+  },
+  {
+    name: 'title',
+    type: 'string',
+    required: true,
+    validate: (v) => (String(v).trim() ? null : 'title must be non-empty'),
+  },
+  {
+    name: 'date',
+    type: 'string',
+    required: false,
+    validate: (v) => {
       // Permite vacío, pero si hay contenido, exige YYYY-MM-DD.
       const s = String(v).trim();
       if (!s) return null;
       return /^\d{4}-\d{2}-\d{2}$/.test(s) ? null : 'date must be YYYY-MM-DD (or empty)';
-    }},
-  { name: 'section', type: 'string', required: true, validate: (v) => String(v).trim() ? null : 'section must be non-empty' },
-  { name: 'topics', type: 'array', required: true, validate: (v) => {
+    },
+  },
+  {
+    name: 'section',
+    type: 'string',
+    required: true,
+    validate: (v) => (String(v).trim() ? null : 'section must be non-empty'),
+  },
+  {
+    name: 'topics',
+    type: 'array',
+    required: true,
+    validate: (v) => {
       if (!Array.isArray(v)) return 'topics must be an array';
       for (const t of v) {
         if (typeof t !== 'string' || !t.trim()) return 'each topic must be a non-empty string';
       }
       return null;
-    }},
-  { name: 'sourceSite', type: 'string', required: true, validate: (v) => String(v).trim() ? null : 'sourceSite must be non-empty' },
-  { name: 'sourceUrl', type: 'string', required: true, validate: (v) => {
-      if (!isSafeUrl(v))           return `sourceUrl "${v}" uses a forbidden scheme (javascript:/data:/vbscript:)`;
-      if (!isAbsoluteOrExempt(v))  return `sourceUrl "${v}" must be an absolute https?:// URL (or # / mailto:)`;
+    },
+  },
+  {
+    name: 'sourceSite',
+    type: 'string',
+    required: true,
+    validate: (v) => (String(v).trim() ? null : 'sourceSite must be non-empty'),
+  },
+  {
+    name: 'sourceUrl',
+    type: 'string',
+    required: true,
+    validate: (v) => {
+      if (!isSafeUrl(v))
+        return `sourceUrl "${v}" uses a forbidden scheme (javascript:/data:/vbscript:)`;
+      if (!isAbsoluteOrExempt(v))
+        return `sourceUrl "${v}" must be an absolute https?:// URL (or # / mailto:)`;
       return null;
-    }},
-  { name: 'status', type: 'string', required: true, validate: (v) => ARTICLE_STATUS.has(String(v)) ? null : `status must be one of: ${Array.from(ARTICLE_STATUS).join(', ')}` },
-  { name: 'contentHtml', type: 'string', required: true, validate: (v) => {
+    },
+  },
+  {
+    name: 'status',
+    type: 'string',
+    required: true,
+    validate: (v) =>
+      ARTICLE_STATUS.has(String(v))
+        ? null
+        : `status must be one of: ${Array.from(ARTICLE_STATUS).join(', ')}`,
+  },
+  {
+    name: 'contentHtml',
+    type: 'string',
+    required: true,
+    validate: (v) => {
       const s = String(v);
       if (!s.trim()) return 'contentHtml must be non-empty';
       // Defense in depth: site/js/render.mjs sanitizeHtml() strips these at
@@ -180,18 +278,24 @@ const ARTICLE_RULES = [
       // at CI time (npm test, run by deploy.yml before every publish)
       // instead of relying solely on the runtime sanitizer.
       if (/<script[\s>]/i.test(s)) return 'contentHtml must not contain <script> tags';
-      if (/\son\w+\s*=/i.test(s)) return 'contentHtml must not contain inline event-handler attributes (on...=)';
+      if (/\son\w+\s*=/i.test(s))
+        return 'contentHtml must not contain inline event-handler attributes (on...=)';
       // Normalized the same way isSafeUrl() does: browsers strip control
       // characters (tab/newline/CR) from anywhere in a URL before parsing
       // its scheme, so "jav\tascript:" resolves to "javascript:" at
       // render time even though it doesn't match this pattern literally.
-      if (/(?:href|src)\s*=\s*["']?\s*(?:javascript|data|vbscript):/i.test(s.replace(/[\x00-\x1F\x7F]+/g, ''))) {
+      if (
+        /(?:href|src)\s*=\s*["']?\s*(?:javascript|data|vbscript):/i.test(
+          s.replace(/[\x00-\x1F\x7F]+/g, '')
+        )
+      ) {
         return 'contentHtml must not contain javascript:/data:/vbscript: URLs';
       }
       const urlError = validateContentHtmlUrls(s);
       if (urlError) return urlError;
       return null;
-    }},
+    },
+  },
 ];
 
 // Optional media fields (TO_FIX #39.x / v0.39.1): documented in
@@ -201,14 +305,24 @@ const ARTICLE_RULES = [
 // CI-time safety net so a bad import is caught before deploy, not after.
 /** @type {FieldRule[]} */
 const ARTICLE_OPTIONAL_RULES = [
-  { name: 'relatedArticles', type: 'array', required: false, validate: (v) => {
+  {
+    name: 'relatedArticles',
+    type: 'array',
+    required: false,
+    validate: (v) => {
       if (!Array.isArray(v)) return 'relatedArticles must be an array';
       for (const id of v) {
-        if (typeof id !== 'string' || !id.trim()) return 'each relatedArticles entry must be a non-empty string (article id)';
+        if (typeof id !== 'string' || !id.trim())
+          return 'each relatedArticles entry must be a non-empty string (article id)';
       }
       return null;
-    }},
-  { name: 'externalLinks', type: 'array', required: false, validate: (v) => {
+    },
+  },
+  {
+    name: 'externalLinks',
+    type: 'array',
+    required: false,
+    validate: (v) => {
       if (!Array.isArray(v)) return 'externalLinks must be an array';
       for (const link of v) {
         if (typeof link !== 'object' || link === null || Array.isArray(link)) {
@@ -231,17 +345,33 @@ const ARTICLE_OPTIONAL_RULES = [
         }
       }
       return null;
-    }},
+    },
+  },
   // metadata is a free-form bag per ARTICLES.schema.md ([key: string]: any),
   // but the fields it documents by name (year in particular) are rendered
   // unescaped-adjacent in articles.js, so their *type* is worth pinning down
   // even though the object as a whole stays open-ended.
-  { name: 'metadata', type: 'object', required: false, validate: (v) => {
-      if (typeof v !== 'object' || v === null || Array.isArray(v)) return 'metadata must be an object';
+  {
+    name: 'metadata',
+    type: 'object',
+    required: false,
+    validate: (v) => {
+      if (typeof v !== 'object' || v === null || Array.isArray(v))
+        return 'metadata must be an object';
       const obj = /** @type {Record<string, unknown>} */ (v);
-      const stringFields = ['mediaType', 'director', 'country', 'duration', 'language', 'subtitles', 'source', 'filmFestival'];
+      const stringFields = [
+        'mediaType',
+        'director',
+        'country',
+        'duration',
+        'language',
+        'subtitles',
+        'source',
+        'filmFestival',
+      ];
       for (const f of stringFields) {
-        if (f in obj && typeof obj[f] !== 'string') return `metadata.${f} must be a string if present`;
+        if (f in obj && typeof obj[f] !== 'string')
+          return `metadata.${f} must be a string if present`;
       }
       if ('year' in obj) {
         const y = obj.year;
@@ -250,7 +380,8 @@ const ARTICLE_OPTIONAL_RULES = [
         }
       }
       return null;
-    }},
+    },
+  },
 ];
 
 const URL_ATTR_RE = /(?:href|src)=['"]([^'"]+)['"]/gi;
@@ -331,8 +462,8 @@ function warnHardWrappedArticles(entries, label) {
       warned++;
       console.warn(
         `⚠️  ${label}/${obj.id} — posible hard-wrapped content: ${hit.brCount} breaks ` +
-        `en párrafo de ${hit.minLineLength} chars. Considerar status='pending-review' ` +
-        `o re-ejecutar dewrapHardBreaks() (ver scripts/backfill-dewrap.mjs).`
+          `en párrafo de ${hit.minLineLength} chars. Considerar status='pending-review' ` +
+          `o re-ejecutar dewrapHardBreaks() (ver scripts/backfill-dewrap.mjs).`
       );
     }
   }
@@ -434,7 +565,9 @@ function scanDir(cfg) {
     totalEntries += data.length;
 
     if (fileErrors.length === 0) {
-      console.log(`✅  ${cfg.label}/${file} — ${data.length} entr${data.length === 1 ? 'y' : 'ies'} valid`);
+      console.log(
+        `✅  ${cfg.label}/${file} — ${data.length} entr${data.length === 1 ? 'y' : 'ies'} valid`
+      );
     } else {
       fileErrors.forEach((e) => console.error(`❌  ${e}`));
       totalErrors += fileErrors.length;
@@ -484,8 +617,8 @@ if (existsSync(CONTENT_DIR)) {
       if (seen.has(entry.id)) {
         console.error(
           `❌  content/${file}[${i}].id: duplicate id "${entry.id}" ` +
-          `(first seen at index ${seen.get(entry.id)}) — ids must be unique, ` +
-          `see ARTICLES.schema.md`
+            `(first seen at index ${seen.get(entry.id)}) — ids must be unique, ` +
+            `see ARTICLES.schema.md`
         );
         idUniquenessErrors++;
       } else {
@@ -513,7 +646,9 @@ if (existsSync(CONTENT_DIR)) {
   }
 }
 if (hardWrapWarnings > 0) {
-  console.log(`\n${hardWrapWarnings} article(s) flagged for manual formatting review (warning only, does not fail the build).`);
+  console.log(
+    `\n${hardWrapWarnings} article(s) flagged for manual formatting review (warning only, does not fail the build).`
+  );
 }
 
 const totalEntries = videoScan.entries + contentScan.entries;
@@ -521,7 +656,9 @@ const totalErrors = videoScan.errors + contentScan.errors + idUniquenessErrors;
 const totalFiles = videoScan.files + contentScan.files;
 
 if (totalFiles === 0) {
-  console.log('⚠️   No JSON files found under site/assets/data/ or site/assets/content/ — nothing to validate.');
+  console.log(
+    '⚠️   No JSON files found under site/assets/data/ or site/assets/content/ — nothing to validate.'
+  );
   process.exit(0);
 }
 
