@@ -249,130 +249,60 @@ Las tarjetas tendrán atributos `data-lang`, `data-status`, `data-type` para que
 
 ---
 
-## MEJORA TÉCNICA: Modernización del stack de herramientas (TypeScript, Python)
+## MEJORA TÉCNICA: Modernización del stack de herramientas (TypeScript, Python) — revisado
 
-**Objetivo:** Mejorar la mantenibilidad, tipo-seguridad y experiencia de desarrollo estandarizando el uso de TypeScript y Python de forma pragmática. Actualmente, el proyecto mezcla JavaScript (.mjs), bash y Python de forma inconsistente. Esto debe refactorizarse siguiendo el principio "usar cuando es conveniente" — es decir, elegir la herramienta correcta por razón técnica, no por preferencia personal.
+**Objetivo:** Evaluar el uso de TypeScript y Python con criterio pragmático — "usar cuando es conveniente", por razón técnica concreta, no por preferencia o por completitud percibida del stack.
 
-### Contexto actual
+> **Nota de esta revisión:** la versión anterior de esta sección justificaba Python casi enteramente con un pipeline de audio (WhatsApp → MP3 → Whisper → traducción) que **no existe todavía**: `site/assets/audios/`, `subtitles/` y `transcripts/` están vacíos salvo `.gitkeep`. Proponer scripts Python para ese flujo ahora significa construir y mantener código sin datos reales contra los que probarlo. Esta revisión sustituye esa justificación por el cuello de botella que **sí es real hoy**: convertir los textos crudos pegados en `nuevos_articulos/` (16 archivos sin procesar a la fecha de esta revisión — fauci, onajpu, pensiones, terapiaLiberal, israel, cremas, viruses, etc.) en posts elaborados con gráficos para el sitio.
 
-| Componente | Lenguaje | Problemas |
-|------------|----------|----------|
-| Build & validation (`scripts/validate-data.mjs`, `encrypt.mjs`, etc.) | JavaScript (.mjs) | Sin tipos; esquemas y validación definidos manualmente; difícil refactorizar |
-| Orchestration (`scripts/test.sh`) | Bash | Bien; no requiere cambios |
-| Testing (`test/*.test.mjs`) | JavaScript | Sin tipos; fixtures y helpers no tipados |
-| One-off debugging (`sandbox/*.mjs`) | JavaScript | Legítimo; no requiere cambios |
-| YunoHost/API integration (`sandbox/check_sso.py`) | Python | Correcto; pero aislado, no parte del build |
+### El cuello de botella real: texto crudo → post gráfico elaborado
 
-### Propuesta de modernización
+Este paso es distinto del que ya cubre `scripts/import-article.mjs`:
 
-#### 1. TypeScript para scripts de build y validación
+| | `import-article.mjs` (ya existe) | Conversión de `nuevos_articulos/` (sin cubrir) |
+|---|---|---|
+| **Entrada** | HTML de SPIP con selectores conocidos (`id="texte-article"`, etc.) | Texto plano pegado sin estructura fija — mezcla de bylines, fechas, cuerpo, a veces URLs de video, sin marcado |
+| **Extracción** | Regex contra posiciones HTML fijas | Requiere heurística/NLP-ligero: separar autor/fecha/título/cuerpo de un bloque de texto libre |
+| **Salida visual** | Reutiliza el `<article>` renderer existente (`render.mjs`) | Necesita generar el activo gráfico (thumbnail / tarjeta / imagen OG) que hoy es un placeholder (`video-card__thumb--placeholder`) |
 
-**Aplicar TypeScript a:**
-- `scripts/validate-data.mjs` → `scripts/validate-data.ts` (compila a `.mjs`)
-- `scripts/encrypt.mjs` → `scripts/encrypt.ts`
-- `scripts/import-article.mjs` → `scripts/import-article.ts`
-- `scripts/check-urls.mjs`, `check-badges.mjs` — si la lógica lo justifica
+Los dos primeros son problemas de **parseo de texto no estructurado**; el tercero es un problema de **generación de imágenes**. Ninguno de los dos se resuelve con un sistema de tipos — se resuelven con las librerías correctas.
 
-**Beneficios:**
-- Esquemas definidos como interfaces TypeScript (`interface Article`, `interface VideoMetadata`) — la fuente de verdad única
-- Validación automática en tiempo de compilación para muchos errores (tipos faltantes, campos opcionales/requeridos)
-- Auto-completado en editor (Intellisense) mejora la velocidad de desarrollo
-- Refactorización segura: cambiar estructura de datos y confirmar en compilación que todos los sitios se actualizaron
-
-**Ejemplo: schema de validación en TypeScript vs. JavaScript actual**
-
-```typescript
-// Antes (JavaScript): esquema manual en comentarios JSDoc
-/** @typedef {{ id: string, title: string, date: string, status: 'imported'|'pending-review', ... }} Article */
-
-// Después (TypeScript): interfaz compilada, reutilizable
-interface Article {
-  id: string;
-  title: string;
-  date: string;
-  status: 'imported' | 'adapted' | 'translated' | 'pending-review' | 'external-only';
-  topics: string[];
-  metadata?: ArticleMetadata;
-  externalLinks?: ExternalLink[];
-}
-
-interface ArticleMetadata {
-  mediaType?: 'film' | 'documentary' | 'audio';
-  director?: string;
-  year?: number;
-  country?: string;
-  duration?: string;
-}
-
-// Función tipada — el compilador rechaza articles malformadas
-function validateArticles(articles: unknown[]): Article[] {
-  // ...
-}
-```
-
-#### 2. Python para utilidades de integración y transformación de datos
+### Dónde Python sí importa ahora
 
 **Aplicar Python a:**
-- `scripts/fetch-external-sources.py` — descargar y limpiar contenido de fuentes externas (scraping, SPIP API, YunoHost)
-- `scripts/transcode-audios.py` — conversión de audios WhatsApp a MP3, normalización
-- `scripts/transcribe-audios.py` — wrapper sobre Whisper (o similar) para transcripción masiva
-- `scripts/deepl-translate.py` — API wrapper para traducciones automáticas (con fallback a manual review)
+- `scripts/build-post-from-raw.py` — ingiere un archivo de `nuevos_articulos/`, separa heurísticamente autor/fecha/título/cuerpo de texto sin marcado, y escribe un borrador de entrada a `articulos_en_trabajo/IN_PROGRESS/` (status `pending-review`, nunca publicación directa) para revisión editorial humana antes de tocar `articles.json`.
+- `scripts/generate-card-image.py` — genera la imagen de tarjeta/OG a partir de título + metadata (Pillow), sustituyendo el placeholder `video-card__thumb--placeholder` por un gráfico real, consistente en tipografía/paleta con `css/style.css`.
 
-**Beneficios:**
-- Acceso directo a librerías especializadas: `requests` (HTTP), `pydub`/`ffmpeg-python` (audio), `openai` (Whisper), `deepl` (traducción)
-- Scripts aislados y reutilizables — no cada sesión reinventa la rueda
-- Mejor para scripts de "carga de datos única" — no requieren integración fuerte con el build JavaScript
+**Por qué Python y no TypeScript aquí:** `Pillow` (composición de imágenes/texto sobre plantilla) y las heurísticas de parseo de texto libre (regex flexible, o un paso opcional de limpieza asistida por LLM) tienen mejor soporte de librerías en Python que en el ecosistema Node para este caso concreto. No es una preferencia — es la herramienta con menos fricción para *este* trabajo.
 
-#### 3. Migración path y timeline
+**Salvaguarda obligatoria:** ambos scripts producen *borradores*, nunca escriben directamente en `site/assets/content/articles.json`. Deben pasar por el mismo `validate-data.mjs` que ya audita todo el catálogo antes de que un borrador se promueva a `READY/` y de ahí a publicación — ver `docs/ARTICLE-PUBLISHING-WORKFLOW.md`. Esto evita que contenido generado heurísticamente (y, en el caso de `nuevos_articulos/`, con carga política/factual sensible — ver ejemplos en la carpeta) entre al sitio sin revisión editorial.
 
-**Fase 1 (v0.42.0) — TypeScript para validación:**
-- [ ] 3.1 Instalar TypeScript + herramientas (`npm install --save-dev typescript ts-node @types/node`)
-- [ ] 3.2 Crear `tsconfig.json` con configuración para ES modules, `outDir: './dist/scripts'`
-- [ ] 3.3 Refactorizar `scripts/validate-data.mjs` → `scripts/validate-data.ts` con interfaces
-- [ ] 3.4 Refactorizar `scripts/check-urls.mjs` → `scripts/check-urls.ts`
-- [ ] 3.5 Actualizar `package.json` scripts: `"test": "tsc && bash scripts/test.sh"` (compila TS primero)
-- [ ] 3.6 Tests: `npm test` sigue pasando; compiled JS en `dist/scripts/` se ejecuta como antes
-- [ ] 3.7 Documentar para desarrolladores: "Escribe nuevos scripts en TypeScript en la carpeta `scripts/`, no en `.mjs`"
+### Dónde TypeScript sigue sin justificarse (por ahora)
 
-**Fase 2 (v0.43.0) — Python para utilidades de datos:**
-- [ ] 3.8 Crear `requirements.txt` con dependencias Python (requests, pydub, openai-whisper, deepl)
-- [ ] 3.9 Escribir `scripts/transcode-audios.py` — convertir audios WhatsApp a MP3 estándar
-- [ ] 3.10 Escribir `scripts/transcribe-audios.py` — wrapper sobre Whisper con cli amigable
-- [ ] 3.11 Escribir `scripts/fetch-external-sources.py` — scraping y normalización de fuentes SPIP/GCI
-- [ ] 3.12 Documentar uso en `README.md` sección "Python scripts" — cómo invocar, dependencias del sistema (ffmpeg para audio, modelo Whisper)
-- [ ] 3.13 Integrar en CI si es apropiado (ej: `transcribe-audios.py` como paso opcional pre-deploy)
+`scripts/validate-data.mjs`, `import-article.mjs` y `render.mjs` ya comparten JSDoc + `@ts-check` (ver CHANGELOG v0.1.0), que da autocompletado e inferencia de tipos en el editor **sin paso de compilación**. A la escala actual (41 artículos, ~3.300 líneas en `scripts/`, 9 archivos de test, 157 tests pasando) migrar a `.ts` añade un paso de build a cambio de una ganancia marginal sobre lo que `@ts-check` ya da gratis.
 
-**Fase 3 (futuro) — Refactor de test suite:**
-- [ ] 3.14 Migrar `test/*.test.mjs` → TypeScript con tipos para fixtures y helpers
-- [ ] 3.15 Considerar framework de testing tipado (ej: Vitest con TypeScript nativo)
+**Disparadores concretos para reconsiderar TypeScript** (en vez de "cuando parezca prudente"):
+- El esquema de `Article` gana más de ~3 variantes de `status` o campos condicionales anidados (hoy: `imported | adapted | translated | pending-review | external-only`, manejable a mano).
+- Más de una persona edita `validate-data.mjs`/`import-article.mjs` en paralelo con regularidad (hoy: flujo de una sesión a la vez).
+- Los scripts de generación de posts (`build-post-from-raw.py` de arriba, o su eventual equivalente Node) crecen lo suficiente como para que el *shape* de su salida y el de `render.mjs` diverjan sin que nada lo detecte — en ese punto, una interfaz compartida sí paga su costo de build.
 
-### Guía de decisión: cuándo usar cada lenguaje
+Hasta que se cumpla alguno de estos, mantener `@ts-check` + JSDoc es la opción de menor fricción.
 
-| Tarea | Lenguaje | Razón |
-|------|----------|-------|
-| Validación de esquemas JSON | TypeScript | Seguridad de tipos; reutilización de interfaces |
-| Transformación de datos (mapeo, filtrado, sanitización) | TypeScript | Tipado; integración con build |
-| Tests y assertions | TypeScript | Tipado; fixtures seguras |
-| Orchestration (run tests, build, deploy) | Bash | Ligero; directo; no necesita tipos |
-| HTTP / APIs externas | Python (o TypeScript + fetch) | Python si requiere librerías pesadas (requests, oauth); TS si es ligero |
-| Audio / vídeo (transcode, normalizar) | Python | ffmpeg-python, pydub maduros |
-| ML/AI (transcripción, traducción) | Python | openai-whisper, deepl-python, etc. |
-| One-off debugging / exploratorio | JavaScript (.mjs) | Rápido; sin overhead de compilación |
+### Fase 1 (ahora) — Python para el pipeline texto-crudo → post
 
-### Beneficios esperados
+- [ ] 3.1 Crear `requirements.txt` con `Pillow` (imágenes) y, si se opta por asistencia LLM en el parseo, el cliente HTTP correspondiente (sin credenciales hardcodeadas — seguir el patrón de `.env` ya establecido).
+- [ ] 3.2 Escribir `scripts/build-post-from-raw.py --file nuevos_articulos/<nombre>` → borrador en `articulos_en_trabajo/IN_PROGRESS/`, nunca en `articles.json` directamente.
+- [ ] 3.3 Escribir `scripts/generate-card-image.py` con 1-2 plantillas (tarjeta normal / tarjeta destacada) que reflejen la paleta de `css/style.css`.
+- [ ] 3.4 Documentar el flujo en `articulos_en_trabajo/README.md`: raw → `build-post-from-raw.py` → revisión humana en `IN_PROGRESS/` → `validate-data.mjs` → `READY/` → publicación.
+- [ ] 3.5 Procesar los 16 archivos actuales de `nuevos_articulos/` con el script y **revisar editorialmente cada borrador** antes de mover ninguno a `READY/` (varios tienen contenido factual/políticamente sensible que ya requiere juicio editorial, no solo estructuración).
 
-1. **Mantenibilidad:** Código tipado es más fácil de refactorizar; esquemas compartidos evitan duplicación
-2. **Confiabilidad:** Menos bugs en tiempo de runtime; compilador atrapa errores de tipo antes de ejecución
-3. **DX mejorada:** Auto-completado del editor; documentación integrada en tipos
-4. **Separación de concerns:** Scripts Python aislados no pollucionan la stack JavaScript
-5. **Escalabilidad:** A medida que crezca el contenido (100+ artículos, 50+ videos, 1000+ audios), scripts tipados son más mantenibles
+### Fase 2 (diferida) — Audio (Whisper/DeepL)
 
-### Consideraciones
+Sin cambios de fondo respecto a la propuesta original, pero movida a "diferida hasta que exista contenido de audio real" — no tiene sentido construir `transcode-audios.py` / `transcribe-audios.py` contra directorios vacíos. Revisar cuando `site/assets/audios/` deje de contener solo `.gitkeep`.
 
-- **No es obligatorio para todo:** Scripts una-sola-vez o exploratorios (sandbox) pueden seguir siendo JavaScript
-- **Retrocompatibilidad:** Los scripts actuales siguen funcionando; migración es gradual
-- **Curva de aprendizaje:** TypeScript tiene costo de aprendizaje, pero el equipo lo puede absorbér durante las tareas normales
-- **CI/CD:** El paso de compilación TypeScript en el build debe ser rápido (~1-2 segundos); si no, considerar esbuild o swc para acelerar
+### Fase 3 (diferida, con disparador explícito) — TypeScript
+
+Ver "Disparadores concretos" arriba. No programar como tarea de un roadmap fijo (`v0.42.0`, etc.) — revisar cuando se cumpla alguno de los tres disparadores.
 
 ---
 
