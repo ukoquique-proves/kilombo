@@ -33,10 +33,12 @@
  *   Uses staticrypt's own cryptoEngine + codec (the same PBKDF2 + AES-256-CBC
  *   pipeline) to encrypt each JSON file. The output is a JSON envelope:
  *
- *     { "encrypted": true, "ciphertext": "<hex>", "salt": "<hex>" }
+ *     { "encrypted": true, "ciphertext": "<hex>" }
  *
  *   The JS fetchers (plandemismo.js, articles.js) detect this envelope and
  *   call parseJson() from decrypt.mjs to recover the plaintext before parsing.
+ *   Note: the salt used during encryption is baked into the pre-hashed password
+ *   by staticrypt's login flow; the envelope does not need to include it.
  *
  * Usage:
  *   STATICRYPT_PASSWORD=<password> node scripts/encrypt.mjs
@@ -165,7 +167,7 @@ async function encryptJsonFile(filePath) {
   } catch { /* not valid JSON — treat as plaintext and attempt to encrypt */ }
 
   const ciphertext = await encode(plaintext, password, salt);
-  writeFileSync(filePath, JSON.stringify({ encrypted: true, ciphertext, salt }), 'utf8');
+  writeFileSync(filePath, JSON.stringify({ encrypted: true, ciphertext }), 'utf8');
   console.log(`✅  JSON encrypted: ${relative(ROOT, filePath)}`);
 }
 

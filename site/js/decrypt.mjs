@@ -4,7 +4,7 @@
  * When the site is deployed with encryption (npm run encrypt), JSON data files
  * are replaced with envelopes of the form:
  *
- *   { "encrypted": true, "ciphertext": "<hex>", "salt": "<hex>" }
+ *   { "encrypted": true, "ciphertext": "<hex>" }
  *
  * staticrypt stores the PBKDF2-derived hashed password in localStorage under
  * the key "staticrypt_passphrase" after a successful login. This module
