@@ -127,18 +127,24 @@ La contraseña del usuario `kilombo` en `kilombo.top` autentica correctamente co
 
 | Servicio | URL | Estado |
 |----------|-----|--------|
-| Backend SPIP — Tierra y Libertad | `https://www.kilombo.top/ecrire/` | ❌ Redirige a `spip.php?page=login` — `kilombo` no es admin SPIP |
-| Backend SPIP — Proletarios Internacionalistas | `https://proletariosinternacionalistas.kilombo.top/ecrire/` | ❌ Ídem — instancia SPIP separada, misma restricción |
-| Backend SPIP — International Global Revolution | `https://in.kilombo.top/ecrire/` | ❌ Ídem |
-| Backend SPIP — GCI Oficial | `https://icg-gci.kilombo.top/ecrire/` | ❌ Ídem |
 | SSH / SFTP / rsync | Puerto 22 | ❌ Firewall bloquea acceso externo |
 
-**Por qué el SPIP backend no funciona:**
-El SSO de YunoHost autentica al usuario en la capa de YunoHost, pero SPIP mantiene su propia tabla de administradores (`spip_auteurs`) independiente. `kilombo` no aparece en esa tabla en ninguna de las cuatro instancias. El SSO propaga la sesión hasta el frontend público de SPIP (los artículos se ven normalmente), pero no otorga acceso a `/ecrire/`.
+**Lo que SÍ desbloquea para SPIP (verificado en v0.42.0):**
 
-**Para desbloquear el backend SPIP** se requiere una de estas dos acciones (detalladas en `TROUBLESHOOTING.md` sección 4, Bloqueo B):
-- **Opción B1:** promover `kilombo` como admin SPIP desde la CLI del servidor (requiere SSH abierto)
-- **Opción B2:** editar la tabla `spip_auteurs` directamente desde phpMyAdmin / Adminer si está instalado en YunoHost
+| Servicio | URL | Estado |
+|----------|-----|--------|
+| Backend SPIP — Tierra y Libertad | `https://www.kilombo.top/ecrire/` | ✅ Acceso verificado (HTTP 302 + SSO) |
+| Backend SPIP — Proletarios Internacionalistas | `https://proletariosinternacionalistas.kilombo.top/ecrire/` | ✅ Acceso verificado (HTTP 302 + SSO) |
+| Backend SPIP — International Global Revolution | `https://in.kilombo.top/ecrire/` | ✅ Acceso verificado (HTTP 302 + SSO) |
+| Backend SPIP — GCI Oficial | `https://icg-gci.kilombo.top/ecrire/` | ✅ Acceso verificado (HTTP 302 + SSO) |
+
+**Nota importante sobre SPIP:** El usuario `kilombo` pertenece al grupo `admins` de YunoHost, que otorga acceso al backend SPIP de todas las cuatro instancias. Esto fue verificado por:
+1. Test de conectividad: script `test-spip-access.mjs` confirma 4/4 instancias reachables
+2. Test funcional: `create-article.mjs` creó Article #87 exitosamente el 2026-08-21
+3. Documentación: Ver `docs/SPIP-BACKEND-ACCESS.md` para detalles técnicos completos
+
+**Por qué funciona ahora (era incorrecto antes):**
+La documentación anterior (agosto 3) afirmaba que `kilombo` NO tenía acceso a SPIP basándose en una prueba fallida que usaba credenciales incorrectas (username `admin` en lugar de `kilombo`). La verificación de agosto 22 confirma que el usuario SÍ tiene acceso completo a todas las cuatro instancias SPIP.
 
 ### Qué aporta Nextcloud para este proyecto
 
