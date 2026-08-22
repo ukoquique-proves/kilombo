@@ -93,6 +93,11 @@ if ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no \
   echo "ℹ️  Autenticación por clave SSH detectada — no se necesita contraseña."
 elif [ -n "${KILOMBOTOP_PASSWORD}" ] && ! echo "${KILOMBOTOP_PASSWORD}" | grep -qi "cambia\|change\|placeholder\|your_password"; then
   # Fall back to password auth via sshpass
+  # ⚠️  SECURITY NOTE: sshpass -p exposes the password as a CLI argument,
+  #     visible to any local user via `ps`. This is an inherent sshpass
+  #     limitation. If running on a shared machine, use SSH keys instead
+  #     (see "AUTENTICACIÓN RECOMENDADA" above). Never use sshpass -p on
+  #     untrusted/multi-user systems.
   if command -v sshpass >/dev/null 2>&1; then
     SSHPASS_CMD="sshpass -p ${KILOMBOTOP_PASSWORD}"
   else
