@@ -550,19 +550,7 @@ Determined that `kilombo` user has **FULL ADMIN access**. This resolves the long
 - **SPIP Behavior:** Admin access to exec=admin_plugin confirmed with SPIP's &bonjour=oui welcome flag
 - **Test Reusability:** Script can be extended to test all 4 SPIP instances and other admin features
 
-- **TO_FIX #63** (GCI extractors) — ⏳ REASSIGNED
-  - Original assumption: plugin-based extraction if admin available
-  - Revised: admin access NOT available (editor-level only)
-  - New approach: implement HTML scraper instead
 
-- **TO_FIX #66** (article creation) — ✅ CONFIRMED WORKING
-  - Persistence verification now automated
-  - Full lifecycle (create, publish, trash, restore) proven functional
-
-### Technical Notes
-- **Credential Quality:** Test uses KILOMBOTOP_PASSWORD (same credentials that successfully create articles) — not hardcoded fallback
-- **SPIP Behavior:** When editor-level user tries to access admin-only page, SPIP returns redirect loop (login → login → ...) instead of explicit error — this is standard SPIP permission model
-- **Test Reusability:** Script can be extended to test all 4 SPIP instances and other admin features (configuration, user management, etc.)
 
 ---
 
