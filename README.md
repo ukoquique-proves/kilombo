@@ -202,11 +202,6 @@ KILOMBO/
 │   └── workflows/
 │       └── deploy.yml     ← GitHub Actions: publica site/ en GitHub Pages en cada push a main
 │
-├── INICIO/                ← Documentación de fase de diagnóstico
-│   ├── ROADMAP-fase-diagnostico.md ← Hoja de ruta de 5 fases
-│   ├── inventario-inicial-kilombo.md
-│   └── pasos-trabajo-kilombo.md
-│
 ├── docs/                  ← Documentación operativa y de referencia
 │   ├── MIGRATION.md               ← Relación entre kilombo.top (SPIP) y el portal espejo (GitHub Pages)
 │   ├── TROUBLESHOOTING.md         ← Diagnóstico de acceso al servidor + flujo de publicación en GitHub Pages
@@ -215,8 +210,7 @@ KILOMBO/
 │   ├── MIRROR_GROWING.md          ← Guía de crecimiento del espejo (qué importar y cómo)
 │   ├── PENDING-REVIEW.md          ← Artículos con status: pending-review y sus pasos de resolución
 │   ├── EXTRACTION-GAPS-FIXED.md   ← Historial de gaps de extracción corregidos
-│   ├── DEPLOYMENT-AND-SOURCE-EDITING.md ← Notas de despliegue y edición de fuente
-│   └── BUILD-TRIGGER.md           ← Notas sobre disparo de build
+│   └── DEPLOYMENT-AND-SOURCE-EDITING.md ← Notas de despliegue y edición de fuente
 │
 ├── .env                   ← Credenciales y referencias externas (NO SUBIR A REPO PÚBLICO)
 ├── .env.example           ← Plantilla de .env (segura, para subir al repo)
