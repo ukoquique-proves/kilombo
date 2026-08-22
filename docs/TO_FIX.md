@@ -3,6 +3,10 @@
 Auditoría activa del proyecto. Solo problemas abiertos.
 Última actualización: 2026-08-18 — v0.39.1; ítems #29, #45, #51, #59, #60, #61, #62 cerrados; seguridad URLs (#ctaUrl/#sourceUrl) resuelta.
 
+> **📋 RELATED:** See also:
+> - **`docs/BUG-AUDIT-REPORT.md`** — Comprehensive project-wide audit covering code quality, data integrity, documentation, build/test, security, and deployment (August 2026)
+> - **`docs/AUDIT-SUMMARY.md`** — Quick reference with actionable next steps and priority checklist
+
 ---
 
 ## 🟢 Recientemente cerrados

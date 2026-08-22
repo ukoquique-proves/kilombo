@@ -226,9 +226,6 @@ export const renderCard = (v) => {
   const cornerHtml = v.cornerLabel
     ? `<span class="thumb-corner">${escapeHtml(v.cornerLabel)}</span>`
     : '';
-  const todoComment = v.ctaPlaceholder
-    ? `<!-- TODO (A-2): reemplazar href por URL real del vídeo ${escapeHtml(v.id)} en tv.canal7salta.com -->`
-    : '';
 
   const article = document.createElement('article');
   article.className = cardClass;
@@ -258,7 +255,6 @@ export const renderCard = (v) => {
         <div class="video-card__langs">
           ${buildLangs(v.langs)}
         </div>
-        ${todoComment}
         <a href="${isSafeUrl(v.ctaUrl) ? escapeHtml(v.ctaUrl) : '#'}" target="_blank" rel="noopener noreferrer"
            class="${ctaClass}"${v.ctaPlaceholder ? ' data-cta-placeholder="true"' : ''}${!isSafeUrl(v.ctaUrl) ? ' data-unsafe-url-blocked="true"' : ''}>${escapeHtml(v.ctaLabel)}</a>
       </div>`;

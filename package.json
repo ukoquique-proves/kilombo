@@ -8,6 +8,12 @@
   },
   "scripts": {
     "test": "bash scripts/test.sh",
+    "lint": "eslint site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs",
+    "lint:fix": "eslint site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs --fix",
+    "format": "prettier --write site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs .eslintrc.json .prettierrc.json",
+    "format:check": "prettier --check site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs",
+    "build": "npm run encrypt",
+    "dev": "npm run preview",
     "import-article": "node scripts/import-article.mjs",
     "backfill-dates": "node scripts/backfill-dates.mjs",
     "i18n-coverage": "node scripts/i18n-coverage.mjs",
@@ -22,7 +28,10 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.62.1",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
     "happy-dom": "^20.11.1",
+    "prettier": "^3.9.6",
     "staticrypt": "3.5.4"
   }
 }
