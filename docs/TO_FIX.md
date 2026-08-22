@@ -56,6 +56,22 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ---
 
+- [ ] **69. delete-article.mjs —trash workflow status: partial (selector confirmed, form submission method undefined)**
+  - **Status:** The script successfully logs in and finds the poubelle radio selector, but clicking it does not trigger SPIP's autosave mechanism for the instituer_article form.
+  - **What works:** `--inspect` mode correctly identifies `input[name="statut"][value="poubelle"]` and dumps the form structure.
+  - **What doesn't work:** Clicking the radio or its label via Playwright does not cause SPIP to save the status change. The hidden `statut_old` field remains at its original value after script execution, indicating the change was never persisted.
+  - **Root cause:** Unknown — likely one of:
+    1. SPIP's autosave for instituer_article requires a specific JavaScript library event (not generic `change`/`blur`/`click`)
+    2. A CSRF token or form state validation that needs to be updated manually
+    3. An AJAX endpoint that Playwright isn't intercepting correctly
+  - **Why this matters:** `create-article.mjs` succeeds because the article creation form (`article_edit`) seems to use different autosave mechanics than the status-change form (`instituer_article`). The forms use different JavaScript handlers.
+  - **Next steps:** 
+    - Inspect SPIP's JavaScript source in `/prive/` to understand the instituer_article autosave mechanism
+    - Or test manual click + manual form inspection to see what network requests SPIP makes
+    - Or pivot to a different method: creating a test article, inspecting what SPIP sends via HTTP when the form auto-submits, and replicating that request via `page.request.post()` instead of clicking
+  - **Location:** `sandbox/delete-article.mjs` (saved, not committed — development tool, not released)
+  - **Related:** #66 (create-article works), #68 (architecture for SPIP management scripts)
+
 ## 🔴 Acción pendiente urgente
 
 - [ ] **67. Docs desincronizados sobre el acceso al backend SPIP (`/ecrire/`) — necesita decisión, no solo redacción**
