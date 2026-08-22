@@ -280,7 +280,7 @@ export function stripEventHandlers(html) {
  * @param {string} html
  */
 export function stripLogoImages(html) {
-  return html.replace(/<img\b[^>]*\bclass=(['"])?[^'\">]*\bspip_logo\b[^'\">]*\1?[^>]*>/gi, '');
+  return html.replace(/<img\b[^>]*\bclass=(['"])?[^'">]*\bspip_logo\b[^'">]*\1?[^>]*>/gi, '');
 }
 
 /**

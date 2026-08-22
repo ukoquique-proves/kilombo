@@ -286,6 +286,7 @@ const ARTICLE_RULES = [
       // render time even though it doesn't match this pattern literally.
       if (
         /(?:href|src)\s*=\s*["']?\s*(?:javascript|data|vbscript):/i.test(
+          // eslint-disable-next-line no-control-regex -- Intentional control-character stripping to defend against XSS via hidden schemes
           s.replace(/[\x00-\x1F\x7F]+/g, '')
         )
       ) {

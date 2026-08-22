@@ -27,6 +27,7 @@ const ABSOLUTE_OR_EXEMPT =
 // /^\s*javascript:/ literally. Stripping the same characters before
 // testing keeps this check aligned with how the string will actually be
 // interpreted once it lands in the DOM.
+// eslint-disable-next-line no-control-regex -- Intentional control-character stripping to defend against XSS via hidden schemes
 const STRIPPED_CONTROL_CHARS = /[\x00-\x1F\x7F]+/g;
 
 /**
