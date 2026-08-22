@@ -486,6 +486,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .section-svg--tierra    { stroke: #6b5d51; }
+.section-svg--actualidad { stroke: #b91c2a; }
 .section-svg--gci       { stroke: #5a7268; }
 .section-svg--pi        { stroke: #8b0000; }
 .section-svg--nom       { stroke: #4a6175; }

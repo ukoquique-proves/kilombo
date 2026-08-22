@@ -10,7 +10,7 @@ interface Article {
   id: string;           // Unique identifier (slug: lowercase alphanumeric + hyphens, max 80 chars)
   title: string;        // Article title
   date: string;         // ISO 8601 date (YYYY-MM-DD), or empty string for undated articles
-  section: string;      // Section: "general" | "tierra" | "nom" | "pi" | "gci"
+  section: string;      // Section: "general" | "actualidad" | "tierra" | "nom" | "pi" | "gci"
   topics: string[];     // Topic tags for filtering
   sourceSite: string;   // Source attribution
   sourceUrl: string;    // URL to original article
