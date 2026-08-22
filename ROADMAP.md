@@ -12,43 +12,6 @@
 
 #### Cambios completados
 
-- [x] **0.42.1 — Remove TODO comment generation from render.mjs** ✅
-  - Eliminadas líneas 229–232 que generaban comentarios HTML en el DOM de 9 videos placeholder
-  - Beneficio: reduce bloat HTML, evita problemas de accesibilidad (screen readers), limpia "View Source" para usuarios finales
-
-- [x] **0.42.2 — Install ESLint + Prettier** ✅
-  - `npm install --save-dev eslint@^9.39.5 prettier@^3.9.6 eslint-config-prettier`
-  - Creado `.eslintrc.json` con reglas: `no-console: warn`, `no-debugger: warn`, `prefer-const: warn`, `eqeqeq: warn`
-  - Creado `.prettierrc.json` (printWidth: 100, semi: true, singleQuote: true, trailingComma: es5)
-  - Creado `.prettierignore` para excluir JSON de contenido y HTML
-
-- [x] **0.42.3 — Add npm scripts for developer workflow** ✅
-  - `npm run lint` — verificar calidad
-  - `npm run lint:fix` — auto-arreglar
-  - `npm run format` — auto-formatear código
-  - `npm run format:check` — verificar formato sin cambios
-  - `npm run build` — alias explícito para `npm run encrypt`
-  - `npm run dev` — alias explícito para `npm run preview`
-
-- [x] **0.42.4 — Verify GCI detector (already working v0.39.1)** ✅
-  - Confirmado: `detectSite()` reconoce correctamente icg-gci, in.kilombo, cdrom, icg-old como categorías separadas
-  - Lanza errores explícitos para sitios no soportados
-  - Sin cambios necesarios
-
-- [x] **0.42.5 — Create comprehensive audit documentation** ✅
-  - Generado `docs/BUG-AUDIT-REPORT.md` (489 líneas): análisis de 2 críticas + 15+ issues medianas
-  - Generado `docs/AUDIT-SUMMARY.md`: guía rápida con checklist de acciones
-
-- [x] **0.42.6 — All tests passing** ✅
-  - 157/157 tests passing
-  - 51 data entries validated
-  - 7 network URLs consistent
-  - 11 index cards verified
-
-**Commit:** e1db21a — "v0.42.0: Quality improvements - remove TODO comments, add ESLint+Prettier tooling"
-
----
-
 ### v0.38.0 — Visual signals for incomplete content (pending-review articles)
 
 **Objetivo:** El espejo sirve como guía para **futuras ediciones**, no como publicación final. Los artículos importados como borradores (sin contenido completo o con imágenes que necesitan descripción) llevan etiqueta `status: pending-review` + notas sobre qué falta. Esta versión hace que esa etiqueta sea **visualmente imposible de pasar por alto** — no solo texto, sino un indicador visual claro en listas y en páginas de detalle.
@@ -86,14 +49,6 @@ Los 6 artículos importados en v0.37.0 ejemplifican esto:
 
 Cada nota es un **task list** para futura edición. El mirror es el mapa de trabajo.
 
-- [x] **0.38.1 — Implementar marcado visual en cards** — badge naranja con emoji ⚠️, animación de pulso ✅
-- [x] **0.38.2 — Implementar banner en detail page** — naranja claro, texto descriptivo ✅
-- [x] **0.38.3 — Añadir animación CSS (pulse-amber)** ✅
-- [x] **0.38.4 — Testear en articulos.html y articulo.html** ✅
-- [x] **0.38.5 — Verificar contrast ratio (WCAG AA)** — naranja #f57c00 sobre texto blanco cumple ✅
-
----
-
 ### v0.39.0 — Schema extension: metadata fields for movies, documentaries, media articles
 
 **Objetivo:** Permitir que artículos con contenido multimedia (películas, documentales, vídeos) lleven metadatos estructurados (director, año, país, duración, idioma, subtítulos) y enlaces externos (YouTube, IMDb, ok.ru, etc.), renderizados en el detalle del artículo como tarjetas visuales clara.
@@ -104,17 +59,6 @@ Cada nota es un **task list** para futura edición. El mirror es el mapa de trab
 - Después: campos JSON opcionales (`externalLinks[]`, `metadata{}`) renderizados como tarjetas visuales en el detalle
 
 #### Implementación (v0.39.0)
-
-- [x] **0.39.1 — Extender schema JSON** — añadir campos opcionales `externalLinks` (array de {type, url, title}) y `metadata` (objeto con director, year, country, duration, language, subtitles, etc.) a la spec en `site/assets/content/articles.json` ✅
-- [x] **0.39.2 — Documentar schema en ARTICLES.schema.md** — guía de referencia TypeScript-style con ejemplos de película completa vs. artículo simple ✅
-- [x] **0.39.3 — Investigar y completar metadatos: Artículos 36 & 46** (Quilombo película, 1984) — ambos stubs que referenciaban el mismo film brasileño ✅
-  - [x] Artículo 36: YouTube link (1 línea) → extracto + ficha técnica completa
-  - [x] Artículo 46: embedded ok.ru players con subtítulos EN/ES → confirm mismo film, variant viewing option
-  - [x] Research completado: Quilombo (1984) dir. Carlos Diegues, drama histórico, Cannes 1984, 110 min, Portuguese, Brasil
-  - [x] Ambos cambios de `status: pending-review` → `status: imported` + full metadata
-- [x] **0.39.4 — Actualizar articles.js** — renderizado condicional de tarjeta de ficha técnica (si `a.metadata` existe) y tarjeta de enlaces externos (si `a.externalLinks` existe) en `initDetailPage()` ✅
-- [x] **0.39.5 — Estilos CSS** — `.article-metadata-card` y `.article-external-links-card` en articles.css con grid layout responsivo, tipografía clara, botones de enlace estilizados ✅
-- [x] **0.39.6 — Tests** — `npm test` pasa con 41 artículos (39 sin metadata + 2 con metadata), sin breaking changes ✅
 
 #### Ejemplo: Artículo 36 (Quilombo película)
 
@@ -440,10 +384,6 @@ function validateArticles(articles: unknown[]): Article[] {
 - **Durante la sesión** → push libremente a `main` para previsualizar en GitHub Pages (`https://ukoquique-proves.github.io/kilombo/`). Cada push se publica en ~30 segundos.
 - **Al finalizar la sesión** → ejecutar `./end-of-session.sh`. Hace ambas cosas en orden: push a GitHub + deploy a `kilombo.top`.
 
-- [x] **1.1 Evaluar opciones de despliegue** — elegida Opción B (GitHub Actions) para preview permanente + rsync/scp para producción
-- [x] **1.2 Implementar la opción elegida** — GitHub Pages activo en `https://ukoquique-proves.github.io/kilombo/`
-- [x] **1.3 Documentar paso a paso en `README.md` sección "Despliegue"**
-- [x] **1.4 Crear `end-of-session.sh`** — script de fin de sesión que pushea a GitHub y sincroniza `kilombo.top` en un solo paso. Si el puerto 22 está cerrado, avisa y deja GitHub Pages actualizado igualmente.
 - [ ] **1.5 Prueba de deploy en `kilombo.top`** — pendiente de que el puerto 22 sea accesible (ver `docs/TROUBLESHOOTING.md` sección 4)
 
 ---
@@ -462,19 +402,6 @@ La sección **"Nuevo Orden Mundial: plandemismo y domesticación"** debe expandi
 - **Idiomas / traducciones:** Facilitar subtítulos en **francés** (y eventualmente otros idiomas) — ver Paso sobre traducciones.
 - **Categorías base del material de Canal7:** Datos estadísticos / Crisis médica internacional / Médicos éticos / Falsos virus & no aislamiento / OMS / Grafeno & contenido de viales / SIDA-Antecesor del COVID
 
-- [x] **2.1 Inventario y selección de materiales**
-  - 9 vídeos de Actualidad seleccionados (sin Chinda), 1 documental SIDA→COVID destacado.
-  - `assets/data/plandemismo-actualidad.json` ✅ creado (9 vídeos)
-  - `assets/data/plandemismo-sida-covid.json` ✅ creado (1 documental)
-  - `assets/data/plandemismo-historicos.json` — pendiente (lote posterior)
-- [x] **2.2 Diseñar la integración en el portal**
-  - `plandemismo.html` creada con 3 tabs: Actualidad / SIDA→COVID / Históricos (Próximamente)
-  - Enlace desde tarjeta sección 03 del índice ✅
-- [x] **2.3 Construir el componente de videos**
-  - Tarjetas renderizadas desde JSON por `plandemismo.js` (función `renderVideoCards`) ✅
-  - Metadatos de subtítulos en los JSON (`subtitlesFr`) ✅
-- [x] **2.4 Poblar lote 1: Actualidad** — 9 vídeos en `plandemismo-actualidad.json` ✅
-- [x] **2.5 Poblar lote 2: SIDA → COVID** — documental "ELISA MATO A RUTH" en `plandemismo-sida-covid.json` ✅
 - [ ] **2.6 Poblar lote 3: Históricos** (después, no prioritario)
   - Cuando el cliente dé el OK, cargar los videos históricos con su titulación propia
 - [ ] **2.7 Subtítulos en francés (fase inicial)**
@@ -531,7 +458,6 @@ No solo enlaces externos; agregar dentro del propio portal. Ver [`MIRROR_GROWING
   - [ ] Estructura cronológica o por medio en `plandemismo.html` (Documentales / Serie Canal7 / Dossieres escritos)
   - [ ] Reproductores de vídeo embebidos o interfaces de player claras, en lugar de listas de enlaces externos
 - [ ] **4.5 Referencias cruzadas automáticas en artículos** — cada artículo tendrá una sección oculta (expandible o cargada bajo demanda) con referencias generadas automáticamente a otros artículos del portal y/o fuentes externas que complementen su contenido
-- [x] **4.6 Rescatar e incorporar los 7 artículos franceses ocultos** — Extraídos del servidor original (donde no tenían sección y eran invisibles). Limpiar el HTML, asignarles la temática correspondiente y agregarlos a `articles.json` (Nivel 2) para darles un hogar visible en el espejo. (Incluye: serie *Contre l'esclavage...* de S. Almería, *La pandémie n'existe pas !*, etc.).
 ### 5. Traducciones y puesta al día de idiomas
 Hay **atraso histórico de traducciones**, especialmente las revistas del GCI que están disponibles en español pero no en francés, y viceversa. También hay que prever subtítulos en francés para los videos de Canal7.
 
@@ -554,12 +480,6 @@ Hay **atraso histórico de traducciones**, especialmente las revistas del GCI qu
 - [ ] Sistema de pestañas (tabs) o selector de idioma dentro de cada sección numerada (GCI, P.I., NOM)
 - [ ] Páginas individuales por idioma con contenido filtrado
 - [ ] Selector global de idioma en la cabecera (ES / EN / FR / Multilingüe)
-- [x] **Indicadores visuales explícitos Nivel 1 (directorio) vs. Nivel 2 (espejo real)** — ver `MIRROR_GROWING.md §0` para la definición de los dos niveles. ✅ Implementado y verificado:
-  - [x] Nueva variante de badge, `.card-status--external` (Nivel 1) vs. `.card-status--mirrored` (Nivel 2), añadida junto a las existentes `.card-status--active` / `--archive` / `--legacy` en `style.css`
-  - [x] Icono o texto corto y consistente en el badge ("↗ Externo" vs. "⬡ Espejo") — no solo color, cumple el requisito de accesibilidad de `MIRROR_GROWING.md §4.6` ("no usar color como único indicador de estado")
-  - [x] Aplicada la nueva clase a **todas** las tarjetas de `index.html` (8/8): Nivel 1 = las que apuntan a `icg-gci.kilombo.top`, `in.kilombo.top`, `cdrom.kilombo.top`, `icg-old.kilombo.top`, `proletariosinternacionalistas.kilombo.top`, `www.kilombo.top`; Nivel 2 = las que apuntan a `articulos.html` / `plandemismo.html`
-  - [x] Test de regresión automatizado: `scripts/check-badges.mjs`, integrado en `npm test` — falla el build si se añade una tarjeta nueva a `index.html` sin badge de nivel. Ya no depende de aplicación manual ni de checklist humano.
-
 ### 6b. Búsqueda y descubrimiento de contenido
 - [ ] **Búsqueda client-side** — integrar herramienta ligera (Pagefind, Lunr.js, o Algolia) sobre todos los artículos e índices de archivo del portal
 - [ ] Nota: el banner de "volver al portal" en subdominios externos (icg-gci, cdrom, etc.) está fuera de alcance — esos sitios no están bajo control de este repo
@@ -615,15 +535,6 @@ git push → GitHub Actions →
   4. deploy to GitHub Pages
 ```
 
-- [x] **7.1 Instalar staticrypt** como devDependency (`npm install --save-dev staticrypt`) ✅
-- [x] **7.2 Crear `scripts/encrypt.mjs`** — cifra las 3 páginas de contenido y todos los JSON de assets usando la CLI de staticrypt ✅
-- [x] **7.3 Actualizar `deploy.yml`** — paso de cifrado añadido entre `npm test` y upload; lee contraseña desde el secret `STATICRYPT_PASSWORD` ✅
-- [x] **7.4 Añadir `STATICRYPT_PASSWORD` como GitHub Actions Secret** en la configuración del repositorio ✅
-- [x] **7.5 Verificar en GitHub Pages** — páginas cifradas muestran el formulario de contraseña; el contenido se descifra correctamente al introducirla ✅
-- [x] **7.6 Verificar que `index.html` sigue siendo público** — confirmado: `index.html` PUBLIC, las otras tres GATED ✅
-
----
-
 ### 8. Revisión de diseño y experiencia de usuario
 - [ ] Revisión visual completa con el cliente (paleta, tipografía, sensación)
 - [ ] **Ilustraciones / iconografía por sección** — el sitio `kilombo.top` original usaba logos y dibujos que daban calidez visual a cada sección. El espejo debe incorporar imágenes representativas propias, diseñadas con coherencia real respecto al significado de cada sección (Tierra y Libertad, GCI, Proletarios Internacionalistas, NOM/Plandemismo) — no copias de las originales, que carecían de representación coherente. Pueden ser ilustraciones SVG, iconografía editorial o imágenes de dominio público seleccionadas por criterio político y estético.
@@ -633,8 +544,6 @@ git push → GitHub Actions →
 - [ ] Testear accesibilidad (contrastes, teclado, lectores de pantalla)
 
 ### 9. SEO y metadatos
-- [x] **Favicon** — `site/favicon.svg` (estrella roja, v0.36.0) + `<link rel="icon">` en las 4 páginas HTML ✅
-- [x] **Open Graph + meta description** — `og:title`, `og:description`, `og:type`, `og:url`, `og:image` añadidos a las 4 páginas (v0.36.0) ✅
 - [ ] `sitemap.xml`
 - [ ] `robots.txt`
 - [ ] Twitter Cards (opcional — OG cubre la mayoría de plataformas)

@@ -595,8 +595,8 @@ Determined that `kilombo` user has **FULL ADMIN access**. This resolves the long
   - `npm run dev` — Alias for `npm run preview` (explicit dev server)
 
 - **Comprehensive audit documentation**
-  - `docs/BUG-AUDIT-REPORT.md` — Full analysis (489 lines): 2 critical + 15+ medium issues, action items with code locations
-  - `docs/AUDIT-SUMMARY.md` — Quick reference guide with priority checklist and next steps
+  - `docs/SPIP-ACCESS.md` — Consolidated SPIP documentation (single source of truth)
+  - `docs/TO_FIX.md` — Active issues tracking (consolidated from separate audit files)
   - Both documents linked from TO_FIX.md for discoverability
 
 ### Changed
@@ -633,7 +633,7 @@ Determined that `kilombo` user has **FULL ADMIN access**. This resolves the long
 - Formatting and linting optional for existing scripts but recommended for new development
 
 ### Next Steps
-See `docs/AUDIT-SUMMARY.md` for priority roadmap:
+See `docs/TO_FIX.md` for active issues and priority roadmap:
 - **CRITICAL (before next deploy):** Resolve SPIP access contradiction docs, implement credential rotation
 - **HIGH (this sprint):** Debug article deletion, implement GCI extractors, archive ROADMAP completed tasks
 - **MEDIUM (future):** Update missing publication dates, add FR subtitles, implement 3-tier filtering

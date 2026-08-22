@@ -4,8 +4,8 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 Última actualización: 2026-08-18 — v0.39.1; ítems #29, #45, #51, #59, #60, #61, #62 cerrados; seguridad URLs (#ctaUrl/#sourceUrl) resuelta.
 
 > **📋 RELATED:** See also:
-> - **`docs/BUG-AUDIT-REPORT.md`** — Comprehensive project-wide audit covering code quality, data integrity, documentation, build/test, security, and deployment (August 2026)
-> - **`docs/AUDIT-SUMMARY.md`** — Quick reference with actionable next steps and priority checklist
+> - **`docs/SPIP-ACCESS.md`** — Consolidated SPIP access and article management documentation (single source of truth)
+> - **`CHANGELOG.md`** — Complete version history and resolved issues by release
 
 ---
 
@@ -16,7 +16,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - **71. Install ESLint + Prettier** — `npm install eslint prettier eslint-config-prettier`. Created `.eslintrc.json` with `no-console: warn`, `no-debugger: warn`, `prefer-const: warn`. Created `.prettierrc.json` and `.prettierignore`. Prevents future debug code commits.
   - **72. Configure npm scripts for developer workflow** — Added `lint`, `lint:fix`, `format`, `format:check`, `build` (→ encrypt), `dev` (→ preview) to package.json. Makes developer workflow explicit and discoverable.
   - **73. Verify GCI detector (already working v0.39.1)** — Confirmed `detectSite()` properly recognizes icg-gci/in/cdrom/icg-old as separate site categories. Throws explicit errors for unsupported sites with helpful messages. No changes needed.
-  - **74. Create comprehensive audit documentation** — Generated `docs/BUG-AUDIT-REPORT.md` (489 lines, 2 critical + 15+ medium issues) and `docs/AUDIT-SUMMARY.md` (quick reference). References all existing issue tracking (TO_FIX.md, PENDING-REVIEW.md, TROUBLESHOOTING.md).
+  - **74. Create comprehensive audit documentation** — Generated comprehensive audit analysis (consolidated into `docs/TO_FIX.md`, `docs/SPIP-ACCESS.md`, and `CHANGELOG.md`). All issues now tracked in single active issues file (`TO_FIX.md`).
   - **75. All tests passing post-changes** — Ran full test suite: 157/157 tests ✅, 51 data entries ✅, 7 network URLs ✅, 11 index cards ✅. Build quality solid.
   - **Commit:** e1db21a — "v0.42.0: Quality improvements - remove TODO comments, add ESLint+Prettier tooling"
   - **Effort:** ~2 hours (installation, config, testing, documentation)
