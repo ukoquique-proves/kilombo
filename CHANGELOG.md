@@ -5,6 +5,93 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.42.2] — 2026-08-22
+
+### NEW: Article Publishing Workflow — Editorial Rebuilding System
+
+**Status:** ✅ COMPLETE — System ready for editorial work
+
+Established comprehensive workflow for careful editorial rebuilding of articles from `/nuevos_articulos/` before publication. Focus is on **quality over automation** — each article is manually reviewed, restructured for clarity, and validated before merging into the mirror.
+
+### Added
+
+- **`/articulos_en_trabajo/`** (new working directory)
+  - Separate workspace for editorial preparation (not in source tree)
+  - Three phases: IN_PROGRESS → READY → Published
+  - Full documentation for editors
+
+- **Editorial documentation** (856 lines total):
+  - `README.md` — Workflow overview and directory structure
+  - `QUICK_START.md` — TL;DR reference for fast lookups
+  - `EDITORIAL_GUIDELINES.md` (251 lines) — Tone, style, structure standards
+  - `SCHEMA_REFERENCE.md` (322 lines) — Complete JSON field documentation
+
+- **`docs/ARTICLE-PUBLISHING-WORKFLOW.md`** (323 lines) — Full end-to-end guide
+  - Three-phase workflow diagram
+  - Phase-by-phase checklist
+  - Common issues & solutions
+  - Batch publication process
+
+- **Automated validation** (existing)
+  - `npm test` validates all JSON against schema
+  - `scripts/validate-data.mjs` checks HTML sanitization
+  - Duplicate detection (ID, sourceUrl)
+
+### Workflow at a Glance
+
+```
+Phase 1: Editorial Preparation
+  Read source → Document issues → Rebuild article → Create JSON
+
+Phase 2: Validation
+  Run npm test → Fix errors → Move to READY
+
+Phase 3: Publication
+  Batch merge → Final test → Commit + Push → Deploy
+```
+
+### Key Principles
+
+- **One language per article** (ES, FR, or EN only)
+- **Careful rebuilding** (fix structure, clarity, redundancy)
+- **Metadata-rich** (title, date, topics, source attribution)
+- **Standards-based** (tone, HTML allowlist, accessibility)
+- **Reproducible** (full documentation, no guesswork)
+
+### Files & Organization
+
+```
+/articulos_en_trabajo/
+├── IN_PROGRESS/     ← Working on articles
+├── READY/           ← Validated, ready to merge
+├── ARCHIVE/         ← Rejected or on-hold
+├── EDITORIAL_GUIDELINES.md
+├── SCHEMA_REFERENCE.md
+├── QUICK_START.md
+└── README.md
+
+/nuevos_articulos/   ← Raw sources (unchanged, read-only)
+```
+
+### Next Steps
+
+1. Pick article from `/nuevos_articulos/`
+2. Create `IN_PROGRESS/[slug].md` with issues & plan
+3. Rebuild article following EDITORIAL_GUIDELINES
+4. Create `IN_PROGRESS/[slug].json` with schema
+5. Run `npm test` from KILOMBO root
+6. Move to `READY/` if valid
+7. Batch merge when ready (3-5 at a time)
+
+### Impact
+
+- **TO_FIX #[pending]** — Article publishing backlog (15 articles in `/nuevos_articulos/`)
+  - Establishes clear process for quality assurance
+  - Reduces publication errors and inconsistencies
+  - Enables future automation on top of solid foundation
+
+---
+
 ## [0.42.1] — 2026-08-22
 
 ### CRITICAL: SPIP Privilege Tier Verified — TO_FIX #67 RESOLVED
