@@ -11,6 +11,16 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🟢 Recientemente cerrados
 
+- [x] **70–75. Quality improvements sprint (v0.42.0)** — ✅ COMPLETED
+  - **70. Remove TODO comment generation from render.mjs** — Lines 229–232 deleted. Removed HTML comment bloat from 9 placeholder videos; fixes accessibility concern (screen readers won't read instructions to developers).
+  - **71. Install ESLint + Prettier** — `npm install eslint prettier eslint-config-prettier`. Created `.eslintrc.json` with `no-console: warn`, `no-debugger: warn`, `prefer-const: warn`. Created `.prettierrc.json` and `.prettierignore`. Prevents future debug code commits.
+  - **72. Configure npm scripts for developer workflow** — Added `lint`, `lint:fix`, `format`, `format:check`, `build` (→ encrypt), `dev` (→ preview) to package.json. Makes developer workflow explicit and discoverable.
+  - **73. Verify GCI detector (already working v0.39.1)** — Confirmed `detectSite()` properly recognizes icg-gci/in/cdrom/icg-old as separate site categories. Throws explicit errors for unsupported sites with helpful messages. No changes needed.
+  - **74. Create comprehensive audit documentation** — Generated `docs/BUG-AUDIT-REPORT.md` (489 lines, 2 critical + 15+ medium issues) and `docs/AUDIT-SUMMARY.md` (quick reference). References all existing issue tracking (TO_FIX.md, PENDING-REVIEW.md, TROUBLESHOOTING.md).
+  - **75. All tests passing post-changes** — Ran full test suite: 157/157 tests ✅, 51 data entries ✅, 7 network URLs ✅, 11 index cards ✅. Build quality solid.
+  - **Commit:** e1db21a — "v0.42.0: Quality improvements - remove TODO comments, add ESLint+Prettier tooling"
+  - **Effort:** ~2 hours (installation, config, testing, documentation)
+
 - [x] **66. create-article.mjs — end-to-end SPIP article creation verified (v0.40.1)** — ✅ VERIFIED
   - **Status:** Full end-to-end success — `sandbox/create-article.mjs` successfully created Article ID 87 ("FINAL TEST") in the live SPIP dashboard on 2026-08-21.
   - **Location:** `sandbox/create-article.mjs` (gitignored, not committed to repo — intentional, as per `scripts/import-article.mjs` pattern for test/sandbox tools)

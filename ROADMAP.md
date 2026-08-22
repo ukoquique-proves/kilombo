@@ -4,7 +4,50 @@
 
 ---
 
-## FASE INMEDIATA (Próximas 3 sesiones) — Visual distinction for draft content + System de filtrado interactivo 3-tiers
+## FASE INMEDIATA (Próximas 3 sesiones) — Visual distinction for draft content + System de filtrado interactivo 3-tiers + Quality improvements
+
+### v0.42.0 — Quality improvements sprint: code quality, tooling, documentation
+
+**Objetivo:** Mejorar la mantenibilidad del código, experiencia de desarrollador, y calidad general del proyecto mediante herramientas automáticas (linting, formatting) y eliminación de código técnico deuda.
+
+#### Cambios completados
+
+- [x] **0.42.1 — Remove TODO comment generation from render.mjs** ✅
+  - Eliminadas líneas 229–232 que generaban comentarios HTML en el DOM de 9 videos placeholder
+  - Beneficio: reduce bloat HTML, evita problemas de accesibilidad (screen readers), limpia "View Source" para usuarios finales
+
+- [x] **0.42.2 — Install ESLint + Prettier** ✅
+  - `npm install --save-dev eslint@^9.39.5 prettier@^3.9.6 eslint-config-prettier`
+  - Creado `.eslintrc.json` con reglas: `no-console: warn`, `no-debugger: warn`, `prefer-const: warn`, `eqeqeq: warn`
+  - Creado `.prettierrc.json` (printWidth: 100, semi: true, singleQuote: true, trailingComma: es5)
+  - Creado `.prettierignore` para excluir JSON de contenido y HTML
+
+- [x] **0.42.3 — Add npm scripts for developer workflow** ✅
+  - `npm run lint` — verificar calidad
+  - `npm run lint:fix` — auto-arreglar
+  - `npm run format` — auto-formatear código
+  - `npm run format:check` — verificar formato sin cambios
+  - `npm run build` — alias explícito para `npm run encrypt`
+  - `npm run dev` — alias explícito para `npm run preview`
+
+- [x] **0.42.4 — Verify GCI detector (already working v0.39.1)** ✅
+  - Confirmado: `detectSite()` reconoce correctamente icg-gci, in.kilombo, cdrom, icg-old como categorías separadas
+  - Lanza errores explícitos para sitios no soportados
+  - Sin cambios necesarios
+
+- [x] **0.42.5 — Create comprehensive audit documentation** ✅
+  - Generado `docs/BUG-AUDIT-REPORT.md` (489 líneas): análisis de 2 críticas + 15+ issues medianas
+  - Generado `docs/AUDIT-SUMMARY.md`: guía rápida con checklist de acciones
+
+- [x] **0.42.6 — All tests passing** ✅
+  - 157/157 tests passing
+  - 51 data entries validated
+  - 7 network URLs consistent
+  - 11 index cards verified
+
+**Commit:** e1db21a — "v0.42.0: Quality improvements - remove TODO comments, add ESLint+Prettier tooling"
+
+---
 
 ### v0.38.0 — Visual signals for incomplete content (pending-review articles)
 

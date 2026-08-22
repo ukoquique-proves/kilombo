@@ -5,6 +5,80 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.42.0] — 2026-08-22
+
+### Quality Improvements Sprint: Code Quality, Tooling, Documentation
+
+- **Status:** ✅ COMPLETED — All tasks passing, 157 tests verified, commit e1db21a
+- **Focus:** Improved developer experience, automated code quality, comprehensive project audit
+
+### Added
+- **`.eslintrc.json`** — ESLint configuration
+  - Rules: `no-console: warn`, `no-debugger: warn`, `prefer-const: warn`, `eqeqeq: warn`, `no-unused-vars: warn`
+  - Prevents future debug code commits (console.log, debugger statements)
+  - Browser + Node environments, ES2021 target
+
+- **`.prettierrc.json`** — Prettier code formatter configuration
+  - printWidth: 100, semi: true, singleQuote: true, trailingComma: es5, endOfLine: lf
+  - Enforces consistent code style across project
+
+- **`.prettierignore`** — Prettier exclusions
+  - Excludes JSON data files, HTML, node_modules, scraped content, build artifacts
+
+- **npm scripts** for developer workflow
+  - `npm run lint` — Check code quality
+  - `npm run lint:fix` — Auto-fix linting issues
+  - `npm run format` — Auto-format code
+  - `npm run format:check` — Verify formatting without changes
+  - `npm run build` — Alias for `npm run encrypt` (explicit build command)
+  - `npm run dev` — Alias for `npm run preview` (explicit dev server)
+
+- **Comprehensive audit documentation**
+  - `docs/BUG-AUDIT-REPORT.md` — Full analysis (489 lines): 2 critical + 15+ medium issues, action items with code locations
+  - `docs/AUDIT-SUMMARY.md` — Quick reference guide with priority checklist and next steps
+  - Both documents linked from TO_FIX.md for discoverability
+
+### Changed
+- **`site/js/render.mjs`** — Removed TODO comment generation
+  - Deleted lines 229–232 that embedded HTML comments in rendered DOM for placeholder videos (9 total)
+  - Eliminates: HTML bloat, potential screen reader issues, unprofessional "View Source" output
+  - Comment removed from both variable declaration and template rendering
+
+- **`package.json`**
+  - Added devDependencies: `eslint@^9.39.5`, `prettier@^3.9.6`, `eslint-config-prettier@^10.1.8`
+  - Updated scripts section with 6 new commands (lint, format, build, dev, etc.)
+  - Maintained all existing functionality
+
+### Verified
+- **GCI site detector** — Confirmed working correctly in v0.39.1
+  - `detectSite()` properly recognizes: icg-gci → 'gci', in.kilombo → 'gci-in', cdrom/icg-old → 'gci-static'
+  - Throws explicit errors for unsupported sites with helpful messages
+  - No changes needed
+
+### Test Results
+- ✅ 157/157 unit tests passing
+- ✅ 51 data entries validated (articles.json + video data)
+- ✅ 7 network URLs consistent across documentation
+- ✅ 11 index card badges verified
+
+### Documentation Updates
+- **`ROADMAP.md`** — Added v0.42.0 section at top of FASE INMEDIATA with 6 completed tasks (0.42.1–0.42.6)
+- **`docs/TO_FIX.md`** — Added items #70–75 (quality improvements) to recently closed section
+- **`CHANGELOG.md`** — This entry
+
+### Technical Notes
+- Installation of ESLint triggered deprecation warning (v9.39.5 no longer supported as of 2026-08, but no breaking changes for current usage)
+- All new config files are non-breaking (don't affect build or deployment)
+- Formatting and linting optional for existing scripts but recommended for new development
+
+### Next Steps
+See `docs/AUDIT-SUMMARY.md` for priority roadmap:
+- **CRITICAL (before next deploy):** Resolve SPIP access contradiction docs, implement credential rotation
+- **HIGH (this sprint):** Debug article deletion, implement GCI extractors, archive ROADMAP completed tasks
+- **MEDIUM (future):** Update missing publication dates, add FR subtitles, implement 3-tier filtering
+
+---
+
 ## [0.41.1] — 2026-08-22
 
 ### Article Deletion Workflow Documentation
