@@ -95,7 +95,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     4. Sin un script versionado, cada sesión reinventa el flujo ad-hoc — que es cómo se originaron bugs en historial anterior.
   - **Qué existe hoy:**
     - `sandbox/create-article.mjs` — crear artículo (verificado, #66).
-    - `sandbox/delete-article.mjs` — mover artículo a `poubelle`/papelera (nuevo, verificado contra servidor, selectores confirmados).
+    - `sandbox/delete-article.mjs` — mover artículo a `poubelle`/papelera (nuevo, selectores confirmados pero acción bloqueada por autosave mismatch — ver #69).
   - **Qué falta para tener el ciclo completo:**
     - `sandbox/update-article.mjs` — editar un artículo existente (título/cuerpo/sección) sin recrearlo. No existe.
     - Extractor GCI (#63) — bloquea poder aplicar estos scripts a instancias GCI/ICR, no solo Tierra y Libertad.
