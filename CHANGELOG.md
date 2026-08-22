@@ -92,7 +92,128 @@ Phase 3: Publication
 
 ---
 
-## [0.42.1] — 2026-08-22
+## [0.42.3] — 2026-08-22
+
+### NEW: Actualidad Section + Automated Publishing Workflow
+
+**Status:** ✅ COMPLETE — Ready for article publication
+
+Made "Actualidad" a real editorial section (like tierra, gci, pi, nom) and created **completely separate automation** for publishing rewritten articles from the editorial workspace directly to the mirror site.
+
+### Major Changes
+
+#### 1. Actualidad Section Implementation
+
+- **Real section** with articles display (not just placeholder)
+- Link in index.html: `articulos.html?section=actualidad`
+- Lightning bolt icon (red accent)
+- Appears first in navigation (highest priority)
+- Can filter/search articles by section like others
+
+#### 2. Automated Publishing Workflow
+
+**Separate process** (independent from editorial workflow):
+
+- **`publish.sh`** — One-command deployment
+- **`publish-to-actualidad.mjs`** — Node.js automation engine
+- **Safety checks** — Validates before committing
+- **Conflict detection** — Rejects duplicate IDs/URLs
+- **Automatic archiving** — Timestamped records
+
+**Workflow:**
+
+```
+READY/ folder → publish.sh → Merge articles → Set section=actualidad
+    ↓              ↓              ↓                    ↓
+Articles       Automation    Validation      Git commit + push
+in repo        starts here   (npm test)      Deploy automatic
+```
+
+### Files Added
+
+- **`articulos_en_trabajo/publish.sh`** — Shell wrapper (executable)
+- **`articulos_en_trabajo/publish-to-actualidad.mjs`** — Automation engine (executable)
+- **`articulos_en_trabajo/AUTOMATION_README.md`** — Quick reference
+- **`articulos_en_trabajo/AUTOMATION_PUBLISH_ACTUALIDAD.md`** — Full technical docs
+- **`articulos_en_trabajo/ARCHIVE/published/`** — Archive for published articles with timestamps
+
+### Files Changed
+
+- **`site/index.html`** — Actualidad section now real (not placeholder)
+- **`site/css/style.css`** — Added `.section-svg--actualidad` styling
+- **`site/assets/content/ARTICLES.schema.md`** — Added `actualidad` to section values
+- **`articulos_en_trabajo/SCHEMA_REFERENCE.md`** — Updated section documentation
+
+### How to Use
+
+```bash
+# 1. Articles validated and in READY/
+cd /root/JOB-sda2/KILOMBO-SITE/articulos_en_trabajo
+ls READY/  # See articles to publish
+
+# 2. Run automation
+./publish.sh
+
+# 3. Done! Articles live on mirror
+# Available at: https://kilombo.top/articulos.html?section=actualidad
+```
+
+### Automation Features
+
+✅ Merge multiple articles in one commit  
+✅ Auto-set `section: "actualidad"` for all  
+✅ Full validation before publishing  
+✅ Conflict detection (duplicate IDs/URLs)  
+✅ Git commit + push (triggers deploy)  
+✅ Timestamped archiving  
+✅ Clear error messages  
+
+### Architecture
+
+**Two separate systems (no mixing):**
+
+1. **Editorial Workflow** (manual)
+   - Read articles from `/nuevos_articulos/`
+   - Create IN_PROGRESS/[slug].md with notes
+   - Rebuild into IN_PROGRESS/[slug].json
+   - Validate with npm test
+   - Move to READY/ when valid
+
+2. **Publishing Automation** (automatic)
+   - Watches READY/ folder
+   - Runs on demand with `./publish.sh`
+   - Merges and publishes
+   - Handles Git operations
+   - Archives with timestamp
+
+### Integration
+
+- Works with existing articles.json (no breaking changes)
+- Respects all existing sections (tierra, gci, pi, nom, general)
+- Actualidad becomes the "news/current events" section
+- GitHub Actions deployment automatic
+- Mirror site updates on each publish
+
+### Next Steps
+
+1. ✅ Actualidad section live
+2. ✅ Automation ready to deploy
+3. Start converting articles from `/nuevos_articulos/`:
+   - Follow EDITORIAL_GUIDELINES.md
+   - Rebuild in IN_PROGRESS/
+   - Move to READY/ when validated
+4. Batch publish with `./publish.sh`
+
+### Documentation
+
+- `AUTOMATION_README.md` — Quick start guide
+- `AUTOMATION_PUBLISH_ACTUALIDAD.md` — Full technical spec
+- `EDITORIAL_GUIDELINES.md` — Article writing standards
+- `SCHEMA_REFERENCE.md` — JSON schema with examples
+
+---
+
+## [0.42.2] — 2026-08-22
 
 ### CRITICAL: SPIP Privilege Tier Verified — TO_FIX #67 RESOLVED
 
