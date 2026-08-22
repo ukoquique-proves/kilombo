@@ -25,19 +25,22 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 ## [0.40.1] — 2026-08-21
 
 ### Verification: create-article.mjs Full End-to-End Success
-- **Status:** VERIFIED — `create-article.mjs` has successfully created a real article in the SPIP dashboard and confirmed it sitting in "en curso de redacción" status.
+- **Status:** VERIFIED for creation ✅; Partial for deletion (blocked by autosave mechanism)
 - **Test:** Article ID 87, titled "FINAL TEST", created with `node sandbox/create-article.mjs --create` on 2026-08-21.
 - **Verification:** Article confirmed visible in SPIP admin panel at `/ecrire/?exec=articles&id_article=87`, status "en curso de redacción", body text populated from stdin input.
 - **Selectors:** All form element selectors (TITLE_SELECTOR, BODY_SELECTOR, SECTION_SELECTOR) verified correct and matched against live SPIP form structure.
-- **Docs:** `docs/DEPLOYMENT-AND-SOURCE-EDITING.md` updated to clarify distinction between (1) static mirror deployment via SSH (blocked by firewall) and (2) SPIP content editing via web backend (working, no SSH required).
-- **Cleanup:** `sandbox/delete-article.mjs` created (saved, not committed) to verify article deletion workflow. Full test cycle completed:
-  - `--inspect` confirmed radio selectors exist and are properly named
-  - `--dry-run` verified form state changes without submission
-  - `--trash` successfully moved Article 87 to trash/poubelle status
-  - Confirms SPIP content management (creation and deletion) is fully operational
+- **Cleanup attempt:** `sandbox/delete-article.mjs` created (saved, not committed) to verify article deletion workflow. Partial cycle:
+  - `--inspect` ✅ Confirmed radio selectors exist and are properly named (`input[name="statut"][value="poubelle"]`)
+  - `--dry-run` ✅ Verified form state changes without submission
+  - `--trash` ❌ **BLOCKED** — Clicking the radio/label does not trigger SPIP's autosave for `instituer_article` form (different mechanism than `article_edit`)
+- **Root cause:** SPIP uses different JavaScript autosave handlers:
+  - `article_edit` (creation) — responds to Playwright clicks ✅
+  - `instituer_article` (status-change) — requires different trigger mechanism ❌
+- **What this proves:** SPIP web backend fully functional for article creation. Deletion blocked by form autosave mechanism mismatch (see TO_FIX #69). No SSH required for either operation.
+- **Docs:** `docs/DEPLOYMENT-AND-SOURCE-EDITING.md` updated with Workflow A/B clarification; `docs/TOKEN-REVOCATION-STEPS.md` created.
 
 ### Changed
-- **`docs/TO_FIX.md`** — #66 added for delete-article.mjs verification; #65 status updated to reflect verification complete; technical debt re-prioritized
+- **`docs/TO_FIX.md`** — #69 added for delete-article.mjs autosave blocker; #66 marked VERIFIED (partial); #65 marked COMPLETED
 
 ---
 
