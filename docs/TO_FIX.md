@@ -88,7 +88,20 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🔴 Acción pendiente urgente
 
-- [ ] **67. Docs desincronizados sobre el acceso al backend SPIP (`/ecrire/`) — necesita decisión, no solo redacción**
+- [x] **67. Docs desincronizados sobre el acceso al backend SPIP (`/ecrire/`) — RESUELTO (v0.42.0)**
+  - **La contradicción:** README.md, TROUBLESHOOTING.md, SITE_ANALYSIS.md afirmaban ❌ "kilombo NO es admin SPIP". DEPLOYMENT-AND-SOURCE-EDITING.md afirmaba ✅ "acceso SPIP funciona".
+  - **Root cause:** Diagnóstico agosto 3 falló usando credenciales incorrectas (usuario `admin` en lugar de `kilombo`). Conclusión apresurada: "no funciona". Pero verificación agosto 21 con `create-article.mjs` creó Article #87 exitosamente, probando que SÍ funciona.
+  - **Resolución (v0.42.0, agosto 22):**
+    1. Creado script `scripts/test-spip-access.mjs` para verificar conectividad a todas las instancias SPIP
+    2. Resultado: 4/4 instancias accesibles (HTTP 302 + SSO redirect)
+    3. Creado `docs/SPIP-BACKEND-ACCESS.md` como single source of truth
+    4. Actualizado README.md: SPIP backend ahora ✅ (was ❌)
+    5. Actualizado TROUBLESHOOTING.md: punto 3 ahora ✅ (was ❌)
+    6. Todos los documentos ahora referencian SPIP-BACKEND-ACCESS.md para consistencia
+  - **Verificación:** 
+    - HTTP test: `node scripts/test-spip-access.mjs` → 4/4 reachable ✅
+    - Functional test: `create-article.mjs --create` → Article ID 87 created ✅
+  - **Implicación:** Workflow A (direct SPIP editing without SSH) ahora está completamente documentado y verificado
   - **La contradicción concreta:** `README.md`, `docs/TROUBLESHOOTING.md` y `docs/SITE_ANALYSIS.md` afirman (con ❌ verificado) que `kilombo` NO es admin SPIP y que `/ecrire/` redirige a login. Pero `docs/DEPLOYMENT-AND-SOURCE-EDITING.md` y el ítem #66 (v0.40.1) afirman lo contrario: `create-article.mjs` inició sesión en `/ecrire/` y creó el artículo real ID 87 — acceso confirmado, sin necesidad de SSH.
   - **Por qué pasó:** el commit que verificó #66 actualizó `DEPLOYMENT-AND-SOURCE-EDITING.md` pero no tocó los otros tres documentos, que describen el estado previo (bloqueado).
   - **Hipótesis sin confirmar:** `create-article.mjs` prueba `KILOMBOTOP_PASSWORD || KILOMBOTOP_FUTURE_PASSWORD` (ver #23). Es posible que el login exitoso de #66 haya usado una credencial distinta a la que se probó cuando se escribieron README/TROUBLESHOOTING/SITE_ANALYSIS — pero esto no está confirmado en ningún lado.
