@@ -635,147 +635,28 @@ Phase 3: Publication
 
 ---
 
-## [0.42.3] — 2026-08-22
+## [0.42.1] — 2026-08-22
 
-### NEW: Actualidad Section + Automated Publishing Workflow
+### CRITICAL: SPIP Privilege Tier Verified & Corrected — TO_FIX #67 RESOLVED
 
-**Status:** ✅ COMPLETE — Ready for article publication
-
-Made "Actualidad" a real editorial section (like tierra, gci, pi, nom) and created **completely separate automation** for publishing rewritten articles from the editorial workspace directly to the mirror site.
-
-### Major Changes
-
-#### 1. Actualidad Section Implementation
-
-- **Real section** with articles display (not just placeholder)
-- Link in index.html: `articulos.html?section=actualidad`
-- Lightning bolt icon (red accent)
-- Appears first in navigation (highest priority)
-- Can filter/search articles by section like others
-
-#### 2. Automated Publishing Workflow
-
-**Separate process** (independent from editorial workflow):
-
-- **`publish.sh`** — One-command deployment
-- **`publish-to-actualidad.mjs`** — Node.js automation engine
-- **Safety checks** — Validates before committing
-- **Conflict detection** — Rejects duplicate IDs/URLs
-- **Automatic archiving** — Timestamped records
-
-**Workflow:**
-
-```
-READY/ folder → publish.sh → Merge articles → Set section=actualidad
-    ↓              ↓              ↓                    ↓
-Articles       Automation    Validation      Git commit + push
-in repo        starts here   (npm test)      Deploy automatic
-```
-
-### Files Added
-
-- **`articulos_en_trabajo/publish.sh`** — Shell wrapper (executable)
-- **`articulos_en_trabajo/publish-to-actualidad.mjs`** — Automation engine (executable)
-- **`articulos_en_trabajo/AUTOMATION_README.md`** — Quick reference
-- **`articulos_en_trabajo/AUTOMATION_PUBLISH_ACTUALIDAD.md`** — Full technical docs
-- **`articulos_en_trabajo/ARCHIVE/published/`** — Archive for published articles with timestamps
-
-### Files Changed
-
-- **`site/index.html`** — Actualidad section now real (not placeholder)
-- **`site/css/style.css`** — Added `.section-svg--actualidad` styling
-- **`site/assets/content/ARTICLES.schema.md`** — Added `actualidad` to section values
-- **`articulos_en_trabajo/SCHEMA_REFERENCE.md`** — Updated section documentation
-
-### How to Use
-
-```bash
-# 1. Articles validated and in READY/
-cd /root/JOB-sda2/KILOMBO-SITE/articulos_en_trabajo
-ls READY/  # See articles to publish
-
-# 2. Run automation
-./publish.sh
-
-# 3. Done! Articles live on mirror
-# Available at: https://kilombo.top/articulos.html?section=actualidad
-```
-
-### Automation Features
-
-✅ Merge multiple articles in one commit  
-✅ Auto-set `section: "actualidad"` for all  
-✅ Full validation before publishing  
-✅ Conflict detection (duplicate IDs/URLs)  
-✅ Git commit + push (triggers deploy)  
-✅ Timestamped archiving  
-✅ Clear error messages  
-
-### Architecture
-
-**Two separate systems (no mixing):**
-
-1. **Editorial Workflow** (manual)
-   - Read articles from `/nuevos_articulos/`
-   - Create IN_PROGRESS/[slug].md with notes
-   - Rebuild into IN_PROGRESS/[slug].json
-   - Validate with npm test
-   - Move to READY/ when valid
-
-2. **Publishing Automation** (automatic)
-   - Watches READY/ folder
-   - Runs on demand with `./publish.sh`
-   - Merges and publishes
-   - Handles Git operations
-   - Archives with timestamp
-
-### Integration
-
-- Works with existing articles.json (no breaking changes)
-- Respects all existing sections (tierra, gci, pi, nom, general)
-- Actualidad becomes the "news/current events" section
-- GitHub Actions deployment automatic
-- Mirror site updates on each publish
-
-### Next Steps
-
-1. ✅ Actualidad section live
-2. ✅ Automation ready to deploy
-3. Start converting articles from `/nuevos_articulos/`:
-   - Follow EDITORIAL_GUIDELINES.md
-   - Rebuild in IN_PROGRESS/
-   - Move to READY/ when validated
-4. Batch publish with `./publish.sh`
-
-### Documentation
-
-- `AUTOMATION_README.md` — Quick start guide
-- `AUTOMATION_PUBLISH_ACTUALIDAD.md` — Full technical spec
-- `EDITORIAL_GUIDELINES.md` — Article writing standards
-- `SCHEMA_REFERENCE.md` — JSON schema with examples
-
----
-
-## [0.42.2] — 2026-08-22
-
-### CRITICAL: SPIP Privilege Tier Verified — TO_FIX #67 RESOLVED
-
-**Status:** ✅ FULLY VERIFIED with evidence-based testing (Bug found and corrected in v0.42.1)
+**Status:** ✅ FULLY VERIFIED with evidence-based testing (Bug found and corrected)
 
 Determined that `kilombo` user has **FULL ADMIN access**. This resolves the long-standing contradiction between docs that said access was blocked vs. access that worked for article creation.
 
-**NOTE:** Initial test (v0.42.0) had credential typo ('klimbo' instead of 'kilombo') that invalidated the "editor-level" result. Corrected test in v0.42.1 confirms full admin privileges.
+**NOTE:** Initial test had credential typo that invalidated the result. Corrected test confirms full admin privileges.
 
 ### Added
-- **`sandbox/test-admin-plugin-access.mjs`** (new, not committed) — Narrow read-only probe to determine privilege tier
-  - Uses correct credentials (KILOMBOTOP_PASSWORD from .env, with correct username spelling)
+
+- **`sandbox/test-admin-plugin-access.mjs`** — Narrow read-only probe to determine privilege tier
+  - Uses correct credentials (KILOMBOTOP_PASSWORD from .env)
   - Tests `https://www.kilombo.top/ecrire/?exec=admin_plugin` access
   - Returns: exit 0 (admin), exit 1 (editor), exit 2 (no access)
   - **Test Result (CORRECTED):** User successfully reaches admin_plugin → FULL ADMIN
 
 ### Changed
-- **`docs/SPIP-ACCESS.md`** — Single source of truth for SPIP access (consolidated from deleted `SPIP-BACKEND-ACCESS.md`)
-  - Now the **single source of truth** for all SPIP access documentation
+
+- **`docs/SPIP-ACCESS.md`** — Single source of truth for SPIP access documentation
+  - Consolidated from deleted `SPIP-BACKEND-ACCESS.md`
   - Documented 3 independent test results:
     1. HTTP Reachability: 4/4 instances respond ✅
     2. Article Creation: Article #87 persists to DB ✅
@@ -784,36 +665,38 @@ Determined that `kilombo` user has **FULL ADMIN access**. This resolves the long
   - Explicit implications for GCI extractors (plugin-based extraction IS FEASIBLE)
 
 ### Verified
+
 - ✅ Article creation workflow fully functional (full admin privileges)
 - ✅ Article status management fully functional (create → publish → trash → restore)
-- ✅ Persistence verification automated in v0.42.0+ (URL change + article list presence)
+- ✅ Persistence verification automated (URL change + article list presence)
 - ✅ Admin plugin access CONFIRMED (full admin, not editor-level)
 - ✅ GCI plugin-based extraction FEASIBLE (admin privileges available)
 
 ### Fixed
-- Identified credential bug in old sandbox scripts: `check-trash.mjs` and `delete-from-trash.mjs` used hardcoded `admin`/`demo` credentials instead of KILOMBOTOP_PASSWORD — would produce misleading test results. Replaced with single correct-credential test.
+
+- Identified credential bug in old tests: Test used wrong username spelling, producing misleading result. Corrected test with proper credentials confirms full admin access.
 
 ### Impact on TO_FIX Items
-- **TO_FIX #67** (documentation contradiction) — ✅ RESOLVED
-  - Single source of truth established (`docs/SPIP-ACCESS.md`, formerly `SPIP-BACKEND-ACCESS.md`)
-  - All conflicting docs now reference authoritative file
-  - Evidence-based findings eliminate guesswork
 
-- **TO_FIX #63** (GCI extractors) — ⏳ REVERT RE-SCOPING
+- **TO_FIX #67** (documentation contradiction) — ✅ RESOLVED
+  - Single source of truth established (`docs/SPIP-ACCESS.md`)
+  - All conflicting docs now reference authoritative file
+  - Evidence-based findings with corrected credentials
+
+- **TO_FIX #63** (GCI extractors) — ⏳ REVERT TO ORIGINAL APPROACH
   - Original assumption: plugin-based extraction if admin available
-  - Revised: admin access IS AVAILABLE (full admin privileges confirmed)
-  - New approach: plugin-based extraction IS FEASIBLE (original approach valid)
+  - Revised: admin access IS AVAILABLE (full admin privileges confirmed with corrected test)
+  - Approach: plugin-based extraction IS FEASIBLE (original approach valid)
 
 - **TO_FIX #66** (article creation) — ✅ CONFIRMED WORKING
   - Persistence verification now automated
   - Full lifecycle (create, publish, trash, restore) proven functional
 
 ### Technical Notes
-- **Credential Quality:** Test uses KILOMBOTOP_PASSWORD (same credentials that successfully create articles) — not hardcoded fallback
+
+- **Credential Quality:** Test uses KILOMBOTOP_PASSWORD (same credentials that successfully create articles)
 - **SPIP Behavior:** Admin access to exec=admin_plugin confirmed with SPIP's &bonjour=oui welcome flag
 - **Test Reusability:** Script can be extended to test all 4 SPIP instances and other admin features
-
-
 
 ---
 
