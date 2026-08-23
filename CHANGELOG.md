@@ -5,6 +5,53 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.42.8] — 2026-08-22
+
+### INVESTIGATION: SPIP Theme Management — Espacio Tierra y Libertad Section Presentation
+
+**Status:** ⚠️ Investigation Complete — Implementation Blocked on Missing Credentials
+
+Completed investigation into how to manage the Espacio Tierra y Libertad section presentation (tab labels, section headers) on the live SPIP backend at `www.kilombo.top`.
+
+**Key Findings:**
+
+1. **Labels are hardcoded, not configurable via SPIP admin**
+   - "Los últimos artículos" → Hardcoded in Escal theme template
+   - "Mapa del sitio" → Hardcoded in footer template
+   - "Curso Salud Holística..." → Editable (it's article #86 title)
+
+2. **Missing server credentials block implementation**
+   - Current `.env` credentials are for mirror deployment only (SFTP)
+   - Editing theme files requires YunoHost admin panel access OR SFTP/SSH to `/plugins/auto/escal/` 
+   - SSH port 22 currently blocked by firewall
+
+3. **Immediate workarounds available**
+   - Can edit article titles via SPIP admin web UI now
+   - Can check Escal plugin menu for built-in customization (untested)
+   - Can modify mirror site as alternative (creates divergence)
+
+**Next Steps:**
+
+Request from client/YunoHost admin:
+- YunoHost admin panel credentials, OR
+- SFTP-only access to theme files, OR
+- Confirmation to open SSH port 22
+
+**Documentation:**
+
+See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` (354 lines) for complete analysis including:
+- HTML inspection results showing where labels come from
+- Why SPIP web admin can't be used for this
+- Detailed credential requirements by solution approach
+- Phase 1/2/3 implementation roadmap (after credentials received)
+
+**Related Issues:**
+
+- See `TO_FIX.md` item #76 for tracking this investigation
+- See `docs/SPIP-ACCESS.md` for verified SPIP admin access details
+
+---
+
 ## [0.42.7] — 2026-08-22
 
 ### FIXED: Schema-Editor Documentation Mismatch — Critical for Automation
