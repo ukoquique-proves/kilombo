@@ -319,5 +319,101 @@ After deploy completes (GitHub Actions):
 
 ---
 
+## Session Log: Batch v0.42.5 (15 Articles, 2026-08-22)
+
+### Overview
+
+**15 newly converted articles** from `nuevos_articulos/` → editorial drafts → mirror publication
+
+**Source:** `/root/JOB-sda2/KILOMBO-SITE/KLIMBO-BUILD/articulos_en_trabajo/READY/`  
+**Location:** `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/articulos_en_trabajo/READY/` (after path correction)  
+**Status:** ✅ All 15 converted to JSON + validated + published
+
+### Batch Composition (15 articles by section)
+
+| # | File | Article ID | Title | Section | Language |
+|---|------|-----------|-------|---------|----------|
+| 1 | 01-eclipse-12-08-2026.json | `eclipse-12-agosto-2026` | El lado oscuro del eclipse del 12 de agosto | NOM | ES |
+| 2 | 02-beljanski.json | `caso-beljanski` | El caso Beljanski: una historia de investigación y controversia | NOM | ES |
+| 3 | 03-elisa-mato-a-ruth.json | `elisa-mato-a-ruth` | ELISA mató a Ruth: del sida a la COVID-19 | NOM | ES |
+| 4 | 04-salta.json | `seleccion-videos-canal-salta` | Una selección de los mejores videos del canal de Salta | GENERAL | ES |
+| 5 | 05-pensiones.json | `otra-gran-mentira-heredabilidad-pensiones` | Otra gran mentira: la heredabilidad de las pensiones reparatorias | TIERRA | ES |
+| 6 | 06-oms-france-soir.json | `seisme-oms-2400-postes` | Séisme à l'OMS : 2 400 postes supprimés et départs de cadres | ACTUALIDAD | FR |
+| 7 | 07-orden-del-caos.json | `orden-del-caos-ultimas-postales-sistema-fiat` | Orden del caos: últimas postales del sistema fiat | ACTUALIDAD | ES |
+| 8 | 08-cremas-solares.json | `cremas-solares-cambio-climatico` | ¿No es el cambio climático? La tesis de las cremas solares | NOM | ES |
+| 9 | 09-no-virus.json | `movimiento-no-virus-disonancia` | Movimiento NO virus: entre la disidencia y la disonancia | NOM | ES |
+| 10 | 10-nuevo-orden-mundial.json | `nuevo-orden-mundial-video` | El Nuevo Orden Mundial | NOM | ES |
+| 11 | 11-mensaje-control-multitudes.json | `control-multitudes-enfermedad` | La enfermedad como herramienta de control: una frase para el debate | NOM | ES |
+| 12 | 12-cola-de-zorro.json | `cola-de-zorro-leccion-plantas` | Cola de zorro: una lección que viene de las plantas | TIERRA | ES |
+| 13 | 13-israel.json | `critica-mohamad-safa-israel` | Mohamad Safa: una crítica contundente contra Israel | ACTUALIDAD | ES |
+| 14 | 14-fauci.json | `anthony-fauci-fusible-controlado` | Anthony Fauci: el fusible controlado | NOM | ES |
+| 15 | 15-onajpu.json | `memoria-verdad-justicia-bella-union` | Memoria, verdad y justicia: la lucha que continúa en Bella Unión | TIERRA | ES |
+
+### Section Distribution
+
+- **ACTUALIDAD:** 3 articles (40%, OMS/Fiat/Israel)
+- **TIERRA:** 3 articles (20%, Pensiones/Cola de Zorro/Bella Unión)
+- **NOM:** 8 articles (53%, Eclipse/Beljanski/ELISA/Solares/No-virus/NOM/Control/Fauci)
+- **GENERAL:** 1 article (7%, Salta videos)
+- **PI:** 0 articles (this batch)
+
+**Total:** 15 articles (56 after merge with existing 41 articles)
+
+### Publishing Strategy
+
+**Phase 1 (COMPLETED):** Bulk conversion to JSON format
+- All 15 articles converted from markdown → JSON with HTML content
+- All articles validated via `npm test` (0 errors, 157/157 tests passing)
+- All articles merged into `site/assets/content/articles.json`
+- Published to GitHub mirror: https://ukoquique-proves.github.io/kilombo/
+
+**Phase 2 (CURRENT - Testing):** Individual article publishing verification
+- Testing migration workflow with **"Cola de zorro"** (TIERRA section)
+- Purpose: Verify article structure, rendering, and link functionality on published mirror
+- After verification: document lessons learned for future batches
+
+**Phase 3 (PENDING):** Refine based on testing
+- If Cola de zorro renders correctly: proceed with standard publishing for remaining batches
+- If issues found: debug and document fixes in TROUBLESHOOTING.md
+
+### Articles Available for Publishing from This Batch
+
+**Not yet published as standalone:** All 15 are already merged into articles.json and deployed to the mirror. However, for the purposes of testing individual article publication workflow:
+
+**Tierra articles (good candidates for next release):**
+1. **Cola de zorro** (`cola-de-zorro-leccion-plantas`) — Test article
+2. **Pensiones** (`otra-gran-mentira-heredabilidad-pensiones`) — About pension heredability
+3. **Bella Unión** (`memoria-verdad-justicia-bella-union`) — Justice/memory work
+
+### Important Paths (Corrected)
+
+The workspace contains a systematic **KLIMBO vs KILOMBO typo** issue. Correct paths:
+
+- ❌ `/root/JOB-sda2/KILOMBO-SITE/KLIMBO-BUILD/` ← WRONG (typo in path)
+- ✅ `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/` ← CORRECT
+
+- ❌ `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/KLIMBO/` ← WRONG
+- ✅ `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/KILOMBO/` ← CORRECT
+
+**Mitigation:** Added `LOCAL_*` environment variables to `.env` to programmatically resolve these paths:
+```bash
+LOCAL_WORKSPACE_ROOT=/root/JOB-sda2/KILOMBO-SITE
+LOCAL_KILOMBO_BUILD=$LOCAL_WORKSPACE_ROOT/KILOMBO-BUILD
+LOCAL_KILOMBO_DIR=$LOCAL_KILOMBO_BUILD/KILOMBO
+LOCAL_ARTICLES_JSON=$LOCAL_KILOMBO_DIR/site/assets/content/articles.json
+LOCAL_ARTICULOS_READY=$LOCAL_KILOMBO_BUILD/articulos_en_trabajo/READY
+```
+
+All scripts now source `.env` and use `$LOCAL_*` variables instead of hardcoded paths.
+
+### Next Steps
+
+1. ✅ Test "Cola de zorro" rendering on published mirror
+2. ⏳ Verify section categorization (Tierra should display correctly)
+3. ⏳ Check image/media references (Cola de zorro uses botanical imagery)
+4. ⏳ Document findings in MIRROR_GROWING.md
+
+---
+
 **Last Updated:** 2026-08-22  
-**Version:** 1.0 (initial workflow definition)
+**Version:** 1.1 (added v0.42.5 batch log)

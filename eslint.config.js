@@ -21,7 +21,7 @@ const rules = {
 export default [
   js.configs.recommended,
   {
-    files: ['site/js/**/*.mjs'],
+    files: ['site/js/**/*.{js,mjs}'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

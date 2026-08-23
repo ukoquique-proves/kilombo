@@ -98,8 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Seed roving tabindex on load
   const initialActive =
-    tabs.find((t) => t.classList.contains('tab--active') && isEnabled(t)) ||
-    getEnabledTabs()[0];
+    tabs.find((t) => t.classList.contains('tab--active') && isEnabled(t)) || getEnabledTabs()[0];
   if (initialActive) updateRovingTabindex(initialActive);
 
   // ================================================================
@@ -115,8 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderGrid = (grid, videos) => {
     grid.innerHTML = '';
     if (videos.length === 0) {
-      grid.innerHTML =
-        '<p class="tab-footer"><em>Ningún vídeo coincide con este filtro.</em></p>';
+      grid.innerHTML = '<p class="tab-footer"><em>Ningún vídeo coincide con este filtro.</em></p>';
       return;
     }
     const fragment = document.createDocumentFragment();
@@ -175,4 +173,3 @@ document.addEventListener('DOMContentLoaded', () => {
   renderVideoCards('assets/data/plandemismo-actualidad.json', 'grid-actualidad', 'tags-actualidad');
   renderVideoCards('assets/data/plandemismo-sida-covid.json', 'grid-sida-covid', 'tags-sida-covid');
 });
-

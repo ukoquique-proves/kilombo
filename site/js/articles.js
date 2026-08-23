@@ -100,9 +100,10 @@ export function renderArticleCard(a) {
     el.dataset.statusPendingReview = 'true';
   }
 
-  const statusHtml = a.status === 'pending-review'
-    ? `<span class="article-card__status-badge article-card__status-badge--pending">⚠️ ${status}</span>`
-    : `<span>${status}</span>`;
+  const statusHtml =
+    a.status === 'pending-review'
+      ? `<span class="article-card__status-badge article-card__status-badge--pending">⚠️ ${status}</span>`
+      : `<span>${status}</span>`;
 
   el.innerHTML = `
       <div class="article-card__meta">
@@ -204,19 +205,22 @@ export function findRelatedArticles(current, all, limit = 3) {
   const currentTopics = new Set(current.topics || []);
   const explicitIds = new Set(explicit.map((a) => a.id));
 
-  const scored = currentTopics.size === 0 ? [] : all
-    .filter((a) => a.id !== current.id && !explicitIds.has(a.id))
-    .map((a) => {
-      const shared = (a.topics || []).filter((t) => currentTopics.has(t)).length;
-      return { article: a, shared };
-    })
-    .filter((x) => x.shared > 0)
-    .sort((x, y) => {
-      if (y.shared !== x.shared) return y.shared - x.shared;
-      // Most recent first; articles without a date sort last.
-      return (y.article.date || '').localeCompare(x.article.date || '');
-    })
-    .map((x) => x.article);
+  const scored =
+    currentTopics.size === 0
+      ? []
+      : all
+          .filter((a) => a.id !== current.id && !explicitIds.has(a.id))
+          .map((a) => {
+            const shared = (a.topics || []).filter((t) => currentTopics.has(t)).length;
+            return { article: a, shared };
+          })
+          .filter((x) => x.shared > 0)
+          .sort((x, y) => {
+            if (y.shared !== x.shared) return y.shared - x.shared;
+            // Most recent first; articles without a date sort last.
+            return (y.article.date || '').localeCompare(x.article.date || '');
+          })
+          .map((x) => x.article);
 
   return [...explicit, ...scored].slice(0, limit);
 }
@@ -291,12 +295,16 @@ function initReadingProgress() {
     ticking = false;
   };
 
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      window.requestAnimationFrame(update);
-      ticking = true;
-    }
-  }, { passive: true });
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!ticking) {
+        window.requestAnimationFrame(update);
+        ticking = true;
+      }
+    },
+    { passive: true }
+  );
   window.addEventListener('resize', update);
 
   update();
@@ -413,16 +421,17 @@ async function initDetailPage() {
 
     titleEl.textContent = a.title;
     document.title = `${a.title} — Kilombo`;
-    
+
     // Mark the page/body with a data attribute for pending-review styling
     if (a.status === 'pending-review') {
       document.body.dataset.articleStatusPendingReview = 'true';
     }
-    
-    const statusBadge = a.status === 'pending-review'
-      ? `<span class="article-detail__status-badge article-detail__status-badge--pending">⚠️ ${escapeHtml(a.status)}</span>`
-      : `<span>${escapeHtml(a.status)}</span>`;
-    
+
+    const statusBadge =
+      a.status === 'pending-review'
+        ? `<span class="article-detail__status-badge article-detail__status-badge--pending">⚠️ ${escapeHtml(a.status)}</span>`
+        : `<span>${escapeHtml(a.status)}</span>`;
+
     metaEl.innerHTML = `
       <span>${escapeHtml(a.date || '—')}</span>
       <span>${escapeHtml(sectionLabel(a.section))}</span>
@@ -436,7 +445,7 @@ async function initDetailPage() {
     // URLs javascript:/data:, conservando solo un allowlist de etiquetas
     // de formato (p, a, strong, em, listas, blockquote, img, ...).
     contentEl.innerHTML = '';
-    
+
     // If pending-review, prepend a visual banner before the content
     if (a.status === 'pending-review') {
       const banner = document.createElement('div');
@@ -450,26 +459,31 @@ async function initDetailPage() {
       `;
       contentEl.appendChild(banner);
     }
-    
+
     contentEl.appendChild(sanitizeHtml(a.contentHtml || ''));
 
     // Render metadata card if present (for movies, documentaries, etc.)
     if (a.metadata && (a.metadata.mediaType || a.metadata.director || a.metadata.year)) {
       const metaCard = document.createElement('div');
       metaCard.className = 'article-metadata-card';
-      
+
       const metaItems = [];
-      if (a.metadata.director) metaItems.push(`<strong>Director:</strong> ${escapeHtml(a.metadata.director)}`);
+      if (a.metadata.director)
+        metaItems.push(`<strong>Director:</strong> ${escapeHtml(a.metadata.director)}`);
       if (a.metadata.year) metaItems.push(`<strong>Año:</strong> ${escapeHtml(a.metadata.year)}`);
-      if (a.metadata.country) metaItems.push(`<strong>País:</strong> ${escapeHtml(a.metadata.country)}`);
-      if (a.metadata.duration) metaItems.push(`<strong>Duración:</strong> ${escapeHtml(a.metadata.duration)}`);
-      if (a.metadata.language) metaItems.push(`<strong>Idioma:</strong> ${escapeHtml(a.metadata.language)}`);
-      if (a.metadata.subtitles) metaItems.push(`<strong>Subtítulos:</strong> ${escapeHtml(a.metadata.subtitles)}`);
-      
+      if (a.metadata.country)
+        metaItems.push(`<strong>País:</strong> ${escapeHtml(a.metadata.country)}`);
+      if (a.metadata.duration)
+        metaItems.push(`<strong>Duración:</strong> ${escapeHtml(a.metadata.duration)}`);
+      if (a.metadata.language)
+        metaItems.push(`<strong>Idioma:</strong> ${escapeHtml(a.metadata.language)}`);
+      if (a.metadata.subtitles)
+        metaItems.push(`<strong>Subtítulos:</strong> ${escapeHtml(a.metadata.subtitles)}`);
+
       metaCard.innerHTML = `
         <div class="article-metadata-card__header">📽️ Ficha técnica</div>
         <div class="article-metadata-card__body">
-          ${metaItems.map(item => `<div class="article-metadata-card__item">${item}</div>`).join('')}
+          ${metaItems.map((item) => `<div class="article-metadata-card__item">${item}</div>`).join('')}
         </div>
       `;
       contentEl.appendChild(metaCard);
@@ -479,18 +493,20 @@ async function initDetailPage() {
     if (a.externalLinks && a.externalLinks.length > 0) {
       const linksCard = document.createElement('div');
       linksCard.className = 'article-external-links-card';
-      
-      const linkItems = a.externalLinks.map(link => {
-        const safeUrl = escapeHtml(safeHref(link.url));
-        const unsafe = !isSafeUrl(link.url);
-        return `
+
+      const linkItems = a.externalLinks
+        .map((link) => {
+          const safeUrl = escapeHtml(safeHref(link.url));
+          const unsafe = !isSafeUrl(link.url);
+          return `
           <a href="${safeUrl}" class="article-external-links-card__link" target="_blank" rel="noopener noreferrer"${unsafe ? ' data-unsafe-url-blocked="true"' : ''}>
             <span class="article-external-links-card__type">${escapeHtml(link.type)}</span>
             <span class="article-external-links-card__title">${escapeHtml(link.title || link.url)}</span>
           </a>
         `;
-      }).join('');
-      
+        })
+        .join('');
+
       linksCard.innerHTML = `
         <div class="article-external-links-card__header">🔗 Enlaces externos</div>
         <div class="article-external-links-card__body">
@@ -535,4 +551,3 @@ if (typeof document !== 'undefined') {
     if (page === 'articulo') initDetailPage();
   });
 }
-

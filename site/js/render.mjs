@@ -30,7 +30,7 @@ import { isSafeUrl } from './shared/url-safety.mjs';
 export const escapeHtml = (s) =>
   String(s === null || s === undefined ? '' : s).replace(
     /[&<>"']/g,
-    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c)
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] || c
   );
 
 // ================================================================
@@ -44,8 +44,24 @@ export const escapeHtml = (s) =>
  * inside an unknown wrapper tag is not silently lost.
  */
 const SANITIZE_ALLOWED_TAGS = new Set([
-  'P', 'A', 'STRONG', 'EM', 'B', 'I', 'UL', 'OL', 'LI',
-  'BLOCKQUOTE', 'H3', 'H4', 'BR', 'IMG', 'SPAN', 'FIGURE', 'FIGCAPTION', 'HR',
+  'P',
+  'A',
+  'STRONG',
+  'EM',
+  'B',
+  'I',
+  'UL',
+  'OL',
+  'LI',
+  'BLOCKQUOTE',
+  'H3',
+  'H4',
+  'BR',
+  'IMG',
+  'SPAN',
+  'FIGURE',
+  'FIGCAPTION',
+  'HR',
 ]);
 
 /** @type {Record<string, string[]>} */
@@ -60,7 +76,16 @@ const SANITIZE_ALLOWED_ATTRS = {
  * unlike other disallowed tags which are unwrapped but keep their text.
  */
 const SANITIZE_DROP_ENTIRELY = new Set([
-  'SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'META', 'NOSCRIPT', 'TEMPLATE', 'SVG',
+  'SCRIPT',
+  'STYLE',
+  'IFRAME',
+  'OBJECT',
+  'EMBED',
+  'LINK',
+  'META',
+  'NOSCRIPT',
+  'TEMPLATE',
+  'SVG',
 ]);
 
 /**
@@ -214,15 +239,9 @@ export const renderCard = (v) => {
     : 'video-card__thumb video-card__thumb--placeholder';
   const playClass = isFeatured ? 'play-icon play-icon--big' : 'play-icon';
   const codeClass = isFeatured ? 'thumb-code thumb-code--big' : 'thumb-code';
-  const codeLabel = v.idAlt
-    ? `${escapeHtml(v.id)} · ${escapeHtml(v.idAlt)}`
-    : escapeHtml(v.id);
-  const titleClass = isFeatured
-    ? 'video-card__title video-card__title--big'
-    : 'video-card__title';
-  const ctaClass = isFeatured
-    ? 'video-card__cta video-card__cta--big'
-    : 'video-card__cta';
+  const codeLabel = v.idAlt ? `${escapeHtml(v.id)} · ${escapeHtml(v.idAlt)}` : escapeHtml(v.id);
+  const titleClass = isFeatured ? 'video-card__title video-card__title--big' : 'video-card__title';
+  const ctaClass = isFeatured ? 'video-card__cta video-card__cta--big' : 'video-card__cta';
   const cornerHtml = v.cornerLabel
     ? `<span class="thumb-corner">${escapeHtml(v.cornerLabel)}</span>`
     : '';
@@ -327,4 +346,3 @@ export const filterVideosByTag = (videos, tag) => {
   if (!tag) return videos;
   return videos.filter((v) => (v.tags || []).includes(tag));
 };
-

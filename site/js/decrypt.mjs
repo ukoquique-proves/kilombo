@@ -39,17 +39,13 @@ export function fromHex(hex) {
  */
 export async function aesDecrypt(ciphertext, hashedPassword) {
   const HMAC_HEX_LEN = 64; // HMAC-SHA256 = 32 bytes = 64 hex chars (prepended by staticrypt's encode())
-  const IV_HEX_LEN   = 32; // AES-CBC IV = 16 bytes = 32 hex chars
-  const iv   = fromHex(ciphertext.slice(HMAC_HEX_LEN, HMAC_HEX_LEN + IV_HEX_LEN));
+  const IV_HEX_LEN = 32; // AES-CBC IV = 16 bytes = 32 hex chars
+  const iv = fromHex(ciphertext.slice(HMAC_HEX_LEN, HMAC_HEX_LEN + IV_HEX_LEN));
   const data = fromHex(ciphertext.slice(HMAC_HEX_LEN + IV_HEX_LEN));
 
-  const key = await crypto.subtle.importKey(
-    'raw',
-    fromHex(hashedPassword),
-    'AES-CBC',
-    false,
-    ['decrypt']
-  );
+  const key = await crypto.subtle.importKey('raw', fromHex(hashedPassword), 'AES-CBC', false, [
+    'decrypt',
+  ]);
 
   const plainBuf = await crypto.subtle.decrypt({ name: 'AES-CBC', iv }, key, data);
   return new TextDecoder().decode(plainBuf);
@@ -82,7 +78,7 @@ export async function parseJson(jsonText) {
   if (!hashedPassword) {
     throw new Error(
       'El contenido está cifrado y no se encontró la contraseña en la sesión. ' +
-      'Recarga la página e introduce la contraseña de acceso.'
+        'Recarga la página e introduce la contraseña de acceso.'
     );
   }
 
@@ -91,9 +87,7 @@ export async function parseJson(jsonText) {
   try {
     plaintext = await aesDecrypt(parsed.ciphertext, hashedPassword);
   } catch {
-    throw new Error(
-      'Error al descifrar los datos. La contraseña almacenada puede ser incorrecta.'
-    );
+    throw new Error('Error al descifrar los datos. La contraseña almacenada puede ser incorrecta.');
   }
 
   return JSON.parse(plaintext);
