@@ -81,14 +81,20 @@ Create `IN_PROGRESS/[article-slug].json`:
   "title": "Capitalized Title",
   "date": "YYYY-MM-DD",
   "section": "tierra|gci|pi|nom|general",
-  "language": "ES|FR|EN",
   "topics": ["tag1", "tag2", "tag3", "tag4"],
   "sourceSite": "Source Name",
   "sourceUrl": "https://example.com/article",
   "status": "adapted",
-  "author": "Author Name (optional)",
   "contentHtml": "<h3>Section</h3><p>Content here...</p>",
   "notes": "Editorial notes explaining any changes made"
+}
+```
+
+**Optional fields** (for future features — metadata not yet rendered in UI):
+```json
+{
+  "language": "ES|FR|EN",
+  "author": "Author Name"
 }
 ```
 
@@ -103,17 +109,19 @@ Before moving to validation, verify:
 [ ] title: clear, descriptive, < 80 chars
 [ ] date: YYYY-MM-DD or empty
 [ ] section: one of [tierra|gci|pi|nom|general]
-[ ] language: ES|FR|EN (single language only)
 [ ] topics: 3-5 lowercase specific tags
 [ ] sourceSite: human-readable name
-[ ] sourceUrl: full URL or empty string
+[ ] sourceUrl: full URL (https://...) or "#" if no source
 [ ] status: adapted (or pending-review)
-[ ] author: name if different from sourceSite (or omit)
 [ ] contentHtml: only allowed tags, no style/script/events
 [ ] contentHtml: all images have alt text
 [ ] contentHtml: all external links functional
 [ ] notes: explains editorial decisions made
+[ ] language: (optional) ES|FR|EN if desired
+[ ] author: (optional) name if different from sourceSite
 ```
+
+**Note:** `language` and `author` are optional fields reserved for future UI features. Currently not rendered. If you include them, they'll be preserved in the data; if omitted, validation will pass.
 
 ## Phase 2: Validation (Automated)
 

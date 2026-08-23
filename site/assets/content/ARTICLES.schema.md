@@ -20,6 +20,10 @@ interface Article {
   // OPTIONAL INTERNAL FIELDS
   notes?: string;       // Editor notes (e.g., "PENDIENTE: agregar datos")
   _lastDewrapped?: string; // ISO timestamp of last hard-break reflow (audit trail)
+  
+  // OPTIONAL METADATA FOR FUTURE USE
+  language?: string;    // Source language: "ES" | "FR" | "EN" (for multilingual features)
+  author?: string;      // Author/creator name (when different from sourceSite)
 
   // OPTIONAL MEDIA FIELDS (movies, documentaries, videos)
   externalLinks?: ExternalLink[];
@@ -57,7 +61,9 @@ interface ArticleMetadata {
 | `date` | Optional in the validator for every article; if present it must be a valid ISO date in `YYYY-MM-DD` format. |
 | `externalLinks` | Optional; present on media/complete articles, omitted on text-only imports |
 | `metadata` | Optional; typically paired with `externalLinks` |
-| `sourceUrl` | Required, must be absolute HTTP(S) URL, unique per article |
+| `sourceUrl` | Required, must be absolute HTTP(S) URL or `#` (if source unknown), unique per article |
+| `language` | Optional; one of: "ES" &#124; "FR" &#124; "EN" — used for future multilingual filtering |
+| `author` | Optional; author/creator name. If present, not currently rendered in UI (reserved for future use). Use embedded blockquote in `contentHtml` for visible author attribution. |
 
 ## Examples
 

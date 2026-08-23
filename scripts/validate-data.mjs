@@ -307,6 +307,23 @@ const ARTICLE_RULES = [
 /** @type {FieldRule[]} */
 const ARTICLE_OPTIONAL_RULES = [
   {
+    name: 'language',
+    type: 'string',
+    required: false,
+    validate: (v) => {
+      const valid = ['ES', 'FR', 'EN'];
+      return valid.includes(String(v).toUpperCase())
+        ? null
+        : `language must be one of: ${valid.join(', ')} (got "${v}")`;
+    },
+  },
+  {
+    name: 'author',
+    type: 'string',
+    required: false,
+    validate: (v) => (String(v).trim() ? null : 'author must be non-empty if present'),
+  },
+  {
     name: 'relatedArticles',
     type: 'array',
     required: false,
