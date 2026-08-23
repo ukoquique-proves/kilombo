@@ -646,6 +646,45 @@ if (existsSync(CONTENT_DIR)) {
   }
 }
 
+// ================================================================
+// sourceUrl uniqueness (global, across all files) — ARTICLES.schema.md
+// documents sourceUrl as "unique per article" to ensure each source is
+// attributed to exactly one article. A duplicate sourceUrl suggests either:
+// 1. Editorial error (same article imported twice)
+// 2. Intentional re-import without updating sourceUrl
+// 3. Multiple articles from same source (should use different URLs if possible)
+// This CI-time safety net catches duplicates before deploy.
+// ================================================================
+let sourceUrlUniquenessErrors = 0;
+const seenSourceUrls = new Map(); // sourceUrl -> { file, index }
+if (existsSync(CONTENT_DIR)) {
+  for (const file of readdirSync(CONTENT_DIR).filter((f) => f.endsWith('.json'))) {
+    let data;
+    try {
+      data = JSON.parse(readFileSync(join(CONTENT_DIR, file), 'utf8'));
+    } catch {
+      continue; // already reported as a JSON parse error above
+    }
+    if (!Array.isArray(data)) continue;
+    for (let i = 0; i < data.length; i++) {
+      const entry = data[i];
+      if (typeof entry !== 'object' || entry === null || typeof entry.sourceUrl !== 'string') continue;
+      const url = entry.sourceUrl;
+      if (seenSourceUrls.has(url)) {
+        const first = seenSourceUrls.get(url);
+        console.error(
+          `❌  content/${file}[${i}].sourceUrl: duplicate sourceUrl "${url}" ` +
+            `(first seen in ${first.file}[${first.index}]) — sourceUrls must be unique, ` +
+            `see ARTICLES.schema.md`
+        );
+        sourceUrlUniquenessErrors++;
+      } else {
+        seenSourceUrls.set(url, { file, index: i });
+      }
+    }
+  }
+}
+
 // Hard-wrap warning pass (TO_FIX #48) — separate from scanDir/validateEntry
 // on purpose: this must never affect totalErrors/exit code, so it reads the
 // content files independently rather than piggybacking on the pass/fail
@@ -670,7 +709,7 @@ if (hardWrapWarnings > 0) {
 }
 
 const totalEntries = videoScan.entries + contentScan.entries;
-const totalErrors = videoScan.errors + contentScan.errors + idUniquenessErrors;
+const totalErrors = videoScan.errors + contentScan.errors + idUniquenessErrors + sourceUrlUniquenessErrors;
 const totalFiles = videoScan.files + contentScan.files;
 
 if (totalFiles === 0) {
