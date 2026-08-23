@@ -6,6 +6,23 @@ Portal central de acceso a la red de sitios de Kilombo. Construido como página 
 
 ---
 
+## 📚 Publishing: Start Here
+
+**New to Kilombo?** Or need to publish an article?
+
+→ **Read [`PUBLISHING-GUIDE.md`](PUBLISHING-GUIDE.md)** — Master guide explaining:
+- How the two publishing systems work (SPIP backend vs. Mirror)
+- Which one to use for your task
+- Step-by-step workflows with actual commands
+- When to use each system
+
+**Quick reference:**
+- **Publish to SPIP** (live immediately): Use `node sandbox/create-article.mjs --create --title "..." --body "..."`
+- **Publish to mirror** (versioned, staged): Use `docs/ARTICLE-PUBLISHING-WORKFLOW.md`
+- **Publish to both**: Use `PUBLISHING-GUIDE.md` Workflow C
+
+---
+
 ## Sobre el contenido y las fuentes
 
 **Kilombo no funciona solo.** El portal integra y enlaza materiales producidos por una **red de espacios amigos y aliados políticos** con los que compartimos línea y objetivos de difusión revolucionaria internacionalista.
