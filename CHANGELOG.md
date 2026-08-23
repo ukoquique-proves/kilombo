@@ -7,48 +7,73 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [0.42.8] — 2026-08-22
 
-### INVESTIGATION: SPIP Theme Management — Espacio Tierra y Libertad Section Presentation
+### INVESTIGATION: SPIP Theme Management — Espacio Tierra y Libertad Section Presentation — CORRECTED
 
-**Status:** ⚠️ Investigation Complete — Implementation Blocked on Missing Credentials
+**Status:** ✅ Investigation CORRECTED — Solution Available, Not Blocked
 
-Completed investigation into how to manage the Espacio Tierra y Libertad section presentation (tab labels, section headers) on the live SPIP backend at `www.kilombo.top`.
+Investigation into how to manage the Espacio Tierra y Libertad section presentation revealed an initial incorrect conclusion that was then corrected by further research.
 
-**Key Findings:**
+**Original (Incorrect) Finding:**
+- Labels hardcoded in Escal theme templates
+- Unreachable without SSH/SFTP server access
+- Would require additional credentials
 
-1. **Labels are hardcoded, not configurable via SPIP admin**
-   - "Los últimos artículos" → Hardcoded in Escal theme template
-   - "Mapa del sitio" → Hardcoded in footer template
-   - "Curso Salud Holística..." → Editable (it's article #86 title)
+**Corrected Finding:**
+- Labels **ARE configurable** via Escal plugin's web-based configuration menu
+- Accessible through SPIP admin interface (`exec=configurer_escal`)
+- No additional credentials needed beyond existing SPIP admin login
+- Automation script already exists (`scripts/customize-escal-theme.mjs`)
+- Documented in `docs/THEME-CUSTOMIZATION.md`
 
-2. **Missing server credentials block implementation**
-   - Current `.env` credentials are for mirror deployment only (SFTP)
-   - Editing theme files requires YunoHost admin panel access OR SFTP/SSH to `/plugins/auto/escal/` 
-   - SSH port 22 currently blocked by firewall
+**What Changed:**
 
-3. **Immediate workarounds available**
-   - Can edit article titles via SPIP admin web UI now
-   - Can check Escal plugin menu for built-in customization (untested)
-   - Can modify mirror site as alternative (creates divergence)
+1. **HTML Analysis (Initial)**
+   - Inspected live page HTML
+   - Found "Los últimos artículos", "Mapa del sitio" text in templates
+   - Incorrectly concluded these were hardcoded
 
-**Next Steps:**
+2. **Corrective Research (Your Investigation)**
+   - Performed programmatic scrape of SPIP admin panel HTML
+   - Discovered `exec=configurer_escal` menu item
+   - Found customization/translation UI for theme labels
+   - Proved labels ARE configurable via web interface
 
-Request from client/YunoHost admin:
-- YunoHost admin panel credentials, OR
-- SFTP-only access to theme files, OR
-- Confirmation to open SSH port 22
+3. **Documentation Updates**
+   - Updated `SPIP-THEME-MANAGEMENT-FINDINGS.md` with correct analysis
+   - Added reference to `scripts/customize-escal-theme.mjs` automation
+   - Added reference to `docs/THEME-CUSTOMIZATION.md` guide
+   - Documented why initial conclusion was wrong
 
-**Documentation:**
+**Key Insight:**
 
-See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` (354 lines) for complete analysis including:
-- HTML inspection results showing where labels come from
-- Why SPIP web admin can't be used for this
-- Detailed credential requirements by solution approach
-- Phase 1/2/3 implementation roadmap (after credentials received)
+When HTML inspection suggests hardcoded text, it's worth checking for a corresponding admin UI, configuration panel, or plugin layer that might expose customization for those same elements. Escal demonstrates this: UI labels appear as literal text in templates but are overrideable through the plugin configuration system.
 
-**Related Issues:**
+**How to Use:**
 
-- See `TO_FIX.md` item #76 for tracking this investigation
-- See `docs/SPIP-ACCESS.md` for verified SPIP admin access details
+**Manual (via Web UI):**
+1. Login to SPIP admin: `https://www.kilombo.top/ecrire/`
+2. Click "Escal" → "Configuration"
+3. Find widget label customization section
+4. Modify labels (Los últimos artículos, Mapa del sitio, etc.)
+5. Save
+6. Changes appear immediately on public site
+
+**Automated (via Script):**
+```bash
+node scripts/customize-escal-theme.mjs --change "Los últimos artículos" --to "Your Custom Label"
+```
+See `docs/THEME-CUSTOMIZATION.md` for full options.
+
+**Implementation Status:**
+- ✅ Solution identified and documented
+- ✅ Automation script exists and ready to use
+- ✅ No additional credentials or server access needed
+- ✅ Ready for immediate implementation
+
+**Related Documentation:**
+- See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` (corrected analysis)
+- See `docs/THEME-CUSTOMIZATION.md` (automation guide)
+- See `TO_FIX.md` item #76 (tracking status)
 
 ---
 

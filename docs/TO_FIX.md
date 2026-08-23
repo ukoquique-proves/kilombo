@@ -88,27 +88,19 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🔴 Acción pendiente urgente
 
-- [ ] **76. SPIP Theme Management — Espacio Tierra y Libertad section presentation (v0.42.8)**
-  - **Problem:** Requested to customize section presentation labels ("Los últimos artículos", "Mapa del sitio") on Espacio Tierra y Libertad section at `https://www.kilombo.top/`.
-  - **Discovery (Investigation Complete):** See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` for full analysis.
-  - **Key Finding:** These labels are **hardcoded in Escal theme template files**, not configurable through the SPIP web admin panel.
-    - `"Los últimos artículos"` → hardcoded in `plugins/auto/escal/v5.2.9/skeletos/...` template
-    - `"Mapa del sitio"` → hardcoded in footer template
-    - `"Curso Salud Holística..."` → editable (it's article #86 title)
-  - **Blocker:** No server-level credentials in `.env` for editing template files
-    - Current credentials (`KILOMBOTOP_*`) are for **mirror deployment only** (SFTP)
-    - Need **YunoHost admin panel** credentials OR **SFTP access** to `/plugins/auto/escal/` OR **SSH port 22 access** to edit theme files
-    - SSH port 22 noted as "firewall blocked" in existing documentation
-  - **Solution Options (Ranked):**
-    1. ✅ **Partial (Now):** Edit article titles via SPIP admin → Artículos (e.g., article #86 title)
-    2. ⚠️ **Needs Credentials:** Contact client/YunoHost admin for additional access (YunoHost panel credentials or SFTP/SSH to theme files)
-    3. 🟡 **Alternative:** Modify mirror site (`site/index.html`) instead of live SPIP (creates divergence but doable now)
-    4. 🟡 **Uncertain:** Check Escal plugin menu in SPIP admin for built-in customization options
-  - **Next Action:** Request client provide:
-    - YunoHost admin credentials, OR
-    - SFTP-only access to `www.kilombo.top/plugins/auto/escal/`, OR
-    - Confirmation that opening SSH port 22 is possible
-  - **Status:** Investigation complete (docs complete), awaiting credentials or client decision
+- [ ] **76. SPIP Theme Management — Espacio Tierra y Libertad section presentation (v0.42.8) — CORRECTED**
+  - **Status Update:** ✅ **Solution FOUND — NOT BLOCKED** (Previous analysis was incorrect)
+  - **Original Problem:** Requested to customize section presentation labels ("Los últimos artículos", "Mapa del sitio") on Espacio Tierra y Libertad section at `https://www.kilombo.top/`.
+  - **Previous (Incorrect) Finding:** Labels hardcoded in Escal templates, unreachable without server file access
+  - **Corrected Finding:** Labels ARE configurable via **Escal plugin configuration menu** (`exec=configurer_escal`) accessible through SPIP admin web UI
+  - **Key Discovery:** Programmatic scrape of admin panel discovered Escal config menu with customization/translation options
+  - **Solution:** 
+    1. ✅ **Manual:** Go to SPIP admin → Escal → Configuration → find widget/label customization section
+    2. ✅ **Automated:** Use script `scripts/customize-escal-theme.mjs` (already exists)
+    3. ✅ See `docs/THEME-CUSTOMIZATION.md` for full automation guide
+  - **Credentials needed:** NONE additional (only existing SPIP admin login, which already works)
+  - **Status:** Ready to implement — no blockers
+  - **Related:** See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` for corrected analysis
 
 - [x] **67. Docs desincronizados sobre el acceso al backend SPIP (`/ecrire/`) — RESUELTO (v0.42.0)**
   - **La contradicción:** README.md, TROUBLESHOOTING.md, SITE_ANALYSIS.md afirmaban ❌ "kilombo NO es admin SPIP". `docs/SPIP-ACCESS.md` (anterior `DEPLOYMENT-AND-SOURCE-EDITING.md`) afirmaba ✅ "acceso SPIP funciona".
