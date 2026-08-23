@@ -111,6 +111,14 @@
 ```bash
 cd $LOCAL_KILOMBO_DIR
 
+# Step 1: Preview WITHOUT creating article
+node sandbox/create-article.mjs \
+  --create \
+  --title "Your Article Title" \
+  --body "<p>Article content here</p>" \
+  --dry-run
+
+# Step 2: If preview looks good, run WITHOUT --dry-run to actually create
 node sandbox/create-article.mjs \
   --create \
   --title "Your Article Title" \
@@ -120,9 +128,20 @@ node sandbox/create-article.mjs \
 **Parameters:**
 - `--title` — Article title (required)
 - `--body` — Article body as HTML (required, use `<p>`, `<strong>`, `<em>`, `<blockquote>`, `<h3>`, etc.)
-- `--dry-run` — Preview without creating (optional)
+- `--section` — Section/rubrique ID (optional, defaults to 1)
+- `--dry-run` — Preview form without any writes (optional)
 
-**Result:**
+**Important: `--dry-run` Behavior**
+
+When you use `--dry-run`, the script:
+- ✅ Fills in the form fields
+- ✅ Takes a screenshot for review
+- ❌ **BLOCKS all autosave requests** (network layer)
+- ❌ **DOES NOT create article** in SPIP database
+
+This prevents the accidental duplicate-article bug (see issue #89/#88). Safe to run multiple times.
+
+**Result (without --dry-run):**
 - Article created with auto-assigned ID
 - Status: `prepa` (Draft) — visible in admin only
 - To publish publicly: Change status to `publie` in SPIP admin or use:
@@ -295,7 +314,37 @@ cd $LOCAL_KILOMBO_DIR
 
 ---
 
-## Key Scripts Reference
+## **Important Fix: The `--dry-run` Bug (Now Resolved)**
+
+### What was the problem?
+
+Previously, the script allowed article creation during `--dry-run`, leading to duplicate articles in SPIP. 
+
+**Example:** Running the same command twice with `--dry-run` on the second run would:
+1. First run: Fill form, autosave fires → Article #88 created
+2. Second run (with `--dry-run`): Same thing → Article #89 created (duplicate)
+
+This happened because SPIP's backend autosaves on field blur (not on a single save button), so filling the form itself triggers database writes.
+
+### How is it fixed now?
+
+**Version 360396e (Aug 22, 2026):** Added network-level blocking:
+
+When you use `--dry-run`, the script now:
+- ✅ Fills the form fields (so you can see the result)
+- ✅ Takes a screenshot for preview
+- ❌ **Blocks all POST requests** at the network layer (prevents autosave)
+- ❌ **Guarantees no database writes** (technically safe to run multiple times)
+
+**You can now safely use `--dry-run` to preview without any side effects.**
+
+### Why does this matter for publishing?
+
+This prevents the workflow from creating unwanted duplicate articles during testing or if you need to re-run a command. It makes the publishing process more reliable and less error-prone.
+
+---
+
+
 
 ### Publishing Scripts
 
