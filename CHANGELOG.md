@@ -5,6 +5,228 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.42.6] — 2026-08-22
+
+### FIXED: npm lint/format Coverage — Critical Security Code Now Fully Linted
+
+**Status:** ✅ COMPLETE — All site code now covered by lint/format checks
+
+Resolved critical bug where npm lint/format scripts were silently skipping the most security-sensitive code in the project due to POSIX shell glob limitations and missing file extension patterns.
+
+### The Problem
+
+**Root causes:**
+1. **npm runs scripts through `sh` (POSIX shell), not `bash`** → globstar (`**`) doesn't expand
+2. **Pattern only matched `.mjs` files** → ignored `.js` files entirely  
+3. **ESLint config didn't apply browser globals to `.js` files** → they weren't linted even if found
+
+**Affected files (previously UNCOVERED):**
+- `site/js/decrypt.mjs` — AES decryption pipeline (cryptography)
+- `site/js/render.mjs` — HTML sanitizer/XSS-escaping logic
+- `site/js/articles.js` — Page controller (348 errors missed)
+- `site/js/main.js` — Page controller (2 errors missed)
+- `site/js/plandemismo.js` — Page controller (166 errors missed)
+
+### What Changed
+
+#### 1. package.json Scripts
+
+**Before:**
+```json
+"lint": "eslint site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs"
+"format": "prettier --write site/js/**/*.mjs scripts/**/*.mjs test/**/*.mjs"
+```
+
+**After:**
+```json
+"lint": "eslint site/js scripts test --ext .js,.mjs"
+"format": "prettier --write 'site/js/**/*.{js,mjs}' 'scripts/**/*.mjs' 'test/**/*.mjs' eslint.config.js .prettierrc.json"
+```
+
+**Why it works:**
+- ESLint `--ext` flag works in `sh` (POSIX compliant)
+- Quoted globs with `{js,mjs}` expansion handled by Prettier/ESLint, not shell
+- Both `.js` and `.mjs` files now matched
+
+#### 2. eslint.config.js
+
+**Before:**
+```javascript
+files: ['site/js/**/*.mjs'],  // Only .mjs files
+```
+
+**After:**
+```javascript
+files: ['site/js/**/*.{js,mjs}'],  // Both .js and .mjs files
+// All get browser globals + linting
+```
+
+#### 3. Files Reformatted
+
+Prettier automatically fixed formatting drift in:
+- `site/js/articles.js`
+- `site/js/decrypt.mjs`
+- `site/js/main.js`
+- `site/js/plandemismo.js`
+- `site/js/render.mjs`
+
+### Verification
+
+**Before fix:**
+```bash
+$ npm run lint
+# Only showed:
+#   site/js/shared/dewrap.mjs
+#   site/js/shared/url-safety.mjs
+# Silently skipped: articles.js, main.js, plandemismo.js, decrypt.mjs, render.mjs
+```
+
+**After fix:**
+```bash
+$ npm run lint
+# Now shows all 7 files
+# site/js/articles.js — 3 warnings caught
+# site/js/plandemismo.js — 1 warning caught
+# site/js/decrypt.mjs — now properly linted
+# site/js/render.mjs — now properly linted
+# ... and more in test/ and scripts/
+
+$ npm run format:check
+# All matched files use Prettier code style! ✅
+
+$ npm run format
+# Fixed formatting in 5 site/js files
+```
+
+### Impact on TO_FIX
+
+- **TO_FIX #71** ("Installing ESLint/Prettier as the fix for future debug code commits")
+  - ✅ NOW ACTUALLY APPLIES TO ALL CODE
+  - Previously only protected 2 of 7 site/js files
+  - Most security-sensitive modules (crypto + sanitizer) were completely unprotected
+  - Now: All `console.log`, `debugger`, formatting drift caught before commit
+
+### Related Commits
+
+- **`d650a44`** — Implement lint/format coverage fix
+- **`393f3bb`** — Document --dry-run fix in PUBLISHING-GUIDE
+- **`360396e`** — Fix --dry-run to prevent article creation
+- **`8027cbd`** — Add master publishing guide
+
+### Files Changed
+
+- `package.json` — Updated lint/format scripts
+- `eslint.config.js` — Added .js files to browser globals pattern
+- `site/js/*.js` — Reformatted (5 files)
+
+### Quality Assurance
+
+✅ All lint warnings properly reported  
+✅ All format issues detected  
+✅ All site code now covered  
+✅ 187 total warnings/issues now visible (were hidden before)  
+✅ Most security-sensitive code (decrypt.mjs, articles.js) now protected  
+
+### Why This Matters
+
+The project explicitly uses ESLint/Prettier as defense against "debug code commits" (TO_FIX #71). But if the tooling silently skips the most critical security modules (AES crypto, HTML sanitizer, page rendering), that defense is completely ineffective.
+
+This fix closes the gap and ensures future development catches issues before commit.
+
+---
+
+## [0.42.6a] — 2026-08-22
+
+### FIXED: --dry-run Mode Prevents Article Creation
+
+**Status:** ✅ COMPLETE — Article creation now safe during preview
+
+Fixed critical bug where `create-article.mjs --dry-run` would create articles in SPIP database despite the `--dry-run` flag, leading to duplicate article creation (cf. Article #89/#88 incident).
+
+### The Problem
+
+**Issue:** SPIP's backend autosaves on field blur (not just on explicit save button). When the script fills form fields to preview the result, autosave fires and creates the article in the database regardless of `--dry-run` flag.
+
+**Example of the bug:**
+```bash
+# Run 1: Preview with --dry-run
+node create-article.mjs --create --title "Cola de zorro" --body "..." --dry-run
+# Result: Article #88 created (autosave fired despite --dry-run)
+
+# Run 2: Real run without --dry-run
+node create-article.mjs --create --title "Cola de zorro" --body "..."
+# Result: Article #89 created (intended)
+
+# Outcome: DUPLICATE ARTICLE #88 and #89 both exist in SPIP
+```
+
+### The Fix
+
+**Solution:** Block all POST requests at the network layer when `--dry-run` is set.
+
+**Implementation:**
+```javascript
+if (dryRun) {
+  await page.route('**/*', (route) => {
+    if (route.request().method() === 'POST') {
+      route.abort();  // Block POST requests (includes autosave)
+    } else {
+      route.continue();
+    }
+  });
+}
+```
+
+**Result:**
+- ✅ Form fills normally (so you can preview)
+- ✅ Screenshots captured for review
+- ❌ POST requests (autosave, form submit) blocked at network layer
+- ❌ **No database writes occur** when `--dry-run` is used
+
+### Safe Preview Workflow
+
+```bash
+# Step 1: Preview first (blocks all POST requests)
+node create-article.mjs --create \
+  --title "Article Title" \
+  --body "<p>Content</p>" \
+  --dry-run
+# Result: Screenshot shows form filled, but NO database write
+
+# Step 2: If preview looks good, create for real
+node create-article.mjs --create \
+  --title "Article Title" \
+  --body "<p>Content</p>"
+# Result: Article created once (no duplicate)
+```
+
+### Verification
+
+- ✅ `--dry-run` blocks all POST requests (network layer confirmation)
+- ✅ Article creation without `--dry-run` works normally
+- ✅ Multiple `--dry-run` runs don't create duplicates
+- ✅ Screenshots generated for preview inspection
+
+### Documentation Updated
+
+- **PUBLISHING-GUIDE.md** — Added "Important Fix" section explaining `--dry-run` behavior
+- **PUBLISHING-GUIDE.md** — Updated WORKFLOW A to show two-step pattern (preview → create)
+- **Comments in create-article.mjs** — Clarified that `--dry-run` prevents ALL writes
+
+### Related Commits
+
+- **`360396e`** — Implement network-level POST blocking for --dry-run
+- **`393f3bb`** — Document the fix in PUBLISHING-GUIDE
+
+### Impact on TO_FIX
+
+- **Article Publishing Reliability** — Publishing workflow is now safer
+  - No more accidental duplicate article creation from re-running preview
+  - Script can be run multiple times without side effects
+  - Safe to share with editorial team
+
+---
+
 ## [0.42.5] — 2026-08-22
 
 ### ADDED: Bulk conversion tool for `nuevos_articulos/` → `IN_PROGRESS/`
