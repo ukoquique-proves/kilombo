@@ -333,7 +333,7 @@ After deploy completes (GitHub Actions):
 
 **15 newly converted articles** from `nuevos_articulos/` → editorial drafts → mirror publication
 
-**Source:** `/root/JOB-sda2/KILOMBO-SITE/KLIMBO-BUILD/articulos_en_trabajo/READY/`  
+**Source:** `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/articulos_en_trabajo/READY/`  
 **Location:** `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/articulos_en_trabajo/READY/` (after path correction)  
 **Status:** ✅ All 15 converted to JSON + validated + published
 
@@ -400,7 +400,7 @@ The workspace contains a systematic **KLIMBO vs KILOMBO typo** issue. Correct pa
 - ❌ `/root/JOB-sda2/KILOMBO-SITE/KLIMBO-BUILD/` ← WRONG (typo in path)
 - ✅ `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/` ← CORRECT
 
-- ❌ `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/KLIMBO/` ← WRONG
+- ❌ `/root/JOB-sda2/KLIMBO-SITE/KLIMBO-BUILD/KLIMBO/` ← WRONG
 - ✅ `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/KILOMBO/` ← CORRECT
 
 **Mitigation:** Added `LOCAL_*` environment variables to `.env` to programmatically resolve these paths:

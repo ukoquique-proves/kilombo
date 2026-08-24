@@ -4,11 +4,11 @@
     {
       "name": "Enforce environment variable usage for paths",
       "trigger": "PreToolUse",
-      "description": "Block hardcoded paths, force use of $LOCAL_KLIMBO_DIR and other env variables",
+      "description": "Block hardcoded paths, force use of $LOCAL_KILOMBO_DIR and other env variables",
       "matcher": "execute_bash|read_file|list_directory|fs_write|str_replace",
       "action": {
         "type": "command",
-        "command": "cat << 'EOF'\n# Check if command contains hardcoded paths to KILOMBO workspace\nif echo \"$1\" | grep -qE \"(KLIMBO-BUILD|/root/JOB-sda2/KLIMBO-SITE)\"; then\n  echo '{\"hookSpecificOutput\":{\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"⚠️  HARDCODED PATH DETECTED: This command contains /root/JOB-sda2/KLIMBO-SITE/KLIMBO-BUILD hardcoded path. Use $LOCAL_KLIMBO_DIR instead. See .kiro/steering/use-env-vars.md for correct syntax. Execute anyway?\"}}'\n  exit 2\nfi\nexit 0\nEOF\n",
+        "command": "#!/bin/bash\n# Check if command contains hardcoded paths to KILOMBO workspace\n# Catches both correct spelling (KILOMBO) and typo variants (KLIMBO)\nif echo \"$1\" | grep -qiE \"(/root/JOB-sda2/KILOM?BO|KILOM?BO-BUILD|KILOM?BO-SITE)\"; then\n  echo '{\"hookSpecificOutput\":{\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"⚠️  HARDCODED PATH DETECTED: This command contains a hardcoded path to the workspace. Use $LOCAL_KILOMBO_DIR, $LOCAL_KILOMBO_BUILD, or $LOCAL_WORKSPACE_ROOT instead. See .kiro/steering/use-env-vars.md for correct syntax.\"}}'\n  exit 2\nfi\nexit 0\n",
         "timeout": 5
       }
     }

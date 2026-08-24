@@ -715,7 +715,7 @@ node sandbox/delete-article.mjs --inspect --id 87
 ### The Problem
 
 Agent operations repeatedly used hardcoded directory paths like `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/` instead of environment variables, leading to:
-- Typos (KLIMBO vs KILOMBO) creating unauthorized workspace pollution
+- Typos (KILOMBO → KLIMBO) creating unauthorized workspace pollution
 - Manual correction overhead on each file operation
 - Risk of uncommitted files in the wrong location
 
@@ -733,7 +733,7 @@ The hook intercepts file operations before execution:
 
 | Tool | Blocked Pattern | Required Pattern |
 |------|---|---|
-| `fs_write` | `/root/JOB-sda2/KLIMBO-BUILD/...` or `/root/JOB-sda2/KILOMBO-BUILD/...` | `$LOCAL_KILOMBO_DIR/...` |
+| `fs_write` | `/root/JOB-sda2/KILOMBO-SITE/KLIMBO-BUILD/...` or `/root/JOB-sda2/KILOMBO-BUILD/...` | `$LOCAL_KILOMBO_DIR/...` |
 | `str_replace` | Same hardcoded paths | `$LOCAL_KILOMBO_DIR/...` |
 | `fs_append` | Same hardcoded paths | `$LOCAL_KILOMBO_DIR/...` |
 
@@ -758,14 +758,14 @@ LOCAL_WORKSPACE_ROOT=/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD
 
 **Scenario 1 — Before hook (current session):**
 ```
-Agent attempts: fs_write /root/JOB-sda2/KLIMBO-BUILD/KILOMBO/file.md "content"
+Agent attempts: fs_write /root/JOB-sda2/KILOMBO-SITE/KLIMBO-BUILD/KILOMBO/file.md "content"
 Result: ✅ Tool executes (no enforcement yet)
 Problem: KLIMBO typo creates unauthorized directory
 ```
 
 **Scenario 2 — After hook (next session onwards):**
 ```
-Agent attempts: fs_write /root/JOB-sda2/KLIMBO-BUILD/KILOMBO/file.md "content"
+Agent attempts: fs_write /root/JOB-sda2/KILOMBO-SITE/KLIMBO-BUILD/KILOMBO/file.md "content"
 Hook intercepts: Detects /KLIMBO-BUILD/ pattern
 Result: ❌ Permission denied
 Agent fixes: fs_write $LOCAL_KILOMBO_DIR/file.md "content"
@@ -809,7 +809,7 @@ To verify the hook is working at session start:
 ### Related Documentation
 
 - **Steering guide:** `.kiro/steering/use-env-vars.md` — comprehensive rules and examples
-- **Previous sessions:** This hook was created to prevent the repeated KLIMBO/KLIMBO typo mistakes documented in earlier session summaries
+- **Previous sessions:** This hook was created to prevent the repeated KLIMBO/KILOMBO typo mistakes documented in earlier session summaries
 
 ### Status: ✅ Hook Created and Committed
 

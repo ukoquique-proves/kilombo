@@ -20,6 +20,7 @@ Portal central de acceso a la red de sitios de Kilombo. Construido como página 
 - **Publish to SPIP** (live immediately): Use `node sandbox/create-article.mjs --create --title "..." --body "..."`
 - **Publish to mirror** (versioned, staged): Use `docs/ARTICLE-PUBLISHING-WORKFLOW.md`
 - **Publish to both**: Use `PUBLISHING-GUIDE.md` Workflow C
+- **Customize Live SPIP Theme** (change hardcoded labels): Use `node scripts/customize-escal-theme.mjs` (see [`docs/THEME-CUSTOMIZATION.md`](docs/THEME-CUSTOMIZATION.md))
 
 ---
 
@@ -67,6 +68,8 @@ Si el objetivo es cambiar el diseño y el contenido del espejo, se trabaja desde
 ```
 
 Si el objetivo es editar directamente el sitio original de SPIP en `kilombo.top`, eso requiere acceso SSH al host real y, además, permisos sobre la instancia de SPIP / YunoHost, que no son los mismos que los usados para publicar este portal estático.
+
+> **Novedad:** Algunos textos fijos del tema en producción (como etiquetas de pestañas y bloques) se pueden modificar programáticamente sin acceso SSH mediante el script de automatización `scripts/customize-escal-theme.mjs`. Ver [`docs/THEME-CUSTOMIZATION.md`](docs/THEME-CUSTOMIZATION.md).
 
 Se puede consultar la guía más detallada en [`docs/SPIP-ACCESS.md`](docs/SPIP-ACCESS.md).
 
