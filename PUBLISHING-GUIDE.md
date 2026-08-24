@@ -388,7 +388,7 @@ READY/ (validated)
        ↓
 Either:
   A) Create in SPIP manually → Live on www.kilombo.top
-  B) Merge to articles.json → Live on GitHub Pages → (optional) deploy to klimbo.top root
+  B) Merge to articles.json → Live on GitHub Pages → (optional) deploy to kilombo.top root
 ```
 
 ### Environment Variables
