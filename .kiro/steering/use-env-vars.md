@@ -60,6 +60,6 @@ Before ANY command that references the project directory:
 
 ---
 
-**Last Updated**: 2026-08-22 (v3 - corrected all KLIMBO→KILOMBO)  
+**Last Updated**: 2026-08-22 (v3 - corrected path variable names)  
 **Status**: CRITICAL - Hook enforcement now active  
 **Hook File**: `.kiro/hooks/enforce-env-vars-paths.json`
