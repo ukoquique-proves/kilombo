@@ -3,6 +3,8 @@
 Auditoría activa del proyecto. Solo problemas abiertos.
 Última actualización: 2026-08-18 — v0.39.1; ítems #29, #45, #51, #59, #60, #61, #62 cerrados; seguridad URLs (#ctaUrl/#sourceUrl) resuelta.
 
+**Note (v0.42.8):** sourceUrl uniqueness validation (commit b332179) implemented in `scripts/validate-data.mjs` lines 500–525 but not originally tracked as a TO_FIX item. Check prevents duplicate imports and is active in `npm test` CI pipeline.
+
 > **📋 RELATED:** See also:
 > - **`docs/SPIP-ACCESS.md`** — Consolidated SPIP access and article management documentation (single source of truth)
 > - **`CHANGELOG.md`** — Complete version history and resolved issues by release
