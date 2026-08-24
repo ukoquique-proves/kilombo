@@ -48,5 +48,18 @@ Before ANY command that references the project directory:
 
 ---
 
-**Last Updated**: 2026-08-22  
-**Status**: CRITICAL - Enforce in all agent work
+## Hook Enforcement
+
+**A PreToolUse hook is now active** (`.kiro/hooks/enforce-env-vars-paths.json`):
+- Monitors all file operations (execute_bash, read_file, list_directory, fs_write, str_replace)
+- Blocks commands with hardcoded paths like `/root/JOB-sda2/KLIMBO-BUILD`
+- Asks for confirmation if hardcoded path detected
+- Activates on next session start
+
+**If you see a permission prompt asking to confirm hardcoded paths**: That's the hook working. Deny it and rewrite the command using env vars.
+
+---
+
+**Last Updated**: 2026-08-22 (v2)  
+**Status**: CRITICAL - Hook enforcement now active  
+**Hook File**: `.kiro/hooks/enforce-env-vars-paths.json
