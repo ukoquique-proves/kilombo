@@ -89,7 +89,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 ## 🔴 Acción pendiente urgente
 
 - [ ] **76. SPIP Theme Management — Espacio Tierra y Libertad section presentation (v0.42.8) — CORRECTED**
-  - **Status Update:** ✅ **Solution FOUND — NOT BLOCKED** (Previous analysis was incorrect)
+  - **Status Update:** ✅ **Solution FOUND — Ready to implement** (No blockers remaining)
   - **Original Problem:** Requested to customize section presentation labels ("Los últimos artículos", "Mapa del sitio") on Espacio Tierra y Libertad section at `https://www.kilombo.top/`.
   - **Previous (Incorrect) Finding:** Labels hardcoded in Escal templates, unreachable without server file access
   - **Corrected Finding:** Labels ARE configurable via **Escal plugin configuration menu** (`exec=configurer_escal`) accessible through SPIP admin web UI
