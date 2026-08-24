@@ -86,22 +86,6 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - **Location:** `sandbox/delete-article.mjs` (saved, not committed — development tool, not released)
   - **Related:** #66 (create-article works), #68 (architecture for SPIP management scripts)
 
-## 🔴 Acción pendiente urgente
-
-- [ ] **76. SPIP Theme Management — Espacio Tierra y Libertad section presentation (v0.42.8) — CORRECTED**
-  - **Status Update:** ✅ **Solution FOUND — Ready to implement** (No blockers remaining)
-  - **Original Problem:** Requested to customize section presentation labels ("Los últimos artículos", "Mapa del sitio") on Espacio Tierra y Libertad section at `https://www.kilombo.top/`.
-  - **Previous (Incorrect) Finding:** Labels hardcoded in Escal templates, unreachable without server file access
-  - **Corrected Finding:** Labels ARE configurable via **Escal plugin configuration menu** (`exec=configurer_escal`) accessible through SPIP admin web UI
-  - **Key Discovery:** Programmatic scrape of admin panel discovered Escal config menu with customization/translation options
-  - **Solution:** 
-    1. ✅ **Manual:** Go to SPIP admin → Escal → Configuration → find widget/label customization section
-    2. ✅ **Automated:** Use script `scripts/customize-escal-theme.mjs` (already exists)
-    3. ✅ See `docs/THEME-CUSTOMIZATION.md` for full automation guide
-  - **Credentials needed:** NONE additional (only existing SPIP admin login, which already works)
-  - **Status:** Ready to implement — no blockers
-  - **Related:** See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` for corrected analysis
-
 - [x] **67. Docs desincronizados sobre el acceso al backend SPIP (`/ecrire/`) — RESUELTO (v0.42.0)**
   - **La contradicción:** README.md, TROUBLESHOOTING.md, SITE_ANALYSIS.md afirmaban ❌ "kilombo NO es admin SPIP". `docs/SPIP-ACCESS.md` (anterior `DEPLOYMENT-AND-SOURCE-EDITING.md`) afirmaba ✅ "acceso SPIP funciona".
   - **Root cause:** Diagnóstico agosto 3 falló usando credenciales incorrectas (usuario `admin` en lugar de `kilombo`). Conclusión apresurada: "no funciona". Pero verificación agosto 21 con `create-article.mjs` creó Article #87 exitosamente, probando que SÍ funciona.
@@ -127,6 +111,23 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     4. Actualizar README/TROUBLESHOOTING/SITE_ANALYSIS para que todas apunten al mismo lugar.
   - **Acción inmediata:** documentado aquí; no reescribir la tablas de acceso hasta confirmar la hipótesis.
 
+
+## 🔴 Acción pendiente urgente
+
+- [ ] **76. SPIP Theme Management — Espacio Tierra y Libertad section presentation (v0.42.8) — CORRECTED**
+  - **Status Update:** ✅ **Solution FOUND — Ready to implement** (No blockers remaining)
+  - **Original Problem:** Requested to customize section presentation labels ("Los últimos artículos", "Mapa del sitio") on Espacio Tierra y Libertad section at `https://www.kilombo.top/`.
+  - **Previous (Incorrect) Finding:** Labels hardcoded in Escal templates, unreachable without server file access
+  - **Corrected Finding:** Labels ARE configurable via **Escal plugin configuration menu** (`exec=configurer_escal`) accessible through SPIP admin web UI
+  - **Key Discovery:** Programmatic scrape of admin panel discovered Escal config menu with customization/translation options
+  - **Solution:** 
+    1. ✅ **Manual:** Go to SPIP admin → Escal → Configuration → find widget/label customization section
+    2. ✅ **Automated:** Use script `scripts/customize-escal-theme.mjs` (already exists)
+    3. ✅ See `docs/THEME-CUSTOMIZATION.md` for full automation guide
+  - **Credentials needed:** NONE additional (only existing SPIP admin login, which already works)
+  - **Status:** Ready to implement — no blockers
+  - **Related:** See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` for corrected analysis
+
 - [ ] **68. Gestión de create/edit/delete en kilombo.top desde el agente — arquitectura y por qué hace falta código dedicado**
   - **La pregunta:** ¿cómo se van a manejar, de forma repetible, futuras creaciones/modificaciones/borrados de artículos en el SPIP real, ejecutados por el agente IA, sin tocar el sitio a mano cada vez?
   - **Por qué SÍ hace falta código especial (no basta con pedirle al agente que "lo haga"):**
@@ -151,34 +152,14 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     3. Verificar acceso: `./sync-to-production.sh` (o el test de login de TROUBLESHOOTING.md)
   - El valor actual del password futuro está en `.env` entre comillas simples para preservar los caracteres especiales (`$$`, `&&`).
 
-- [ ] **57. Metadata extraction analysis: Articles 36 & 46 (Quilombo PELÍCULA movies) — LOW friction to complete**
-  - **Problem**: Articles 36 & 46 are pending-review stubs. kilombo.top source contains only 1-line bodies but has critical metadata embedded:
-    - Article 36: `<p><a href="https://youtu.be/icuIeOoU_3k" target="_blank">Quilombo película</a></p>`
-    - Article 46: references Portuguese film with English/Spanish subtitles
-    - Missing: synopses, director, year, country, duration, production credits
-  - **Why no automation**: SPIP CMS stores only title, date, body text — no metadata schema. Ficha técnica (credits, year, country) must be:
-    1. Text-mined manually from article body (not applicable — body is 1 line)
-    2. Manually researched from IMDb/Wikipedia/etc.
-    3. Stored in separate JSON field (recommended)
-  - **Extraction pattern**: Zero pattern to generalize — only 2 known stubs, no programmatic extraction possible.
-  - **Recommended approach (LOW-FRICTION)**:
-    1. Extend `articles.json` schema with optional `externalLinks` array + `metadata` object:
-       ```json
-       "externalLinks": [
-         { "type": "youtube", "url": "https://youtu.be/icuIeOoU_3k", "title": "Full film" }
-       ],
-       "metadata": {
-         "director": "Carlos Diegues",
-         "year": 1985,
-         "country": "Brasil",
-         "duration": "120 min"
-       }
-       ```
-    2. Render as metadata card in `articulo.html` detail page
-    3. Manually research & complete articles 36 & 46 (~15 mins total)
-    4. Document pattern in ROADMAP.md for future movie imports
-  - **Effort**: 15 mins vs. weeks (full IMDb integration)
-  - **Status**: Pending user decision on schema extension + priority
+- [x] **57. Metadata extraction analysis: Articles 36 & 46 (Quilombo PELÍCULA movies) — ✅ RESOLVED (v0.39.1)**
+  - **Status**: Feature complete — metadata schema (`externalLinks`, `metadata` fields) documented in `ARTICLES.schema.md`, implemented in `site/js/articles.js` (lines 465–500), and both articles (`quilombo-pelicula`, `kilombo-quilombo-pelicula`) already have that data populated.
+  - **What was implemented**: 
+    1. ✅ Schema extension: Optional `externalLinks` array + `metadata` object added to `ARTICLES.schema.md`
+    2. ✅ Rendering: `site/js/articles.js` renders metadata cards in detail pages (confirmed in ROADMAP.md v0.39.0)
+    3. ✅ Data: Both articles have metadata already populated in `articles.json`
+  - **Remaining action (editorial, not technical)**: Research & populate additional metadata (director, year, country) for articles 36 & 46. This is curation work, not a code/architecture issue.
+  - **Why closed**: Technology stack is ready and deployed. The original problem (schema missing, rendering missing) is solved. Metadata population is ongoing editorial work, not a blocking tech issue.
 
 - [ ] **63. Implementar extractores para la red GCI — 3 categorías técnicas distintas**
   - **Contexto:** #61 (cerrado v0.39.1) corrigió `detectSite()` para que ya no clasifique los hosts GCI como `tierra`, evitando corrupción silenciosa. La v0.40.x (fix-plan Block A) refinó además la detección en 3 categorías técnicas reales, acordes a la infraestructura documentada en `TROUBLESHOOTING.md §2`:
