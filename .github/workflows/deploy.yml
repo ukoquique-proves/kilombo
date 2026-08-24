@@ -58,9 +58,23 @@ jobs:
         run: npm ci
 
       - name: Encrypt site content
-        run: npm run encrypt
+        run: |
+          if [ -z "$STATICRYPT_PASSWORD" ]; then
+            echo "❌ ERROR: STATICRYPT_PASSWORD secret is not set in GitHub Secrets"
+            exit 1
+          fi
+          npm run encrypt
         env:
           STATICRYPT_PASSWORD: ${{ secrets.STATICRYPT_PASSWORD }}
+
+      - name: Verify dist/ was created
+        run: |
+          if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
+            echo "❌ ERROR: dist/ directory is empty or missing after encryption"
+            exit 1
+          fi
+          echo "✅ dist/ contents:"
+          ls -lh dist/ | head -10
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
