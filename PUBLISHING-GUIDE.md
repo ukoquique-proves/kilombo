@@ -66,7 +66,7 @@
 **What it is:**
 - Static site built from `site/assets/content/articles.json`
 - Served from GitHub Pages: `https://ukoquique-proves.github.io/kilombo/`
-- Also deployed to mirror root at `klimbo.top` (after port 22 is open)
+- Also deployed to mirror root at `kilombo.top` (after port 22 is open)
 - Fully version-controlled
 
 **Pros:**
@@ -300,13 +300,13 @@ cd $LOCAL_KILOMBO_DIR
 **This script:**
 1. Checks for uncommitted changes
 2. Pushes to GitHub main (if any new commits)
-3. Attempts SSH deploy to `klimbo.top` via rsync (if port 22 is open)
+3. Attempts SSH deploy to `kilombo.top` via rsync (if port 22 is open)
 4. Reports success/failure
 
 **Result:**
 - Article on SPIP at `www.kilombo.top` ✅
 - Article on GitHub Pages ✅
-- Article on mirror at `klimbo.top` root (if port 22 open) ✅
+- Article on mirror at `kilombo.top` root (if port 22 open) ✅
 
 ### Documentation:
 - Combine `WORKFLOW A` and `WORKFLOW B`
@@ -353,7 +353,7 @@ This prevents the workflow from creating unwanted duplicate articles during test
 | `sandbox/create-article.mjs` | Create article in SPIP backend | `node sandbox/create-article.mjs --create --title "..." --body "..."` |
 | `sandbox/delete-article.mjs` | Change article status in SPIP | `node sandbox/delete-article.mjs --change --id <N> --status publie` |
 | `end-of-session.sh` | Deploy to both systems | `./end-of-session.sh` |
-| `sync-to-production.sh` | Deploy mirror to klimbo.top | `./sync-to-production.sh` (called by end-of-session.sh) |
+| `sync-to-production.sh` | Deploy mirror to kilombo.top | `./sync-to-production.sh` (called by end-of-session.sh) |
 
 ### Validation Scripts
 
@@ -404,7 +404,7 @@ When in doubt, check `.env` for correct paths instead of hardcoding.
 
 - **NOT required** for SPIP editing (uses web browser + SSO)
 - **NOT required** for mirror editing (uses git)
-- **ONLY required** for `sync-to-production.sh` (rsync to klimbo.top root)
+- **ONLY required** for `sync-to-production.sh` (rsync to kilombo.top root)
   - To enable: https://kilombo.top/yunohost/admin/ → Herramientas → Firewall → TCP 22
   - Optional — mirror still works on GitHub Pages without it
 
