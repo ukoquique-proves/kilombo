@@ -2,13 +2,13 @@
   "version": "v1",
   "hooks": [
     {
-      "name": "Block KILOMBO typo",
+      "name": "Block KLIMBO typo",
       "trigger": "PreToolUse",
-      "description": "Catch and prevent the typo KILOMBO (should be KILOMBO) in any command or code edit",
+      "description": "Catch and prevent the typo KLIMBO (should be KILOMBO) in any command or code edit",
       "matcher": "execute_bash|str_replace|fs_write|read_file",
       "action": {
         "type": "command",
-        "command": "#!/bin/bash\n# Block any instance of 'KILOMBO' (case-insensitive) — it should always be 'KILOMBO'\nif echo \"$1\" | grep -qi 'KILOMBO'; then\n  echo '{\"hookSpecificOutput\":{\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"🚫 TYPO DETECTED: 'KILOMBO' appears in this operation. The correct spelling is KILOMBO. This typo was intentionally removed from the entire project. Please correct it before proceeding.\"}}'\n  exit 2\nfi\nexit 0\n",
+        "command": "#!/bin/bash\n# Block any instance of 'KLIMBO' (case-insensitive) — it should always be 'KILOMBO'\nif echo \"$1\" | grep -qi 'KLIMBO'; then\n  echo '{\"hookSpecificOutput\":{\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"🚫 TYPO DETECTED: KLIMBO appears in this operation. The correct spelling is KILOMBO. This typo was intentionally removed from the entire project. Please correct it before proceeding.\"}}'\n  exit 2\nfi\nexit 0\n",
         "timeout": 3
       }
     }

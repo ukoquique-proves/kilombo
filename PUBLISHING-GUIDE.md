@@ -273,20 +273,40 @@ git push origin main
 
 ### Steps:
 
-#### Step 1: Publish to SPIP (use WORKFLOW A)
+#### Step 1: Publish to Mirror (use WORKFLOW B)
+
+Create JSON in `articulos_en_trabajo/IN_PROGRESS/[slug].json`, validate, move to READY/, merge, commit, push to GitHub main.
+
+**Result on GitHub Pages:** Article live at https://ukoquique-proves.github.io/kilombo/articulos.html
+
+#### Step 2: Migrate to SPIP (use the migration system)
 
 ```bash
-node sandbox/create-article.mjs \
-  --create \
-  --title "Your Title" \
-  --body "<p>Content</p>"
+# Option A: Create and preview (dry-run)
+node scripts/migrate-to-spip.mjs --article-id [article-slug] --dry-run
+
+# Option B: Create in draft status
+node scripts/migrate-to-spip.mjs --article-id [article-slug]
+
+# Option C: Create and publish immediately
+node scripts/migrate-to-spip.mjs --article-id [article-slug] --publish
 ```
 
-Note the article ID returned (e.g., `89`)
+**Examples:**
+```bash
+# Dry-run preview (safe, no changes)
+node scripts/migrate-to-spip.mjs --article-id terrorismo-estado-mundial --dry-run
 
-#### Step 2: Publish to Mirror (use WORKFLOW B)
+# Create article (draft status, visible in admin only)
+node scripts/migrate-to-spip.mjs --article-id terrorismo-estado-mundial
 
-Create JSON in `articulos_en_trabajo/IN_PROGRESS/[slug].json`, validate, move to READY/, merge, commit, push.
+# Create and publish (live immediately)
+node scripts/migrate-to-spip.mjs --article-id terrorismo-estado-mundial --publish
+```
+
+**Result on SPIP:** Article at `www.kilombo.top/spip.php?article<ID>`
+
+For detailed options and troubleshooting, see `docs/MIGRATION-WORKFLOW.md`.
 
 #### Step 3: End-of-Session Deploy
 
@@ -350,8 +370,9 @@ This prevents the workflow from creating unwanted duplicate articles during test
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
-| `sandbox/create-article.mjs` | Create article in SPIP backend | `node sandbox/create-article.mjs --create --title "..." --body "..."` |
-| `sandbox/delete-article.mjs` | Change article status in SPIP | `node sandbox/delete-article.mjs --change --id <N> --status publie` |
+| `scripts/migrate-to-spip.mjs` | Migrate articles from JSON to SPIP | `node scripts/migrate-to-spip.mjs --article-id [slug]` or `--publish` |
+| `sandbox/create-article.mjs` | Low-level SPIP article creation | `node sandbox/create-article.mjs --create --title "..." --body "..."` |
+| `sandbox/delete-article.mjs` | Low-level SPIP status change | `node sandbox/delete-article.mjs --change --id <N> --status publie` |
 | `end-of-session.sh` | Deploy to both systems | `./end-of-session.sh` |
 | `sync-to-production.sh` | Deploy mirror to kilombo.top | `./sync-to-production.sh` (called by end-of-session.sh) |
 
