@@ -707,3 +707,117 @@ node sandbox/delete-article.mjs --inspect --id 87
 - ✅ Documented in `docs/SPIP-ARTICLE-MANAGEMENT.md`
 - ✅ Test case Article #87 successfully moved to trash (2026-08-22)
 - ⚠️ Permanent DB deletion requires SSH/admin access (by design — SPIP safety feature)
+
+---
+
+## 10. Environment Variable Enforcement Hook — Preventing Hardcoded Paths
+
+### The Problem
+
+Agent operations repeatedly used hardcoded directory paths like `/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/` instead of environment variables, leading to:
+- Typos (KLIMBO vs KILOMBO) creating unauthorized workspace pollution
+- Manual correction overhead on each file operation
+- Risk of uncommitted files in the wrong location
+
+### The Solution: PreToolUse Hook
+
+A Kiro agent hook now **blocks file operations that use hardcoded paths** and enforces the use of environment variables defined in `.env`.
+
+**Hook location:** `.kiro/hooks/enforce-env-vars-paths.json`
+
+**When it activates:** At the start of the next session after this was created (2026-08-22).
+
+### How It Works
+
+The hook intercepts file operations before execution:
+
+| Tool | Blocked Pattern | Required Pattern |
+|------|---|---|
+| `fs_write` | `/root/JOB-sda2/KLIMBO-BUILD/...` or `/root/JOB-sda2/KILOMBO-BUILD/...` | `$LOCAL_KILOMBO_DIR/...` |
+| `str_replace` | Same hardcoded paths | `$LOCAL_KILOMBO_DIR/...` |
+| `fs_append` | Same hardcoded paths | `$LOCAL_KILOMBO_DIR/...` |
+
+When a hardcoded path is detected:
+
+1. Hook blocks the tool invocation
+2. Agent receives a permission denial
+3. Agent must rewrite the command using `$LOCAL_KILOMBO_DIR` from `.env`
+4. Operation proceeds once rewritten correctly
+
+### Environment Variables Available
+
+From `.env`:
+
+```bash
+LOCAL_KILOMBO_DIR=/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD/KILOMBO
+LOCAL_KILOMBO_BUILD=/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD
+LOCAL_WORKSPACE_ROOT=/root/JOB-sda2/KILOMBO-SITE/KILOMBO-BUILD
+```
+
+### Example: What Happens When a Typo Occurs
+
+**Scenario 1 — Before hook (current session):**
+```
+Agent attempts: fs_write /root/JOB-sda2/KLIMBO-BUILD/KILOMBO/file.md "content"
+Result: ✅ Tool executes (no enforcement yet)
+Problem: KLIMBO typo creates unauthorized directory
+```
+
+**Scenario 2 — After hook (next session onwards):**
+```
+Agent attempts: fs_write /root/JOB-sda2/KLIMBO-BUILD/KILOMBO/file.md "content"
+Hook intercepts: Detects /KLIMBO-BUILD/ pattern
+Result: ❌ Permission denied
+Agent fixes: fs_write $LOCAL_KILOMBO_DIR/file.md "content"
+Hook allows: ✅ Tool executes
+```
+
+### Testing the Hook
+
+To verify the hook is working at session start:
+
+1. Open a new Kiro session
+2. Try to use a hardcoded path (e.g., `fs_write /root/JOB-sda2/KILOMBO-BUILD/test.txt "test"`)
+3. Hook should prompt with a permission dialog
+4. Rewrite using `$LOCAL_KILOMBO_DIR`
+5. Operation succeeds
+
+### Hook Configuration Details
+
+**Hook file:** `.kiro/hooks/enforce-env-vars-paths.json`
+
+```json
+{
+  "version": "v1",
+  "hooks": [{
+    "name": "Enforce env vars for paths",
+    "trigger": "PreToolUse",
+    "matcher": "fs_write|str_replace|fs_append",
+    "action": { "type": "command", "command": "... checks for hardcoded paths ..." }
+  }]
+}
+```
+
+**Trigger:** `PreToolUse` — runs before any file write/edit operation
+
+**Matcher:** Catches the three file-writing tools: `fs_write`, `str_replace`, `fs_append`
+
+**Action:** Shell command that validates paths and returns:
+- Exit code `0` → proceed
+- Exit code `2` + stderr → permission denied
+
+### Related Documentation
+
+- **Steering guide:** `.kiro/steering/use-env-vars.md` — comprehensive rules and examples
+- **Previous sessions:** This hook was created to prevent the repeated KLIMBO/KLIMBO typo mistakes documented in earlier session summaries
+
+### Status: ✅ Hook Created and Committed
+
+- ✅ Hook file created: `.kiro/hooks/enforce-env-vars-paths.json`
+- ✅ Steering guide updated: `.kiro/steering/use-env-vars.md`
+- ✅ Will activate automatically at next session start
+- ⏳ Currently inactive (session already started before hook was created)
+
+### For Future Sessions
+
+If you see permission prompts about hardcoded paths starting in the next session, that's working as intended — deny them and rewrite using `$LOCAL_KILOMBO_DIR`.
