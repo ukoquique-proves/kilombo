@@ -18,9 +18,15 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="$PROJECT_ROOT/.env"
 
 # Read the operation (get/store/erase)
-read operation
+operation="${1:-}"
 
 case "$operation" in
+  capability)
+    # Newer git versions ask what capabilities the helper supports
+    echo "capability=get"
+    echo "capability=store"
+    echo "capability=erase"
+    ;;
   get)
     # git is asking for credentials
     if [ ! -f "$ENV_FILE" ]; then
