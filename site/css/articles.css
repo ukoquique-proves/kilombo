@@ -238,6 +238,27 @@
   color: #1a1a1a;
 }
 
+/* Links inside article body — must be visually distinct from plain text.
+   The global reset (a { text-decoration: none }) hides them otherwise. */
+.article-detail__content a {
+  color: #b91c2a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.article-detail__content a:hover,
+.article-detail__content a:focus-visible {
+  color: #8b0000;
+  opacity: 0.85;
+}
+
+.article-detail__content a[target="_blank"]::after {
+  content: " ↗";
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
 /* NOTA: sanitizeHtml() (site/js/render.mjs) solo admite h3/h4 en el
    contenido de artículos — un <h2> escrito a mano en articles.json se
    descarta al sanear y este selector nunca llega a aplicarse. Al agregar
