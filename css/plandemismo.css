@@ -1,0 +1,591 @@
+/*
+ * plandemismo.css — styles specific to plandemismo.html
+ *
+ * Dependencies: this sheet must be loaded AFTER style.css, which defines:
+ *   --paper, --paper-alt, --ink, --gray, --gray-light, --rule,
+ *   --lang-es, --lang-fr, --lang-en,
+ *   --status-legacy-bg, --status-legacy-fg
+ *
+ * --plandem-red here is the same value as --red-dark in style.css (#8b0000).
+ * Both are kept separate to allow independent theming of the NOM section
+ * without affecting the global red-dark accent.
+ */
+
+/* ========================================================================
+   SAFETY FALLBACKS — if this sheet is ever loaded WITHOUT style.css
+   (e.g. in a dev sandbox, or if the <link> order is wrong), the
+   following var(--name, fallback) pattern ensures NO styling regresses
+   to unstyled white. If the variable IS set (because style.css loaded
+   first), the fallback is silently ignored — zero cost, 100% safe.
+   ======================================================================== */
+:root {
+  --paper:             var(--paper,             #fcfbf7);
+  --paper-alt:         var(--paper-alt,         #f0ede4);
+  --ink:               var(--ink,               #121212);
+  --gray:              var(--gray,              #595959);
+  --gray-light:        var(--gray-light,        #a0a0a0);
+  --rule:              var(--rule,              #1e1e1e);
+  --lang-es:           var(--lang-es,           #1b5e20);
+  --lang-fr:           var(--lang-fr,           #0d47a1);
+  --lang-en:           var(--lang-en,           #311b92);
+  --status-legacy-bg:  var(--status-legacy-bg,  #eceff1);
+  --status-legacy-fg:  var(--status-legacy-fg,  #455a64);
+  --font-serif:        var(--font-serif,        'Playfair Display', Georgia, serif);
+  --font-sans:         var(--font-sans,         'Inter', Verdana, Arial, sans-serif);
+  --font-mono:         var(--font-mono,         'Courier New', 'Lucida Console', monospace);
+
+  /* NOM section own palette (always defined here, no fallback needed) */
+  --plandem-red: #8b0000;
+  --plandem-red-soft: rgba(139, 0, 0, 0.07);
+  --plandem-red-line: rgba(139, 0, 0, 0.2);
+  --sida-accent: #4a0e0e;
+  --sida-bg: #f9ecec;
+}
+
+.site-title--small {
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  letter-spacing: 0.25em;
+}
+
+.site-back-link {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--paper);
+  opacity: 0.75;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px dashed rgba(255,255,255,0.3);
+  padding-bottom: 2px;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.site-back-link:hover {
+  opacity: 1;
+  color: #fff;
+}
+
+.page-lead {
+  max-width: 100%;
+  margin: 0 0 2.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--paper-alt);
+  border-left: 4px solid var(--plandem-red);
+  font-size: 0.98rem;
+}
+
+.page-lead p + p {
+  margin-top: 0.75rem;
+}
+
+.page-lead__note {
+  font-size: 0.88rem;
+  color: var(--gray);
+  font-style: italic;
+  border-top: 1px dashed rgba(0,0,0,0.12);
+  padding-top: 0.75rem;
+}
+
+.ext-link {
+  color: var(--plandem-red);
+  font-weight: 700;
+  border-bottom: 1px solid var(--plandem-red-line);
+}
+
+.ext-link:hover {
+  background: var(--plandem-red-soft);
+}
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0 0 2rem;
+  border-bottom: 2px solid var(--plandem-red-line);
+  padding-bottom: 0;
+}
+
+.tab {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.4rem;
+  background: transparent;
+  border: 2px solid transparent;
+  border-bottom: none;
+  color: var(--gray);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  position: relative;
+  bottom: -2px;
+  border-radius: 0;
+}
+
+.tab:not(:disabled):hover {
+  color: var(--plandem-red);
+  background: var(--plandem-red-soft);
+}
+
+.tab--active {
+  border-color: var(--plandem-red-line);
+  border-bottom-color: var(--paper);
+  background: var(--paper);
+  color: var(--plandem-red);
+}
+
+.tab-num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--gray-light);
+  margin-right: 0.5rem;
+}
+
+.tab--active .tab-num {
+  color: var(--plandem-red);
+}
+
+.tab--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  font-style: italic;
+}
+
+.tab-panel--hidden {
+  display: none;
+}
+
+/* ---------- Section sub-header ---------- */
+.section-subheader {
+  max-width: 80ch;
+  margin: 0 0 2rem;
+}
+
+.section-subheader h2 {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.01em;
+  border-bottom: 2px solid var(--rule);
+  padding-bottom: 0.35rem;
+  display: inline-block;
+}
+
+.section-subheader p {
+  color: var(--gray);
+  font-size: 1rem;
+}
+
+.warning-block {
+  margin: 1.5rem 0 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--sida-bg);
+  border: 1px solid var(--plandem-red-line);
+  border-left: 6px solid var(--sida-accent);
+}
+
+.warning-block p {
+  margin: 0.3rem 0;
+  color: #3a0d0d;
+  font-size: 1.02rem;
+}
+
+.warning-block p:first-child {
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  margin-top: 0;
+}
+
+.warning-block__small {
+  font-style: italic;
+  margin-top: 0.75rem;
+  font-size: 0.92rem;
+  color: #6b1f1f;
+  border-top: 1px dashed var(--plandem-red-line);
+  padding-top: 0.6rem;
+}
+
+.coming-soon {
+  margin-top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+  color: var(--gray-light);
+}
+
+/* ---------- Video grid ---------- */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.video-grid--featured {
+  grid-template-columns: 1fr;
+}
+
+/* ---------- Video card ---------- */
+.video-card {
+  background: var(--paper);
+  border: 1px solid rgba(0,0,0,0.14);
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform    0.18s ease,
+    box-shadow   0.18s ease,
+    border-color 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.video-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--plandem-red);
+  transition: height 0.18s ease;
+}
+
+/* arrow indicator */
+.video-card::after {
+  content: "→";
+  position: absolute;
+  bottom: 1.1rem;
+  right: 1.1rem;
+  font-size: 0.9rem;
+  color: var(--plandem-red);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+}
+
+.video-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.11),
+    0 0 0 1px rgba(139,0,0,0.22);
+  border-color: rgba(139,0,0,0.38);
+}
+
+.video-card:hover::before {
+  height: 5px;
+}
+
+.video-card:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.video-card--featured {
+  border-width: 1.5px;
+  border-color: rgba(139,0,0,0.3);
+  background: linear-gradient(180deg, #fff, var(--paper-alt));
+}
+
+.video-card--featured::before {
+  height: 6px;
+}
+
+.video-card__media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+  position: relative;
+}
+
+.video-card__thumb {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at center, #2a0505 0%, #0a0202 70%);
+  color: #fff;
+  position: relative;
+}
+
+.video-card__thumb--featured {
+  background:
+    radial-gradient(ellipse at center, #5a0a0a 0%, #1a0202 70%);
+}
+
+.play-icon {
+  font-size: 2.6rem;
+  color: var(--paper);
+  opacity: 0.92;
+  background: var(--plandem-red);
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  padding-left: 5px;
+}
+
+.play-icon--big {
+  width: 96px;
+  height: 96px;
+  font-size: 3.6rem;
+  padding-left: 7px;
+}
+
+.thumb-code {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.08em;
+  background: rgba(0,0,0,0.6);
+  padding: 0.1rem 0.55rem;
+}
+
+.thumb-code--big {
+  font-size: 1rem;
+  padding: 0.2rem 0.65rem;
+}
+
+.thumb-corner {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--plandem-red);
+  color: #fff;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.6rem;
+}
+
+.video-card__body {
+  padding: 1rem 1.1rem 1.2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.7rem;
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meta-pais, .meta-fecha {
+  font-weight: 600;
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(139,0,0,0.1);
+  color: #6b0000;
+}
+
+.meta-pais {
+  background: rgba(139,0,0,0.13);
+  color: #7a0000;
+}
+
+.meta-cat {
+  font-weight: 500;
+  color: var(--gray);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+}
+
+.video-card__title {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+  margin-bottom: 0.55rem;
+}
+
+.video-card__title--big {
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+.video-card__desc {
+  font-size: 0.9rem;
+  color: var(--gray);
+  line-height: 1.55;
+  margin-bottom: 0.9rem;
+}
+
+.video-card__keypoints {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  border-left: 3px solid var(--plandem-red);
+  padding-left: 0.9rem;
+}
+
+.video-card__keypoints li {
+  font-size: 0.88rem;
+  color: var(--ink);
+  padding: 0.2rem 0;
+  position: relative;
+}
+
+.video-card__keypoints li::before {
+  content: "▸ ";
+  color: var(--plandem-red);
+  font-weight: 700;
+  margin-right: 0.25rem;
+}
+
+.video-card__langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.lang-chip {
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.07);
+  color: #444;
+}
+
+.lang-chip--es { background: rgba(27,94,32,0.13);  color: #1b5e20; border-color: rgba(27,94,32,0.25); }
+/* .lang-chip--fr rule removed after audit (no FR lang-chip on any video).
+   It was only ever used with --pending / --todo variants. Re-add only if
+   FR-original videos appear (i.e. videos whose source is FR, not subtitles). */
+.lang-chip--en { background: rgba(49,27,146,0.11); color: #311b92; border-color: rgba(49,27,146,0.22); }
+.lang-chip--de { background: rgba(0,0,0,0.09); color: var(--ink); border-color: rgba(0,0,0,0.2); }
+
+.lang-chip--pending {
+  background: rgba(69,90,100,0.1);
+  color: var(--status-legacy-fg);
+  font-style: italic;
+  border-style: dashed;
+  border-color: rgba(69,90,100,0.25);
+}
+
+.lang-chip--todo {
+  background: rgba(255,193,7,0.12);
+  color: #7a5c00;
+  border-color: rgba(255,193,7,0.45);
+  animation: softPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes softPulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; box-shadow: 0 0 0 2px rgba(255,193,7,0.35); }
+}
+
+.video-card__cta {
+  display: inline-block;
+  margin-top: auto;
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  padding: 0.55rem 0.95rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.video-card__cta:hover {
+  background: var(--plandem-red);
+  border-color: var(--plandem-red);
+}
+
+.video-card__cta--big {
+  font-size: 0.95rem;
+  padding: 0.7rem 1.1rem;
+}
+
+.tab-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--gray);
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(0,0,0,0.15);
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+/* --- Tablet: 481px – 768px --- */
+@media (max-width: 768px) {
+  .video-grid {
+    /* 320px min would try to fit two columns at ~650px — force single */
+    grid-template-columns: 1fr;
+  }
+
+  .tabs {
+    gap: 0.15rem;
+  }
+
+  .page-lead {
+    padding: 1.1rem 1.25rem;
+  }
+}
+
+/* --- Mobile: ≤ 480px --- */
+@media (max-width: 480px) {
+  .tabs {
+    gap: 0;
+  }
+
+  .tab {
+    flex: 1 1 100%;
+    text-align: left;
+    padding: 0.7rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  .page-lead {
+    padding: 1rem;
+  }
+
+  /* Keep video card body padding consistent for badge rows */
+  .video-card__body {
+    padding: 0.9rem 1rem 1.1rem;
+  }
+
+  .video-card__langs {
+    gap: 0.3rem;
+  }
+
+  .video-card__meta {
+    gap: 0.3rem;
+  }
+
+  .warning-block {
+    padding: 1rem;
+  }
+}

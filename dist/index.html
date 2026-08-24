@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kilombo — Publicaciones y archivos internacionalistas</title>
+<meta name="description" content="Portal central de acceso a publicaciones y archivos internacionalistas. Plataforma editorial, análisis político y documentales de espacios compañeros en la red Kilombo.">
+<meta property="og:title" content="Kilombo — Publicaciones y archivos internacionalistas">
+<meta property="og:description" content="Portal central de acceso a publicaciones y archivos internacionalistas de la red Kilombo.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kilombo.top/">
+<meta property="og:image" content="https://kilombo.top/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- =================================================================
+     CONFIG — URLs de la red Kilombo
+     Mantener sincronizado con .env.example (variables KILOMBO_SITE_*)
+     Si cambia alguna URL, actualizarla aquí Y en .env.example.
+     -----------------------------------------------------------------
+     TIERRA:    https://www.kilombo.top/
+     GCI:       https://icg-gci.kilombo.top/
+     GCI_EN:    https://in.kilombo.top/
+     GCI_CDROM: https://cdrom.kilombo.top/
+     GCI_OLD:   https://icg-old.kilombo.top/
+     PI:        https://proletariosinternacionalistas.kilombo.top/
+     SSO:       https://kilombo.top/yunohost/sso/
+     ================================================================= -->
+
+<header class="site-header">
+  <div class="container">
+    <div class="site-header__inner">
+      <svg class="site-logo-star" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- outer filled star -->
+        <polygon points="50,4 61,35 95,35 68,57 79,88 50,68 21,88 32,57 5,35 39,35"
+                 fill="#b91c2a"/>
+        <!-- inner outline star -->
+        <polygon points="50,22 57,43 80,43 62,56 69,77 50,64 31,77 38,56 20,43 43,43"
+                 fill="none" stroke="#fcfbf7" stroke-width="2.5"/>
+      </svg>
+      <div>
+        <h1 class="site-title">KILOMBO</h1>
+        <p class="site-subtitle">Publicaciones y archivos internacionalistas</p>
+        <p class="site-mission">Archivo riguroso de análisis internacionalista para el estudio y la acción política en la red de espacios compañeros.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="section section--actualidad" id="actualidad">
+    <div class="section-header section-header--illustrated">
+      <div class="section-header__text">
+        <span class="section-number">✦</span>
+        <h2 class="section-title">Actualidad</h2>
+        <p class="section-tagline">Noticias y análisis de coyuntura publicados en el portal. Artículos recientes sobre los acontecimientos en curso.</p>
+      </div>
+      <div class="section-illustration" aria-hidden="true">
+        <!-- Lightning bolt — urgent, breaking news, immediate action -->
+        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" class="section-svg section-svg--actualidad">
+          <path d="M40 8 L28 38 L48 38 L32 72 L52 32 L36 32 Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <a href="articulos.html?section=actualidad" class="card card--lang-es">
+        <div class="card-header">
+          <span class="card-lang">Español</span>
+          <span class="card-status card-status--mirrored">⬡ Espejo</span>
+        </div>
+        <h3 class="card-title">Análisis de Actualidad</h3>
+        <p class="card-desc">Artículos sobre los acontecimientos en curso — análisis urgente de coyuntura internacional y situaciones de ruptura política.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">Noticias</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section section--tierra" id="espacio-tierra-y-libertad">
+    <div class="section-header section-header--illustrated">
+      <div class="section-header__text">
+        <span class="section-number">⭐</span>
+        <h2 class="section-title">Espacio Tierra y Libertad</h2>
+        <p class="section-tagline">Plataforma editorial internacionalista — artículos de análisis, fundamentos científicos y dossieres temáticos.</p>
+      </div>
+      <div class="section-illustration" aria-hidden="true">
+        <!-- Rising sun — dawn, awakening, tierra libre -->
+        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" class="section-svg section-svg--tierra">
+          <circle cx="40" cy="46" r="16" fill="none" stroke="currentColor" stroke-width="2.5"/>
+          <line x1="40" y1="6"  x2="40" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="16" y1="14" x2="21" y2="21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="64" y1="14" x2="59" y2="21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="6"  y1="36" x2="14" y2="38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="74" y1="36" x2="66" y2="38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="12" y1="58" x2="19" y2="53" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="68" y1="58" x2="61" y2="53" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="8"  y1="70" x2="72" y2="70" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <a href="https://www.kilombo.top/" class="section-source-link" target="_blank" rel="noopener noreferrer" aria-label="Visitar fuente externa: www.kilombo.top">↗ Fuente</a>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <a href="articulos.html?section=tierra" class="card card--lang-es">
+        <div class="card-header">
+          <span class="card-lang">Español</span>
+          <span class="card-status card-status--mirrored">Activo · ⬡ Espejo</span>
+        </div>
+        <h3 class="card-title">Artículos — Tierra y Libertad</h3>
+        <p class="card-desc">Textos de análisis, fundamentos científicos y dossieres temáticos publicados en el portal desde el Espacio Tierra y Libertad.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">Editorial</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" id="gci">
+    <div class="section-header section-header--illustrated">
+      <div class="section-header__text">
+        <span class="section-number">01</span>
+        <h2 class="section-title">GCI — Grupo Comunista Internacionalista</h2>
+        <p class="section-tagline">Textos programáticos, comunicados oficiales, archivo histórico y plataformas internacionales de la corriente del GCI.</p>
+      </div>
+      <div class="section-illustration" aria-hidden="true">
+        <!-- Globe with meridians — international organised struggle -->
+        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" class="section-svg section-svg--gci">
+          <circle cx="40" cy="40" r="28" fill="none" stroke="currentColor" stroke-width="2.5"/>
+          <ellipse cx="40" cy="40" rx="14" ry="28" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <line x1="12" y1="40" x2="68" y2="40" stroke="currentColor" stroke-width="1.8"/>
+          <line x1="15" y1="24" x2="65" y2="24" stroke="currentColor" stroke-width="1.4"/>
+          <line x1="15" y1="56" x2="65" y2="56" stroke="currentColor" stroke-width="1.4"/>
+          <line x1="40" y1="12" x2="40" y2="68" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        <a href="https://icg-gci.kilombo.top/" class="section-source-link" target="_blank" rel="noopener noreferrer" aria-label="Visitar fuente externa: icg-gci.kilombo.top">↗ Fuente</a>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card card--lang-multi card--coming-soon">
+        <div class="card-header">
+          <span class="card-lang">ES / EN / FR</span>
+          <span class="card-status card-status--mirrored">Próximamente · ⬡ Espejo</span>
+        </div>
+        <h3 class="card-title">Artículos — GCI</h3>
+        <p class="card-desc">Próximamente — textos programáticos y comunicados del GCI publicados en el portal.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">Oficial</span>
+        </div>
+      </div>
+
+      <a href="https://icg-gci.kilombo.top/" class="card card--lang-multi" target="_blank" rel="noopener">
+        <div class="card-header">
+          <span class="card-lang">ES / EN / FR</span>
+          <span class="card-status card-status--external">Activo · ↗ Externo</span>
+        </div>
+        <h3 class="card-title">GCI — Sitio Oficial</h3>
+        <p class="card-desc">Sitio oficial del Grupo Comunista Internacionalista / Internationalist Communist Group. Textos programáticos y comunicados.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">Oficial</span>
+          <span class="tag tag--affil">ICG / GCI</span>
+        </div>
+      </a>
+
+      <a href="https://in.kilombo.top/" class="card card--lang-en" target="_blank" rel="noopener">
+        <div class="card-header">
+          <span class="card-lang">English</span>
+          <span class="card-status card-status--external">Activo · ↗ Externo</span>
+        </div>
+        <h3 class="card-title">International Global Revolution</h3>
+        <p class="card-desc">Plataforma internacionalista en inglés. Análisis y comunicados de la corriente internacional del GCI en lengua inglesa.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">ICG / GCI</span>
+        </div>
+      </a>
+
+      <a href="https://cdrom.kilombo.top/" class="card card--archive card--lang-multi" target="_blank" rel="noopener">
+        <div class="card-header">
+          <span class="card-lang">FR / ES / EN +</span>
+          <span class="card-status card-status--external">Archivo · ↗ Externo</span>
+        </div>
+        <h3 class="card-title">ICG / GCI CD-Rom</h3>
+        <p class="card-desc">Archivo revolucionario multilingüe en CD-Rom digital. Décadas de textos y documentos del GCI.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">Archivo</span>
+          <span class="tag tag--affil">Multilingüe</span>
+          <span class="tag tag--scope">Histórico</span>
+        </div>
+      </a>
+
+      <a href="https://icg-old.kilombo.top/" class="card card--archive card--lang-multi" target="_blank" rel="noopener">
+        <div class="card-header">
+          <span class="card-lang">Varios</span>
+          <span class="card-status card-status--external">Legado · ↗ Externo</span>
+        </div>
+        <h3 class="card-title">ICG — Sitio Histórico</h3>
+        <p class="card-desc">Antiguo sitio web del Internationalist Communist Group (ICG / GCI). Repositorio de textos y comunicados históricos de la organización.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">Histórico</span>
+          <span class="tag tag--affil">ICG / GCI</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" id="proletarios-internacionalistas">
+    <div class="section-header section-header--illustrated">
+      <div class="section-header__text">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Proletarios Internacionalistas</h2>
+        <p class="section-tagline">¡POR LA REVOLUCION SOCIAL MUNDIAL! — Crítica, fundamentos y análisis de la situación internacional.</p>
+      </div>
+      <div class="section-illustration" aria-hidden="true">
+        <!-- Raised fist — collective proletarian force -->
+        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" class="section-svg section-svg--pi">
+          <path d="M34 68 L34 44 L28 44 L28 32 L34 32 L34 28 L40 28 L40 24 L46 24 L46 28 L52 28 L52 44 L46 44 L46 68 Z"
+                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+          <line x1="34" y1="32" x2="34" y2="44" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="40" y1="28" x2="40" y2="44" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="46" y1="28" x2="46" y2="44" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="20" y1="72" x2="60" y2="72" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <a href="https://proletariosinternacionalistas.kilombo.top/" class="section-source-link" target="_blank" rel="noopener noreferrer" aria-label="Visitar fuente externa: proletariosinternacionalistas.kilombo.top">↗ Fuente</a>
+      </div>
+    </div>
+
+    <div class="cards-grid cards-grid--featured">
+      <a href="articulos.html?section=pi" class="card card--lang-multi card--featured">
+        <div class="card-header">
+          <span class="card-lang">Español · Français</span>
+          <span class="card-status card-status--mirrored">Activo · ⬡ Espejo</span>
+        </div>
+        <h3 class="card-title">Artículos — Proletarios Internacionalistas</h3>
+        <p class="card-desc">Crítica política, fundamentos revolucionarios y análisis de coyuntura internacional. Edición bilingüe ES/FR.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">P.I. / I.P.</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" id="nuevo-orden-mundial">
+    <div class="section-header section-header--illustrated">
+      <div class="section-header__text">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Nuevo Orden Mundial: plandemismo y domesticación</h2>
+        <p class="section-tagline">Análisis y documentos sobre la ofensiva ideológica, los regímenes de confinamiento y las estrategias de control social contemporáneas.</p>
+      </div>
+      <div class="section-illustration" aria-hidden="true">
+        <!-- Eye inside broken chain — surveillance exposed, domination broken -->
+        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" class="section-svg section-svg--nom">
+          <path d="M10 40 Q40 14 70 40 Q40 66 10 40 Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+          <circle cx="40" cy="40" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/>
+          <circle cx="40" cy="40" r="3.5" fill="currentColor"/>
+          <line x1="40" y1="6"  x2="40" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3,3"/>
+          <line x1="40" y1="64" x2="40" y2="74" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3,3"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <a href="articulos.html?section=nom" class="card card--thematic card--lang-es">
+        <div class="card-header">
+          <span class="card-lang">ES / FR</span>
+          <span class="card-status card-status--mirrored">Activo · ⬡ Espejo</span>
+        </div>
+        <h3 class="card-title">Artículos — NOM / Plandemismo</h3>
+        <p class="card-desc">Textos de análisis sobre la ofensiva del Nuevo Orden Mundial, el plandemismo y las estrategias de control social.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">Análisis</span>
+        </div>
+      </a>
+
+      <a href="plandemismo.html" class="card card--thematic card--lang-es">
+        <div class="card-header">
+          <span class="card-lang">Español + FR subt.</span>
+          <span class="card-status card-status--mirrored">Activo · ⬡ Espejo</span>
+        </div>
+        <h3 class="card-title">Vídeos — Nuevo Orden / Plandemismo</h3>
+        <p class="card-desc">Dossieres temáticos y vídeos de actualidad de Canal7 Salta. Incluye el documental "ELISA MATO A RUTH" (SIDA como antecesor del COVID). Subtítulos en francés en preparación.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">Temático</span>
+          <span class="tag tag--scope">Videos Canal7</span>
+          <span class="tag tag--affil">SIDA→COVID</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section section--archivo" id="archivo-portal">
+    <div class="section-header">
+      <span class="section-number">——</span>
+      <h2 class="section-title">Archivo — Índice de artículos</h2>
+      <p class="section-tagline">Textos de los espacios de la red publicados dentro del propio portal, con enlace a la fuente original. Abarca materiales de todas las secciones anteriores.</p>
+    </div>
+
+    <div class="cards-grid cards-grid--featured">
+      <a href="articulos.html" class="card card--lang-es">
+        <div class="card-header">
+          <span class="card-lang">ES / FR</span>
+          <span class="card-status card-status--mirrored">Activo · ⬡ Espejo</span>
+        </div>
+        <h3 class="card-title">Artículos internos</h3>
+        <p class="card-desc">Índice de artículos publicados dentro del portal, procedentes de los espacios Tierra y Libertad, Proletarios Internacionalistas, GCI y NOM. Cada entrada enlaza a la fuente original.</p>
+        <div class="card-tags">
+          <span class="tag tag--type">Archivo</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4 class="footer-title">Kilombo</h4>
+        <p class="footer-desc">Espacio de publicaciones y archivos internacionalistas.</p>
+      </div>
+      <div>
+        <h4 class="footer-title">Acceso SSO</h4>
+        <a href="https://kilombo.top/yunohost/sso/" class="footer-link" target="_blank" rel="noopener">Portal SSO — Aplicaciones, espacios e inicio de sesión</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© Kilombo — Contenido disponible para difusión revolucionaria.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

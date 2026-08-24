@@ -1,0 +1,10 @@
+{
+  "_comment": "Single source of truth for all Kilombo network URLs. check-urls.mjs validates .env.example, site/index.html and README.md against this file. To change a URL, edit it here — the CI check will then flag the other sources as out of sync.",
+  "sso":       "https://kilombo.top/yunohost/sso",
+  "tierra":    "https://www.kilombo.top",
+  "gci":       "https://icg-gci.kilombo.top",
+  "gci_en":    "https://in.kilombo.top",
+  "gci_cdrom": "https://cdrom.kilombo.top",
+  "gci_old":   "https://icg-old.kilombo.top",
+  "pi":        "https://proletariosinternacionalistas.kilombo.top"
+}
