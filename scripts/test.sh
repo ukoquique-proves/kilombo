@@ -30,7 +30,7 @@ echo "============================================================"
 # Scoped to test/*.test.mjs on purpose: a bare `node --test` uses Node's
 # default discovery glob, which also matches any file named `test-*.mjs`
 # or `*-test.mjs` anywhere in the repo — including scripts/test-spip-access.mjs,
-# scripts/test-spip-privilege-tiers.mjs and sandbox/test-admin-plugin-access.mjs.
+# scripts/test-spip-privilege-tiers.mjs and scripts/test-spip-access.mjs (successors to a since-removed sandbox/test-admin-plugin-access.mjs).
 # Those are live scripts that hit the real SPIP backend and require a
 # populated .env, so an unscoped `node --test` fails on any machine/CI run
 # without those credentials, even though the actual unit tests all pass.

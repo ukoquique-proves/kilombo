@@ -453,4 +453,4 @@ The four-layer architecture provides:
 ✅ **Testability** — Decoupled modules
 ✅ **Extensibility** — Easy to add new capabilities
 
-**The problem solved:** Article management is no longer hidden in sandbox scripts. It's now a first-class citizen in the project architecture with clear documentation, discoverable tools, and multiple workflows to support different editorial processes.
+**The problem solved:** Article management is no longer hidden in an undocumented sandbox/ directory. It's now a first-class citizen in the project architecture with clear documentation, discoverable tools, and multiple workflows to support different editorial processes.

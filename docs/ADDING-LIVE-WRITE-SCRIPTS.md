@@ -30,7 +30,7 @@ If you're creating a new script that uses Playwright to **write** to www.kilombo
    Edit `test/live-write-gateway.test.mjs` and add your script to `KNOWN_LIVE_WRITE_SCRIPTS`:
    ```javascript
    const KNOWN_LIVE_WRITE_SCRIPTS = [
-     'sandbox/create-article.mjs',
+     'scripts/create-article.mjs',
      'scripts/manage-article-status.mjs',
      'scripts/customize-escal-theme.mjs',
      'scripts/my-new-script.mjs',        // ← Add here
@@ -58,7 +58,7 @@ Without the gateway, each new script is a separate security hardening task.
 
 ## Enforcement
 
-A Kiro pre-commit hook (`.kiro/hooks/enforce-gateway-with-playwright.json`) blocks any script that imports Playwright from `scripts/` or `sandbox/` without also importing `live-write-gateway.mjs`. You'll see the error if you try to create a script that bypasses the gateway:
+A Kiro pre-commit hook (`.kiro/hooks/enforce-gateway-with-playwright.json`) blocks any script that imports Playwright from `scripts/` (including `scripts/debug/`) without also importing `live-write-gateway.mjs`. You'll see the error if you try to create a script that bypasses the gateway:
 
 ```
 [SECURITY] New script imports Playwright but not live-write-gateway.
@@ -103,7 +103,7 @@ async function deleteComment(commentId) {
 Then update the test list:
 ```javascript
 const KNOWN_LIVE_WRITE_SCRIPTS = [
-  'sandbox/create-article.mjs',
+  'scripts/create-article.mjs',
   'scripts/manage-article-status.mjs',
   'scripts/customize-escal-theme.mjs',
   'scripts/delete-comment.mjs',        // ← Add this line

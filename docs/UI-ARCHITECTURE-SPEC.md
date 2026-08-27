@@ -199,7 +199,7 @@ const env = fs.readFileSync(path.join(KILOMBO_DIR, '.env'), 'utf8');
 const vars = parseEnvFile(env);
 
 // Later, spawn commands with env vars set:
-const proc = spawn('node', ['sandbox/create-article.mjs', ...args], {
+const proc = spawn('node', ['scripts/create-article.mjs', ...args], {
   cwd: KILOMBO_DIR,
   env: { ...process.env, ...vars }
 });
@@ -233,7 +233,7 @@ app.post('/api/commands/create-article', async (req, res) => {
   
   // Spawn the script
   const args = [
-    'sandbox/create-article.mjs',
+    'scripts/create-article.mjs',
     '--create',
     '--title', title,
     '--body', body,

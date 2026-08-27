@@ -24,8 +24,8 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - **Effort:** ~2 hours (installation, config, testing, documentation)
 
 - [x] **66. create-article.mjs — end-to-end SPIP article creation verified (v0.40.1)** — ✅ VERIFIED
-  - **Status:** Full end-to-end success — `sandbox/create-article.mjs` successfully created Article ID 87 ("FINAL TEST") in the live SPIP dashboard on 2026-08-21.
-  - **Location:** `sandbox/create-article.mjs` (gitignored, not committed to repo — intentional, as per `scripts/import-article.mjs` pattern for test/sandbox tools)
+  - **Status:** Full end-to-end success — `scripts/create-article.mjs` successfully created Article ID 87 ("FINAL TEST") in the live SPIP dashboard on 2026-08-21.
+  - **Location:** `scripts/create-article.mjs` (gitignored, not committed to repo — intentional, as per `scripts/import-article.mjs` pattern for test/sandbox tools)
   - **Verification performed:**
     - `--inspect` mode: Dumped live SPIP form selectors (TITLE_SELECTOR, BODY_SELECTOR, SECTION_SELECTOR)
     - `--dry-run` mode: Verified form fields filled and autosave triggered
@@ -85,7 +85,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     - Inspect SPIP's JavaScript source in `/prive/` to understand the instituer_article autosave mechanism
     - Or test manual click + manual form inspection to see what network requests SPIP makes
     - Or pivot to a different method: creating a test article, inspecting what SPIP sends via HTTP when the form auto-submits, and replicating that request via `page.request.post()` instead of clicking
-  - **Location:** `sandbox/delete-article.mjs` (saved, not committed — development tool, not released)
+  - **Location:** `scripts/debug/delete-article.mjs` (saved, not committed — development tool, not released; `scripts/debug/` is the post-Phase-6 home for exploratory scripts, replacing the old `sandbox/`)
   - **Related:** #66 (create-article works), #68 (architecture for SPIP management scripts)
 
 - [x] **67. Docs desincronizados sobre el acceso al backend SPIP (`/ecrire/`) — RESUELTO (v0.42.0)**
@@ -138,12 +138,12 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     3. Los selectores reales de cada formulario cambian entre plantillas de las 4 instancias SPIP. Cada script necesita su propio modo `--inspect` para confirmarlos contra el HTML real antes de actuar.
     4. Sin un script versionado, cada sesión reinventa el flujo ad-hoc — que es cómo se originaron bugs en historial anterior.
   - **Qué existe hoy:**
-    - `sandbox/create-article.mjs` — crear artículo (verificado, #66).
-    - `sandbox/delete-article.mjs` — mover artículo a `poubelle`/papelera (nuevo, selectores confirmados pero acción bloqueada por autosave mismatch — ver #69).
+    - `scripts/create-article.mjs` — crear artículo (verificado, #66).
+    - `scripts/debug/delete-article.mjs` — mover artículo a `poubelle`/papelera (nuevo, selectores confirmados pero acción bloqueada por autosave mismatch — ver #69).
   - **Qué falta para tener el ciclo completo:**
-    - `sandbox/update-article.mjs` — editar un artículo existente (título/cuerpo/sección) sin recrearlo. No existe.
+    - `scripts/debug/update-article.mjs` — editar un artículo existente (título/cuerpo/sección) sin recrearlo. No existe.
     - Extractor GCI (#63) — bloquea poder aplicar estos scripts a instancias GCI/ICR, no solo Tierra y Libertad.
-    - Refactor: `create-article.mjs` y `delete-article.mjs` duplican la función `login()` línea por línea. Antes de añadir `update-article.mjs` (un tercer duplicado), extraer un módulo compartido (`sandbox/spip-session.mjs`) con el login + detección SSO/SPIP.
+    - Refactor: `create-article.mjs` y `delete-article.mjs` duplican la función `login()` línea por línea. Antes de añadir `update-article.mjs` (un tercer duplicado), extraer un módulo compartido (`scripts/debug/spip-session.mjs`) con el login + detección SSO/SPIP.
   - **Patrón de seguridad a mantener:** `--inspect` (solo lectura) → `--dry-run` (rellena/marca sin enviar) → ejecución real. Mismo orden que impone `create-article.mjs` y que replica `delete-article.mjs`.
   - **Estado:** documentado, no cerrado. `update-article.mjs` y refactor de `spip-session.mjs` son trabajo pendiente.
 

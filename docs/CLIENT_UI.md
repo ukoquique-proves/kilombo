@@ -40,7 +40,7 @@ El paso de publicación a SPIP (que usa Playwright) sigue siendo una acción exp
 
 ## Estado actual vs. lo que había antes
 
-El tab "Crear Artículo" del dashboard actual llama directamente a `sandbox/create-article.mjs`, que escribe en el SPIP de producción via Playwright. Esto es correcto para publicación directa, pero no sirve para el flujo de borradores.
+El tab "Crear Artículo" del dashboard actual llama directamente a `scripts/create-article.mjs`, que escribe en el SPIP de producción via Playwright. Esto es correcto para publicación directa, pero no sirve para el flujo de borradores.
 
 El pipeline `IN_PROGRESS/` → `READY/` ya existe y está activo:
 - `articulos_en_trabajo/IN_PROGRESS/` tiene ~70 ficheros (artículos en proceso)

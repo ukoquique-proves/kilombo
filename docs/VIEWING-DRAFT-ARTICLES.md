@@ -135,7 +135,7 @@ The project has multiple layers of article management:
    - Manual access point
    - UI for editorial review
 
-**Status (as of v0.45.0):** This has been addressed — `manage-article-status.mjs` and `list-draft-articles.mjs` now live in `scripts/` (production tools) instead of `sandbox/`, are documented in `PUBLISHING-GUIDE.md` and `README.md`.
+**Status (as of v0.45.0):** This has been addressed — `manage-article-status.mjs` and `list-draft-articles.mjs` now live in `scripts/` (production tools) instead of `sandbox/` (which no longer exists), and are documented in `PUBLISHING-GUIDE.md` and `README.md`.
 
 ---
 

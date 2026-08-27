@@ -6,7 +6,7 @@
  * site (www.kilombo.top).
  *
  * WHY THIS EXISTS:
- * Four separate CLI scripts (sandbox/create-article.mjs,
+ * Four separate CLI scripts (scripts/create-article.mjs,
  * scripts/manage-article-status.mjs, scripts/customize-escal-theme.mjs, and
  * indirectly scripts/migrate-to-spip.mjs via SPIPClient, which spawns the
  * first two as subprocesses) each independently drive a Playwright browser

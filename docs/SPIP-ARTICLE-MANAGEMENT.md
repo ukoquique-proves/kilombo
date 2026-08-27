@@ -22,7 +22,7 @@ SPIP uses a 5-state article workflow. All transitions are reversible except for 
 
 ## Article Management Scripts
 
-All scripts are located in `sandbox/` and use Playwright to automate the SPIP admin UI.
+All scripts are located in `scripts/` and use Playwright to automate the SPIP admin UI.
 
 ### create-article.mjs — Create New Articles
 
@@ -32,13 +32,13 @@ All scripts are located in `sandbox/` and use Playwright to automate the SPIP ad
 
 ```bash
 # Preview form without creating (no database writes)
-node sandbox/create-article.mjs --create --title "Title" --body "<p>Body</p>" --dry-run
+node scripts/create-article.mjs --create --title "Title" --body "<p>Body</p>" --dry-run
 
 # Actually create the article
-node sandbox/create-article.mjs --create --title "Title" --body "<p>Body</p>"
+node scripts/create-article.mjs --create --title "Title" --body "<p>Body</p>"
 
 # Optional parameters
-node sandbox/create-article.mjs --create \
+node scripts/create-article.mjs --create \
   --title "Title" \
   --body "<p>Body HTML</p>" \
   --section 1 \

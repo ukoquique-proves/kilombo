@@ -699,7 +699,7 @@ The `scripts/manage-article-status.mjs` script was tested with Article #87 ("FIN
 
 ```bash
 # 1. Create test article (already done)
-node sandbox/create-article.mjs --create
+node scripts/create-article.mjs --create
 
 # 2. Move to trash
 node scripts/manage-article-status.mjs --change --id 87 --status poubelle

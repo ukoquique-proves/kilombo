@@ -160,13 +160,13 @@ git clone https://github.com/ukoquique-proves/kilombo
 
 ### Update scripts
 
-If you have scripts that use the token (e.g., `sandbox/create-article.mjs`):
+If you have scripts that use the token (e.g., `scripts/create-article.mjs`):
 
 1. Verify they read from `.env`
 2. Restart the script or reload the environment:
    ```bash
    source .env
-   node sandbox/create-article.mjs --inspect --id 1
+   node scripts/create-article.mjs --inspect --id 1
    ```
 
 ---

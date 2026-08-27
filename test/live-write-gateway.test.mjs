@@ -28,7 +28,7 @@ const REPO_ROOT = resolve(__dirname, '..');
 // SPIP site (i.e. drives Playwright to submit a form, change a status,
 // or otherwise write to www.kilombo.top).
 const KNOWN_LIVE_WRITE_SCRIPTS = [
-  'sandbox/create-article.mjs',
+  'scripts/create-article.mjs',
   'scripts/manage-article-status.mjs',
   'scripts/customize-escal-theme.mjs',
 ];

@@ -43,7 +43,7 @@ When a developer discovered the project, they found:
    - No built-in delay or confirmation required
 
 2. **Migration Scripts Don't Enforce Review**
-   - Article creation scripts (`sandbox/create-article.mjs`) can change status to published
+   - Article creation scripts (`scripts/create-article.mjs`) can change status to published
    - No requirement to keep articles in draft while waiting for approval
    - Direct publication is possible in a single script execution
 
@@ -176,7 +176,7 @@ SPIP provides 5 article status codes:
 ### Attack Surface
 
 **Direct Access Points:**
-1. `scripts/sandbox/create-article.mjs` — Can create AND change status
+1. `scripts/scripts/create-article.mjs` — Can create AND change status
 2. `scripts/manage-article-status.mjs` — Can change article status
 3. Any custom script using the SPIP API directly
 4. Direct SPIP login (requires credentials)

@@ -1,7 +1,7 @@
 /**
  * scripts/lib/spip-client.mjs
  * ═══════════════════════════════════════════════════════════════════════
- * Abstraction layer over sandbox/create-article.mjs and scripts/manage-article-status.mjs
+ * Abstraction layer over scripts/create-article.mjs and scripts/manage-article-status.mjs
  *
  * RESPONSIBILITIES:
  *   - Encapsulate Playwright-based SPIP interactions
@@ -32,7 +32,6 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPTS_DIR = path.join(__dirname, '..');
-const SANDBOX_DIR = path.join(__dirname, '..', '..', 'sandbox');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Slug → SPIP rubrique ID lookup table
@@ -40,7 +39,7 @@ const SANDBOX_DIR = path.join(__dirname, '..', '..', 'sandbox');
 // IMPORTANT: these IDs must be verified against the live SPIP instance at
 // kilombo.top BEFORE this table is used in production. Run:
 //
-//   node sandbox/create-article.mjs --inspect
+//   node scripts/create-article.mjs --inspect
 //
 // and read the <select name="id_parent"> option values from the output.
 // Update the values below with the real IDs, then remove the TODO comment.
@@ -54,7 +53,7 @@ const SANDBOX_DIR = path.join(__dirname, '..', '..', 'sandbox');
 
 /** @type {Record<string, string>} */
 const SLUG_TO_RUBRIQUE_ID = {
-  // Verified against live SPIP on kilombo.top via sandbox/probe-rubriques.mjs
+  // Verified against live SPIP on kilombo.top via scripts/probe-rubriques.mjs
   // Full rubrique tree:
   //   0  (none / root)
   //   20 Home
@@ -84,8 +83,8 @@ const SLUG_TO_RUBRIQUE_ID = {
  * Translate a category slug (used in articles.json) to a SPIP numeric rubrique ID.
  * Passes numeric strings through unchanged.
  *
- * Rubrique map verified against live SPIP on kilombo.top (sandbox/probe-rubriques.mjs).
- * To re-verify: node sandbox/probe-rubriques.mjs
+ * Rubrique map verified against live SPIP on kilombo.top (scripts/probe-rubriques.mjs).
+ * To re-verify: node scripts/probe-rubriques.mjs
  *
  * @param {string} section - slug (e.g. 'tierra') or numeric ID (e.g. '6')
  * @returns {string} numeric rubrique ID
@@ -97,7 +96,7 @@ export function slugToRubriquId(section) {
   if (!id) {
     throw new Error(
       `Unknown section slug: "${section}". ` +
-      `Run \`node sandbox/create-article.mjs --inspect\` to discover the live ` +
+      `Run \`node scripts/create-article.mjs --inspect\` to discover the live ` +
       `SPIP rubrique IDs, then update SLUG_TO_RUBRIQUE_ID in scripts/lib/spip-client.mjs.`
     );
   }
@@ -129,11 +128,11 @@ export class SPIPClient {
 
     // Translate slug → numeric rubrique ID at the boundary.
     // This is the single place where the translation happens; the Playwright
-    // script (sandbox/create-article.mjs) only accepts numeric IDs.
+    // script (scripts/create-article.mjs) only accepts numeric IDs.
     const rubriquId = slugToRubriquId(section);
 
     const args = [
-      path.join(SANDBOX_DIR, 'create-article.mjs'),
+      path.join(SCRIPTS_DIR, 'create-article.mjs'),
       '--create',
       '--title',
       title,

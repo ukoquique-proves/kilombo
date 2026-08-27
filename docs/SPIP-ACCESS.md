@@ -43,7 +43,7 @@ All four SPIP instances respond with SSO redirects (expected for auth-required p
 
 #### Test 2: Article Creation & Persistence (v0.42.0+)
 
-**Script:** `sandbox/create-article.mjs`
+**Script:** `scripts/create-article.mjs`
 
 Creates a test article and verifies it persists to database:
 
@@ -59,7 +59,7 @@ Creates a test article and verifies it persists to database:
 
 #### Test 3: Privilege Tier — Admin Access (v0.42.0+)
 
-**Script:** `sandbox/test-admin-plugin-access.mjs`
+**Script:** `sandbox/test-admin-plugin-access.mjs` (historical name — this script was already removed from the repo prior to Phase 6; its successor is `scripts/test-spip-privilege-tiers.mjs`)
 
 Tests whether `kilombo` can access admin plugin management (requires full admin privileges):
 
@@ -157,7 +157,7 @@ node scripts/manage-article-status.mjs --change --id 87 --status poubelle --dry-
 ### Automation Script (Node.js)
 
 ```bash
-node sandbox/create-article.mjs \
+node scripts/create-article.mjs \
   --create \
   --title "My Article Title" \
   --body "<p>Article content here</p>"
@@ -185,7 +185,7 @@ Want to create/edit articles in SPIP at kilombo.top/ecrire/?
   │              └─ Create/edit articles in the admin panel
   │
   └─ YES, use automation
-       └─ Run: node sandbox/create-article.mjs --create ...
+       └─ Run: node scripts/create-article.mjs --create ...
             └─ Script handles form filling, submission, verification
 ```
 
@@ -276,7 +276,7 @@ Article creation via SPIP web interface **does not require SSH or port 22 access
 
 ```bash
 # Create article
-node sandbox/create-article.mjs --create --title "Title" --body "<p>Content</p>"
+node scripts/create-article.mjs --create --title "Title" --body "<p>Content</p>"
 
 # Inspect article status
 node scripts/manage-article-status.mjs --inspect --id 87
@@ -285,7 +285,7 @@ node scripts/manage-article-status.mjs --inspect --id 87
 node scripts/manage-article-status.mjs --change --id 87 --status publie
 
 # Test privilege tier
-node sandbox/test-admin-plugin-access.mjs
+node scripts/test-spip-privilege-tiers.mjs  # (successor to the removed sandbox/test-admin-plugin-access.mjs)
 
 # Test HTTP reachability
 node scripts/test-spip-access.mjs
@@ -301,9 +301,9 @@ node scripts/test-spip-access.mjs
 
 ### Key Files
 
-- Article creation script: `sandbox/create-article.mjs`
+- Article creation script: `scripts/create-article.mjs`
 - Status management script: `scripts/manage-article-status.mjs`
-- Privilege testing script: `sandbox/test-admin-plugin-access.mjs`
+- Privilege testing script: `scripts/test-spip-privilege-tiers.mjs` (successor to the removed `sandbox/test-admin-plugin-access.mjs`)
 - Reachability testing script: `scripts/test-spip-access.mjs`
 
 ---

@@ -55,7 +55,7 @@ Manages interactions with SPIP backend without exposing Playwright details.
 
 **Responsibilities:**
 - Encapsulate browser automation (Playwright)
-- Invoke sandbox scripts (create-article.mjs, delete-article.mjs)
+- Invoke scripts/ CLI tools (create-article.mjs, and the not-yet-committed delete-article.mjs in scripts/debug/)
 - Parse script output into structured results
 - Handle errors and timeouts
 
@@ -332,7 +332,7 @@ node scripts/migrate-to-spip.mjs --list
 # Step 2: Dry-run preview (no changes)
 node scripts/migrate-to-spip.mjs --article-id my-article --dry-run
 
-# Step 3: Review screenshot at sandbox/article_create_dryrun.png
+# Step 3: Review screenshot at docs/debug-snapshots/article_create_dryrun.png
 
 # Step 4: If satisfied, create article (draft status)
 node scripts/migrate-to-spip.mjs --article-id my-article
@@ -429,7 +429,7 @@ This only affects `sync-to-production.sh`. The SPIP migration doesn't need SSH.
 
 ### "SPIP form fields not found"
 
-The create-article.mjs script uses CSS selectors based on standard SPIP layout. If SPIP was customized, selectors may need updating in `sandbox/create-article.mjs`.
+The create-article.mjs script uses CSS selectors based on standard SPIP layout. If SPIP was customized, selectors may need updating in `scripts/create-article.mjs`.
 
 ### "Article appears in SPIP but not on www.kilombo.top"
 
@@ -448,7 +448,7 @@ SPIP has caching. Try:
 | `scripts/lib/article-extractor.mjs` | Data layer (articles.json) |
 | `scripts/lib/spip-client.mjs` | SPIP abstraction layer |
 | `scripts/lib/migration-reporter.mjs` | Logging & reporting |
-| `sandbox/create-article.mjs` | Low-level SPIP article creation (Playwright) |
+| `scripts/create-article.mjs` | Low-level SPIP article creation (Playwright) |
 | `scripts/manage-article-status.mjs` | Low-level SPIP status change (Playwright) |
 
 ---

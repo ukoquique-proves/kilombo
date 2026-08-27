@@ -23,8 +23,8 @@
     "i18n-coverage": "node scripts/i18n-coverage.mjs",
     "encrypt": "node scripts/encrypt.mjs",
     "preview": "python3 -m http.server 8080 --directory site",
-    "scrape": "bash sandbox/scrape-curl.sh",
-    "scrape:full": "bash sandbox/scrape-comprehensive.sh",
+    "scrape": "bash scripts/scrape-curl.sh",
+    "scrape:full": "bash scripts/scrape-comprehensive.sh",
     "check-corruption": "node scripts/detect-fixed-column-corruption.mjs"
   },
   "keywords": [],

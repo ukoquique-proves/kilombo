@@ -494,7 +494,7 @@ Estas entradas aparecerán automáticamente en el tab "Auditoría" del dashboard
 
 **ANTES (actual):**
 ```
-[ Crear Artículo ]    →   Publicación directa via sandbox/create-article.mjs → SPIP
+[ Crear Artículo ]    →   Publicación directa via scripts/create-article.mjs → SPIP
 [ Auditoría    ]
 [ Jobs         ]
 [ Estado       ]

@@ -197,7 +197,7 @@ function sanitizeInput(str, maxLength = 200000) {
 /**
  * POST /api/commands/create-article
  *
- * Spawn: node sandbox/create-article.mjs --create --title "..." --body "..." --section "..."
+ * Spawn: node scripts/create-article.mjs --create --title "..." --body "..." --section "..."
  *
  * Body:
  *   {
@@ -247,7 +247,7 @@ app.post('/api/commands/create-article', (req, res) => {
   }
 
   const args = [
-    'sandbox/create-article.mjs',
+    'scripts/create-article.mjs',
     '--create',
     '--title', sanitizedTitle,
     '--body', sanitizedBody,

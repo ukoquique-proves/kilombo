@@ -112,14 +112,14 @@
 cd $LOCAL_KILOMBO_DIR
 
 # Step 1: Preview WITHOUT creating article
-node sandbox/create-article.mjs \
+node scripts/create-article.mjs \
   --create \
   --title "Your Article Title" \
   --body "<p>Article content here</p>" \
   --dry-run
 
 # Step 2: If preview looks good, run WITHOUT --dry-run to actually create
-node sandbox/create-article.mjs \
+node scripts/create-article.mjs \
   --create \
   --title "Your Article Title" \
   --body "<p>Article content here</p>"
@@ -151,7 +151,7 @@ This prevents the accidental duplicate-article bug (see issue #89/#88). Safe to 
 
 ### Documentation:
 - Full details: `docs/SPIP-ACCESS.md`
-- Script reference: `sandbox/create-article.mjs` (comments in file)
+- Script reference: `scripts/create-article.mjs` (comments in file)
 
 ---
 
@@ -422,7 +422,7 @@ This prevents the workflow from creating unwanted duplicate articles during test
 | Script | Purpose | Usage |
 |--------|---------|-------|
 | `scripts/migrate-to-spip.mjs` | Migrate articles from JSON to SPIP | `node scripts/migrate-to-spip.mjs --article-id [slug]` or `--publish` |
-| `sandbox/create-article.mjs` | Low-level SPIP article creation | `node sandbox/create-article.mjs --create --title "..." --body "..."` |
+| `scripts/create-article.mjs` | Low-level SPIP article creation | `node scripts/create-article.mjs --create --title "..." --body "..."` |
 | `scripts/manage-article-status.mjs` | Low-level SPIP status change | `node scripts/manage-article-status.mjs --change --id <N> --status publie` |
 | `end-of-session.sh` | Deploy to both systems | `./end-of-session.sh` |
 | `sync-to-production.sh` | Deploy mirror to kilombo.top | `./sync-to-production.sh` (called by end-of-session.sh) |

@@ -26,7 +26,7 @@
       "mitigated": "2026-08-24",
       "summary": "Publishing an article directly to the live SPIP site (prepa -> publie in one script run) takes one command with no confirmation, while the safe draft-then-review path requires a manual admin login and status change. Safe should be easier than risky; here it's inverted.",
       "affects": [
-        "sandbox/create-article.mjs",
+        "scripts/create-article.mjs",
         "scripts/manage-article-status.mjs",
         "scripts/lib/spip-client.mjs",
         "scripts/migrate-to-spip.mjs"

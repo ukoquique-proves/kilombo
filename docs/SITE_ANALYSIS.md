@@ -1,6 +1,6 @@
 # SITE_ANALYSIS — www.kilombo.top Complete Inventory
 
-**Source:** Authenticated full-site probe via `sandbox/scrape-comprehensive.sh` (2026-08-11)  
+**Source:** Authenticated full-site probe via `scripts/scrape-comprehensive.sh` (2026-08-11)  
 **Data:** SPIP 4.4.15 running on nginx, IP `80.67.181.245`  
 **Coverage:** All article IDs (1–120 probed) + RSS + archive indices + hidden/unlisted articles  
 **⚠️ COVERAGE LIMITATION:** Only **publicly published articles** — draft/private articles inaccessible (user lacks SPIP author rights)
