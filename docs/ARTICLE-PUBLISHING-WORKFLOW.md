@@ -2,6 +2,8 @@
 
 Complete end-to-end process for transforming raw articles from `/nuevos_articulos/` into published content in the Kilombo mirror.
 
+> **Note (Phase 8, CONSOLIDATION-PHASES-6-8-HANDOFF.md):** within the repo itself, `articulos_en_trabajo/` now lives at `data/articulos_en_trabajo/`. The absolute `/root/JOB-sda2/...` paths below describe a specific operator's local machine layout from past sessions and are left as historical/environment-specific references — on that machine, any path ending in `.../KILOMBO-BUILD/KILOMBO/articulos_en_trabajo` (i.e. inside the repo checkout) should likewise be read as `.../KILOMBO-BUILD/KILOMBO/data/articulos_en_trabajo` going forward.
+
 ## Overview
 
 ```

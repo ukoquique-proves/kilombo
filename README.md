@@ -267,13 +267,20 @@ KILOMBO/
 │   ├── test.sh            ← Runner de tests: unit tests + validate-data + check-urls
 │   ├── encrypt.mjs        ← Cifra HTML + JSON con StatiCrypt antes del deploy a GitHub Pages
 │   ├── validate-data.mjs  ← Validador de esquemas para JSON (videos + contenido interno)
-│   └── check-urls.mjs     ← Comprueba consistencia de URLs entre .env.example, index.html y README
+│   ├── check-urls.mjs     ← Comprueba consistencia de URLs entre .env.example, index.html y README
+│   ├── create-article.mjs ← Creación de artículos en SPIP vía Playwright (promovido desde sandbox/ en Phase 6)
+│   └── debug/             ← Scripts exploratorios/no comprometidos con producción (ex-sandbox/)
+│
+├── data/                  ← Datos mutables en tiempo de ejecución (fuera del árbol versionado, Phase 8)
+│   ├── articulos_en_trabajo/  ← Pipeline de borradores editoriales: IN_PROGRESS/ → READY/
+│   └── ready-articles.json    ← Snapshot histórico de artículos listos para migrar
 │
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml     ← GitHub Actions: publica site/ en GitHub Pages en cada push a main
 │
 ├── docs/                  ← Documentación operativa y de referencia
+│   ├── debug-snapshots/           ← Capturas de pantalla/HTML de depuración (ex-sandbox/, Phase 6)
 │   ├── MIGRATION.md               ← Relación entre kilombo.top (SPIP) y el portal espejo (GitHub Pages)
 │   ├── TROUBLESHOOTING.md         ← Diagnóstico de acceso al servidor + flujo de publicación en GitHub Pages
 │   ├── TO_FIX.md                  ← Bugs y pendientes activos

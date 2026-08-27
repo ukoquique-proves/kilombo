@@ -34,8 +34,8 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
-const IN_PROGRESS_DIR = join(REPO_ROOT, 'articulos_en_trabajo', 'IN_PROGRESS');
-const READY_DIR = join(REPO_ROOT, 'articulos_en_trabajo', 'READY');
+const IN_PROGRESS_DIR = join(REPO_ROOT, 'data', 'articulos_en_trabajo', 'IN_PROGRESS');
+const READY_DIR = join(REPO_ROOT, 'data', 'articulos_en_trabajo', 'READY');
 
 for (const d of [IN_PROGRESS_DIR, READY_DIR]) {
   if (!existsSync(d)) mkdirSync(d, { recursive: true });

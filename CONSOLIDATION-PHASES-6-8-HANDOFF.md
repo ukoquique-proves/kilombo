@@ -294,3 +294,32 @@ entries and this doc's own history are intentionally left untouched).
 **Rollback:** each phase is its own git commit (`git log --oneline` in this repo);
 `git revert` either commit independently if needed.
 
+---
+
+## Session 3 Summary (Recovery — a later upload of this repo had regressed)
+
+A subsequent upload of this repo turned out to be a **different snapshot** than the
+one Session 2 finished: the Session 2 Summary text above was present verbatim, but
+the actual file moves had been lost. `sandbox/` was deleted, but `create-article.mjs`
+and 7 other sandbox-era scripts (`probe-rubriques.mjs`, `scrape-curl.sh`,
+`scrape-comprehensive.sh`, `scripts/debug/*`, `docs/debug-snapshots/*`) were gone
+**entirely** — not just left in the old location — while `api/server.mjs`,
+`scripts/lib/spip-client.mjs` (`SANDBOX_DIR`, used at runtime), and two test files
+still pointed at `sandbox/create-article.mjs`. Net effect: article creation was
+broken and 2 tests failed (`live-write-gateway.test.mjs`).
+
+**Fix:**
+- Recovered all 12 missing files from an intact earlier working copy.
+- Re-applied the same reference fixes as Phase 6 (including the `SANDBOX_DIR`
+  runtime constant) → back to 234/234.
+- Phase 8 had also partially regressed: drafts were split between a real root
+  `articulos_en_trabajo/` (2 live drafts) and an orphaned, empty
+  `data/articulos_en_trabajo/` stub. Merged them into `data/` with no data loss,
+  moved `ready-articles.json` there too, and re-applied the same code/doc updates.
+- Verified live: `drafts-store.mjs` resolves 2 drafts, 0 ready — matching disk.
+
+**Takeaway for future sessions:** if you're restoring or merging from an older
+export of this repo, diff `scripts/`, `scripts/debug/`, and `docs/debug-snapshots/`
+against what's expected before assuming a migration is intact — a doc/CHANGELOG
+match is not proof the underlying files moved correctly.
+

@@ -97,6 +97,6 @@ for (const r of results) {
 }
 
 // Export detailed JSON for import script
-const jsonPath = path.join(__dirname, '../ready-articles.json');
+const jsonPath = path.join(__dirname, '../data/ready-articles.json');
 fs.writeFileSync(jsonPath, JSON.stringify(results, null, 2));
-console.log(`\n## Exported to ready-articles.json\n`);
+console.log(`\n## Exported to data/ready-articles.json\n`);

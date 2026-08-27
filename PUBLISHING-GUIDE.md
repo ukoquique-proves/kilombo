@@ -173,7 +173,7 @@ This prevents the accidental duplicate-article bug (see issue #89/#88). Safe to 
 
 2. **Create editorial notes**
    ```bash
-   cd articulos_en_trabajo/IN_PROGRESS
+   cd data/articulos_en_trabajo/IN_PROGRESS
    touch [slug].md
    ```
    
@@ -197,11 +197,11 @@ This prevents the accidental duplicate-article bug (see issue #89/#88). Safe to 
 3. **Rebuild article** with proper formatting
    - Follow `docs/EDITORIAL_GUIDELINES.md`
    - Use HTML tags: `<p>`, `<h3>`, `<h4>`, `<strong>`, `<em>`, `<blockquote>`, `<a>`, `<ul>`, `<li>`
-   - Store in `articulos_en_trabajo/IN_PROGRESS/[slug].md`
+   - Store in `data/articulos_en_trabajo/IN_PROGRESS/[slug].md`
 
 #### Phase 2: Convert to JSON
 
-Create `articulos_en_trabajo/IN_PROGRESS/[slug].json`:
+Create `data/articulos_en_trabajo/IN_PROGRESS/[slug].json`:
 
 ```json
 {
@@ -234,7 +234,7 @@ If validation fails: Read error message, fix JSON, re-run `npm test`
 #### Phase 4: Move to READY
 
 ```bash
-cd articulos_en_trabajo
+cd data/articulos_en_trabajo
 mv IN_PROGRESS/[slug].json READY/[slug].json
 ```
 
@@ -260,7 +260,7 @@ git push origin main
 - Full details: `docs/ARTICLE-PUBLISHING-WORKFLOW.md`
 - Editorial guidelines: `docs/EDITORIAL_GUIDELINES.md`
 - Schema reference: `docs/SCHEMA_REFERENCE.md`
-- Quick start: `articulos_en_trabajo/QUICK_START.md`
+- Quick start: `data/articulos_en_trabajo/QUICK_START.md`
 
 ---
 
@@ -275,7 +275,7 @@ git push origin main
 
 #### Step 1: Publish to Mirror (use WORKFLOW B)
 
-Create JSON in `articulos_en_trabajo/IN_PROGRESS/[slug].json`, validate, move to READY/, merge, commit, push to GitHub main.
+Create JSON in `data/articulos_en_trabajo/IN_PROGRESS/[slug].json`, validate, move to READY/, merge, commit, push to GitHub main.
 
 **Result on GitHub Pages:** Article live at https://ukoquique-proves.github.io/kilombo/articulos.html
 

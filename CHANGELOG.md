@@ -53,6 +53,31 @@ Comprehensive consolidation of 26 documentation files, resolving fragmentation, 
 
 ---
 
+## [0.53.0] — 2026-08-27
+
+### FIX: Recovered a regressed sandbox/ → scripts/ migration (Phases 6 & 8)
+
+**Status:** ✅ Complete · `npm test 234/234 ✅` (was 232/234 — article creation was broken)
+
+This snapshot of the repo had lost the file moves from a prior Phase 6/8 session
+while keeping the doc/CHANGELOG text describing them as done. `sandbox/` was
+deleted, but `create-article.mjs` and 7 other scripts were gone entirely, while
+`api/server.mjs` and a runtime `SANDBOX_DIR` constant in `scripts/lib/spip-client.mjs`
+still pointed at the missing `sandbox/create-article.mjs` — breaking article
+creation and failing `test/live-write-gateway.test.mjs`.
+
+- Recovered `create-article.mjs`, `probe-rubriques.mjs`, `scrape-curl.sh`,
+  `scrape-comprehensive.sh` into `scripts/`; exploratory scripts into
+  `scripts/debug/`; debug captures into `docs/debug-snapshots/`.
+- Fixed the `SANDBOX_DIR` runtime constant and all remaining `sandbox/` references.
+- Merged a split Phase 8 state: real drafts in root `articulos_en_trabajo/` plus an
+  orphaned empty `data/articulos_en_trabajo/` stub → consolidated into `data/` with
+  no data loss; `ready-articles.json` moved alongside it.
+
+See `CONSOLIDATION-PHASES-6-8-HANDOFF.md` (Session 3 Summary) for the full account.
+
+---
+
 ## [0.52.0] — 2026-08-27
 
 ### FEATURE: Fase 6 IA — Groq integration: /improve + /apply-suggestion (live)

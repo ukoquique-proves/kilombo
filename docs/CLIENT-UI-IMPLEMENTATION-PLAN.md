@@ -30,7 +30,7 @@ Actualizado por última vez: **2026-08-26**.
 
 ## 1. Objetivo
 
-Conectar el pipeline de borradores ya existente (`articulos_en_trabajo/IN_PROGRESS/` → `READY/`) a la UI del cliente mediante:
+Conectar el pipeline de borradores ya existente (`data/articulos_en_trabajo/IN_PROGRESS/` → `READY/`) a la UI del cliente mediante:
 
 1. Librerías reutilizables en `scripts/lib/`
 2. 7 endpoints REST en `api/server.mjs`
@@ -126,13 +126,13 @@ export function slugify(title) {
 
 ---
 
-### 3.3 Asegurar que `articulos_en_trabajo/` exista con subdirs · ✅ HECHO
+### 3.3 Asegurar que `data/articulos_en_trabajo/` exista con subdirs · ✅ HECHO
 
 **Ejecutado:**
 - `mkdir -p articulos_en_trabajo/{IN_PROGRESS,READY}` en el repositorio local (2026-08-26).
 - Además, `drafts-store.mjs` incluye `ensureDirs()` auto-lanzado en carga (IIFE) con `mkdirSync(d, {recursive:true})`, así que incluso si el dir desapareciera, el módulo lo recrea en runtime.
 
-**Verificación:** Si el directorio `articulos_en_trabajo/` (y subdirs `IN_PROGRESS/`, `READY/`) no existe en el runtime, `drafts-store.mjs` fallará al escribir.
+**Verificación:** Si el directorio `data/articulos_en_trabajo/` (y subdirs `IN_PROGRESS/`, `READY/`) no existe en el runtime, `drafts-store.mjs` fallará al escribir.
 
 **Decisión:** Añadir chequeo + `mkdir -p` (recursivo) en el constructor de `drafts-store.mjs` (no como paso aparte). Mejor encapsulado en la propia librería que como script de setup.
 
@@ -142,7 +142,7 @@ export function slugify(title) {
 
 **Archivo creado:** [scripts/lib/drafts-store.mjs](../scripts/lib/drafts-store.mjs) · 2026-08-26
 
-**Módulo de acceso al filesystem para `articulos_en_trabajo/`.** Toda escritura/lectura de borradores pasa por aquí (nunca endpoints API manipulan fs directamente).
+**Módulo de acceso al filesystem para `data/articulos_en_trabajo/`.** Toda escritura/lectura de borradores pasa por aquí (nunca endpoints API manipulan fs directamente).
 
 ### API exportada · 6/6 métodos ✅
 
@@ -163,7 +163,7 @@ export function listReady()                // ✅ HECHO
 - [x] Verifica unicidad de slug contra 3 fuentes: IN_PROGRESS, READY, articles.json publicado
 - [x] Sufijos `-2`, `-3`, etc. en colisiones (con `slugify()` para respetar 80-char cap)
 - [x] Defaults completos: `sourceSite: "Kilombo Cliente Dashboard"`, `sourceUrl: "#"`, `status: "pending-review"`, `date: hoy YYYY-MM-DD`, `createdAt`/`updatedAt` ISO
-- [x] Escribe `articulos_en_trabajo/IN_PROGRESS/<slug>.json`
+- [x] Escribe `data/articulos_en_trabajo/IN_PROGRESS/<slug>.json`
 - [x] Audit log entry `draft.create`
 
 **Verificado en smoke-test:** Crea 2 borradores con mismo título → slugs `smoke-test-articulo` y `smoke-test-articulo-2`.
@@ -213,7 +213,7 @@ export function listReady()                // ✅ HECHO
 ```javascript
 // drafts-store.mjs (cargado en runtime, resolve correcto desde scripts/lib/)
 const REPO_ROOT = resolve(__dirname, '..', '..');
-const WORK_DIR = join(REPO_ROOT, 'articulos_en_trabajo');
+const WORK_DIR = join(REPO_ROOT, 'data', 'articulos_en_trabajo');
 const IN_PROGRESS_DIR = join(WORK_DIR, 'IN_PROGRESS');
 const READY_DIR = join(WORK_DIR, 'READY');
 const ARTICLES_JSON_PATH = join(REPO_ROOT, 'site', 'assets', 'content', 'articles.json');
@@ -434,7 +434,7 @@ Añadir 7 nuevos endpoints. Todos usan `drafts-store.mjs` para operaciones fs. T
   data: {
     approved: true,
     slug,
-    path: "articulos_en_trabajo/READY/<slug>.json",
+    path: "data/articulos_en_trabajo/READY/<slug>.json",
     approvedAt: "2026-08-26T...",
     validationErrors: []  // array vacío cuando pasa
   }
@@ -578,7 +578,7 @@ Implementar **3 subtabs internas**:
 - Al cargar (o al cambiar selector de slug): `GET /api/drafts/:slug` → pintar `previewHtml` en un `<div>` + mostrar metadata
 - "Editar ←": volver a Subtab A cargando los datos actuales
 - "Aprobar →": **llamada crítica** → `POST /api/drafts/:slug/approve`
-  - `200 OK` → Mostrar banner verde: "✅ Artículo aprobado y movido a `articulos_en_trabajo/READY/<slug>.json`. Listo para publicar en kilombo.top"
+  - `200 OK` → Mostrar banner verde: "✅ Artículo aprobado y movido a `data/articulos_en_trabajo/READY/<slug>.json`. Listo para publicar en kilombo.top"
   - `422 VALIDATION_FAILED` → Mostrar cada error en rojo, con el path del campo y el mensaje. NINGÚN paso automático: el usuario tiene que volver a Subtab A, corregir, guardar, reintentar aprobar.
   - `400 DRAFT_ALREADY_APPROVED` → Mostrar info: este artículo ya está en READY
 
@@ -609,7 +609,7 @@ Implementar **3 subtabs internas**:
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│ Artículos aprobados en articulos_en_trabajo/READY/              │
+│ Artículos aprobados en data/articulos_en_trabajo/READY/              │
 │                                                                   │
 │   SLUG                  FECHA APROBADO    SECCIÓN   ACCIONES      │
 │ ─────────────────────────────────────────────────────────────    │
@@ -638,7 +638,7 @@ Ya descrito en §6.5 y §6.6: endpoints `/improve` y `/apply-suggestion` devuelv
 | # | Paso | Resultado esperado |
 |---|------|--------------------|
 | 1 | `npm run start` → abrir `http://localhost:3000/dashboard.html` | Server arranca, dashboard carga sin errores JS en consola |
-| 2 | Tab "🆕 Nuevo Artículo" → Subtab A: rellenar campos, click "Guardar borrador" | Crea fichero en `articulos_en_trabajo/IN_PROGRESS/<slug>.json`. Slug visible en UI. |
+| 2 | Tab "🆕 Nuevo Artículo" → Subtab A: rellenar campos, click "Guardar borrador" | Crea fichero en `data/articulos_en_trabajo/IN_PROGRESS/<slug>.json`. Slug visible en UI. |
 | 3 | Ir a Subtab B → comprobar preview | `previewHtml` renderiza correctamente, metadata visible |
 | 4 | Volver a A, modificar cuerpo → Guardar → volver a B | Cambios reflejados, `updatedAt` actualizado |
 | 5 | **Casos FAIL de approve** (probar varios): |

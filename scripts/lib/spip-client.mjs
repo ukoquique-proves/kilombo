@@ -11,7 +11,7 @@
  *
  * ARCHITECTURE:
  *   - Does NOT create/modify files directly
- *   - Uses child_process to invoke sandbox scripts
+ *   - Uses child_process to invoke scripts/ CLI tools
  *   - Parses script output to extract results
  *   - Returns structured data (not raw stdout)
  *

@@ -16,7 +16,7 @@
 - UI real, flujo completo (no mock) operando sobre artículos reales
 - URL permanente, protegida con contraseña (StatiCrypt)
 - **Sin infraestructura nueva:** el servidor Express existente en `api/server.mjs` es el backend (v1 ya arranca con `npm start`)
-- Pipeline `articulos_en_trabajo/IN_PROGRESS/` → `READY/` ya existe; este hito solo **conecta la UI al pipeline** (no modifica el pipeline)
+- Pipeline `data/articulos_en_trabajo/IN_PROGRESS/` → `READY/` ya existe; este hito solo **conecta la UI al pipeline** (no modifica el pipeline)
 
 **Arquitectura:**
 ```
@@ -24,9 +24,9 @@ Cliente (navegador)
     │
     ▼
 api/server.mjs (Express existente en puerto 3000)
-    ├─ POST /api/drafts                  → scripts/lib/drafts-store.mjs → articulos_en_trabajo/IN_PROGRESS/<slug>.json
+    ├─ POST /api/drafts                  → scripts/lib/drafts-store.mjs → data/articulos_en_trabajo/IN_PROGRESS/<slug>.json
     ├─ GET /api/drafts/:slug             → lectura + previewHtml renderizado con sanitizeHtml()
-    └─ POST /api/drafts/:slug/approve    → validateArticleEntry() + move → articulos_en_trabajo/READY/<slug>.json
+    └─ POST /api/drafts/:slug/approve    → validateArticleEntry() + move → data/articulos_en_trabajo/READY/<slug>.json
                                                                                │
                                                                                ▼
                                                               Listo para publicar en kilombo.top
@@ -341,7 +341,7 @@ Los dos primeros son problemas de **parseo de texto no estructurado**; el tercer
 ### Dónde Python sí importa ahora
 
 **Aplicar Python a:**
-- `scripts/build-post-from-raw.py` — ingiere un archivo de `nuevos_articulos/`, separa heurísticamente autor/fecha/título/cuerpo de texto sin marcado, y escribe un borrador de entrada a `articulos_en_trabajo/IN_PROGRESS/` (status `pending-review`, nunca publicación directa) para revisión editorial humana antes de tocar `articles.json`.
+- `scripts/build-post-from-raw.py` — ingiere un archivo de `nuevos_articulos/`, separa heurísticamente autor/fecha/título/cuerpo de texto sin marcado, y escribe un borrador de entrada a `data/articulos_en_trabajo/IN_PROGRESS/` (status `pending-review`, nunca publicación directa) para revisión editorial humana antes de tocar `articles.json`.
 - `scripts/generate-card-image.py` — genera la imagen de tarjeta/OG a partir de título + metadata (Pillow), sustituyendo el placeholder `video-card__thumb--placeholder` por un gráfico real, consistente en tipografía/paleta con `css/style.css`.
 
 **Por qué Python y no TypeScript aquí:** `Pillow` (composición de imágenes/texto sobre plantilla) y las heurísticas de parseo de texto libre (regex flexible, o un paso opcional de limpieza asistida por LLM) tienen mejor soporte de librerías en Python que en el ecosistema Node para este caso concreto. No es una preferencia — es la herramienta con menos fricción para *este* trabajo.
@@ -362,9 +362,9 @@ Hasta que se cumpla alguno de estos, mantener `@ts-check` + JSDoc es la opción 
 ### Fase 1 (ahora) — Python para el pipeline texto-crudo → post
 
 - [ ] 3.1 Crear `requirements.txt` con `Pillow` (imágenes) y, si se opta por asistencia LLM en el parseo, el cliente HTTP correspondiente (sin credenciales hardcodeadas — seguir el patrón de `.env` ya establecido).
-- [ ] 3.2 Escribir `scripts/build-post-from-raw.py --file nuevos_articulos/<nombre>` → borrador en `articulos_en_trabajo/IN_PROGRESS/`, nunca en `articles.json` directamente.
+- [ ] 3.2 Escribir `scripts/build-post-from-raw.py --file nuevos_articulos/<nombre>` → borrador en `data/articulos_en_trabajo/IN_PROGRESS/`, nunca en `articles.json` directamente.
 - [ ] 3.3 Escribir `scripts/generate-card-image.py` con 1-2 plantillas (tarjeta normal / tarjeta destacada) que reflejen la paleta de `css/style.css`.
-- [ ] 3.4 Documentar el flujo en `articulos_en_trabajo/README.md`: raw → `build-post-from-raw.py` → revisión humana en `IN_PROGRESS/` → `validate-data.mjs` → `READY/` → publicación.
+- [ ] 3.4 Documentar el flujo en `data/articulos_en_trabajo/README.md`: raw → `build-post-from-raw.py` → revisión humana en `IN_PROGRESS/` → `validate-data.mjs` → `READY/` → publicación.
 - [ ] 3.5 Procesar los 16 archivos actuales de `nuevos_articulos/` con el script y **revisar editorialmente cada borrador** antes de mover ninguno a `READY/` (varios tienen contenido factual/políticamente sensible que ya requiere juicio editorial, no solo estructuración).
 
 ### Fase 2 (diferida) — Audio (Whisper/DeepL)

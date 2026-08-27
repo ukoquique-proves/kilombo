@@ -19,7 +19,7 @@ Documento de diseño para la interfaz que el cliente usará para gestionar el fl
 Cliente pega contenido bruto
         │
         ▼
-POST /api/drafts  →  articulos_en_trabajo/IN_PROGRESS/<slug>.json
+POST /api/drafts  →  data/articulos_en_trabajo/IN_PROGRESS/<slug>.json
         │
         ▼
 GET /api/drafts/:slug  →  preview renderizado (HTML sanitizado)
@@ -31,7 +31,7 @@ GET /api/drafts/:slug  →  preview renderizado (HTML sanitizado)
 POST /api/drafts/:slug/approve
         │
         ▼
-articulos_en_trabajo/READY/<slug>.json  →  listo para publicar en kilombo.top
+data/articulos_en_trabajo/READY/<slug>.json  →  listo para publicar en kilombo.top
 ```
 
 El paso de publicación a SPIP (que usa Playwright) sigue siendo una acción explícita separada, no parte del flujo automático de aprobación.
@@ -43,8 +43,8 @@ El paso de publicación a SPIP (que usa Playwright) sigue siendo una acción exp
 El tab "Crear Artículo" del dashboard actual llama directamente a `scripts/create-article.mjs`, que escribe en el SPIP de producción via Playwright. Esto es correcto para publicación directa, pero no sirve para el flujo de borradores.
 
 El pipeline `IN_PROGRESS/` → `READY/` ya existe y está activo:
-- `articulos_en_trabajo/IN_PROGRESS/` tiene ~70 ficheros (artículos en proceso)
-- `articulos_en_trabajo/READY/` tiene 16 artículos aprobados
+- `data/articulos_en_trabajo/IN_PROGRESS/` tiene ~70 ficheros (artículos en proceso)
+- `data/articulos_en_trabajo/READY/` tiene 16 artículos aprobados
 - El flujo está documentado en `docs/ARTICLE-PUBLISHING-WORKFLOW.md`
 
 Lo que falta es conectar ese pipeline a la UI. Nada de lo que se va a construir modifica el pipeline existente — solo añade una capa programática encima.
@@ -66,7 +66,7 @@ Extraer `validateArticleEntry()` y el esquema de campos (`ARTICLE_RULES`) de `sc
 
 ### 2. `scripts/lib/drafts-store.mjs`
 
-Módulo de acceso al filesystem para `articulos_en_trabajo/`. Exporta:
+Módulo de acceso al filesystem para `data/articulos_en_trabajo/`. Exporta:
 
 ```js
 createDraft(fields)          // escribe IN_PROGRESS/<slug>.json, comprueba unicidad de slug

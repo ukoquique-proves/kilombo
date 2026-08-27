@@ -4,6 +4,8 @@
  *
  * Filesystem access layer for the editorial draft pipeline:
  *   articulos_en_trabajo/IN_PROGRESS/*.json  →  drafts-store  →  READY/*.json
+ * (physically located at data/articulos_en_trabajo/ as of Phase 8 —
+ * see CONSOLIDATION-PHASES-6-8-HANDOFF.md)
  *
  * All API endpoints in api/server.mjs that mutate or read drafts go through
  * this module — nothing in server.mjs touches fs directly for draft content.
@@ -43,7 +45,7 @@ import { validateArticleEntry } from './article-validator.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..', '..');
-const WORK_DIR = join(REPO_ROOT, 'articulos_en_trabajo');
+const WORK_DIR = join(REPO_ROOT, 'data', 'articulos_en_trabajo');
 const IN_PROGRESS_DIR = join(WORK_DIR, 'IN_PROGRESS');
 const READY_DIR = join(WORK_DIR, 'READY');
 const ARTICLES_JSON_PATH = join(REPO_ROOT, 'site', 'assets', 'content', 'articles.json');

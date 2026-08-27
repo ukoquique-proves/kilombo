@@ -58,11 +58,11 @@ dist/
 *.backup
 site-backup*/
 
-# --------- Temporary scraping & sandbox artifacts ---------
+# --------- Temporary scraping artifacts ---------
 # These are ephemeral outputs from data collection & testing — never commit
-# sandbox/ — contains auth/decrypt workflows (keep private, not shipped)
 # scraped-full/, scraped-content/ — raw HTML dumps from live site (6.3MB+, regenerable)
-sandbox/
+# Debug snapshots (screenshots/HTML captures) now live in docs/debug-snapshots/;
+# the *.html rule below still keeps any captured HTML out of git.
 scraped-content/
 scraped-full/
 *.html  # temporary HTML files from scraping
@@ -72,6 +72,12 @@ check_sso.py
 test_sso.py
 fetch_live.py
 *.pyc
+
+# --------- Mutable runtime data (Phase 8 consolidation) ---------
+# Editorial drafts and publish snapshots live under data/ now; the folder
+# itself is tracked (see data/.gitkeep) but its contents are not.
+data/articulos_en_trabajo/
+data/ready-articles.json
 
 # --------- Audios / videos / contenido pesado ---------
 # (si se sube contenido grande, usar LFS u otro almacenamiento)
