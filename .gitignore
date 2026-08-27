@@ -1,0 +1,79 @@
+# =========================================================
+# Kilombo — .gitignore
+# =========================================================
+# NUNCA subir credenciales, archivos temporales, ni logs
+# al repositorio público.
+
+# --------- Entorno / credenciales ---------
+.env
+.env.backup
+.env.local
+.env.*.local
+
+# --------- Logs y archivos temporales ---------
+*.log
+*.log.*
+live-write-audit.log.jsonl
+tmp/
+temp/
+cache/
+*.tmp
+*.swp
+*~
+*.orig
+
+# Serveo / ngrok / tuneles temporales
+serveo.log
+ngrok-stable*
+
+# --------- Sistemas ---------
+.DS_Store
+Thumbs.db
+
+# --------- Old nested clone from initial setup (redundant) ---------
+repo/
+
+# --------- Editores ---------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# --------- Python (si se usan scripts) ---------
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# --------- Node (si se usa alguna herramienta) ---------
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# --------- Build output (encrypted deploy artefact — never commit) ---------
+dist/
+*.bak
+*.backup
+site-backup*/
+
+# --------- Temporary scraping & sandbox artifacts ---------
+# These are ephemeral outputs from data collection & testing — never commit
+# sandbox/ — contains auth/decrypt workflows (keep private, not shipped)
+# scraped-full/, scraped-content/ — raw HTML dumps from live site (6.3MB+, regenerable)
+sandbox/
+scraped-content/
+scraped-full/
+*.html  # temporary HTML files from scraping
+cookie.txt
+cookies.txt
+check_sso.py
+test_sso.py
+fetch_live.py
+*.pyc
+
+# --------- Audios / videos / contenido pesado ---------
+# (si se sube contenido grande, usar LFS u otro almacenamiento)
+# assets/audios/*.mp3
+# assets/subtitles/*.vtt

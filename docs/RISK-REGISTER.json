@@ -1,0 +1,52 @@
+{
+  "$schema": "./RISK-REGISTER.schema.md",
+  "notes": [
+    "This file is the machine-checkable index of known architectural risks.",
+    "It is deliberately data, not prose — narrative detail belongs in a",
+    "linked detail_doc. test/live-write-gateway.test.mjs asserts every",
+    "'affects' path exists and every entry has the required fields.",
+    "Adding a risk here does NOT block development — 'status: open' is a",
+    "normal, expected state. It exists to be tracked, not to be a gate.",
+    "",
+    "ENFORCING THE GATEWAY:",
+    "A Kiro pre-commit hook (.kiro/hooks/enforce-gateway-with-playwright.json)",
+    "flags any new script that imports Playwright without also importing",
+    "live-write-gateway.mjs. This prevents new mutating scripts from bypassing",
+    "the audit/gating chokepoint. When creating a new script that mutates",
+    "the live SPIP site, the hook will guide you to add guardedWrite() and",
+    "to update test/live-write-gateway.test.mjs KNOWN_LIVE_WRITE_SCRIPTS."
+  ],
+  "risks": [
+    {
+      "id": "KILO-001",
+      "title": "Direct publish requires fewer steps than editorial review",
+      "status": "mitigated",
+      "severity": "high",
+      "opened": "2026-08-24",
+      "mitigated": "2026-08-24",
+      "summary": "Publishing an article directly to the live SPIP site (prepa -> publie in one script run) takes one command with no confirmation, while the safe draft-then-review path requires a manual admin login and status change. Safe should be easier than risky; here it's inverted.",
+      "affects": [
+        "sandbox/create-article.mjs",
+        "scripts/manage-article-status.mjs",
+        "scripts/lib/spip-client.mjs",
+        "scripts/migrate-to-spip.mjs"
+      ],
+      "mitigation": "✓ IMPLEMENTED: Both scripts (manage-article-status.mjs and migrate-to-spip.mjs) now require KILO_APPROVE_PUBLISHING=true env var before publishing (status publie or --publish flag). All publish attempts are routed through live-write-gateway.mjs chokepoint and logged.",
+      "detail_doc": "SECURITY-REPORT.md"
+    },
+    {
+      "id": "KILO-002",
+      "title": "Theme-configuration script shares full admin credentials with publish scripts",
+      "status": "open",
+      "severity": "medium",
+      "opened": "2026-08-25",
+      "summary": "customize-escal-theme.mjs authenticates with the same broad 'kilombo' admin account as the article-publishing scripts. There is no SPIP role that can edit Escal presentation fields without also being able to create and publish articles, so 'safely reskin the homepage' and 'publish unreviewed content' are the same privilege.",
+      "affects": [
+        "scripts/customize-escal-theme.mjs",
+        "scripts/probe-escal-fields.mjs"
+      ],
+      "mitigation": "Create a second, narrower SPIP credential scoped to the Escal configuration screens only; use it for customize-escal-theme.mjs and probe-escal-fields.mjs instead of KILOMBOTOP_PASSWORD.",
+      "detail_doc": null
+    }
+  ]
+}

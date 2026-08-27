@@ -1,0 +1,100 @@
+name: Deploy to GitHub Pages
+# ⚠️  CONTEXT NOTE: the compact/context generator used for AI-assisted sessions
+# excludes .github/, so this file never appears in those bundles automatically.
+# If any session work touches the deploy pipeline, encryption step, or CI job
+# order, include this file manually — otherwise the session is blind to the
+# most security-sensitive part of the pipeline. (see TO_FIX #25)
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+  deploy:
+    needs: test
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Encrypt site content
+        run: |
+          if [ -z "$STATICRYPT_PASSWORD" ]; then
+            echo "❌ ERROR: STATICRYPT_PASSWORD environment variable is empty"
+            exit 1
+          fi
+          npm run encrypt 2>&1 | tee encrypt.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "❌ Encryption failed"
+            exit 1
+          fi
+        env:
+          STATICRYPT_PASSWORD: ${{ secrets.STATICRYPT_PASSWORD }}
+
+      - name: Verify dist/ was created
+        run: |
+          if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
+            echo "❌ ERROR: dist/ directory is empty or missing after encryption"
+            exit 1
+          fi
+          echo "✅ dist/ created with:"
+          find dist/ -type f | head -20
+          
+          if grep -q '"encrypted":true' dist/assets/content/articles.json 2>/dev/null; then
+            echo "✅ articles.json is encrypted"
+          else
+            echo "⚠️  articles.json might not be encrypted, checking..."
+            head -c 200 dist/assets/content/articles.json || echo "Can't read file"
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

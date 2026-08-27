@@ -1,0 +1,46 @@
+{
+  "name": "kilombo",
+  "version": "0.52.0",
+  "description": "Portal central de acceso a la red de sitios de Kilombo. Construido como página estática (HTML, CSS, JS) para ser alojado en la infraestructura YunoHost de `kilombo.top`.",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "bash scripts/test.sh",
+    "lint": "eslint site/js scripts test api --ext .js,.mjs",
+    "lint:fix": "eslint site/js scripts test api --ext .js,.mjs --fix",
+    "format": "prettier --write 'site/js/**/*.{js,mjs}' 'scripts/**/*.mjs' 'test/**/*.mjs' eslint.config.js .prettierrc.json",
+    "format:check": "prettier --check 'site/js/**/*.{js,mjs}' 'scripts/**/*.mjs' 'test/**/*.mjs'",
+    "build": "npm run encrypt",
+    "dev": "npm run preview",
+    "ui": "node ../run-ui.mjs",
+    "ui:site": "npm run preview",
+    "ui:dashboard": "npm start",
+    "start": "node api/server.mjs",
+    "import-article": "node scripts/import-article.mjs",
+    "backfill-dates": "node scripts/backfill-dates.mjs",
+    "i18n-coverage": "node scripts/i18n-coverage.mjs",
+    "encrypt": "node scripts/encrypt.mjs",
+    "preview": "python3 -m http.server 8080 --directory site",
+    "scrape": "bash sandbox/scrape-curl.sh",
+    "scrape:full": "bash sandbox/scrape-comprehensive.sh",
+    "check-corruption": "node scripts/detect-fixed-column-corruption.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "groq-sdk": "^1.6.0",
+    "happy-dom": "^20.11.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "staticrypt": "3.5.4"
+  }
+}

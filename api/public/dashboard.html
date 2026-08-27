@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KILOMBO — Panel de Control</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 28px;
+      margin: 0 0 30px 0;
+      color: #222;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ddd;
+    }
+    
+    .tab-button {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    
+    .tab-button.active {
+      color: #d32f2f;
+      border-bottom-color: #d32f2f;
+      font-weight: 600;
+    }
+    
+    .tab-button:hover {
+      color: #333;
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.2s;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+      background-color: #f1f8f1;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background: #d32f2f;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: #b71c1c;
+    }
+    
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .alert {
+      padding: 12px 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    
+    .alert.info {
+      background: #e3f2fd;
+      color: #1565c0;
+      border-left: 4px solid #1565c0;
+    }
+    
+    .alert.warning {
+      background: #fff3e0;
+      color: #e65100;
+      border-left: 4px solid #e65100;
+    }
+    
+    .alert.error {
+      background: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #c62828;
+    }
+    
+    .alert.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+    
+    .job-status {
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+    
+    .job-status.running {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    .job-status.completed {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .job-status.failed {
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    .output-box {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin-top: 10px;
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #ccc;
+      border-top: 2px solid #d32f2f;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .audit-entry {
+      padding: 10px;
+      border-left: 3px solid #ddd;
+      margin-bottom: 10px;
+      background: #fafafa;
+      font-size: 13px;
+    }
+    
+    .audit-time {
+      color: #999;
+      font-size: 12px;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+    /* Subtabs (nested inside "🆕 Nuevo Artículo") */
+    .subtabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .subtab-button {
+      padding: 8px 14px;
+      background: none;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      color: #777;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+
+    .subtab-button.active {
+      color: #1565c0;
+      border-bottom-color: #1565c0;
+      font-weight: 600;
+    }
+
+    .subtab-content {
+      display: none;
+    }
+
+    .subtab-content.active {
+      display: block;
+    }
+
+    .draft-status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .draft-status-badge.none { background: #eee; color: #666; }
+    .draft-status-badge.checking { background: #fff3e0; color: #e65100; }
+    .draft-status-badge.approved { background: #e8f5e9; color: #2e7d32; }
+    .draft-status-badge.error { background: #ffebee; color: #c62828; }
+
+    .preview-box {
+      border: 1px solid #90caf9;
+      background: white;
+      border-radius: 4px;
+      padding: 18px;
+      margin-top: 10px;
+    }
+
+    .preview-meta {
+      background: #f5f5f5;
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .preview-meta span {
+      margin-right: 16px;
+      display: inline-block;
+    }
+
+    .preview-body {
+      border-top: 1px solid #eee;
+      padding-top: 14px;
+    }
+
+    .ai-stub-box {
+      text-align: center;
+      padding: 50px 20px;
+      color: #888;
+    }
+
+    .ai-stub-box .big-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .suggestion-card {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      background: #fafafa;
+    }
+    .sug-header {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+    .sug-kind {
+      font-size: 12px;
+      font-weight: 700;
+      background: #e8f0fe;
+      color: #1a56db;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .sug-selector { font-size: 12px; color: #666; }
+    .sug-original { font-size: 13px; color: #c00; margin-bottom: 4px; }
+    .sug-proposed { font-size: 13px; color: #060; margin-bottom: 4px; }
+    .sug-rationale { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .sug-apply-btn { font-size: 13px; padding: 4px 12px; }
+    .sug-applied-badge { font-size: 13px; color: green; margin-left: 8px; }
+
+    table.simple-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    table.simple-table th,
+    table.simple-table td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    table.simple-table th {
+      color: #777;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .btn-secondary {
+      background: #eee;
+      color: #444;
+    }
+
+    .btn-secondary:hover {
+      background: #ddd;
+    }
+
+    .field-errors {
+      color: #c62828;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .field-errors li {
+      margin-bottom: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔴 KILOMBO — Panel de Control (MVP Phase 1)</h1>
+    
+    <!-- Status Alert -->
+    <div id="status-alert" class="alert info" style="display: none;"></div>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-button active" onclick="switchTab(event, 'new-article')">
+        🆕 Nuevo Artículo
+      </button>
+      <button class="tab-button" onclick="switchTab(event, 'ready-drafts')">
+        📬 Listos para Publicar
+      </button>
+      <button class="tab-button" onclick="switchTab(event, 'create-article')">
+        📤 Publicación Directa
+      </button>
+      <button class="tab-button" onclick="switchTab(event, 'manage-status')">
+        🔄 Cambiar Estado
+      </button>
+      <button class="tab-button" onclick="switchTab(event, 'jobs')">
+        ⏱️  Trabajos Recientes
+      </button>
+      <button class="tab-button" onclick="switchTab(event, 'audit')">
+        📋 Auditoría
+      </button>
+      <button class="tab-button" onclick="switchTab(event, 'status')">
+        ℹ️ Estado del Sistema
+      </button>
+    </div>
+
+    <!-- NEW ARTICLE TAB (drafts pipeline: IN_PROGRESS -> READY) -->
+    <div id="new-article" class="tab-content active">
+      <div class="card">
+        <div class="subtabs">
+          <button class="subtab-button active" onclick="switchSubtab(event, 'subtab-write')">
+            ✍️ Redacción
+          </button>
+          <button class="subtab-button" onclick="switchSubtab(event, 'subtab-preview')">
+            👁️ Preview
+          </button>
+          <button class="subtab-button" onclick="switchSubtab(event, 'subtab-ai')">
+            ✨ Mejorar con IA
+          </button>
+        </div>
+
+        <!-- SUBTAB A: Redacción -->
+        <div id="subtab-write" class="subtab-content active">
+          <form onsubmit="submitSaveDraft(event)">
+            <div class="form-group">
+              <label for="draft-title">Título *</label>
+              <input type="text" id="draft-title" placeholder="Título del artículo" required>
+            </div>
+
+            <div class="form-group">
+              <label for="draft-section">Sección *</label>
+              <select id="draft-section" required>
+                <option value="general">General</option>
+                <option value="actualidad">Actualidad</option>
+                <option value="tierra">Tierra y Libertad</option>
+                <option value="nom">NOM / Plandemismo</option>
+                <option value="pi">Proletarios Internacionalistas</option>
+                <option value="gci">GCI</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="draft-topics">Topics (separados por coma) *</label>
+              <input type="text" id="draft-topics" placeholder="cine, quilombo, historia" required>
+            </div>
+
+            <div class="form-group">
+              <label for="draft-body">Cuerpo (HTML o texto) *</label>
+              <textarea id="draft-body" placeholder="&lt;h3&gt;Introducción&lt;/h3&gt;&#10;&lt;p&gt;...&lt;/p&gt;" required style="min-height: 220px;"></textarea>
+            </div>
+
+            <button type="submit">💾 Guardar borrador</button>
+          </form>
+
+          <div id="draft-save-result" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- SUBTAB B: Preview -->
+        <div id="subtab-preview" class="subtab-content">
+          <div class="form-group">
+            <label for="draft-select">Seleccionar borrador</label>
+            <select id="draft-select" onchange="loadDraftPreview()">
+              <option value="">— Elegir borrador —</option>
+            </select>
+          </div>
+
+          <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px;">
+            <button type="button" class="btn-secondary" onclick="editCurrentDraft()">← Editar</button>
+            <div>
+              <button type="button" class="btn-secondary" onclick="switchSubtabById('subtab-ai')">✨ Mejorar con IA</button>
+              <button type="button" onclick="approveDraft()">✅ Aprobar →</button>
+            </div>
+          </div>
+
+          <div id="draft-preview-container"></div>
+          <div id="draft-approve-result" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- SUBTAB C: Mejorar con IA (stub) -->
+        <div id="subtab-ai" class="subtab-content">
+          <!-- Shown when GROQ_API_KEY is missing (501 response) -->
+          <div id="ai-unavailable" class="ai-stub-box" style="display:none">
+            <div class="big-icon">🚧</div>
+            <h3>Próximamente</h3>
+            <p>La funcionalidad de sugerencias de IA se activará cuando se configure <code>GROQ_API_KEY</code> en el servidor.</p>
+            <p>Mientras tanto, puedes editar y aprobar el artículo manualmente sin problemas.</p>
+            <button type="button" class="btn-secondary" onclick="switchSubtabById('subtab-preview')">← Volver a Preview</button>
+          </div>
+          <!-- Active AI panel -->
+          <div id="ai-panel">
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap">
+              <label for="ai-slug-select" style="font-weight:600">Borrador:</label>
+              <select id="ai-slug-select" style="flex:1; min-width:200px"></select>
+              <button type="button" id="btn-improve" class="btn-primary" onclick="runImprove()">✨ Mejorar con IA</button>
+              <button type="button" class="btn-secondary" onclick="switchSubtabById('subtab-preview')">← Preview</button>
+            </div>
+            <div style="font-size:12px; color:#a15c00; background:#fff8e1; border:1px solid #ffe0a3; border-radius:4px; padding:8px 12px; margin-bottom:10px">
+              ⚠️ El modelo puede inventar datos (identidades, cargos, contexto) al intentar "enriquecer" artículos breves. Verifica cada sugerencia contra la fuente antes de aplicarla — no confíes en la redacción por sí sola.
+            </div>
+            <div id="ai-status" style="font-size:13px; margin-bottom:10px; min-height:20px; padding:6px 0"></div>
+            <div id="ai-suggestions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- READY DRAFTS TAB -->
+    <div id="ready-drafts" class="tab-content">
+      <div class="card">
+        <h2>Artículos listos para publicar</h2>
+        <p style="color: #666; font-size: 13px;">
+          Borradores aprobados en <code>articulos_en_trabajo/READY/</code>, pendientes de publicación en <code>kilombo.top</code> (paso a SPIP vía Playwright, separado).
+        </p>
+        <button onclick="refreshReadyDrafts()">Refrescar</button>
+        <div id="ready-drafts-list" style="margin-top: 15px;"></div>
+      </div>
+    </div>
+
+    <!-- CREATE ARTICLE TAB (direct publish, unchanged) -->
+    <div id="create-article" class="tab-content">
+      <div class="card">
+        <h2>Crear Nuevo Artículo (publicación directa)</h2>
+        <p style="color: #666; font-size: 13px;">
+          Publica directamente en SPIP vía Playwright, sin pasar por el flujo de borradores.
+          Para el flujo normal de edición y revisión, usa la pestaña «🆕 Nuevo Artículo».
+        </p>
+        <form onsubmit="submitCreateArticle(event)">
+          <div class="form-group">
+            <label for="title">Título *</label>
+            <input type="text" id="title" placeholder="Título del artículo" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="body">Cuerpo del Artículo *</label>
+            <textarea id="body" placeholder="Contenido (HTML o texto plano)" required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="section">Sección</label>
+            <select id="section">
+              <option value="general">General</option>
+              <option value="actualidad">Actualidad</option>
+              <option value="tierra">Tierra y Libertad</option>
+              <option value="nom">NOM / Plandemismo</option>
+              <option value="pi">Proletarios Internacionalistas</option>
+              <option value="gci">GCI</option>
+            </select>
+          </div>
+          
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="dry-run-article">
+            <label for="dry-run-article" style="margin: 0;">Ejecutar en modo simulación (dry-run)</label>
+          </div>
+          
+          <button type="submit">Crear Artículo</button>
+        </form>
+        
+        <div id="create-article-result"></div>
+      </div>
+    </div>
+    
+    <!-- MANAGE STATUS TAB -->
+    <div id="manage-status" class="tab-content">
+      <div class="card">
+        <h2>Cambiar Estado del Artículo</h2>
+        <div id="publish-gate-warning" class="alert warning" style="display: none;">
+          ⚠️ <strong>Publicación Directa Bloqueada</strong><br>
+          <code>KILO_APPROVE_PUBLISHING=false</code> — La publicación directa está deshabilitada.
+          Usa "Propuesto para revisión" en lugar de "Publicado".
+        </div>
+        <form onsubmit="submitManageStatus(event)">
+          <div class="form-group">
+            <label for="article-id">ID del Artículo *</label>
+            <input type="number" id="article-id" placeholder="Ej: 90" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="new-status">Nuevo Estado *</label>
+            <select id="new-status" required>
+              <option value="">Seleccionar estado...</option>
+              <option value="prepa">En curso de redacción (prepa)</option>
+              <option value="prop">Propuesto para revisión (prop)</option>
+              <option value="publie">Publicado (publie) ⚠️</option>
+              <option value="refuse">Rechazado (refuse)</option>
+              <option value="poubelle">A la papelera (poubelle)</option>
+            </select>
+          </div>
+          
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="actually-change">
+            <label for="actually-change" style="margin: 0;">Aplicar el cambio (marcar para confirmar)</label>
+          </div>
+          
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="dry-run-status">
+            <label for="dry-run-status" style="margin: 0;">Modo simulación (dry-run)</label>
+          </div>
+          
+          <button type="submit">Enviar Cambio de Estado</button>
+        </form>
+        
+        <div id="manage-status-result"></div>
+      </div>
+    </div>
+    
+    <!-- JOBS TAB -->
+    <div id="jobs" class="tab-content">
+      <div class="card">
+        <h2>Trabajos Recientes</h2>
+        <button onclick="refreshJobs()">Refrescar</button>
+        <div id="jobs-list" style="margin-top: 15px;"></div>
+      </div>
+    </div>
+    
+    <!-- AUDIT TAB -->
+    <div id="audit" class="tab-content">
+      <div class="card">
+        <h2>Registro de Auditoría</h2>
+        <p style="color: #666; font-size: 13px;">
+          Últimas 50 operaciones registradas en <code>live-write-audit.log.jsonl</code>
+        </p>
+        <button onclick="refreshAudit()">Refrescar</button>
+        <div id="audit-list" style="margin-top: 15px;"></div>
+      </div>
+    </div>
+    
+    <!-- STATUS TAB -->
+    <div id="status" class="tab-content">
+      <div class="card">
+        <h2>Estado del Sistema</h2>
+        <div id="system-status"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const API_BASE = '/api';
+
+    // ------------------------------------------------------------
+    // Shared-secret auth (x-kilo-secret header, required by
+    // requireSharedSecret() on the server for /api/jobs, /api/audit-log,
+    // /api/commands, /api/drafts, /api/ready-drafts). Prompted once per
+    // browser session and cached in sessionStorage — never persisted
+    // beyond the tab's lifetime, never sent to any non-/api endpoint.
+    // ------------------------------------------------------------
+    function getKiloSecret() {
+      let secret = sessionStorage.getItem('kiloSecret');
+      if (!secret) {
+        secret = window.prompt('Clave de acceso al panel (x-kilo-secret):') || '';
+        if (secret) sessionStorage.setItem('kiloSecret', secret);
+      }
+      return secret;
+    }
+
+    // Wrapper around fetch() that attaches the shared-secret header to
+    // every /api call. On 401 it clears the cached secret and re-prompts
+    // once, so a stale/wrong secret doesn't silently keep failing.
+    async function apiFetch(url, options = {}) {
+      const headers = Object.assign({}, options.headers, { 'x-kilo-secret': getKiloSecret() });
+      let res = await fetch(url, Object.assign({}, options, { headers }));
+      if (res.status === 401) {
+        sessionStorage.removeItem('kiloSecret');
+        const retryHeaders = Object.assign({}, options.headers, { 'x-kilo-secret': getKiloSecret() });
+        res = await fetch(url, Object.assign({}, options, { headers: retryHeaders }));
+      }
+      return res;
+    }
+
+    // Tab switching
+    function switchTab(event, tabName) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(tabName).classList.add('active');
+      const clickedButton = event && event.currentTarget ? event.currentTarget : document.querySelector(`.tab-button[onclick*="'${tabName}'"]`);
+      if (clickedButton) clickedButton.classList.add('active');
+      
+      // Auto-load data for certain tabs
+      if (tabName === 'jobs') refreshJobs();
+      if (tabName === 'audit') refreshAudit();
+      if (tabName === 'status') refreshSystemStatus();
+      if (tabName === 'new-article') refreshDraftSelector();
+      if (tabName === 'ready-drafts') refreshReadyDrafts();
+    }
+
+    // Subtab switching (inside "🆕 Nuevo Artículo")
+    function switchSubtab(event, subtabName) {
+      document.querySelectorAll('.subtab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.subtab-button').forEach(b => b.classList.remove('active'));
+
+      document.getElementById(subtabName).classList.add('active');
+      const clickedButton = event && event.currentTarget ? event.currentTarget : document.querySelector(`.subtab-button[onclick*="'${subtabName}'"]`);
+      if (clickedButton) clickedButton.classList.add('active');
+
+      if (subtabName === 'subtab-preview') refreshDraftSelector();
+      if (subtabName === 'subtab-ai') { refreshAiSelector(); getKiloSecret(); }
+    }
+
+    // Programmatic subtab switch (no click event, e.g. "Editar ←" button)
+    function switchSubtabById(subtabName) {
+      document.querySelectorAll('.subtab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.subtab-button').forEach(b => b.classList.remove('active'));
+      document.getElementById(subtabName).classList.add('active');
+      const button = document.querySelector(`.subtab-button[onclick*="'${subtabName}'"]`);
+      if (button) button.classList.add('active');
+      if (subtabName === 'subtab-preview') refreshDraftSelector();
+      if (subtabName === 'subtab-ai') { refreshAiSelector(); getKiloSecret(); }
+    }
+    
+    // Show alert
+    function showAlert(message, type = 'info') {
+      const alertEl = document.getElementById('status-alert');
+      alertEl.textContent = message;
+      alertEl.className = `alert ${type}`;
+      alertEl.style.display = 'block';
+      
+      if (type === 'success' || type === 'info') {
+        setTimeout(() => alertEl.style.display = 'none', 5000);
+      }
+    }
+    
+    // Create Article
+    async function submitCreateArticle(e) {
+      e.preventDefault();
+      
+      const title = document.getElementById('title').value;
+      const body = document.getElementById('body').value;
+      const section = document.getElementById('section').value;
+      const dryRun = document.getElementById('dry-run-article').checked;
+      
+      try {
+        const res = await apiFetch(`${API_BASE}/commands/create-article`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, body, section, dryRun }),
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          showAlert(`Error: ${data.error}`, 'error');
+          return;
+        }
+        
+        showAlert(`✅ Trabajo iniciado: ${data.jobId}`, 'success');
+        e.target.reset();
+        
+        // Display job status
+        displayJobStatus(data.jobId, 'create-article-result');
+        
+      } catch (err) {
+        showAlert(`Error de red: ${err.message}`, 'error');
+      }
+    }
+    
+    // Manage Status
+    async function submitManageStatus(e) {
+      e.preventDefault();
+      
+      const id = parseInt(document.getElementById('article-id').value);
+      const status = document.getElementById('new-status').value;
+      const change = document.getElementById('actually-change').checked;
+      const dryRun = document.getElementById('dry-run-status').checked;
+      
+      try {
+        const res = await apiFetch(`${API_BASE}/commands/manage-article-status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, status, change, dryRun }),
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          const msg = data.blocked ? `⚠️ Bloqueado: ${data.error}` : `Error: ${data.error}`;
+          showAlert(msg, data.blocked ? 'warning' : 'error');
+          return;
+        }
+        
+        showAlert(`✅ Trabajo iniciado: ${data.jobId}`, 'success');
+        
+        // Display job status
+        displayJobStatus(data.jobId, 'manage-status-result');
+        
+      } catch (err) {
+        showAlert(`Error de red: ${err.message}`, 'error');
+      }
+    }
+    
+    // Display job status with polling
+    async function displayJobStatus(jobId, containerId) {
+      const container = document.getElementById(containerId);
+      let attempts = 0;
+      const maxAttempts = 240; // 240 polls = 2 minutes with 500ms interval (Playwright jobs can take 30-60s)
+      
+      async function pollStatus() {
+        try {
+          const res = await apiFetch(`${API_BASE}/jobs/${jobId}/status`);
+          const job = await res.json();
+          
+          if (res.ok) {
+            const statusClass = job.status === 'running' ? 'running' : (job.status === 'completed' ? 'completed' : 'failed');
+            
+            container.innerHTML = `
+              <div class="job-status ${statusClass}">
+                <div><strong>Estado:</strong> ${job.status}</div>
+                <div><strong>ID:</strong> ${job.id}</div>
+                <div><strong>Inicio:</strong> ${new Date(job.startTime).toLocaleString()}</div>
+                ${job.exitCode !== null ? `<div><strong>Código de salida:</strong> ${job.exitCode}</div>` : ''}
+                ${job.stdout ? `<div><strong>Salida:</strong></div><div class="output-box">${escapeHtml(job.stdout)}</div>` : ''}
+                ${job.stderr ? `<div><strong>Errores:</strong></div><div class="output-box">${escapeHtml(job.stderr)}</div>` : ''}
+              </div>
+            `;
+            
+            // Continue polling if still running
+            if (job.status === 'running' && attempts < maxAttempts) {
+              attempts++;
+              setTimeout(pollStatus, 500);
+            }
+          }
+        } catch (err) {
+          container.innerHTML = `<div class="alert error">Error al obtener estado: ${err.message}</div>`;
+        }
+      }
+      
+      pollStatus();
+    }
+    
+    // Format script name from path (no path module in browser)
+    function basename(fullPath) {
+      if (!fullPath) return '';
+      const parts = fullPath.split(/[\\/]/);
+      return parts[parts.length - 1] || fullPath;
+    }
+    
+    // Format job target info for display
+    function formatJobArgs(args) {
+      if (!args || !Array.isArray(args)) return '';
+      const script = args.find(a => a.endsWith('.mjs'));
+      return script ? basename(script) : args.slice(0, 3).join(' ');
+    }
+    
+    // Format audit target info into human-readable string
+    function formatAuditTarget(target) {
+      if (!target) return '';
+      if (typeof target !== 'object') return String(target);
+      const parts = Object.entries(target)
+        .filter(([k, v]) => v !== null && v !== undefined && v !== '')
+        .map(([k, v]) => {
+          const displayVal = typeof v === 'string' && v.length > 60 ? v.substring(0, 60) + '…' : v;
+          return `${k}=${displayVal}`;
+        });
+      return parts.join(', ');
+    }
+    
+    // Refresh jobs
+    async function refreshJobs() {
+      const container = document.getElementById('jobs-list');
+      container.innerHTML = '<div class="spinner"></div> Cargando...';
+      
+      try {
+        const res = await apiFetch(`${API_BASE}/jobs`);
+        const data = await res.json();
+        
+        if (!res.ok) {
+          container.innerHTML = `<div class="alert error">Error al cargar trabajos: ${data.error || res.statusText}</div>`;
+          return;
+        }
+        
+        if (!data.jobs || data.jobs.length === 0) {
+          container.innerHTML = '<div class="alert info">Sin trabajos recientes.</div>';
+          return;
+        }
+        
+        container.innerHTML = data.jobs.map(job => {
+          const statusClass = job.status === 'running' ? 'running' : (job.status === 'completed' ? 'completed' : 'failed');
+          const displayArgs = job.args ? job.args.filter(a => !a.startsWith('--')).slice(0, 5).join(' ') : '';
+          return `
+            <div class="job-status ${statusClass}" style="margin-bottom: 10px;">
+              <div><strong>Estado:</strong> ${job.status}
+                ${job.status === 'running' ? '<span class="spinner"></span>' : ''}
+              </div>
+              <div><strong>ID:</strong> ${job.id}</div>
+              <div><strong>Comando:</strong> ${escapeHtml(job.command || '')} ${escapeHtml(displayArgs)}</div>
+              <div><strong>Inicio:</strong> ${job.startTime ? new Date(job.startTime).toLocaleString() : '—'}</div>
+              ${job.endTime ? `<div><strong>Fin:</strong> ${new Date(job.endTime).toLocaleString()}</div>` : ''}
+              ${job.exitCode !== null ? `<div><strong>Código de salida:</strong> ${job.exitCode}</div>` : ''}
+              ${job.stderr ? `<details><summary>Ver errores (${job.stderr.length} chars)</summary><div class="output-box">${escapeHtml(job.stderr)}</div></details>` : ''}
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        container.innerHTML = `<div class="alert error">${err.message}</div>`;
+      }
+    }
+    
+    // Refresh audit
+    async function refreshAudit() {
+      const container = document.getElementById('audit-list');
+      container.innerHTML = '<div class="spinner"></div> Cargando...';
+      
+      try {
+        const res = await apiFetch(`${API_BASE}/audit-log`);
+        const data = await res.json();
+        
+        if (data.entries.length === 0) {
+          container.innerHTML = '<div class="alert info">Sin entradas de auditoría aún.</div>';
+          return;
+        }
+        
+        container.innerHTML = data.entries.map(entry => `
+          <div class="audit-entry">
+            <div class="audit-time">${new Date(entry.timestamp).toLocaleString()}</div>
+            <div><strong>${escapeHtml(entry.action)}</strong>${entry.dryRun ? ' 🔒dry-run' : ''} — ${escapeHtml(entry.details || formatAuditTarget(entry.target))}</div>
+            ${entry.script ? `<div style="color:#888;font-size:11px;">script: ${escapeHtml(entry.script)}${entry.result ? ' | resultado: ' + escapeHtml(entry.result) : ''}</div>` : ''}
+          </div>
+        `).join('');
+        
+      } catch (err) {
+        container.innerHTML = `<div class="alert error">${err.message}</div>`;
+      }
+    }
+    
+    // Refresh system status
+    async function refreshSystemStatus() {
+      const container = document.getElementById('system-status');
+      container.innerHTML = '<div class="spinner"></div> Cargando...';
+      
+      try {
+        const res = await fetch(`${API_BASE}/env-status`);
+        const envStatus = await res.json();
+        
+        const res2 = await fetch(`${API_BASE}/health`);
+        const health = await res2.json();
+        
+        container.innerHTML = `
+          <div class="alert info">
+            <div><strong>Versión:</strong> ${health.version}</div>
+            <div><strong>Tiempo activo (uptime):</strong> ${Math.round(health.uptime)}s</div>
+            <div><strong>KILO_APPROVE_PUBLISHING:</strong> ${envStatus.KILO_APPROVE_PUBLISHING ? '✅ Habilitado' : '❌ Deshabilitado'}</div>
+          </div>
+        `;
+        
+        // Update warning in manage-status tab
+        if (!envStatus.KILO_APPROVE_PUBLISHING) {
+          document.getElementById('publish-gate-warning').style.display = 'block';
+        }
+        
+      } catch (err) {
+        container.innerHTML = `<div class="alert error">${err.message}</div>`;
+      }
+    }
+    
+    // ============================================================
+    // DRAFTS PIPELINE (Fase 4) — "🆕 Nuevo Artículo" tab
+    // ============================================================
+
+    // Subtab A: save a new draft (POST /api/drafts)
+    async function submitSaveDraft(e) {
+      e.preventDefault();
+
+      const title = document.getElementById('draft-title').value;
+      const section = document.getElementById('draft-section').value;
+      const topics = document.getElementById('draft-topics').value
+        .split(',').map((t) => t.trim()).filter(Boolean);
+      const contentHtml = document.getElementById('draft-body').value;
+
+      const resultEl = document.getElementById('draft-save-result');
+      resultEl.innerHTML = '<div class="spinner"></div> Guardando...';
+
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, section, topics, contentHtml }),
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          const details = (data.details || []).map((d) => `<li>${escapeHtml(d)}</li>`).join('');
+          resultEl.innerHTML = `
+            <div class="alert error">
+              Error: ${escapeHtml(data.error || res.statusText)}
+              ${details ? `<ul class="field-errors">${details}</ul>` : ''}
+            </div>`;
+          return;
+        }
+
+        sessionStorage.setItem('currentDraftSlug', data.data.slug);
+        resultEl.innerHTML = `
+          <div class="alert success">
+            ✅ Borrador guardado. Slug: <strong>${escapeHtml(data.data.slug)}</strong>
+            &nbsp; <button type="button" class="btn-secondary" onclick="switchSubtabById('subtab-preview')">Ir a Preview →</button>
+          </div>`;
+      } catch (err) {
+        resultEl.innerHTML = `<div class="alert error">Error de red: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    // Subtab B: populate the draft selector (GET /api/drafts)
+    async function refreshDraftSelector() {
+      const select = document.getElementById('draft-select');
+      if (!select) return;
+
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts`);
+        const data = await res.json();
+        if (!res.ok || !data.ok) return;
+
+        const currentSlug = sessionStorage.getItem('currentDraftSlug') || '';
+        select.innerHTML = '<option value="">— Elegir borrador —</option>' +
+          data.data.drafts.map((d) => `<option value="${escapeHtml(d.slug)}">${escapeHtml(d.title)} (${escapeHtml(d.slug)})</option>`).join('');
+
+        if (currentSlug && data.data.drafts.some((d) => d.slug === currentSlug)) {
+          select.value = currentSlug;
+          loadDraftPreview();
+        }
+      } catch (err) {
+        // Non-fatal — selector just stays empty
+      }
+    }
+
+    // Subtab B: load + render the preview for the selected draft
+    async function loadDraftPreview() {
+      const slug = document.getElementById('draft-select').value;
+      const container = document.getElementById('draft-preview-container');
+      document.getElementById('draft-approve-result').innerHTML = '';
+
+      if (!slug) {
+        container.innerHTML = '';
+        return;
+      }
+
+      sessionStorage.setItem('currentDraftSlug', slug);
+      container.innerHTML = '<div class="spinner"></div> Cargando...';
+
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}`);
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          container.innerHTML = `<div class="alert error">Error: ${escapeHtml(data.error || res.statusText)}</div>`;
+          return;
+        }
+
+        const { draft, previewHtml, location } = data.data;
+        const topics = Array.isArray(draft.topics) ? draft.topics.join(', ') : '';
+
+        container.innerHTML = `
+          <div class="preview-box">
+            <div class="preview-meta">
+              <span>📋 SECCIÓN: ${escapeHtml(draft.section || '')}</span>
+              <span>📅 Fecha: ${escapeHtml(draft.date || '')}</span>
+              <span>🏷️ Topics: ${escapeHtml(topics)}</span>
+              <span>Estado: ${escapeHtml(draft.status || '')}</span>
+              <span>Ubicación: ${escapeHtml(location || '')}</span>
+            </div>
+            <div class="preview-body">${previewHtml}</div>
+          </div>`;
+      } catch (err) {
+        container.innerHTML = `<div class="alert error">Error de red: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    // Subtab B: "← Editar" — load the current draft's fields back into Subtab A
+    async function editCurrentDraft() {
+      const slug = document.getElementById('draft-select').value || sessionStorage.getItem('currentDraftSlug');
+      if (!slug) {
+        switchSubtabById('subtab-write');
+        return;
+      }
+
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}`);
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          const draft = data.data.draft;
+          document.getElementById('draft-title').value = draft.title || '';
+          document.getElementById('draft-section').value = draft.section || 'general';
+          document.getElementById('draft-topics').value = Array.isArray(draft.topics) ? draft.topics.join(', ') : '';
+          document.getElementById('draft-body').value = draft.contentHtml || '';
+        }
+      } catch (err) {
+        // Non-fatal — just fall through to the (possibly empty) form
+      }
+
+      switchSubtabById('subtab-write');
+    }
+
+    // Subtab B: "✅ Aprobar →" (POST /api/drafts/:slug/approve)
+    async function approveDraft() {
+      const slug = document.getElementById('draft-select').value;
+      const resultEl = document.getElementById('draft-approve-result');
+
+      if (!slug) {
+        resultEl.innerHTML = '<div class="alert warning">Selecciona un borrador primero.</div>';
+        return;
+      }
+
+      resultEl.innerHTML = '<span class="draft-status-badge checking">🟡 Validando...</span>';
+
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}/approve`, { method: 'POST' });
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+          resultEl.innerHTML = `
+            <div class="alert success">
+              ✅ Artículo aprobado y movido a <code>articulos_en_trabajo/READY/${escapeHtml(slug)}.json</code>.
+              Listo para publicar en kilombo.top.
+            </div>`;
+          refreshDraftSelector();
+          return;
+        }
+
+        if (data.code === 'VALIDATION_FAILED') {
+          const errors = (data.details && data.details.validationErrors) || [];
+          resultEl.innerHTML = `
+            <div class="alert error">
+              <strong>❌ Validación fallida</strong> — corrige y guarda de nuevo en Redacción antes de reintentar.
+              <ul class="field-errors">${errors.map((e) => `<li>${escapeHtml(e)}</li>`).join('')}</ul>
+            </div>`;
+          return;
+        }
+
+        if (data.code === 'DRAFT_ALREADY_APPROVED') {
+          resultEl.innerHTML = `<div class="alert info">ℹ️ Este artículo ya está en READY.</div>`;
+          return;
+        }
+
+        resultEl.innerHTML = `<div class="alert error">Error: ${escapeHtml(data.error || res.statusText)}</div>`;
+      } catch (err) {
+        resultEl.innerHTML = `<div class="alert error">Error de red: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    // ============================================================
+    // SUBTAB C — Mejorar con IA (Groq)
+    // ============================================================
+
+    // Holds the suggestions array from the last /improve call so
+    // /apply-suggestion can pass it back without re-calling Groq.
+    let _currentSuggestions = [];
+    let _currentAiSlug = null;
+
+    // Sync the AI subtab slug selector with the drafts list.
+    async function refreshAiSelector() {
+      const select = document.getElementById('ai-slug-select');
+      if (!select) return;
+      // Pre-select synchronously from sessionStorage so the button works immediately
+      const current = _currentAiSlug || sessionStorage.getItem('currentDraftSlug') || '';
+      if (current && !select.value) {
+        // Add a temporary option so the value is set before the fetch returns
+        if (!select.querySelector(`option[value="${CSS.escape(current)}"]`)) {
+          const opt = document.createElement('option');
+          opt.value = current;
+          opt.textContent = current;
+          select.appendChild(opt);
+        }
+        select.value = current;
+      }
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts`);
+        const data = await res.json();
+        if (!res.ok || !data.ok) return;
+        const slugs = (data.data.drafts || []).map((d) => d.slug);
+        const selected = select.value || current;
+        select.innerHTML =
+          '<option value="">— selecciona borrador —</option>' +
+          slugs.map((s) => `<option value="${escapeHtml(s)}"${s === selected ? ' selected' : ''}>${escapeHtml(s)}</option>`).join('');
+      } catch (_) { /* silent */ }
+    }
+
+    async function runImprove() {
+      const select = document.getElementById('ai-slug-select');
+      const btn = document.getElementById('btn-improve');
+      // Fall back to the slug the user last worked on in Preview/Write tabs
+      const slug = select.value || sessionStorage.getItem('currentDraftSlug') || '';
+      const statusEl = document.getElementById('ai-status');
+      const suggestionsEl = document.getElementById('ai-suggestions');
+
+      if (!slug) {
+        statusEl.innerHTML = '<span style="color:orange;font-weight:600">⚠️ Selecciona un borrador en el selector de arriba, o ve a Redacción y guarda uno primero.</span>';
+        return;
+      }
+
+      // Lock button and show spinner
+      btn.disabled = true;
+      btn.textContent = '⏳ Consultando...';
+      _currentAiSlug = slug;
+      _currentSuggestions = [];
+      statusEl.innerHTML = `<span style="color:#555">⏳ Consultando Groq para "<strong>${escapeHtml(slug)}</strong>"… <em>(puede tardar unos segundos)</em></span>`;
+      suggestionsEl.innerHTML = '';
+
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}/improve`, { method: 'POST' });
+        const data = await res.json();
+
+        // 501 = key not configured — show static banner
+        if (res.status === 501 || data.code === 'NOT_IMPLEMENTED') {
+          document.getElementById('ai-panel').style.display = 'none';
+          document.getElementById('ai-unavailable').style.display = '';
+          return;
+        }
+
+        if (!res.ok || !data.ok) {
+          statusEl.innerHTML = `<span style="color:red">❌ Error: ${escapeHtml(data.error || res.statusText)}${data.code ? ` (${escapeHtml(data.code)})` : ''}</span>`;
+          return;
+        }
+
+        const { suggestions, model } = data.data;
+        _currentSuggestions = suggestions;
+
+        if (!suggestions || suggestions.length === 0) {
+          statusEl.innerHTML = '✅ El modelo no encontró sugerencias de mejora.';
+          return;
+        }
+
+        statusEl.innerHTML = `✅ <strong>${suggestions.length} sugerencia(s)</strong> — modelo: <code>${escapeHtml(model)}</code>`;
+
+        const kindLabel = { rewrite: '✏️ Reescritura', add: '➕ Añadir', remove: '🗑️ Eliminar', metadata: '🏷️ Metadato' };
+
+        suggestionsEl.innerHTML = suggestions.map((s) => `
+          <div class="suggestion-card" id="sug-card-${escapeHtml(s.id)}">
+            <div class="sug-header">
+              <span class="sug-kind">${escapeHtml(kindLabel[s.kind] || s.kind)}</span>
+              <span class="sug-selector">${escapeHtml(s.selector || '')}</span>
+            </div>
+            ${s.original ? `<div class="sug-original"><strong>Original:</strong> ${escapeHtml(s.original)}</div>` : ''}
+            ${s.kind === 'remove'
+              ? `<div class="sug-proposed"><em>(eliminar completamente)</em></div>`
+              : `<div class="sug-proposed"><strong>Propuesto:</strong> ${escapeHtml(s.proposed || '')}</div>`}
+            <div class="sug-rationale"><em>${escapeHtml(s.rationale || '')}</em></div>
+            <button type="button" class="btn-primary sug-apply-btn" onclick="applySuggestion('${escapeHtml(s.id)}')">Aplicar</button>
+            <span class="sug-applied-badge" id="sug-badge-${escapeHtml(s.id)}" style="display:none">✅ Aplicada</span>
+          </div>`).join('');
+
+      } catch (err) {
+        statusEl.innerHTML = `<span style="color:red">❌ Error de red: ${escapeHtml(err.message)}</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ Mejorar con IA';
+      }
+    }
+
+    async function applySuggestion(suggestionId) {
+      const slug = _currentAiSlug;
+      if (!slug) return;
+
+      const btn = document.querySelector(`#sug-card-${CSS.escape(suggestionId)} .sug-apply-btn`);
+      if (btn) { btn.disabled = true; btn.textContent = 'Aplicando...'; }
+
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}/apply-suggestion`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ suggestionId, suggestions: _currentSuggestions }),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+          if (btn) btn.style.display = 'none';
+          const badge = document.getElementById(`sug-badge-${suggestionId}`);
+          if (badge) badge.style.display = '';
+          document.getElementById('ai-status').textContent =
+            `✅ Sugerencia "${suggestionId}" aplicada. Visita Preview para ver el resultado.`;
+          return;
+        }
+
+        if (btn) { btn.disabled = false; btn.textContent = 'Aplicar'; }
+        document.getElementById('ai-status').innerHTML =
+          `<span style="color:red">Error al aplicar: ${escapeHtml(data.error || res.statusText)}</span>`;
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Aplicar'; }
+        document.getElementById('ai-status').innerHTML =
+          `<span style="color:red">Error de red: ${escapeHtml(err.message)}</span>`;
+      }
+    }
+
+    // "📬 Listos para Publicar" tab (GET /api/ready-drafts)
+    async function refreshReadyDrafts() {
+      const container = document.getElementById('ready-drafts-list');
+      container.innerHTML = '<div class="spinner"></div> Cargando...';
+
+      try {
+        const res = await apiFetch(`${API_BASE}/ready-drafts`);
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          container.innerHTML = `<div class="alert error">Error: ${escapeHtml(data.error || res.statusText)}</div>`;
+          return;
+        }
+
+        const drafts = data.data.drafts;
+        if (!drafts.length) {
+          container.innerHTML = '<div class="alert info">Sin artículos listos para publicar todavía.</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table class="simple-table">
+            <thead>
+              <tr><th>Slug</th><th>Título</th><th>Sección</th><th>Aprobado</th></tr>
+            </thead>
+            <tbody>
+              ${drafts.map((d) => `
+                <tr>
+                  <td>${escapeHtml(d.slug)}</td>
+                  <td>${escapeHtml(d.title || '')}</td>
+                  <td>${escapeHtml(d.section || '')}</td>
+                  <td>${d.approvedAt ? new Date(d.approvedAt).toLocaleString() : '—'}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+          <p style="color:#666; font-size: 13px; margin-top: 10px;">N = ${data.data.total} artículo(s) listo(s) para publicar a SPIP.</p>`;
+      } catch (err) {
+        container.innerHTML = `<div class="alert error">${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    // Utility
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+    
+    // Load status on page load
+    window.addEventListener('load', () => {
+      refreshSystemStatus();
+    });
+  </script>
+</body>
+</html>

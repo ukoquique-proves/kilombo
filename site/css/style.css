@@ -1,0 +1,726 @@
+:root {
+  --ink: #121212;
+  --paper: #d4cec5;
+  --paper-alt: #c9bfb5;
+  --page-bg: #b8ada2;
+  --red: #b91c2a;
+  --red-dark: #8b0000;
+  /* Darkened from #595959 — that value read fine on white but dropped
+     below WCAG AA (4.5:1) for small text on this page's warmer, darker
+     surfaces (paper-alt, page-bg), which is exactly the kind of thing
+     that makes body copy feel like a strain to read without being able
+     to say why. */
+  --gray: #404040;
+  --gray-light: #a0a0a0;
+  --rule: #1e1e1e;
+  --lang-es: #1b5e20;
+  --lang-fr: #0d47a1;
+  --lang-en: #311b92;
+  --lang-multi: #4a148c;
+  --status-active-bg: #e8f5e9;
+  --status-active-fg: #1b5e20;
+  --status-archive-bg: #fff8e1;
+  --status-archive-fg: #e65100;
+  --status-legacy-bg: #eceff1;
+  --status-legacy-fg: #455a64;
+  --section-bg: #ede8e1;
+
+  /* Typography */
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans:  'Inter', Verdana, Arial, Helvetica, sans-serif;
+  --font-mono:  'Courier New', 'Lucida Console', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--page-bg);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.site-header {
+  background: var(--ink);
+  color: var(--paper);
+  border-bottom: 4px solid var(--red);
+  padding: 2.5rem 0 2rem;
+  margin-bottom: 3rem;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.site-logo-star {
+  flex: 0 0 auto;
+  width: clamp(48px, 7vw, 72px);
+  height: clamp(48px, 7vw, 72px);
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+}
+
+.site-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.site-subtitle {
+  font-family: var(--font-sans);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: var(--gray-light);
+  margin-top: 0.5rem;
+  letter-spacing: 0.04em;
+  font-style: italic;
+}
+
+.site-mission {
+  font-family: var(--font-sans);
+  font-size: clamp(0.85rem, 1.8vw, 1rem);
+  color: var(--paper-alt);
+  margin-top: 0.75rem;
+  line-height: 1.5;
+  max-width: 65ch;
+  letter-spacing: 0.01em;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.section {
+  margin-bottom: 4.5rem;
+  background: var(--section-bg);
+  padding: 2.5rem 2rem;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.section-header {
+  border-left: 5px solid var(--red);
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.section-header--featured {
+  border-left: 5px solid var(--red);
+  background: linear-gradient(90deg, rgba(185,28,42,0.07), transparent);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-right: 1rem;
+}
+
+.section-number {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--red);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+}
+
+.section-label {
+  display: inline-block;
+  background: var(--red);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.7rem;
+  margin-bottom: 0.6rem;
+  font-weight: 700;
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+.section-tagline {
+  font-size: 1rem;
+  color: #1a1a1a;
+  line-height: 1.55;
+  max-width: 65ch;
+}
+
+.section--tierra {
+  border-left: 5px solid #7a6b63;
+  padding-left: 1.5rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.section--tierra .section-title,
+.section--tierra .section-tagline,
+.section--tierra .section-label,
+.section--tierra .section-number {
+  color: #1a1a1a;
+}
+
+.section--tierra .section-header {
+  border-left: none;
+  padding-left: 0;
+}
+
+.section--tierra .section-number {
+  color: #1a1a1a;
+  font-size: 1rem;
+}
+
+.section--featured {
+  background: var(--section-bg);
+  padding: 2.5rem;
+  border: 1px solid rgba(0,0,0,0.15);
+  position: relative;
+}
+
+.section--featured::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: var(--red);
+}
+
+/* All four sections share one calm background tone. They were previously
+   four different hues (brown/olive/mauve/teal) as you scrolled down the
+   page — that variation didn't encode any real information (order and
+   identity are already carried by the number + border accent + icon) and
+   just made the page read as busier than it is. One tone, differentiated
+   only where it matters (Tierra y Libertad is "featured" — see
+   .section--featured), keeps scrolling calm and lets the accent color do
+   its job. */
+#espacio-tierra-y-libertad,
+#gci,
+#proletarios-internacionalistas,
+#nuevo-orden-mundial {
+  background: var(--section-bg);
+}
+
+.featured-intro {
+  max-width: 75ch;
+  margin: 0 0 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+  font-size: 1.05rem;
+  color: #1a1a1a;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.cards-grid--featured {
+  grid-template-columns: 1fr;
+}
+
+/* ====================================================================
+   NOTE: previous rules `.cards-grid--two` and `.card--lang-fr` were
+   removed after v0.8.0 PI section unification (single bilingual card
+   instead of separate ES / FR cards).
+   Re-add if section 02 ever splits again into two separate URLs.
+   ==================================================================== */
+
+/* ------------------------------------------------------------------ */
+/* CARD BASE                                                            */
+/* ------------------------------------------------------------------ */
+
+.card {
+  display: block;
+  background: #e8e0d5;
+  border: 1px solid rgba(0,0,0,0.18);
+  padding: 1.4rem 1.25rem 1.25rem;
+  position: relative;
+  /* elevation + border glow + top-bar color + arrow opacity */
+  transition:
+    transform        0.18s ease,
+    box-shadow       0.18s ease,
+    border-color     0.18s ease;
+  overflow: hidden;
+}
+
+/* top accent bar */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--rule);
+  transition: height 0.18s ease, background 0.18s ease;
+}
+
+/* arrow indicator — slides in from the right on hover */
+.card::after {
+  content: "→";
+  position: absolute;
+  bottom: 1.1rem;
+  right: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--red);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.11),
+    0 0 0 1px rgba(185,28,42,0.25);
+  border-color: rgba(185,28,42,0.45);
+}
+
+.card:hover::before {
+  height: 4px;
+  background: var(--red);
+}
+
+.card:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ------------------------------------------------------------------ */
+/* CARD VARIANTS                                                        */
+/* ------------------------------------------------------------------ */
+
+.card--featured::before {
+  height: 5px;
+  background: var(--red);
+}
+
+.card--featured {
+  background: linear-gradient(180deg, #fff 0%, var(--paper) 100%);
+  border: 1.5px solid rgba(185,28,42,0.28);
+}
+
+.card--archive {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--paper),
+    var(--paper) 10px,
+    var(--paper-alt) 10px,
+    var(--paper-alt) 20px
+  );
+}
+
+.card--thematic {
+  border-left: 4px solid var(--red-dark);
+}
+
+/* ------------------------------------------------------------------ */
+/* CARD INTERNALS                                                       */
+/* ------------------------------------------------------------------ */
+
+.card-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.card-lang {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.09);
+  color: #444;
+}
+
+.card--lang-es .card-lang { background: #1b5e20;  color: #ffffff; }
+.card--lang-en .card-lang { background: #311b92; color: #ffffff; }
+.card--lang-multi .card-lang { background: #4a148c; color: #ffffff; }
+
+/* Status + tier used to be two separate solid-fill pills (5 different
+   saturated colors between them: green/orange/gray/gray/purple). That
+   color-coding didn't carry more meaning than the text already does, and
+   stacking two loud pills per card next to the lang pill was the main
+   source of clutter on this page. Now it's a single quiet outline badge —
+   the words ("Activo", "Externo"...) still tell you everything, restraint
+   handles the rest. */
+.card-status {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.5);
+  color: #3a352f;
+  border: 1px solid rgba(0,0,0,0.18);
+}
+
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 0.55rem;
+  color: #1a1a1a;
+}
+
+.card-desc {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: #1a1a1a;
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: #ffffff;
+  background: #666;
+}
+
+/* One quiet neutral for every tag except --type, which keeps the brand red
+   as the single accent color in this row — was four different fills
+   (dark red / near-black / mid-gray / dark red again) doing no extra
+   signaling work over the label text itself. */
+.tag--type  { background: #8b1320;  color: #ffffff; border-color: rgba(185,28,42,0.4); }
+.tag--affil,
+.tag--scope { background: #555;     color: #ffffff; }
+
+/* ------------------------------------------------------------------ */
+/* SECTION ILLUSTRATIONS                                                */
+/* ------------------------------------------------------------------ */
+
+.section-header--illustrated {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.section-header__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.section-illustration {
+  flex: 0 0 auto;
+  opacity: 0.55;
+  transition: opacity 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.section:hover .section-illustration {
+  opacity: 0.75;
+}
+
+/* Small external source link below the section SVG icon.
+   Quiet by design — the internal content is the primary action. */
+.section-source-link {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gray);
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.section-source-link:hover {
+  color: var(--red);
+  border-color: rgba(185,28,42,0.4);
+}
+
+.section-svg {
+  display: block;
+  width: 68px;
+  height: 68px;
+}
+
+.section-svg--tierra    { stroke: #6b5d51; }
+.section-svg--actualidad { stroke: #b91c2a; }
+.section-svg--gci       { stroke: #5a7268; }
+.section-svg--pi        { stroke: #8b0000; }
+.section-svg--nom       { stroke: #4a6175; }
+.section-svg--actualidad { stroke: #5a4e3a; }
+
+/* Actualidad section — same solid treatment as the four named editorial
+   sections. Warm parchment tint (slightly golden) signals live/current
+   content, forward-looking. */
+.section--actualidad {
+  background: #e8e4d0;
+  border-left: 5px solid #a0522d;
+}
+
+/* Coming-soon card — not a link, no hover interaction */
+.card--coming-soon {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.card--coming-soon::after {
+  display: none;
+}
+
+.card--coming-soon:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: rgba(0,0,0,0.18);
+}
+
+.card--coming-soon:hover::before {
+  height: 3px;
+  background: var(--rule);
+}
+
+/* Cool near-white, desaturated — signals reference index, not editorial.
+   Dashed border reinforces the "different kind of thing" framing. */
+.section--archivo {
+  background: #e4e4e0;
+  border: 1px dashed rgba(0,0,0,0.2);
+  box-shadow: none;
+}
+
+.section--archivo .section-number {
+  color: var(--gray);
+  letter-spacing: 0.1em;
+}
+
+.section--archivo .section-title {
+  font-size: clamp(1.3rem, 2.8vw, 1.9rem);
+  color: #2a2a2a;
+}
+
+@media (max-width: 480px) {
+  .section-header--illustrated {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .section-illustration {
+    align-self: center;
+    margin-top: 0.5rem;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* FOOTER                                                               */
+/* ------------------------------------------------------------------ */
+
+.site-footer {
+  background: var(--ink);
+  color: var(--gray-light);
+  margin-top: 5rem;
+  padding: 3rem 0 1.5rem;
+  border-top: 4px solid var(--red);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.footer-title {
+  font-family: var(--font-serif);
+  color: var(--paper);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.8rem;
+}
+
+.footer-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.footer-link {
+  font-size: 0.9rem;
+  color: var(--paper);
+  border-bottom: 1px solid var(--red);
+  padding-bottom: 0.1rem;
+  transition: color 0.15s ease;
+}
+
+.footer-link:hover {
+  color: var(--red);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 1.25rem;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+/* --- Tablet: 481px – 768px --- */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  .cards-grid {
+    /* Force single column — 280px min would try to fit two at ~580px */
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    margin-bottom: 3rem;
+  }
+
+  .section--featured {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .section--tierra {
+    padding-left: 1.25rem;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* --- Mobile: ≤ 480px --- */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .site-header {
+    padding: 1.75rem 0 1.25rem;
+  }
+
+  .section--featured {
+    padding: 1.25rem 1rem;
+  }
+
+  .section--tierra {
+    padding-left: 1rem;
+  }
+
+  .section-header {
+    padding-left: 0.9rem;
+  }
+
+  /* Keep card internal padding consistent so tags don't hug the edge */
+  .card {
+    padding: 1.1rem 1rem 1rem;
+  }
+
+  /* Tags row: tighten gap slightly but keep wrap working cleanly */
+  .card-tags {
+    gap: 0.3rem;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .site-footer {
+    margin-top: 3rem;
+    padding: 2rem 0 1.25rem;
+  }
+}
+
+/* ================================================================
+   TOPIC / TAG FILTER BAR
+   Shared component: articulos.html filters articles by topic,
+   plandemismo.html filters each tab's video grid by tag. One
+   implementation (site/js/render.mjs renderFilterBar) — see that
+   file's header comment for why it lives there instead of in
+   articles.js or plandemismo.js individually.
+   ================================================================ */
+
+.topic-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.topic-filter-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0.32rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #e8e0d5;
+  color: #333;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.topic-filter-btn:hover {
+  border-color: rgba(185, 28, 42, 0.4);
+}
+
+.topic-filter-btn:focus-visible {
+  outline: 2px solid rgba(185, 28, 42, 0.6);
+  outline-offset: 2px;
+}
+
+.topic-filter-btn.is-active {
+  background: #b91c2a;
+  border-color: #b91c2a;
+  color: #fff;
+}
+

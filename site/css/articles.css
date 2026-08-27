@@ -1,0 +1,599 @@
+/* articles.css — estilos mínimos para el sistema de artículos (JSON → HTML) */
+
+.articles-header {
+  margin: 2rem 0 1rem;
+}
+
+.articles-header h2 {
+  margin: 0 0 0.5rem;
+}
+
+.articles-note {
+  margin: 0.5rem 0 0;
+  color: #333;
+}
+
+.article-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 2rem;
+}
+
+.article-card {
+  display: block;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  background: #e8e0d5;
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform    0.18s ease,
+    box-shadow   0.18s ease,
+    border-color 0.18s ease;
+}
+
+/* arrow indicator */
+.article-card::after {
+  content: "→";
+  position: absolute;
+  bottom: 0.9rem;
+  right: 1rem;
+  font-size: 0.85rem;
+  color: #b91c2a;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+}
+
+.article-card:hover,
+.article-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.1),
+    0 0 0 1px rgba(185,28,42,0.22);
+  border-color: rgba(185, 28, 42, 0.45);
+  outline: none;
+}
+
+.article-card:hover::after,
+.article-card:focus-visible::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.article-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.55rem;
+  margin: 0 0 0.75rem;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.72rem;
+  color: #ffffff;
+}
+
+.article-card__meta span {
+  background: #666;
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+/* ================================================================
+   PENDING-REVIEW STATUS BADGE — card level
+   Distinct visual treatment for pending-review articles: amber/warning
+   color, warning emoji, larger weight. Allows visitors to spot stubs
+   at a glance before clicking in.
+   ================================================================ */
+
+.article-card__status-badge {
+  background: #f57c00;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.2);
+  font-weight: 600;
+  animation: pulse-amber 2s ease-in-out infinite;
+}
+
+@keyframes pulse-amber {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(245, 124, 0, 0.4);
+  }
+  50% {
+    opacity: 0.95;
+    box-shadow: 0 0 0 6px rgba(245, 124, 0, 0);
+  }
+}
+
+.article-card__status-badge--pending {
+  background: #f57c00;
+}
+
+.article-card__title {
+  margin: 0 0 0.5rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.article-card__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.topic-chip {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: #555;
+  border: 1px solid rgba(0,0,0,0.2);
+  font-size: 0.72rem;
+  color: #ffffff;
+}
+
+.article-detail {
+  margin: 1.5rem 0 2rem;
+  padding: 1.25rem;
+  border: 2px solid rgba(0, 0, 0, 0.16);
+  border-radius: 10px;
+  background: #e8e0d5;
+}
+
+.article-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.55rem;
+  margin: 0.75rem 0 1.25rem;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.75rem;
+  color: #ffffff;
+}
+
+.article-detail__meta span {
+  background: #666;
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+/* ================================================================
+   PENDING-REVIEW STATUS BADGE — detail page
+   Mirrors card-level badge with same warning color treatment.
+   ================================================================ */
+
+.article-detail__status-badge {
+  background: #666;
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+.article-detail__status-badge--pending {
+  background: #f57c00;
+  color: #ffffff;
+  font-weight: 600;
+  animation: pulse-amber 2s ease-in-out infinite;
+}
+
+/* ================================================================
+   PENDING-REVIEW BANNER — prominently warns reader before content
+   Large warning icon, clear language, distinct background color.
+   Placed at the top of article content so it's impossible to miss.
+   ================================================================ */
+
+.article-pending-banner {
+  display: flex;
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem;
+  background: #fff3e0;
+  border: 2px solid #f57c00;
+  border-radius: 6px;
+  border-left: 6px solid #f57c00;
+}
+
+.article-pending-banner__icon {
+  flex: 0 0 auto;
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-top: 0.2rem;
+}
+
+.article-pending-banner__text {
+  flex: 1;
+  font-family: 'Inter', Verdana, Arial, sans-serif;
+}
+
+.article-pending-banner__text strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #e65100;
+  font-weight: 700;
+}
+
+.article-pending-banner__text p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #bf360c;
+}
+
+.article-detail__content {
+  line-height: 1.7;
+  font-family: 'Inter', Verdana, Arial, sans-serif;
+  font-size: 1rem;
+  max-width: 72ch;
+  margin-left: auto;
+  margin-right: auto;
+  color: #1a1a1a;
+}
+
+/* Links inside article body — must be visually distinct from plain text.
+   The global reset (a { text-decoration: none }) hides them otherwise. */
+.article-detail__content a {
+  color: #b91c2a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.article-detail__content a:hover,
+.article-detail__content a:focus-visible {
+  color: #8b0000;
+  opacity: 0.85;
+}
+
+.article-detail__content a[target="_blank"]::after {
+  content: " ↗";
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+/* NOTA: sanitizeHtml() (site/js/render.mjs) solo admite h3/h4 en el
+   contenido de artículos — un <h2> escrito a mano en articles.json se
+   descarta al sanear y este selector nunca llega a aplicarse. Al agregar
+   subtítulos a un artículo para cortar bloques largos de texto, usar
+   <h3>/<h4>, no <h2>. */
+.article-detail__content h3,
+.article-detail__content h4 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  margin-top: 1.25rem;
+  color: #1a1a1a;
+}
+
+.article-detail__content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem 0;
+  border-radius: 6px;
+}
+
+.article-detail__content figure {
+  margin: 1.5rem 0;
+  padding: 0;
+}
+
+.article-detail__content figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Letra capital en el primer párrafo — ancla visual editorial que no
+   depende de que el artículo tenga imágenes. Solo aplica al <p> que abre
+   el artículo, así que artículos muy cortos (2-3 líneas) no quedan
+   desbalanceados por un drop cap desproporcionado. */
+.article-detail__content > p:first-of-type::first-letter {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 900;
+  font-size: 3.4em;
+  line-height: 0.82;
+  float: left;
+  margin: 0.04em 0.1em 0 0;
+  color: #b91c2a;
+}
+
+.article-detail__content blockquote {
+  position: relative;
+  margin: 1.5rem 0;
+  padding: 0.85rem 1rem 0.85rem 1.5rem;
+  border-left: 4px solid #b91c2a;
+  background: rgba(185, 28, 42, 0.05);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: #1a1a1a;
+}
+
+/* Comilla decorativa — refuerza el "pull-quote" sin tocar el HTML de
+   entrada (el <blockquote> ya sanitizado no necesita marcado extra).
+   aria-hidden no aplica a contenido CSS generado, así que no añade ruido
+   a lectores de pantalla. */
+.article-detail__content blockquote::before {
+  content: "“";
+  position: absolute;
+  top: -0.1rem;
+  left: 0.35rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: rgba(185, 28, 42, 0.35);
+  line-height: 1;
+}
+
+.article-detail__source-box {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(185, 28, 42, 0.08);
+  border: 1px solid rgba(185, 28, 42, 0.25);
+  border-left: 4px solid #b91c2a;
+  border-radius: 6px;
+}
+
+.article-detail__source-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #b91c2a;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.article-detail__source-site {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.article-detail__source-link {
+  display: inline-block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #0066cc;
+  text-decoration: none;
+  word-break: break-all;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 102, 204, 0.08);
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.article-detail__source-link:hover {
+  background: rgba(0, 102, 204, 0.15);
+  text-decoration: underline;
+}
+
+.article-detail__source-link::after {
+  content: " ↗";
+  font-size: 0.8em;
+}
+
+.article-empty {
+  padding: 1rem;
+  border: 2px dashed rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  background: #e8e0d5;
+}
+
+/* ================================================================
+   READING PROGRESS BAR (articulo.html)
+   No heading structure exists in article content yet, so this is
+   today's nav aid for the longer articles rather than a TOC.
+   Moved here from an inline <style> block in articulo.html to match
+   the rest of the project: styling lives in css/, behavior lives in
+   js/, both testable/reviewable in one place.
+   ================================================================ */
+
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #b91c2a, #8b0000);
+  width: 0%;
+  z-index: 9999;
+  transition: width 0.1s ease;
+}
+
+/* ================================================================
+   ARTICLE CONTROLS — search box (articulos.html)
+   .topic-filter-bar / .topic-filter-btn now live in style.css,
+   shared with plandemismo.js's per-tab tag filter.
+   ================================================================ */
+
+.article-controls {
+  margin: 1rem 0 0.5rem;
+}
+
+.article-search {
+  font: inherit;
+  font-size: 0.92rem;
+  width: 100%;
+  max-width: 360px;
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: #e8e0d5;
+  color: #222;
+}
+
+.article-search:focus-visible {
+  outline: 2px solid rgba(185, 28, 42, 0.6);
+  outline-offset: 1px;
+  border-color: rgba(185, 28, 42, 0.4);
+}
+
+/* ================================================================
+   RELATED ARTICLES (articulo.html)
+   ================================================================ */
+
+.article-detail__related {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.25);
+}
+
+.article-detail__related-title {
+  margin: 0 0 0.85rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.related-grid .article-card {
+  padding: 0.85rem;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+/* --- Tablet: 481px – 768px --- */
+@media (max-width: 768px) {
+  .article-list {
+    /* minmax(260px) can force two tight columns at ~530px — go single */
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Mobile: ≤ 480px --- */
+@media (max-width: 480px) {
+  .article-card {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  /* Topic chips: slightly smaller gap so they wrap cleanly */
+  .article-card__topics {
+    gap: 0.28rem;
+  }
+
+  .article-detail {
+    padding: 1rem;
+  }
+
+  .article-detail__meta {
+    gap: 0.3rem 0.45rem;
+  }
+}
+
+/* ================================================================
+   METADATA CARDS — movies, documentaries, media articles (v0.39.0+)
+   Renders ficha técnica (director, year, country, duration, etc.)
+   and external links (YouTube, IMDb, ok.ru) as styled cards.
+   ================================================================ */
+
+.article-metadata-card {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: rgba(185, 28, 42, 0.08);
+  border: 1px solid rgba(185, 28, 42, 0.25);
+  border-left: 4px solid #b91c2a;
+  border-radius: 6px;
+}
+
+.article-metadata-card__header {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #b91c2a;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.article-metadata-card__body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.article-metadata-card__item {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #1a1a1a;
+}
+
+.article-metadata-card__item strong {
+  font-weight: 600;
+  color: #b91c2a;
+  margin-right: 0.3rem;
+}
+
+.article-external-links-card {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: rgba(0, 102, 204, 0.08);
+  border: 1px solid rgba(0, 102, 204, 0.25);
+  border-left: 4px solid #0066cc;
+  border-radius: 6px;
+}
+
+.article-external-links-card__header {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0066cc;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.article-external-links-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.article-external-links-card__link {
+  display: block;
+  padding: 0.6rem 0.8rem;
+  background: #0066cc;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.article-external-links-card__link:hover {
+  background: #0052a3;
+  transform: translateX(2px);
+}
+
+.article-external-links-card__type {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  text-transform: uppercase;
+}
+
+.article-external-links-card__title {
+  word-break: break-word;
+}
+
