@@ -7,6 +7,39 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [Unreleased] — Documentation Consolidation: Phases 0–7 Complete
 
+### REFACTOR: api/server.mjs split into layers (Clean Architecture / Clean Code)
+
+**Status:** ✅ Complete · `npm test 234/234 ✅` · `eslint 0 errors ✅`
+
+`api/server.mjs` had grown into a 1004-line file mixing HTTP routing,
+business logic, and infrastructure (Groq SDK calls, raw fs access, crypto)
+directly inside route handlers, with the same drafts-store error-mapping
+`if (err.code === 'X') ...` chain independently duplicated across ~5 routes.
+
+Split into thin controllers (validate → call service/store → map response)
+plus new single-responsibility modules:
+- `api/lib/util/sanitize-input.mjs` — pure string utility
+- `api/lib/audit-logger.mjs` — isolates fs access for the audit trail
+- `api/lib/auth.mjs` — `requireSharedSecret` middleware, takes the audit
+  logger as a dependency instead of touching the filesystem itself
+- `api/lib/http-errors.mjs` — `sendDraftError()`: single source of truth
+  for mapping drafts-store error codes to HTTP responses
+- `api/lib/services/ai-improve-service.mjs` — isolates the Groq SDK and
+  prompt/response logic; server.mjs now only calls `generateSuggestions()`
+
+`api/server.mjs`: 1004 → 700 lines. Verified with a manual smoke test of 7
+error paths (404/400/422/501 across drafts CRUD, approve, improve,
+audit-log) confirming byte-for-byte identical response shapes.
+
+**Known remaining duplication (flagged, not fixed this pass):** 5 scripts
+(`create-article.mjs`, `customize-escal-theme.mjs`, `list-draft-articles.mjs`,
+`manage-article-status.mjs`, `probe-escal-fields.mjs`) each define their own
+`login()` for the Playwright/SPIP auth flow. They share the same core
+SPIP-login/SSO-fallback pattern but diverge in post-login navigation, and
+none of them have test coverage against the live site — extracting a shared
+`spip-session.mjs` (already planned in `docs/TO_FIX.md` #68) needs to happen
+in a session where it can be verified against real SPIP, not blind.
+
 ### IMPROVEMENT: Unified launch entry for the two local UIs
 
 **Status:** ✅ Complete · 2026-08-27
