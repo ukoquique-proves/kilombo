@@ -16,13 +16,15 @@
  */
 
 import express from 'express';
-import fs from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
-import Groq from 'groq-sdk';
 import { createJob, getJob, listJobs } from './lib/job-manager.mjs';
+import { createAuditLogger } from './lib/audit-logger.mjs';
+import { createRequireSharedSecret } from './lib/auth.mjs';
+import { sanitizeInput } from './lib/util/sanitize-input.mjs';
+import { sendDraftError, splitFieldErrors } from './lib/http-errors.mjs';
+import { generateSuggestions } from './lib/services/ai-improve-service.mjs';
 import { slugToRubriquId } from '../scripts/lib/spip-client.mjs';
 import {
   createDraft,
@@ -56,61 +58,13 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ------------------------------------------------------------
-// Simple shared-secret protection for sensitive endpoints
+// Shared-secret protection for sensitive endpoints
 // - Requires `KILO_SHARED_SECRET` to be set in .env or environment
 // - Logs failed auth attempts to live-write-audit.log.jsonl
 // ------------------------------------------------------------
 const SHARED_SECRET = process.env.KILO_SHARED_SECRET || '';
-// Pre-encoded once at startup so the per-request comparison is allocation-free.
-const SHARED_SECRET_BUF = Buffer.from(SHARED_SECRET, 'utf8');
-
-const auditLogPath = path.join(KILOMBO_DIR, 'live-write-audit.log.jsonl');
-function appendAuditLine(obj) {
-  try {
-    const line = JSON.stringify(obj) + '\n';
-    fs.appendFileSync(auditLogPath, line, { encoding: 'utf8' });
-  } catch (err) {
-    // Non-fatal: warn but continue
-    console.warn('[AUDIT] Failed to write audit log:', err && err.message);
-  }
-}
-
-function requireSharedSecret(req, res, next) {
-  // Always require the shared secret header
-  const supplied = (req.get('x-kilo-secret') || '').trim();
-  if (!SHARED_SECRET) {
-    // This should be guarded at startup; defensive fallback here
-    console.error('[SECURITY] KILO_SHARED_SECRET not configured — refusing request');
-    appendAuditLine({ ts: new Date().toISOString(), event: 'auth_config_missing', path: req.path, method: req.method });
-    return res.status(500).json({ error: 'Server misconfigured', message: 'KILO_SHARED_SECRET not configured on server' });
-  }
-
-  // Constant-time comparison — prevents timing side-channels that could leak
-  // the secret one byte at a time. `timingSafeEqual` requires equal-length
-  // buffers, so we encode the supplied value and check lengths first (the
-  // length check itself leaks no secret bytes — the attacker already controls
-  // the supplied value).
-  const suppliedBuf = Buffer.from(supplied, 'utf8');
-  const secretMatch =
-    supplied.length === SHARED_SECRET.length &&
-    crypto.timingSafeEqual(suppliedBuf, SHARED_SECRET_BUF);
-  if (!supplied || !secretMatch) {
-    const entry = {
-      ts: new Date().toISOString(),
-      event: 'auth_failed',
-      path: req.path,
-      method: req.method,
-      ip: req.ip || (req.connection && req.connection.remoteAddress) || null,
-      supplied: !!supplied,
-      ua: req.get('user-agent') || null,
-    };
-    appendAuditLine(entry);
-    console.warn('[SECURITY] Missing or invalid x-kilo-secret for', req.path, 'from', entry.ip);
-    return res.status(401).json({ error: 'Unauthorized', message: 'Missing or invalid x-kilo-secret header' });
-  }
-
-  return next();
-}
+const auditLog = createAuditLogger(path.join(KILOMBO_DIR, 'live-write-audit.log.jsonl'));
+const requireSharedSecret = createRequireSharedSecret({ secret: SHARED_SECRET, auditLogger: auditLog });
 
 // Protect sensitive routes: job control, audit log, command endpoints and drafts
 app.use('/api/jobs', requireSharedSecret);
@@ -173,22 +127,6 @@ app.get('/api/jobs', (req, res) => {
     });
   }
 });
-
-/**
- * Sanitize user input — remove/escape potentially dangerous characters
- * Used as defense-in-depth; primary protection is spawn() without shell: true
- *
- * @param {string} str - Input string to sanitize
- * @param {number} maxLength - Maximum allowed length (defense-in-depth against DoS)
- */
-function sanitizeInput(str, maxLength = 200000) {
-  if (typeof str !== 'string') return '';
-  // Remove control characters (keep printable + extended UTF-8)
-  return str
-    // eslint-disable-next-line no-control-regex -- Intentional security sanitization to prevent XSS via control-character injection
-    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '') // Control characters
-    .substring(0, maxLength); // Limit length to prevent DoS
-}
 
 // ============================================================
 // CREATE ARTICLE ENDPOINT
@@ -367,28 +305,12 @@ app.post('/api/commands/manage-article-status', (req, res) => {
  */
 app.get('/api/audit-log', (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 50, 500);
-  const auditLogPath = path.join(KILOMBO_DIR, 'live-write-audit.log.jsonl');
-  
+
   try {
-    if (!fs.existsSync(auditLogPath)) {
+    if (!auditLog.exists()) {
       return res.json({ entries: [], message: 'No audit log entries yet' });
     }
-    
-    const content = fs.readFileSync(auditLogPath, 'utf8');
-    const entries = content
-      .split('\n')
-      .filter(line => line.trim())
-      .map(line => {
-        try {
-          return JSON.parse(line);
-        } catch {
-          return null;
-        }
-      })
-      .filter(Boolean)
-      .reverse() // Most recent first
-      .slice(0, limit);
-    
+    const entries = auditLog.read(limit);
     res.json({ entries, total: entries.length });
   } catch (err) {
     res.status(500).json({
@@ -436,12 +358,11 @@ app.post('/api/drafts', (req, res) => {
     const result = createDraft(fields);
     return res.status(201).json({ ok: true, data: result });
   } catch (err) {
-    const details = err.message ? err.message.split('; ').map((s) => s.trim()).filter(Boolean) : [];
     return res.status(400).json({
       ok: false,
       error: err.message || 'Failed to create draft',
       code: 'INVALID_FIELDS',
-      details,
+      details: splitFieldErrors(err),
     });
   }
 });
@@ -532,25 +453,7 @@ app.get('/api/drafts/:slug', (req, res) => {
       data: { draft, previewHtml, location },
     });
   } catch (err) {
-    if (err && err.code === 'DRAFT_NOT_FOUND') {
-      return res.status(404).json({
-        ok: false,
-        error: err.message || 'Draft not found',
-        code: 'DRAFT_NOT_FOUND',
-      });
-    }
-    if (err && err.code === 'INVALID_SLUG') {
-      return res.status(400).json({
-        ok: false,
-        error: err.message || 'Invalid slug',
-        code: 'INVALID_SLUG',
-      });
-    }
-    return res.status(500).json({
-      ok: false,
-      error: 'Failed to read draft',
-      internal: err.message,
-    });
+    return sendDraftError(res, err, 'Failed to read draft');
   }
 });
 
@@ -571,123 +474,13 @@ app.put('/api/drafts/:slug', (req, res) => {
     const result = updateDraft(slug, fields);
     return res.json({ ok: true, data: result });
   } catch (err) {
-    if (err && err.code === 'DRAFT_NOT_FOUND') {
-      return res.status(404).json({
-        ok: false,
-        error: err.message || 'Draft not found',
-        code: 'DRAFT_NOT_FOUND',
-      });
-    }
-    if (err && err.code === 'DRAFT_ALREADY_APPROVED') {
-      return res.status(400).json({
-        ok: false,
-        error: err.message || 'Cannot update already-approved draft',
-        code: 'DRAFT_ALREADY_APPROVED',
-      });
-    }
-    if (err && err.code === 'INVALID_SLUG') {
-      return res.status(400).json({
-        ok: false,
-        error: err.message || 'Invalid slug',
-        code: 'INVALID_SLUG',
-      });
-    }
-    const details = err.message ? err.message.split('; ').map((s) => s.trim()).filter(Boolean) : [];
-    return res.status(400).json({
-      ok: false,
-      error: err.message || 'Failed to update draft',
+    return sendDraftError(res, err, 'Failed to update draft', {
+      status: 400,
       code: 'INVALID_FIELDS',
-      details,
+      includeDetails: true,
     });
   }
 });
-
-// ============================================================
-// AI IMPROVEMENT — Groq
-// ============================================================
-
-const GROQ_MODEL = 'qwen/qwen3.6-27b';
-
-/**
- * Extract plain URLs from raw content (href= attributes + bare https?:// links).
- * Returns at most 3 to avoid prompt bloat.
- * @param {string} contentHtml
- * @returns {string[]}
- */
-function extractUrls(contentHtml) {
-  const found = new Set();
-  // href="..." attributes
-  for (const m of contentHtml.matchAll(/href=['"]?(https?:\/\/[^\s'"<>]+)/gi)) found.add(m[1]);
-  // bare URLs in text
-  for (const m of contentHtml.matchAll(/(?<!['"=])(https?:\/\/[^\s<>"']+)/g)) found.add(m[1]);
-  return [...found].slice(0, 3);
-}
-
-/**
- * Fetch plain text from a URL (best-effort, 5s timeout, max 3000 chars).
- * Returns null on any error — never throws.
- * @param {string} url
- * @returns {Promise<string|null>}
- */
-async function fetchUrlText(url) {
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000);
-    const resp = await fetch(url, {
-      signal: controller.signal,
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; KilomboBot/1.0)' },
-    });
-    clearTimeout(timer);
-    if (!resp.ok) return null;
-    const ct = resp.headers.get('content-type') || '';
-    if (!ct.includes('html') && !ct.includes('text')) return null;
-    const html = await resp.text();
-    // Strip tags, collapse whitespace
-    return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 3000);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Build the system prompt for article improvement, optionally with fetched URL content.
- * @param {string} contentHtml
- * @param {Array<{url: string, text: string|null}>} urlPreviews
- * @returns {string}
- */
-function buildImprovePrompt(contentHtml, urlPreviews = []) {
-  const articleText = contentHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 4000);
-
-  const urlSection = urlPreviews.length > 0
-    ? '\n\nCONTENIDO DE ENLACES EXTERNOS (extraído automáticamente):\n' +
-      urlPreviews.map(({ url, text }) =>
-        text
-          ? `URL: ${url}\nContenido: ${text}`
-          : `URL: ${url}\nContenido: [no disponible — URL inaccesible o sin texto]`
-      ).join('\n\n')
-    : '';
-
-  const summaryRule = urlPreviews.some(({ text }) => text)
-    ? '\n6. Si hay contenido de enlaces externos disponible, UNA de las sugerencias debe ser de kind="add" con un resumen en español del artículo enlazado, para enriquecer el contexto del borrador.'
-    : '';
-
-  return `Eres un editor de textos políticos para un portal de izquierda internacionalista en español/francés.
-Tu tarea es revisar el siguiente artículo en HTML y devolver una lista de sugerencias de mejora concretas.
-
-REGLAS ESTRICTAS:
-1. Responde SOLO con un array JSON válido, sin texto extra antes ni después.
-2. Cada sugerencia tiene exactamente esta forma:
-   { "id": "sug-N", "kind": "rewrite"|"add"|"remove"|"metadata", "selector": "descripción del párrafo o campo", "original": "texto original (vacío si kind=add)", "proposed": "texto propuesto", "rationale": "por qué" }
-3. Máximo 5 sugerencias. Prioriza: claridad, precisión política, fluidez.
-4. No alteres el HTML — trabaja sobre el texto visible solamente.
-5. PROHIBIDO INVENTAR HECHOS. No atribuyas identidades, profesiones, nacionalidades, cargos, motivaciones o interpretaciones a personas mencionadas si no están explícitas en el texto. Nunca redactes una cita o paráfrasis que suene a hecho verificado si no lo es.
-6. Si el artículo es demasiado breve o carece de contexto para "mejorarlo" sin inventar información, NO generes una sugerencia "add" que rellene ese vacío con contenido inventado. En su lugar, usa "metadata" para señalar al editor humano qué información falta y debe verificar por su cuenta (ej: "Falta verificar quién es la persona citada y el contexto de la publicación").
-7. Cuando sugieras "remove", el campo "proposed" debe ser exactamente la cadena vacía "" — nunca una explicación en prosa dentro de ese campo (usa "rationale" para eso).
-8. Ante la duda entre inventar contenido o dejar el artículo sin cambios en ese punto, elige NO sugerir nada.${summaryRule}
-
-ARTÍCULO:
-${articleText}${urlSection}`;
-}
 
 /**
  * POST /api/drafts/:slug/improve — AI improvement suggestions via Groq
@@ -719,75 +512,25 @@ app.post('/api/drafts/:slug/improve', requireSharedSecret, async (req, res) => {
   try {
     draft = await getDraft(slug);
   } catch (err) {
-    if (err.code === 'INVALID_SLUG')
-      return res.status(400).json({ ok: false, error: err.message, code: 'INVALID_SLUG' });
-    if (err.code === 'DRAFT_NOT_FOUND')
-      return res.status(404).json({ ok: false, error: err.message, code: 'DRAFT_NOT_FOUND' });
-    return res
-      .status(500)
-      .json({ ok: false, error: 'Failed to read draft', internal: err.message });
+    return sendDraftError(res, err, 'Failed to read draft');
   }
 
   try {
-    // Fetch external URL content in parallel (best-effort, non-blocking)
-    const urls = extractUrls(draft.contentHtml || '');
-    const urlPreviews = await Promise.all(
-      urls.map(async (url) => ({ url, text: await fetchUrlText(url) }))
-    );
-
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const completion = await groq.chat.completions.create({
-      model: GROQ_MODEL,
-      messages: [{ role: 'user', content: buildImprovePrompt(draft.contentHtml || '', urlPreviews) }],
-      temperature: 0.4,
-      max_tokens: 1500,
-      reasoning_effort: 'none', // disable <think> block on Qwen3 models
+    const { suggestions, model } = await generateSuggestions({
+      contentHtml: draft.contentHtml || '',
+      apiKey: process.env.GROQ_API_KEY,
     });
-
-    const raw = completion.choices?.[0]?.message?.content ?? '';
-
-    // Strip <think>...</think> reasoning block (some models emit this before the answer).
-    // Only strip incomplete block (no closing tag) as a fallback.
-    let stripped = raw.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-    if (stripped.length === 0 && raw.includes('<think>') && !raw.includes('</think>')) {
-      // Entire response was inside an unclosed <think> — nothing useful, treat as empty
-      stripped = '';
-    }
-
-    // Extract JSON array from response (model sometimes wraps in markdown)
-    const match = stripped.match(/\[[\s\S]*\]/);
-    if (!match) {
-      return res.status(422).json({
-        ok: false,
-        error: 'AI returned unparseable response',
-        code: 'AI_PARSE_ERROR',
-        raw: stripped.slice(0, 500),
-      });
-    }
-
-    let suggestions;
-    try {
-      suggestions = JSON.parse(match[0]);
-    } catch {
-      return res.status(422).json({
-        ok: false,
-        error: 'AI response was not valid JSON',
-        code: 'AI_PARSE_ERROR',
-        raw: stripped.slice(0, 500),
-      });
-    }
-
-    return res.json({
-      ok: true,
-      data: { suggestions, model: GROQ_MODEL, slug },
-    });
+    return res.json({ ok: true, data: { suggestions, model, slug } });
   } catch (err) {
+    if (err.code === 'AI_PARSE_ERROR') {
+      return res.status(422).json({ ok: false, error: err.message, code: err.code, raw: err.raw });
+    }
     console.warn(`[improve] Groq API error for slug=${slug}:`, err.message);
     return res.status(500).json({
       ok: false,
       error: 'Groq API call failed',
       code: 'AI_ERROR',
-      internal: err.message,
+      internal: err.internal || err.message,
     });
   }
 });
@@ -837,11 +580,7 @@ app.post('/api/drafts/:slug/apply-suggestion', requireSharedSecret, async (req, 
     try {
       result = await getDraft(slug);
     } catch (err) {
-      if (err.code === 'DRAFT_NOT_FOUND')
-        return res.status(404).json({ ok: false, error: err.message, code: 'DRAFT_NOT_FOUND' });
-      return res
-        .status(500)
-        .json({ ok: false, error: 'Failed to read draft', internal: err.message });
+      return sendDraftError(res, err, 'Failed to read draft');
     }
 
     const current = result.contentHtml ?? '';
@@ -863,15 +602,7 @@ app.post('/api/drafts/:slug/apply-suggestion', requireSharedSecret, async (req, 
       },
     });
   } catch (err) {
-    if (err.code === 'DRAFT_NOT_FOUND')
-      return res.status(404).json({ ok: false, error: err.message, code: 'DRAFT_NOT_FOUND' });
-    if (err.code === 'DRAFT_ALREADY_APPROVED')
-      return res
-        .status(400)
-        .json({ ok: false, error: err.message, code: 'DRAFT_ALREADY_APPROVED' });
-    return res
-      .status(500)
-      .json({ ok: false, error: 'Failed to apply suggestion', internal: err.message });
+    return sendDraftError(res, err, 'Failed to apply suggestion');
   }
 });
 
@@ -892,42 +623,7 @@ app.post('/api/drafts/:slug/approve', (req, res) => {
     const result = approveDraft(slug);
     return res.json({ ok: true, data: result });
   } catch (err) {
-    if (err && err.code === 'DRAFT_NOT_FOUND') {
-      return res.status(404).json({
-        ok: false,
-        error: err.message || 'Draft not found',
-        code: 'DRAFT_NOT_FOUND',
-      });
-    }
-    if (err && err.code === 'DRAFT_ALREADY_APPROVED') {
-      return res.status(400).json({
-        ok: false,
-        error: err.message || 'Draft already approved',
-        code: 'DRAFT_ALREADY_APPROVED',
-      });
-    }
-    if (err && err.code === 'INVALID_SLUG') {
-      return res.status(400).json({
-        ok: false,
-        error: err.message || 'Invalid slug',
-        code: 'INVALID_SLUG',
-      });
-    }
-    if (err && err.code === 'VALIDATION_FAILED') {
-      return res.status(422).json({
-        ok: false,
-        error: 'Validation failed — same rules as CI. Fix issues and retry.',
-        code: 'VALIDATION_FAILED',
-        details: {
-          validationErrors: Array.isArray(err.validationErrors) ? err.validationErrors : [],
-        },
-      });
-    }
-    return res.status(500).json({
-      ok: false,
-      error: 'Failed to approve draft',
-      internal: err.message,
-    });
+    return sendDraftError(res, err, 'Failed to approve draft');
   }
 });
 
