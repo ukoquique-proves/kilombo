@@ -27,7 +27,9 @@
     "scrape:full": "bash scripts/scrape-comprehensive.sh",
     "check-corruption": "node scripts/detect-fixed-column-corruption.mjs",
     "probe-escal-fields": "node scripts/probe-escal-fields.mjs",
-    "customize-theme": "node scripts/customize-escal-theme.mjs"
+    "customize-theme": "node scripts/customize-escal-theme.mjs",
+    "update-article": "node scripts/update-article.mjs",
+    "delete-article": "node scripts/debug/delete-article.mjs"
   },
   "keywords": [],
   "author": "",
