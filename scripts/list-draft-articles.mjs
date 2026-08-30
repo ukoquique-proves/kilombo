@@ -24,16 +24,21 @@
  *
  *   # Verbose output with article URLs
  *   node scripts/list-draft-articles.mjs --all --verbose
+ *
+ * SESSION/LOGIN:
+ * Uses scripts/lib/spip-session.mjs (TO_FIX #68) instead of a local
+ * login() copy. The old local copy here was the least defensive of the
+ * three that existed pre-refactor — it only checked for a generic
+ * `form[method="post"]` to detect SSO and never re-navigated if login
+ * landed somewhere unexpected, unlike create-article.mjs's version.
  */
 
 import { chromium } from 'playwright';
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { BASE_URL, loadEnv, getPassword, login } from './lib/spip-session.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const USERNAME = 'kilombo';
-const BASE_URL = 'https://www.kilombo.top';
 const ENV_PATH = path.join(__dirname, '..', '.env');
 
 // SPIP status names (Spanish)
@@ -65,25 +70,6 @@ const SECTIONS = {
   8: 'Tierra y Libertad (MAIN)',
 };
 
-function loadEnv() {
-  const envContent = fs.readFileSync(ENV_PATH, 'utf8');
-  const vars = {};
-  envContent.split('\n').forEach((line) => {
-    const match = line.match(/^([A-Z_]+)=(.+)$/);
-    if (match) {
-      let value = match[2].trim();
-      if (
-        (value.startsWith("'") && value.endsWith("'")) ||
-        (value.startsWith('"') && value.endsWith('"'))
-      ) {
-        value = value.slice(1, -1);
-      }
-      vars[match[1]] = value;
-    }
-  });
-  return vars;
-}
-
 function parseArgs(argv) {
   const args = {
     all: false,
@@ -101,28 +87,6 @@ function parseArgs(argv) {
   }
 
   return args;
-}
-
-async function login(page, password) {
-  console.log('🔐 Logging into SPIP admin...');
-  await page.goto(`${BASE_URL}/ecrire/?exec=articles`, { waitUntil: 'domcontentloaded' });
-
-  // Check for SSO login
-  const ssoLoginForm = await page.$('form[method="post"]');
-  if (ssoLoginForm) {
-    console.log('📝 Submitting credentials via SSO...');
-    await page.fill('input[type="text"], input[name="credentials"]', USERNAME);
-    await page.fill('input[type="password"]', password);
-    await page.click('button[type="submit"]');
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {});
-    await page.waitForTimeout(2000);
-  }
-
-  if (page.url().includes('exec=login')) {
-    throw new Error('Login failed — check credentials in .env');
-  }
-
-  console.log('✅ Logged in\n');
 }
 
 async function extractArticles(page, statuses) {
@@ -200,8 +164,8 @@ async function extractArticles(page, statuses) {
 }
 
 async function main() {
-  const env = loadEnv();
-  const password = env.KILOMBOTOP_PASSWORD;
+  const env = loadEnv(ENV_PATH);
+  const password = getPassword(env);
 
   if (!password) {
     console.error('❌ KILOMBOTOP_PASSWORD not found in .env');
@@ -217,7 +181,11 @@ async function main() {
     console.log('📋 SPIP Draft Articles Viewer');
     console.log('═'.repeat(80) + '\n');
 
-    await login(page, password);
+    await login(page, {
+      password,
+      targetUrl: `${BASE_URL}/ecrire/?exec=articles`,
+      expectedUrlIncludes: 'exec=articles',
+    });
 
     // Extract articles
     const articles = await extractArticles(page, args.status);

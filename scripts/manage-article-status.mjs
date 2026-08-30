@@ -18,17 +18,21 @@
  * (scripts/lib/live-write-gateway.mjs), the shared chokepoint for every
  * script that mutates the live SPIP site. Pass-through today, audited
  * always, and the first place any future approval gate gets added.
+ *
+ * SESSION/LOGIN:
+ * Uses scripts/lib/spip-session.mjs (TO_FIX #68) instead of a local
+ * login() copy — this used to carry its own hand-rolled login(), which
+ * had already drifted from the other scripts (e.g. it didn't re-navigate
+ * on an unexpected post-login URL the way create-article.mjs's did).
  */
 
 import { chromium } from 'playwright';
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { guardedWrite } from './lib/live-write-gateway.mjs';
+import { BASE_URL, loadEnv, getPassword, login } from './lib/spip-session.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const USERNAME = 'kilombo';
-const BASE_URL = 'https://www.kilombo.top';
 const ENV_PATH = path.join(__dirname, '..', '.env');
 
 // Valid SPIP article statuses (what's actually available in the dropdown)
@@ -39,16 +43,6 @@ const VALID_STATUSES = {
   refuse: 'Rechazado (Refused)',
   poubelle: 'A la papelera (Trash)',
 };
-
-function loadEnv() {
-  const envContent = fs.readFileSync(ENV_PATH, 'utf8');
-  const vars = {};
-  envContent.split('\n').forEach((line) => {
-    const match = line.match(/^([A-Z_]+)=(.+)$/);
-    if (match) vars[match[1]] = match[2];
-  });
-  return vars;
-}
 
 function parseArgs(argv) {
   const args = { mode: null, id: null, status: null, dryRun: false };
@@ -61,37 +55,6 @@ function parseArgs(argv) {
     else if (a === '--dry-run') args.dryRun = true;
   }
   return args;
-}
-
-async function login(page, password, targetUrl) {
-  console.log(`Navigating to ${targetUrl} ...`);
-  await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
-
-  if (page.url().includes('page=login') || page.url().includes('exec=login')) {
-    console.log('Detected SPIP login page. Logging in...');
-    await page.fill('input[name="login"], input[type="text"]', USERNAME);
-    await page.fill('input[name="password"], input[type="password"]', password);
-    await page.click('input[type="submit"], button[type="submit"]');
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {});
-    await page.waitForTimeout(2000);
-  }
-
-  if (page.url().includes('sso') || page.url().includes('portalapi')) {
-    console.log('Detected YunoHost SSO page. Logging in...');
-    await page.fill(
-      'input[type="text"], input[name="credentials"], input[name="username"], input[id="loginInput"]',
-      USERNAME
-    );
-    await page.fill('input[type="password"]', password);
-    await page.click('button[type="submit"], input[type="submit"], #submit');
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {});
-    await page.waitForTimeout(2000);
-  }
-
-  console.log('Current URL after login:', page.url());
-  if (page.url().includes('exec=login') || page.url().includes('page=login')) {
-    throw new Error(`Login failed — landed on ${page.url()}`);
-  }
 }
 
 async function inspectArticleStatus(page, id) {
@@ -330,8 +293,8 @@ Note: Availability of status options depends on the article's current state.
     process.exit(1);
   }
 
-  const env = loadEnv();
-  const password = env.KILOMBOTOP_PASSWORD || env.KILOMBOTOP_FUTURE_PASSWORD;
+  const env = loadEnv(ENV_PATH);
+  const password = getPassword(env);
   if (!password) {
     console.error(`No password in ${ENV_PATH}`);
     process.exit(1);
@@ -341,7 +304,8 @@ Note: Availability of status options depends on the article's current state.
   const page = await browser.newPage();
 
   try {
-    await login(page, password, `${BASE_URL}/ecrire/?exec=article&id_article=${args.id}`);
+    const targetUrl = `${BASE_URL}/ecrire/?exec=article&id_article=${args.id}`;
+    await login(page, { password, targetUrl, expectedUrlIncludes: 'exec=article' });
 
     if (args.mode === 'inspect') {
       await inspectArticleStatus(page, args.id);
