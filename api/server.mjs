@@ -19,7 +19,7 @@ import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
-import { createJob, getJob, listJobs } from './lib/job-manager.mjs';
+import { createJob, getJob } from './lib/job-manager.mjs';
 import { createAuditLogger } from './lib/audit-logger.mjs';
 import { createRequireSharedSecret } from './lib/auth.mjs';
 import { sanitizeInput } from './lib/util/sanitize-input.mjs';
@@ -27,6 +27,8 @@ import { sendDraftError, splitFieldErrors } from './lib/http-errors.mjs';
 import { generateSuggestions } from './lib/services/ai-improve-service.mjs';
 import { slugToRubriquId } from '../scripts/lib/spip-client.mjs';
 import { VALID_SECTIONS, VALID_STATUSES, isValidSection, isValidStatus } from './lib/command-validators.mjs';
+import statusRouter from './routes/status.mjs';
+import jobsRouter from './routes/jobs.mjs';
 import {
   createDraft,
   getDraft,
@@ -77,59 +79,19 @@ app.use('/api/drafts', requireSharedSecret);
 app.use('/api/ready-drafts', requireSharedSecret);
 
 // ============================================================
-// HEALTH CHECK
+// PUBLIC STATUS ROUTES (GET /api/health, GET /api/env-status)
+// Extracted to api/routes/status.mjs — see docs/TO_FIX.md #80.
 // ============================================================
-
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    version: '0.47.0-MVP',
-    uptime: process.uptime(),
-  });
-});
+app.use('/api', statusRouter);
 
 // ============================================================
-// JOB STATUS ENDPOINT
+// JOB STATUS ROUTES (GET /api/jobs/:jobId/status, GET /api/jobs)
+// Extracted to api/routes/jobs.mjs — see docs/TO_FIX.md #80.
+// Mounted after the /api/jobs auth middleware registered above, so
+// protection is unchanged.
 // ============================================================
 
-/**
- * GET /api/jobs/:jobId/status
- * Query the status of a running or completed job
- */
-app.get('/api/jobs/:jobId/status', (req, res) => {
-  const job = getJob(req.params.jobId);
-  
-  if (!job) {
-    return res.status(404).json({
-      error: 'Job not found',
-      jobId: req.params.jobId,
-    });
-  }
-  
-  res.json(job);
-});
-
-/**
- * GET /api/jobs
- * List recent jobs (most recent first)
- * Query param: ?limit=N (default 20, max 100)
- */
-app.get('/api/jobs', (req, res) => {
-  const limit = Math.min(parseInt(req.query.limit) || 20, 100);
-  try {
-    const jobs = listJobs(limit);
-    res.json({
-      jobs,
-      total: jobs.length,
-      limit,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: 'Failed to list jobs',
-      details: err.message,
-    });
-  }
-});
+app.use('/api/jobs', jobsRouter);
 
 // ============================================================
 // SHARED COMMAND-JOB HELPER
