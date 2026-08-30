@@ -283,9 +283,12 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - La lógica de scraping/limpieza/reescritura de URLs en TROUBLESHOOTING.md §8 ya está implementada en `scripts/import-article.mjs`, eliminando la necesidad de ejecutar solo snippets Python ad hoc.
   - Fix: `scripts/import-article.mjs` ejecuta dedup → fetch → extract → clean → rewrite_relative_urls → write y llama a `validate-data.mjs` al final.
 
-- [ ] **38. La deuda de traducción ES/FR solo es visible por búsqueda de texto**
-  - El incumplimiento de la regla §5.3 de MIRROR_GROWING.md se detecta haciendo `grep` por "pendiente FR" en los docs.
-  - Fix: un script pequeño `scripts/check-translations.mjs` que lea `articles.json`, agrupe las entradas y detecte versiones incompletas.
+- [x] **38. La deuda de traducción ES/FR solo es visible por búsqueda de texto** — ✅ Resuelto v0.42.9 (2026-08-30)
+  - **Hallazgo real (distinto del problema original descrito):** `scripts/i18n-coverage.mjs` ya existía y ya estaba enlazado a `npm run i18n-coverage`, pero leía campos `lang`/`translationOf` que **nunca existieron en el schema real** (`site/assets/content/ARTICLES.schema.md` documenta `language` y `relatedArticles`). Resultado: el script reportaba 57/57 artículos como "sin `lang`" siempre, para cualquier dataset — ruido constante, no un reporte real.
+  - **Fix:** reescrito para usar `language` y `relatedArticles` (los campos reales, ya usados por `article-validator.mjs` y por `findRelatedArticles()` en `site/js/articles.js`, ver #62). Un par se cuenta como traducción confirmada solo si dos entradas con `language` distinto se referencian mutuamente vía `relatedArticles`; un link `relatedArticles` entre dos entradas del mismo idioma (variantes, ver #62) no cuenta como traducción.
+  - **Resultado del reporte corregido, contra los datos reales:** 56/57 artículos sin `language` asignado (deuda de backfill real, no del script) y 1 con `language` pero sin traducción registrada. El script ahora también deja visibles, por primera vez, pares ES/FR con título evidente pero sin enlazar (ej. `contra-genocidio-guerras-infinitas-pi` / `contre-genocide-guerres-infinites-pi`, `1-mayo-2023-contra-militarizacion` / `1er-mai-2023-tierra-fr`).
+  - **Tests:** `test/i18n-coverage.test.mjs` (nuevo, 6 casos) cubre: falta de `language`, pareo cruzado vía `relatedArticles`, no-doble-conteo de un link mutuo, exclusión de links del mismo idioma, entrada etiquetada sin pareo, y referencia `relatedArticles` colgante.
+  - **Pendiente (fuera de este fix, es trabajo editorial no de código):** backfillear `language` en los 56 artículos que no lo tienen, y decidir si los pares ES/FR con título evidente detectados arriba deben enlazarse vía `relatedArticles`.
 
 - [x] **39. `plandemismo.css` redeclara tokens de color de `style.css` con valores hex hardcodeados**
   - Esta duplicación es intencional: `plandemismo.css` usa `var(--x, #fallback)` como una capa de seguridad si se carga sin `style.css` o si el orden de carga no fuera el esperado.
