@@ -347,6 +347,22 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     - `scripts/validators/` — validadores separados por dominio (schema.mjs, content-qa.mjs, data-format.mjs) — parcialmente iniciado por `scripts/lib/article-validator.mjs` (ver nota arriba)
     - **No es bloqueante hoy**, pero es una deuda técnica de arquitectura que evitará refactorizaciones de emergencia cuando la complejidad se dispare.
 
+- [ ] **80. `api/server.mjs` — un solo archivo mezcla 5 responsabilidades (auth, jobs, commands, audit, drafts)**
+  - **Problema:** `api/server.mjs` (~830 líneas) contiene en un solo archivo: bootstrap de la app y middleware, el endpoint de jobs, los tres endpoints de commands (create-article, manage-article-status, publish-ready-article), el endpoint de audit-log/env-status, y toda la API de drafts (CRUD + IA/Groq). No es un bug — todo funciona — pero cualquier cambio a una sola familia de rutas requiere abrir y navegar el archivo completo.
+  - **Ya hecho (base para lo siguiente, cero cambios de comportamiento):**
+    - De-duplicación del bloque `createJob → getJob → try/catch → 500` repetido en los 3 endpoints de commands, extraído a un helper `startCommandJob()`.
+    - Extracción de `validSections`/`validStatuses` (antes inline y duplicados) a `api/lib/command-validators.mjs` (`VALID_SECTIONS`, `VALID_STATUSES`, `isValidSection()`, `isValidStatus()`).
+  - **Acción propuesta (opcional, no bloqueante — hacer solo si la navegación del archivo empieza a molestar en la práctica):** dividir `server.mjs` en routers por familia, **una ruta a la vez**, no por familia completa de un golpe:
+    1. `GET /api/health` — sin auth, sin dependencias, sirve para validar el mecanismo de montaje del router antes de tocar nada con implicancia de seguridad.
+    2. `GET /api/env-status` — mismo perfil de riesgo mínimo.
+    3. `GET /api/jobs/:jobId/status` y `GET /api/jobs` — solo lectura de job-manager.
+    4. `GET /api/audit-log` — solo lectura.
+    5. Los 3 endpoints de `/api/commands/*`, uno por uno — ya apoyados en el helper y los validadores de arriba, por lo que mover cada uno es principalmente reubicación, no lógica nueva.
+    6. `/api/drafts` + `/api/ready-drafts`, ruta por ruta, dejando para el final `/api/drafts/:slug/improve` y `/api/drafts/:slug/apply-suggestion`.
+  - **Cuidado explícito al mover el paso 6:** `improve` y `apply-suggestion` aplican `requireSharedSecret` como middleware inline, además del `app.use('/api/drafts', requireSharedSecret)` a nivel de prefijo — es redundante pero intencional-por-omisión; no eliminar una de las dos capas como "limpieza" al mover el código. También preservar la distinción `getDraft()` vs `getReadyDraft()` (`getReadyDraft` no debe preferir un duplicado stale en `IN_PROGRESS/` — ver comentario en el código junto a `GET /api/ready-drafts/:slug`).
+  - **Cada paso es independiente:** no hay obligación de completar la lista una vez empezada. Detenerse después de cualquier paso deja el sistema en un estado estable — no es un refactor a medio terminar, cada paso completado es su propio checkpoint. Cada paso: `node --check` + `npm test` verde antes de considerarlo terminado.
+  - **No incluido en esta acción (deliberadamente fuera de alcance):** unificar la inconsistencia de forma de respuesta entre endpoints (`{ error }` vs `{ ok: false, error, code }`) y el banner ASCII de arranque con la lista de endpoints hardcodeada — ambos son problemas de claridad reales pero requieren auditar primero a los consumidores (`site/js`, `dashboard.html`) antes de cambiar cualquier forma de respuesta.
+
 - [x] **25. Blind spot del generador de contexto compacto** — ✅ Mitigado.
   - El generador excluye `.github/`, por lo que `deploy.yml` no aparece en los bundles de revisión.
   - Solución adoptada: `deploy.yml` tiene un comentario en su propio encabezado advirtiendo de este blind spot, para que cualquier sesión que abra el archivo directamente vea la advertencia sin depender de este documento. Confirmado presente en el archivo actual.
