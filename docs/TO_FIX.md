@@ -3,7 +3,7 @@
 Auditoría activa del proyecto. Solo problemas abiertos.
 Última actualización: 2026-08-30 — v0.54.0 dashboard + SPIP session module + i18n-coverage fix + Escal probe (phases 1-5) + update-article.mjs implementation complete.
 
-**Note (v0.54.0+):** sourceUrl uniqueness validation (commit b332179) implemented in `scripts/validate-data.mjs` lines 500–525 but not originally tracked as a TO_FIX item. Check prevents duplicate imports and is active in `npm test` CI pipeline.
+**Note (v0.54.0+):** sourceUrl uniqueness validation implemented in `scripts/validate-data.mjs` lines 361–394. Prevents duplicate imports and is active in `npm test` CI pipeline.
 
 > **📋 RELATED:** See also:
 > - **`docs/SPIP-ACCESS.md`** — Consolidated SPIP access and article management documentation (single source of truth)
