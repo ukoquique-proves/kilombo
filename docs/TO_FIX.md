@@ -175,6 +175,16 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - `scripts/update-article.mjs` (271 lines) created and verified working
   - All SPIP management scripts now use unified spip-session.mjs login module
 
+- [x] **79. Dashboard buttons "Editar" and "Devolver a Borrador" had identical behavior** — ✅ FIXED (2026-08-30)
+  - **Problem:** Both buttons in the READY articles section called the same function (`editReadyArticle()`) with no functional difference, confusing users about which button to use.
+  - **Root cause:** `moveBackToDraft()` function (line 1493) just called `editReadyArticle()` with no actual implementation.
+  - **Fix applied:**
+    1. **"✏️ Editar"** now loads article data into the form editor for in-place quick editing (no status change, no confirmation needed)
+    2. **"↩️ Devolver a Borrador"** moves article back to IN_PROGRESS status (with confirmation dialog) for full re-editing
+  - **Verification:** npm lint (0 errors, 494 warnings — acceptable), npm test (all passing)
+  - **Commit:** f85f2d2 — "fix: Distinguish 'Editar' (in-place) from 'Devolver a Borrador' button behaviors"
+  - **UX improvement:** Users now have two distinct workflows: quick edits (Editar) vs. full rework (Devolver a Borrador)
+
 - [ ] **23. Cambiar `KILOMBOTOP_PASSWORD` por `KILOMBOTOP_FUTURE_PASSWORD` en `.env`**
   - En cuanto el cliente confirme que el nuevo password está activo en el servidor, ejecutar:
     1. Copiar el valor de `KILOMBOTOP_FUTURE_PASSWORD` a `KILOMBOTOP_PASSWORD` en `.env`
