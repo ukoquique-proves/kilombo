@@ -170,7 +170,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 - [x] **68-next. Implementar `update-article.mjs` usando la arquitectura de `spip-session.mjs`** — ✅ COMPLETED & CI VERIFIED (2026-08-30)
   - **Status:** Implementation complete, tested, verified, and CI-passing
   - **What's Done:**
-    - ✅ Created `scripts/update-article.mjs` (348 lines) following same pattern as create-article.mjs
+    - ✅ Created `scripts/update-article.mjs` (271 lines) following same pattern as create-article.mjs
     - ✅ Uses spip-session.mjs for login (no code duplication)
     - ✅ Supports --inspect mode (read-only form inspection)
     - ✅ Supports --update mode with --title, --body, and/or --section flags
