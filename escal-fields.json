@@ -1,0 +1,1528 @@
+{
+  "discoveredAt": "2026-08-30T04:41:54.736Z",
+  "totalFields": 169,
+  "fields": [
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Desconectarse",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&action=logout&logout=prive"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login",
+      "placeholder": "",
+      "menuName": "Desconectarse",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&action=logout&logout=prive"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Desconectarse",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&action=logout&logout=prive"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Desconectarse",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&action=logout&logout=prive"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Desconectarse",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&action=logout&logout=prive"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrwA7iik2BkREyO42paDMO2J3DBW/Fu4PaavFIG7UUvFkWnir2MQKbnRiEMa5bPjqs41K3TT5CxRJP+wd2k8tioAsui8pen5du4xbVq3v40kC6DXKVdbwp7sFUadF1e/TEd3lXYWG0zv2Ezmap2DibOCZDTixw==",
+      "placeholder": "",
+      "menuName": "Desconectarse",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&action=logout&logout=prive"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Desconectarse",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&action=logout&logout=prive"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Desconectarse",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&action=logout&logout=prive"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Desconectarse",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&action=logout&logout=prive"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrGw6eil2J8g9UOZb7Le8RX9EQHOFZVOAAbn2U6Hcscli7+uaGJ6E7O4mllmqy8EYoG12GrNTSReP6FdDKvFEz+OYMcmH8cXPaPX8yMEc8Xu8kySR64GbeDfKE0E9oVu1K0+DItnrj5PyZCnJQ==",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Daccueil",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=accueil",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FryY6Sm0xBkB8cPIcXtip+hXpuJZ+YpPrl7zkK6OM47WQ0xhbQx9X4FNkzMcIOtwHDE61AAhVZ6n1rlt1uzHEF3jwVfK4gIvvjXt/YKX2IRWpqAxrQ2vMO4uBratgETfTJAK2o64LHkbIc/kDqlxZkiyze2oB5I=",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Acogida",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=accueil"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dlayout",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=layout",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "Frya6Si02BkR9V/5rD6f4aABtpKuqSsIvitHnX/MNe2mfFkLC5rutAAnD3jH3we9tVGedTjq3jx88bCsH3qGYI+bcoDCoYjbpZ2MPoc8o+nZ8KN8JOerOSQLOeCCghVZvZb4ltOefwK2jM6alZCMdWIABmuMc3H3Fw==",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Diseño",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=layout"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dpopup",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=popup",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "Frya6Wm02BkR9V/Jtz4mf8mFJxVxvqsefNVrkHiZU9v1RgF/6dXBORKiskmpn/jOpEf7uBzbP0yUp6T/j/xmtfUNEyp7pDJREIlUlSwqvaBqM+xYk9jJPzxJOe1CmCeM6434ltc+Pr4vApQDp5xInqp4UvcOMXoL",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Modalbox",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=popup"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Delements",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=elements",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrCQ6Si02F8g9U/5rF7btiI8/BN16nRfFtN23HtgYV5slIpf/oO6SpFM3ATTld5OqJro8KWdi4r3dxGNmCksgzIc5KErlaBTCEn05kF7M/edCGOHKpeqaODj7DWf0jHRGCYlkg42djIrU3bbbM5RX1KpF2iNO/WR/1Hs",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Elementos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=elements"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dbandeau",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=bandeau",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrCa6Wm03F8g81/Is35skBU7nJTqJ8esoZvBkJ8LIYPodt8/8oztX8l3UMQO34aK7rZkRZn1yU5kmtPM19KnKjQOeM894fVLiC3Brr401KlGu0v7Sbn/RRlePaK8S8DA15ScOZDwPB63YPRDY7qY577Ci50VX0ezKw==",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Banner",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bandeau"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dmenuh",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=menuh",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "Frya6Smk2BkR9YPwLP0k6ou0fpkHViTcsP/qjHCfUNzFKOKAn569GKHjUT5FTwbdktXA0pmq5WgiyKXIqht4bC4zp1rqPsQ4xEbkDn7bvSiLBGLgasgOlIzECKTniU2EywB+jte/Px7OBJRDwEniWdkj53+aUDIz",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Menú horizontal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=menuh"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dmultilinguisme",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=multilinguisme",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrOc6Wm02Fkg9V/Jtz4xaJexfplMRBwNd/WxOWoKeYpgpNotrAp049EY9B4vxJrG3G1b8LuIvUqwz7+br7nVDUY4/qXFmuQBVgSJ8TGOTVIBt5cCGauMUEa9ggt8sxMOn0jv7HxppM3fmor0rZX1Nf2O0gmCvRpvLxu0ysOHiQ==",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Multilingüismo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=multilinguisme"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dpied",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=pied",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrKc6Smk2Fkg9YPwLK22say0fpne4IutK//KjHCf0Ef0mLjXxKecdEjyeBBKOkyusqFXIAAhmI8yDiX+lMaaQNez16CsQ7teS3hFQ86uZny2QVNhcWC4plEGVLbxJbDyIMRPVvdr5uTnzdJmuwAzlJru4BSVLHYP",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Pie de página",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=pied"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dsommaire_principal",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=sommaire_principal",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrGc6Smk2Fkg9YPwLEnb+Ky0frnerJ+I6B/3kp8HIYv0utKk8A0JpOchSVis+fr6LJQ8AB7o1gsc/wT4bWlJ8HvXZi2AtykN6NTDNUtgfI0gvG2SyZiS2TTiqA3bWZHRgtSizjE/gkRlf9YXIClux7Ki0oiVp0ZR33cGPmfVUS8=",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Página de inicio",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=sommaire_principal"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dautres_principal",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=autres_principal",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FryQ7Wmk2BkB8UvwT5/qewz8anyPdAvITr15rFOKeUqAavXgY9zI31qWGMNbM6hEyfolCmPKdQC3iTr/nHHHK5wXvf2Gzqu5wa9gmpQqLL4idzBWsy/MedYLt3Gkgp+u48b+hlcuHEDbnc24zdbTdaOv95pQ5ufVraJXMcKLjQ==",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Otras páginas",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=autres_principal"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dchoix_blocs",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=choix_blocs",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrAa6Wm02F8gOUrJt1QhFs2FBzpxp6o6dBWnkniZNefGgsfEKfbnH6/Wkpt8j0J5XQeAcNfeggbW1NoIYrOO/T2M/+uTZ0v46Z/9d5NTJAeeKKPkn2FdXXjkprVvqzWukWoK2H1hm6yPNHvOgXtcqDiZQd7YRJPnklUdZTs=",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Elección de los bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=choix_blocs"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dparametrage_blocs",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=parametrage_blocs",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FreQ7Wmk2F8g9YPwzMa7KOdvLYOx5wtIv/94rFMKeYJgpDfq0+llYUMOCIHCspaM25NHAb5TVwdVxeBztmerbXlrukamxkSNo66b2y3AsIOeGJfW8ZnY+CKKzjze8ni5FB9DAH92MjfpfRX59wZRFc5PniM2NzUHuyYA7nINcs4=",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Configuración de bloques laterales",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=parametrage_blocs"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dfonds",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=fonds",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FvAa6Si02Bk+6zy317RZjnw8i2lRks1XXZbreoXrVfzby97jCobzREuDdziP5YO9r3dPMOveok6CBKulkfGEaYpusUjPK+pf1PEWki7hhhASwZssX5TRWrJg2TdNjr5db2VkDr1jNvmAtof58VoCwt8otoKCB5I=",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Los fondos y los textos",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=fonds"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dbords",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=bords",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrCQ6Smk2FkQ9YPwLEnkYeIxzZh4H7wEee3vGXiZU9v1xBQsSK4JS4/FNj1GFoFUAI/8skRC/nl0PSCUbuLcJUapPbLiAFi9syz8x9zxtA8ICx+Gu9nJOof0jMWd6/BkTaKOVofjH2cWDen7iFlFBPFOym72IPNz",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Bordes y redondeo",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=bords"
+    },
+    {
+      "name": "action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "converser",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    },
+    {
+      "name": "redirect",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "spip.php?page=login&url=%2Fecrire%2F%3Fexec%3Dconfigurer_escal%26cfg%3Dplugins",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    },
+    {
+      "name": "var_lang_ecrire",
+      "type": "select-one",
+      "label": "Idiomas del sitio",
+      "value": "es",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    },
+    {
+      "name": "page",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    },
+    {
+      "name": "url",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "/ecrire/?exec=configurer_escal&cfg=plugins",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    },
+    {
+      "name": "formulaire_action",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "login",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    },
+    {
+      "name": "formulaire_action_args",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "FrCQ6Smk2F8g9V/Jd/OkRog0fpneIKZOjrigOGoKeYpgpDPa3/1V0AJUsYALpNz2wzB/67icgf2KmRERqLxK5nNYyLKb8mzAx0Bo4MxnPIdDlVLoVwiQaNeOocJXaLlMO9BtbLZPFclf9r/vHXhkafZM9k0TLWXr+7E=",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    },
+    {
+      "name": "formulaire_action_sign",
+      "type": "hidden",
+      "label": "(no label)",
+      "value": "",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    },
+    {
+      "name": "var_login",
+      "type": "text",
+      "label": "Login o dirección mail: *",
+      "value": "kilombo@kilombo.top",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    },
+    {
+      "name": "session_remember",
+      "type": "checkbox",
+      "label": "Quedar identificado unos días",
+      "value": "oui",
+      "placeholder": "",
+      "menuName": "Los plugins en Escal",
+      "menuUrl": "https://www.kilombo.top/ecrire/?exec=configurer_escal&cfg=plugins"
+    }
+  ],
+  "usage": "Use field name with: node scripts/customize-escal-theme.mjs --field <name> --value \"<text>\""
+}
