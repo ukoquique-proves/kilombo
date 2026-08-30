@@ -69,6 +69,7 @@ export default [
       'scripts/probe-rubriques.mjs',
       'scripts/manage-article-status.mjs',
       'scripts/list-draft-articles.mjs',
+      'scripts/update-article.mjs',
       'scripts/debug/**/*.mjs',
     ],
     languageOptions: {
