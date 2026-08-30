@@ -3,7 +3,7 @@
 Auditoría activa del proyecto. Solo problemas abiertos.
 Última actualización: 2026-08-30 — v0.54.0 dashboard + SPIP session module + i18n-coverage fix + Escal probe (phases 1-5) + update-article.mjs implementation complete.
 
-**Note (v0.42.8):** sourceUrl uniqueness validation (commit b332179) implemented in `scripts/validate-data.mjs` lines 500–525 but not originally tracked as a TO_FIX item. Check prevents duplicate imports and is active in `npm test` CI pipeline.
+**Note (v0.54.0+):** sourceUrl uniqueness validation (commit b332179) implemented in `scripts/validate-data.mjs` lines 500–525 but not originally tracked as a TO_FIX item. Check prevents duplicate imports and is active in `npm test` CI pipeline.
 
 > **📋 RELATED:** See also:
 > - **`docs/SPIP-ACCESS.md`** — Consolidated SPIP access and article management documentation (single source of truth)
@@ -116,7 +116,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🔴 Acción pendiente urgente
 
-- [ ] **76. SPIP Theme Management — Escal label customization workflow (v0.42.8)** — 🟡 BLOCKED: Architecture Discovery Needed
+- [ ] **76. SPIP Theme Management — Escal label customization workflow** — 🟡 BLOCKED: Architecture Discovery Needed
   - **Status Update (2026-08-30 evening):** Implementation plan phases 1–5 complete; Phase 5 revealed architectural blocker
   - **Original Problem:** Customize section presentation labels ("Los últimos artículos", "Mapa del sitio") on Espacio Tierra y Libertad
   - **Solution Hypothesized:** Labels ARE configurable via **Escal plugin configuration menu** (`exec=configurer_escal`) — accessible through SPIP admin web UI
@@ -314,7 +314,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - La lógica de scraping/limpieza/reescritura de URLs en TROUBLESHOOTING.md §8 ya está implementada en `scripts/import-article.mjs`, eliminando la necesidad de ejecutar solo snippets Python ad hoc.
   - Fix: `scripts/import-article.mjs` ejecuta dedup → fetch → extract → clean → rewrite_relative_urls → write y llama a `validate-data.mjs` al final.
 
-- [x] **38. La deuda de traducción ES/FR solo es visible por búsqueda de texto** — ✅ Resuelto v0.42.9 (2026-08-30)
+- [x] **38. La deuda de traducción ES/FR solo es visible por búsqueda de texto** — ✅ Resuelto v0.54.0 (2026-08-30)
   - **Hallazgo real (distinto del problema original descrito):** `scripts/i18n-coverage.mjs` ya existía y ya estaba enlazado a `npm run i18n-coverage`, pero leía campos `lang`/`translationOf` que **nunca existieron en el schema real** (`site/assets/content/ARTICLES.schema.md` documenta `language` y `relatedArticles`). Resultado: el script reportaba 57/57 artículos como "sin `lang`" siempre, para cualquier dataset — ruido constante, no un reporte real.
   - **Fix:** reescrito para usar `language` y `relatedArticles` (los campos reales, ya usados por `article-validator.mjs` y por `findRelatedArticles()` en `site/js/articles.js`, ver #62). Un par se cuenta como traducción confirmada solo si dos entradas con `language` distinto se referencian mutuamente vía `relatedArticles`; un link `relatedArticles` entre dos entradas del mismo idioma (variantes, ver #62) no cuenta como traducción.
   - **Resultado del reporte corregido, contra los datos reales:** 56/57 artículos sin `language` asignado (deuda de backfill real, no del script) y 1 con `language` pero sin traducción registrada. El script ahora también deja visibles, por primera vez, pares ES/FR con título evidente pero sin enlazar (ej. `contra-genocidio-guerras-infinitas-pi` / `contre-genocide-guerres-infinites-pi`, `1-mayo-2023-contra-militarizacion` / `1er-mai-2023-tierra-fr`).
@@ -558,7 +558,7 @@ Los siguientes problemas fueron identificados en GAPS.md durante la revisión ar
 
 **Session Phase 2 (August 30):**
 
-- [x] **i18n-coverage Script Fixed (#38 resolved, v0.42.9)** — ✅ COMPLETED
+- [x] **i18n-coverage Script Fixed (#38 resolved, v0.54.0)** — ✅ COMPLETED
   - Fixed TO_FIX #38: i18n-coverage.mjs now reads real schema fields (language/relatedArticles)
   - Was reading non-existent fields (lang/translationOf), causing 100% false "missing translation" reports
   - Added test/i18n-coverage.test.mjs with 6 test cases
