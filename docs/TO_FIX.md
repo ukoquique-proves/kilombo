@@ -116,38 +116,38 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ## 🔴 Acción pendiente urgente
 
-- [ ] **76. SPIP Theme Management — Espacio Tierra y Libertad section presentation (v0.42.8) — CORRECTED**
-  - **Status Update:** ✅ **Solution FOUND — Ready to implement** (No blockers remaining)
-  - **Original Problem:** Requested to customize section presentation labels ("Los últimos artículos", "Mapa del sitio") on Espacio Tierra y Libertad section at `https://www.kilombo.top/`.
-  - **Previous (Incorrect) Finding:** Labels hardcoded in Escal templates, unreachable without server file access
-  - **Corrected Finding:** Labels ARE configurable via **Escal plugin configuration menu** (`exec=configurer_escal`) accessible through SPIP admin web UI
-  - **Key Discovery:** Programmatic scrape of admin panel discovered Escal config menu with customization/translation options
-  - **Solution:** 
-    1. ✅ **Manual:** Go to SPIP admin → Escal → Configuration → find widget/label customization section
-    2. ✅ **Automated:** Use script `scripts/customize-escal-theme.mjs` (already exists)
-    3. ✅ See `docs/THEME-CUSTOMIZATION.md` for full automation guide
-  - **Credentials needed:** NONE additional (only existing SPIP admin login, which already works)
-  - **Status:** Ready to implement — no blockers
-  - **Related:** See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` for corrected analysis
+- [ ] **76. SPIP Theme Management — Escal label customization workflow (v0.42.8)** — 🟡 PARTIALLY COMPLETE
+  - **Status Update (2026-08-30):** Implementation plan phases 1–3 complete; phases 4–6 ready for execution
+  - **Original Problem:** Customize section presentation labels ("Los últimos artículos", "Mapa del sitio") on Espacio Tierra y Libertad
+  - **Solution Confirmed:** Labels ARE configurable via **Escal plugin configuration menu** (`exec=configurer_escal`) — accessible through SPIP admin web UI
+  - **What's Implemented (Phases 1–3):**
+    - ✅ Documentation corrected (--field/--value syntax verified in CHANGELOG.md and SPIP-THEME-MANAGEMENT-FINDINGS.md)
+    - ✅ Scripts refactored (`customize-escal-theme.mjs` uses spip-session.mjs, full --dry-run support)
+    - ✅ npm scripts added: `npm run customize-theme`, `npm run probe-escal-fields`
+  - **What's Pending (Phases 4–6):**
+    - ⏳ **Phase 4 (READY):** Run `npm run probe-escal-fields -- --export escal-fields.json` to discover real field names on live site (read-only, low risk)
+    - ⏳ **Phase 5 (READY):** Test with discovered field: `npm run customize-theme -- --field <NAME> --value "Test" --dry-run`
+    - ⏳ **Phase 6 (DEFERRED):** Only after phases 4–5 succeed: first live write to production Escal theme
+  - **Related:** See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` and `/root/JOB/KLIMBO/KLIMBO-BUILD/TO_FIX-76-68-implementation-plan.md`
 
-- [x] **68. Gestión de create/edit/delete en kilombo.top desde el agente — arquitectura y por qué hace falta código dedicado** — ✅ PARTIALLY RESOLVED (spip-session module refactor)
-  - **✅ COMPLETED:** `scripts/lib/spip-session.mjs` created (144 lines) with shared login/session logic
+- [x] **68. Gestión de create/edit/delete en kilombo.top desde el agente — arquitectura y por qué hace falta código dedicado** — ✅ PARTIALLY RESOLVED (spip-session module refactor, v0.54.0)
+  - **✅ COMPLETED (2026-08-29):** `scripts/lib/spip-session.mjs` created (144 lines) with shared login/session logic
   - **✅ COMPLETED:** Refactored `create-article.mjs`, `customize-escal-theme.mjs`, `probe-escal-fields.mjs` to use shared module
   - **✅ COMPLETED:** Eliminates code duplication (removed ~150 lines of copy-paste login code from 3 scripts)
   - **✅ COMPLETED:** Improves error handling uniformity (merged best defensive behavior from all 3 prior copies)
-  - **⏳ PENDING:** `update-article.mjs` — ready to implement using spip-session module (no code duplication)
+  - **✅ COMPLETED (2026-08-30):** npm scripts added (`npm run probe-escal-fields`, `npm run customize-theme`)
+  - **⏳ PENDING (next sprint):** `update-article.mjs` — ready to implement using spip-session module (no code duplication needed)
+  - **⏳ PENDING:** `delete-article.mjs` refactor — also ready to use spip-session
   - **⏳ PENDING:** GCI extractors (#63) — architecturally prepared but not yet domain-specific
-  - **Status (2026-08-29):** Foundation complete. Can now add `update-article.mjs` without duplicating login code.
-  - **Files modified:** `scripts/lib/spip-session.mjs` (NEW), `scripts/create-article.mjs`, `scripts/customize-escal-theme.mjs`, `scripts/probe-escal-fields.mjs`, `CHANGELOG.md`
+  - **Status (2026-08-30):** Foundation complete. Commits: a9b5a30 (refactor), 9be180c (i18n-coverage fix), 101598c (npm scripts)
+  - **Files modified:** `scripts/lib/spip-session.mjs` (NEW), `scripts/create-article.mjs`, `scripts/customize-escal-theme.mjs`, `scripts/probe-escal-fields.mjs`, `CHANGELOG.md`, `package.json`
 
-- [ ] **68-next. Implementar `update-article.mjs` usando la arquitectura de `spip-session.mjs`**
-  - **La pregunta:** ¿cómo se van a manejar, de forma repetible, futuras creaciones/modificaciones/borrados de artículos en el SPIP real, ejecutados por el agente IA, sin tocar el sitio a mano cada vez?
-  - **Por qué SÍ hace falta código especial (no basta con pedirle al agente que "lo haga"):**
-    1. SPIP no expone una API REST para `/ecrire/` — es un panel de administración para humanos, detrás del login propio de SPIP (o SSO de YunoHost en algunas instancias). La única forma programática es automatizar el navegador (Playwright).
-    2. El formulario de artículo de SPIP 4.4 **autoguarda por campo al perder el foco (blur)**, no con un botón único de "Guardar" — así que un script tiene que rellenar y desenfocar cada campo individualmente y esperar red inactiva.
-    3. Los selectores reales de cada formulario cambian entre plantillas de las 4 instancias SPIP. Cada script necesita su propio modo `--inspect` para confirmarlos contra el HTML real antes de actuar.
-    4. Sin un script versionado, cada sesión reinventa el flujo ad-hoc — que es cómo se originaron bugs en historial anterior.
-  - **Qué existe hoy:**
+- [ ] **68-next. Implementar `update-article.mjs` usando la arquitectura de `spip-session.mjs`** — 🟡 READY FOR NEXT SPRINT
+  - **Status:** Architecture ready, no code duplication blocker remaining
+  - **Implementation:** Follow same --inspect → --dry-run → live pattern as create-article.mjs
+  - **Testing:** Will need integration test against live Article #87 (or test article)
+  - **Effort:** 2–3 hours estimated (following established patterns)
+  - **Related:** Completes the full CRUD cycle for article management (currently: Create ✅, Read ✅, Update ⏳, Delete ❌)
     - `scripts/create-article.mjs` — crear artículo (verificado, #66).
     - `scripts/debug/delete-article.mjs` — mover artículo a `poubelle`/papelera (nuevo, selectores confirmados pero acción bloqueada por autosave mismatch — ver #69).
   - **Qué falta para tener el ciclo completo:**
@@ -482,7 +482,9 @@ Los siguientes problemas fueron identificados en GAPS.md durante la revisión ar
 
 ---
 
-## 🟢 Fixeado en Esta Sesión (August 29, 2026)
+## 🟢 Fixeado en Esta Sesión — Agosto 29-30, 2026
+
+**Session Phase 1 (August 29):**
 
 - [x] **Dashboard Edit Capability for READY Articles** — ✅ COMPLETED
   - Transformed readonly table → interactive cards with 4 action buttons per article
@@ -522,7 +524,29 @@ Los siguientes problemas fueron identificados en GAPS.md durante la revisión ar
   - Documented 8 deferred improvements with timing + effort + rationale
   - Explained decisions to fix critical bugs (missing endpoint, ESLint errors) vs defer refactoring
   - New section: "No Fixeado Este Sprint" with architectural debt items
-  - Section "Fixeado en Esta Sesión" summarizes all completions
+
+**Session Phase 2 (August 30):**
+
+- [x] **i18n-coverage Script Fixed (#38 resolved, v0.42.9)** — ✅ COMPLETED
+  - Fixed TO_FIX #38: i18n-coverage.mjs now reads real schema fields (language/relatedArticles)
+  - Was reading non-existent fields (lang/translationOf), causing 100% false "missing translation" reports
+  - Added test/i18n-coverage.test.mjs with 6 test cases
+  - Updated TO_FIX.md marking #38 as resolved
+  - Corrected CHANGELOG.md command documentation
+  - Files: `scripts/i18n-coverage.mjs` (rewritten), `test/i18n-coverage.test.mjs` (NEW), `docs/TO_FIX.md`
+
+- [x] **Theme Management npm Scripts Added** — ✅ COMPLETED
+  - Added "probe-escal-fields" npm script for field discovery on live Escal config
+  - Added "customize-theme" npm script for automating Escal label changes
+  - Enables TO_FIX #76 implementation phases 4–6 (field discovery → dry-run → live write)
+  - Files: `package.json`
+
+- [x] **Updated TO_FIX.md Checkboxes** — ✅ COMPLETED
+  - Marked #68 as [x] PARTIALLY RESOLVED with detailed phase breakdown
+  - Marked #76 as [ ] PARTIALLY COMPLETE with implementation status (phases 1–3 done, 4–6 pending)
+  - Added #68-next for `update-article.mjs` (ready for next sprint)
+  - Updated "Fixeado en Esta Sesión" section with all work from both phases
+  - Documented remaining work clearly
   - Files: `docs/TO_FIX.md`
 
 ---
