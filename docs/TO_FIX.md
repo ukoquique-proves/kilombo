@@ -5,6 +5,8 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 **Note (v0.54.0+):** sourceUrl uniqueness validation implemented in `scripts/validate-data.mjs` lines 361–394. Prevents duplicate imports and is active in `npm test` CI pipeline.
 
+**Note (Data stores):** Dashboard UI displays articles from `data/articulos_en_trabajo/READY/` directory (30 articles), which is the authoritative source. The secondary export `data/ready-articles.json` (8 articles) is a snapshot and not the primary source.
+
 > **📋 RELATED:** See also:
 > - **`docs/SPIP-ACCESS.md`** — Consolidated SPIP access and article management documentation (single source of truth)
 > - **`CHANGELOG.md`** — Complete version history and resolved issues by release
@@ -523,7 +525,7 @@ Los siguientes problemas fueron identificados en GAPS.md durante la revisión ar
 - [x] **Dashboard Edit Capability for READY Articles** — ✅ COMPLETED
   - Transformed readonly table → interactive cards with 4 action buttons per article
   - Added 4 new JavaScript functions: `toggleReadyArticlePreview()`, `editReadyArticle()`, `moveBackToDraft()`, `publishReadyArticle()`
-  - All 29 READY articles now fully editable
+  - All 30 READY articles (from `data/articulos_en_trabajo/READY/`) now fully editable
   - Files: `api/public/dashboard.html` (UI + CSS + JS)
 
 - [x] **Unified Credentials** — ✅ COMPLETED
