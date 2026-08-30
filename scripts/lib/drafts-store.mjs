@@ -12,7 +12,8 @@
  *
  * Exports (see each JSDoc for shape):
  *   createDraft(fields)         -> { slug, path, createdAt }
- *   getDraft(slug)              -> article object (throws if missing)
+ *   getDraft(slug)              -> article object (throws if missing; prefers IN_PROGRESS if slug exists in both)
+ *   getReadyDraft(slug)         -> article object from READY/ only (throws if missing there)
  *   listDrafts()                -> [{ slug, title, date, section, status, topics, createdAt, updatedAt }, ...]
  *   updateDraft(slug, fields)   -> { slug, updatedAt }
  *   approveDraft(slug)          -> { approved: true, slug, path, approvedAt, validationErrors: [] }
@@ -311,6 +312,28 @@ export function getDraft(slug) {
 }
 
 /**
+ * Read a draft from READY/ only, ignoring any same-slug file that may still
+ * exist in IN_PROGRESS/ (stale duplicates left over from pre-approveDraft()
+ * migrations). Unlike getDraft(), this never prefers IN_PROGRESS — callers
+ * that specifically want the approved/READY copy (e.g. the dashboard's
+ * "✏️ Editar" button on a ready article) must use this instead of getDraft(),
+ * or they'll incorrectly 404 whenever a stale IN_PROGRESS duplicate exists.
+ *
+ * @param {string} slug
+ * @returns {Record<string, unknown> & { _location: 'READY' }}
+ */
+export function getReadyDraft(slug) {
+  validateSlugOrThrow(slug, 'draft.getReady');
+  const p = readyPath(slug);
+  if (existsSync(p)) {
+    return Object.assign(readJson(p), { _location: /** @type {const} */ ('READY') });
+  }
+  const err = new Error(`Draft "${slug}" not found in READY`);
+  Object.assign(err, { code: 'DRAFT_NOT_FOUND' });
+  throw err;
+}
+
+/**
  * @returns {Array<{ slug: string, title: string, date: string, section: string, status: string, topics: string[], createdAt?: string, updatedAt?: string }>}
  */
 export function listDrafts() {
@@ -451,5 +474,58 @@ export function approveDraft(slug) {
     path: rp,
     approvedAt,
     validationErrors: [],
+  };
+}
+
+/**
+ * Move a READY draft back to IN_PROGRESS (undo approval).
+ * Throws DRAFT_NOT_FOUND if the slug doesn't exist in READY.
+ * Throws DRAFT_ALREADY_IN_PROGRESS if the slug already exists in IN_PROGRESS.
+ *
+ * @param {string} slug
+ * @returns {{ reverted: true, slug, path, revertedAt: string }}
+ */
+export function revertDraft(slug) {
+  validateSlugOrThrow(slug, 'draft.revert');
+  const rp = readyPath(slug);
+  if (!existsSync(rp)) {
+    const ip = inProgressPath(slug);
+    const err = existsSync(ip)
+      ? Object.assign(new Error(`Draft "${slug}" is already in IN_PROGRESS`), {
+          code: 'DRAFT_ALREADY_IN_PROGRESS',
+        })
+      : Object.assign(new Error(`Draft "${slug}" not found in READY`), {
+          code: 'DRAFT_NOT_FOUND',
+        });
+    appendAudit('draft.revert', { slug }, false, err.message);
+    throw err;
+  }
+
+  const entry = readJson(rp);
+  // Strip READY-only markers so the draft re-enters the pipeline cleanly
+  delete entry.approved;
+  delete entry.approvedAt;
+  delete entry.validationErrors;
+  const revertedAt = new Date().toISOString();
+  entry.updatedAt = revertedAt;
+  entry.status = entry.status || 'pending-review';
+
+  const ip = inProgressPath(slug);
+  const tmp = join(IN_PROGRESS_DIR, `.${slug}.tmp.${process.pid}`);
+  writeFileSync(tmp, JSON.stringify(entry, null, 2) + '\n', 'utf8');
+  renameSync(tmp, ip);
+
+  try {
+    unlinkIfExists(rp);
+  } catch {
+    /* non-fatal: IN_PROGRESS is canonical after revert */
+  }
+
+  appendAudit('draft.revert', { slug, path: ip, revertedAt }, true);
+  return {
+    reverted: /** @type {const} */ (true),
+    slug,
+    path: ip,
+    revertedAt,
   };
 }

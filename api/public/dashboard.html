@@ -1044,7 +1044,9 @@
     // DRAFTS PIPELINE (Fase 4) — "🆕 Nuevo Artículo" tab
     // ============================================================
 
-    // Subtab A: save a new draft (POST /api/drafts)
+    // Subtab A: save a draft — intelligently UPDATE if an existing draft is loaded
+    // (currentDraftSlug in sessionStorage), otherwise CREATE a new one.
+    // If the existing draft is in READY, auto-revert it to IN_PROGRESS first.
     async function submitSaveDraft(e) {
       e.preventDefault();
 
@@ -1057,13 +1059,63 @@
       const resultEl = document.getElementById('draft-save-result');
       resultEl.innerHTML = '<div class="spinner"></div> Guardando...';
 
+      const existingSlug = sessionStorage.getItem('currentDraftSlug');
+
       try {
-        const res = await apiFetch(`${API_BASE}/drafts`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, section, topics, contentHtml }),
-        });
-        const data = await res.json();
+        let res;
+        let data;
+        let wasUpdate = false;
+
+        if (existingSlug) {
+          // Try UPDATE first (PUT /api/drafts/:slug).
+          // If the draft is in READY, we'll get DRAFT_ALREADY_APPROVED →
+          // auto-revert to IN_PROGRESS, then try PUT again.
+          res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(existingSlug)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, section, topics, contentHtml }),
+          });
+          data = await res.json();
+
+          if (res.ok && data.ok) {
+            wasUpdate = true;
+          } else if (data.code === 'DRAFT_ALREADY_APPROVED') {
+            // Draft is in READY — revert to IN_PROGRESS, then retry UPDATE
+            const revertRes = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(existingSlug)}/revert`, {
+              method: 'POST',
+            });
+            const revertData = await revertRes.json();
+            if (!revertRes.ok || !revertData.ok) {
+              resultEl.innerHTML = `
+                <div class="alert error">
+                  Error al devolver a borrador: ${escapeHtml(revertData.error || revertRes.statusText)}
+                  ${revertData.details ? `<ul class="field-errors">${revertData.details.map((d) => `<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
+                </div>`;
+              return;
+            }
+            // Now retry the PUT
+            res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(existingSlug)}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ title, section, topics, contentHtml }),
+            });
+            data = await res.json();
+            if (res.ok && data.ok) wasUpdate = true;
+          } else if (data.code === 'DRAFT_NOT_FOUND') {
+            // Slug was set but draft file was removed externally — fall through to CREATE
+            wasUpdate = false;
+          }
+        }
+
+        if (!wasUpdate) {
+          // CREATE new draft (fallback / normal new-draft path)
+          res = await apiFetch(`${API_BASE}/drafts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, section, topics, contentHtml }),
+          });
+          data = await res.json();
+        }
 
         if (!res.ok || !data.ok) {
           const details = (data.details || []).map((d) => `<li>${escapeHtml(d)}</li>`).join('');
@@ -1076,11 +1128,10 @@
         }
 
         sessionStorage.setItem('currentDraftSlug', data.data.slug);
-        resultEl.innerHTML = `
-          <div class="alert success">
-            ✅ Borrador guardado. Slug: <strong>${escapeHtml(data.data.slug)}</strong>
-            &nbsp; <button type="button" class="btn-secondary" onclick="switchSubtabById('subtab-preview')">Ir a Preview →</button>
-          </div>`;
+        const action = wasUpdate
+          ? `✅ Borrador actualizado: <strong>${escapeHtml(data.data.slug)}</strong>`
+          : `✅ Borrador guardado. Slug: <strong>${escapeHtml(data.data.slug)}</strong>&nbsp; <button type="button" class="btn-secondary" onclick="switchSubtabById('subtab-preview')">Ir a Preview →</button>`;
+        resultEl.innerHTML = `<div class="alert success">${action}</div>`;
       } catch (err) {
         resultEl.innerHTML = `<div class="alert error">Error de red: ${escapeHtml(err.message)}</div>`;
       }
@@ -1461,17 +1512,15 @@
 
         if (res.ok && data.ok) {
           const { draft } = data.data;
-          // Load article data into the form fields
-          document.getElementById('article-title').value = draft.title || '';
-          document.getElementById('article-body').value = draft.body || '';
-          document.getElementById('article-slug').value = draft.slug || '';
-          document.getElementById('article-topics').value = (draft.topics && Array.isArray(draft.topics)) ? draft.topics.join(', ') : '';
-          document.getElementById('article-ctaUrl').value = draft.ctaUrl || '';
-          document.getElementById('article-sourceUrl').value = draft.sourceUrl || '';
-          
+          document.getElementById('draft-title').value = draft.title || '';
+          document.getElementById('draft-section').value = draft.section || 'general';
+          document.getElementById('draft-topics').value = Array.isArray(draft.topics) ? draft.topics.join(', ') : '';
+          document.getElementById('draft-body').value = draft.contentHtml || '';
+
           sessionStorage.setItem('currentDraftSlug', slug);
-          showAlert(`✅ Artículo "${slug}" cargado para editar. Realiza cambios y haz clic en "💾 Guardar Borrador".`, 'success');
+          showAlert(`✅ Artículo "${slug}" cargado para editar. Realiza cambios y haz clic en "💾 Guardar borrador".`, 'success');
           switchTab(null, 'new-article');
+          switchSubtabById('subtab-write');
           return;
         }
 
@@ -1483,17 +1532,15 @@
 
     // Move READY article back to IN_PROGRESS (for re-editing with status change)
     async function moveBackToDraft(slug) {
-      const confirmed = confirm(`¿Mover "${slug}" de vuelta a Borrador?\n\nSeráMovido a: articulos_en_trabajo/IN_PROGRESS/${slug}.json\n\nUso típico: si necesitas cambios significativos o revisión completa.`);
+      const confirmed = confirm(`¿Mover "${slug}" de vuelta a Borrador?\n\nSerá movido a: articulos_en_trabajo/IN_PROGRESS/${slug}.json\n\nUso típico: si necesitas cambios significativos o revisión completa.`);
       if (!confirmed) return;
 
       const card = document.getElementById(`ready-card-${CSS.escape(slug)}`);
       if (card) card.innerHTML = '<div class="spinner"></div> Moviendo a borrador...';
 
       try {
-        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'in_progress' }),
+        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}/revert`, {
+          method: 'POST',
         });
         const data = await res.json();
 
@@ -1503,6 +1550,7 @@
             refreshReadyDrafts();
             sessionStorage.setItem('currentDraftSlug', slug);
             switchTab(null, 'new-article');
+            switchSubtabById('subtab-preview');
           }, 800);
           return;
         }

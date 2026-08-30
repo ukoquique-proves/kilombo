@@ -29,10 +29,12 @@ import { slugToRubriquId } from '../scripts/lib/spip-client.mjs';
 import {
   createDraft,
   getDraft,
+  getReadyDraft,
   listDrafts,
   updateDraft,
   approveDraft,
   listReady,
+  revertDraft,
 } from '../scripts/lib/drafts-store.mjs';
 import { reduceToAllowlist } from '../scripts/import-article.mjs';
 
@@ -503,27 +505,31 @@ app.get('/api/ready-drafts', (req, res) => {
  *   { ok: false, error, code: "READY_DRAFT_NOT_FOUND" }
  */
 app.get('/api/ready-drafts/:slug', (req, res) => {
+  const slug = req.params.slug;
   try {
-    const slug = req.params.slug;
-    const drafts = listReady();
-    const draft = drafts.find(d => d.slug === slug);
+    // Read from READY/ directly (not getDraft(), which prefers a same-slug
+    // IN_PROGRESS file if one happens to still exist — see getReadyDraft()
+    // JSDoc). Using getDraft() here made this endpoint 404 for any READY
+    // article that still had a stale IN_PROGRESS duplicate on disk.
+    const draftFull = getReadyDraft(slug);
 
-    if (!draft) {
+    const location = draftFull._location;
+    delete draftFull._location;
+
+    const previewHtml = reduceToAllowlist(String(draftFull.contentHtml || ''));
+
+    return res.json({
+      ok: true,
+      data: { draft: draftFull, previewHtml, location },
+    });
+  } catch (err) {
+    if (err && err.code === 'DRAFT_NOT_FOUND') {
       return res.status(404).json({
         ok: false,
         error: `Ready draft "${slug}" not found`,
         code: 'READY_DRAFT_NOT_FOUND',
       });
     }
-
-    // Generate sanitized preview HTML
-    const previewHtml = reduceToAllowlist(String(draft.contentHtml || ''));
-
-    return res.json({
-      ok: true,
-      data: { draft, previewHtml },
-    });
-  } catch (err) {
     return res.status(500).json({
       ok: false,
       error: 'Failed to fetch ready draft',
@@ -726,6 +732,26 @@ app.post('/api/drafts/:slug/approve', (req, res) => {
     return res.json({ ok: true, data: result });
   } catch (err) {
     return sendDraftError(res, err, 'Failed to approve draft');
+  }
+});
+
+/**
+ * POST /api/drafts/:slug/revert — ↩️ Move READY draft back to IN_PROGRESS
+ *
+ * Reverses approveDraft() for when you need significant re-edits.
+ *
+ * Responses:
+ *   200 { ok: true, data: { reverted, slug, path, revertedAt } }
+ *   404 { ok: false, error, code: "DRAFT_NOT_FOUND" }
+ *   400 { ok: false, error, code: "DRAFT_ALREADY_IN_PROGRESS" }
+ */
+app.post('/api/drafts/:slug/revert', (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const result = revertDraft(slug);
+    return res.json({ ok: true, data: result });
+  } catch (err) {
+    return sendDraftError(res, err, 'Failed to revert draft');
   }
 });
 
