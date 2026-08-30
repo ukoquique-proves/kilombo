@@ -20,26 +20,58 @@ Portal central de acceso a la red de sitios de Kilombo. Construido como página 
 
 ## 🚀 Run the UI
 
-This project has two local interfaces, and they now share a single first-run entry point:
+This project has two local interfaces. Choose the appropriate startup method based on your environment:
 
-- **Public site / mirror preview** → `http://localhost:8080`
-- **Article editor / publishing dashboard** → `http://localhost:3000/dashboard.html`
-
-Start the selector from the project root:
+### Interactive Mode (Local Development)
+Show a menu and choose which UI to launch:
 
 ```bash
 cd KILOMBO
 npm run ui
 ```
 
-You can also choose directly without the prompt:
+This displays:
+```
+Choose which UI to launch:
+  1) Public site         -> http://localhost:8080
+  2) Article dashboard  -> http://localhost:3000/dashboard.html
+  3) Cancel
+```
 
+### Non-Interactive Mode (Background / Automation / CI/CD)
+**⚠️ Important:** Always use flags in non-TTY environments (background processes, CI/CD, scripts).
+
+Start the dashboard directly (no menu):
 ```bash
-npm run ui -- --site
 npm run ui -- --dashboard
 ```
 
-This removes the earlier discovery problem where the second interface was hidden behind a different backend startup flow and was harder to find than the public preview.
+Or start the public site:
+```bash
+npm run ui -- --site
+```
+
+These work in **background processes**, **headless environments**, and **CI/CD pipelines** because they don't require terminal input.
+
+### Direct Server Startup (Alternative)
+If you need more control, start the servers directly:
+
+```bash
+# Article dashboard only
+npm start
+
+# Public site preview only
+npm run preview
+```
+
+### Troubleshooting UI Startup
+
+| Scenario | Command | Works in Background? |
+|----------|---------|---------------------|
+| Local dev, interactive choice | `npm run ui` | ❌ No (needs TTY) |
+| Background / CI/CD | `npm run ui -- --dashboard` | ✅ Yes |
+| Local dev, just dashboard | `npm start` | ✅ Yes |
+| Local dev, just site preview | `npm run preview` | ✅ Yes |
 
 ### Publishing Workflows
 
