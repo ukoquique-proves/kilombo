@@ -1,7 +1,7 @@
 # TO_FIX — Bugs y problemas de consistencia detectados
 
 Auditoría activa del proyecto. Solo problemas abiertos.
-Última actualización: 2026-08-26 — ítems #29, #45, #51, #59, #60, #61, #62 cerrados; seguridad URLs (#ctaUrl/#sourceUrl) resuelta; #54 (fixed-column corruption) y #77/#78 (prerequisitos Dashboard de Borradores) cerrados y verificados.
+Última actualización: 2026-08-30 — v0.54.0 dashboard + SPIP session module + i18n-coverage fix + Escal probe (phases 1-5) + update-article.mjs implementation complete.
 
 **Note (v0.42.8):** sourceUrl uniqueness validation (commit b332179) implemented in `scripts/validate-data.mjs` lines 500–525 but not originally tracked as a TO_FIX item. Check prevents duplicate imports and is active in `npm test` CI pipeline.
 
@@ -582,7 +582,7 @@ Los siguientes problemas fueron identificados en GAPS.md durante la revisión ar
 
 ---
 
-**Last Updated:** 2026-08-29  
+**Last Updated:** 2026-08-30  
 **Session:** Dashboard & API Improvements  
 **Next Review:** After frontend refactor work starts
 
