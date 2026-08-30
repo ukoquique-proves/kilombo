@@ -26,6 +26,7 @@ import { sanitizeInput } from './lib/util/sanitize-input.mjs';
 import { sendDraftError, splitFieldErrors } from './lib/http-errors.mjs';
 import { generateSuggestions } from './lib/services/ai-improve-service.mjs';
 import { slugToRubriquId } from '../scripts/lib/spip-client.mjs';
+import { VALID_SECTIONS, VALID_STATUSES, isValidSection, isValidStatus } from './lib/command-validators.mjs';
 import {
   createDraft,
   getDraft,
@@ -198,10 +199,9 @@ app.post('/api/commands/create-article', (req, res) => {
     });
   }
 
-  const validSections = ['general', 'actualidad', 'tierra', 'nom', 'pi', 'gci'];
-  if (!validSections.includes(section) && !/^\d+$/.test(section)) {
+  if (!isValidSection(section)) {
     return res.status(400).json({
-      error: `Invalid section. Must be one of: ${validSections.join(', ')} (or a numeric SPIP rubrique ID)`,
+      error: `Invalid section. Must be one of: ${VALID_SECTIONS.join(', ')} (or a numeric SPIP rubrique ID)`,
     });
   }
   
@@ -273,10 +273,9 @@ app.post('/api/commands/manage-article-status', (req, res) => {
     });
   }
   
-  const validStatuses = ['publie', 'prepa', 'prop', 'refuse', 'poubelle'];
-  if (!validStatuses.includes(status)) {
+  if (!isValidStatus(status)) {
     return res.status(400).json({
-      error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
+      error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`,
     });
   }
   

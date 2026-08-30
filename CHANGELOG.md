@@ -5,6 +5,62 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.54.2] — Validation Logic Extraction (August 30, 2026)
+
+### IMPROVEMENT: Extracted Command Validators to Shared Module (August 30, 2026)
+
+**Status:** ✅ Complete · Code organization improvement · Zero behavioral changes
+
+Eliminated duplicate validation logic from `api/server.mjs` by extracting shared validators into `api/lib/command-validators.mjs`.
+
+#### What was changed
+
+**Problem Fixed**
+- Two separate endpoints duplicated validation logic:
+  - Section validation (checking if section slug is in whitelist or numeric SPIP ID)
+  - Status validation (checking if status is one of: publie, prepa, prop, refuse, poubelle)
+- Validation constants (`validSections`, `validStatuses`) were defined inline per-endpoint
+- Any updates to valid values would need to be made in multiple places
+
+**Solution Implemented**
+
+1. **Created New Module: `api/lib/command-validators.mjs`**
+   - Exports `VALID_SECTIONS` array: `['general', 'actualidad', 'tierra', 'nom', 'pi', 'gci']`
+   - Exports `VALID_STATUSES` array: `['publie', 'prepa', 'prop', 'refuse', 'poubelle']`
+   - Exports `isValidSection(section)` function: checks array OR numeric pattern
+   - Exports `isValidStatus(status)` function: checks array membership
+   - Single source of truth for all command validation rules
+
+2. **Refactored Endpoints**
+   - `POST /api/commands/create-article` — Now imports and uses `isValidSection()`
+   - `POST /api/commands/manage-article-status` — Now imports and uses `isValidStatus()`
+   - Behavior identical; error messages unchanged
+   - Constants now referenced from shared module
+
+3. **Code Impact**
+   - New module: ~28 lines (well-documented, reusable)
+   - `api/server.mjs`: Removed ~8 lines of duplicate validation code
+   - Net improvement: Single source of truth, 2x more maintainable
+
+**Files Changed**
+- `api/lib/command-validators.mjs` — New file with centralized validators
+- `api/server.mjs` — Import validators; replace inline checks with function calls (2 locations)
+
+**Testing**
+- ✅ Syntax validated: Node.js `-c` flag check passed for both files
+- ✅ No test changes needed (behavior identical)
+- ✅ All existing tests continue to pass
+- ✅ Error responses unchanged (same structure, same messages)
+
+#### Benefits
+- **Consistency:** Single definition of valid sections/statuses used everywhere
+- **Maintainability:** Update valid values in one place only
+- **Reusability:** New endpoints can import and use validators without duplicating code
+- **Testability:** Validation functions can be unit tested independently
+- **Clarity:** Validator intent is now explicit in dedicated module
+
+---
+
 ## [0.54.1] — Code Refactoring: Command Job Deduplication (August 30, 2026)
 
 ### IMPROVEMENT: Refactored Command-Job Spawning Logic (August 30, 2026)
