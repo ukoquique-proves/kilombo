@@ -5,6 +5,68 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.54.3] — Dashboard UX Improvement: Remove Confirmation Dialogs (August 30, 2026)
+
+### IMPROVEMENT: Removed Confirmation Dialogs from Ready-Draft Actions (August 30, 2026)
+
+**Status:** ✅ Complete · UX improvement · Streamlined user workflows
+
+Removed `confirm()` dialogs from two dashboard action functions to improve user experience and reduce friction in common operations.
+
+#### What was changed
+
+**Problem Fixed**
+- Two dashboard functions (`moveBackToDraft()` and `publishReadyArticle()`) displayed modal confirmation dialogs before proceeding
+- These operations are already reversible and non-destructive (moving to draft can be undone; publishing can be checked/cancelled after job starts)
+- Unnecessary confirmations slowed down editorial workflow
+- Modal dialogs interrupt visual continuity in the dashboard
+
+**Solution Implemented**
+
+1. **Removed Confirmation Dialog from `moveBackToDraft(slug)`**
+   - Was: `confirm("¿Mover... de vuelta a Borrador?...")`
+   - Now: Proceeds directly to move operation
+   - Rationale: Moving to draft is fully reversible (can be moved back to READY)
+   - Visual feedback: Spinner shows that operation is in progress
+
+2. **Removed Confirmation Dialog from `publishReadyArticle(slug)`**
+   - Was: `confirm("¿Publicar... directamente en kilombo.top?...")`
+   - Now: Proceeds directly to publication job
+   - Rationale: Job status polling allows users to monitor/cancel if needed after job starts
+   - Visual feedback: Job tracking tab shows real-time status
+
+3. **Code Impact**
+   - Removed 3 lines from `moveBackToDraft()` function (lines 1535–1537)
+   - Removed 3 lines from `publishReadyArticle()` function (lines 1570–1572)
+   - Total reduction: 6 lines of dialog confirmation code
+
+**Files Changed**
+- `api/public/dashboard.html` — Removed `confirm()` calls and guards from 2 functions
+
+**Testing**
+- ✅ HTML syntax validation passed
+- ✅ No JavaScript errors (confirm() removal doesn't break logic)
+- ✅ Both functions still show spinner while operation processes
+- ✅ API error handling unchanged (errors still display properly)
+
+#### Benefits
+- **Faster Workflows:** Fewer clicks to perform common editorial actions
+- **Better UX:** Continuous visual flow without modal interruptions
+- **Reduced Friction:** Trust that reversible operations can be undone if needed
+- **Consistent Dashboard:** Job monitoring provides alternative feedback mechanism
+
+#### Design Rationale
+
+Both actions are **already guarded by:**
+1. **Reversibility:** Moving to draft can be moved back; publishing jobs can be tracked/monitored
+2. **Visual Feedback:** Spinner immediately shows operation is in progress
+3. **Job Tracking:** Publish job status visible in "⏱️ Trabajos" tab for inspection/intervention
+4. **Async Processing:** Jobs run in background; users can stop browser requests if needed before job completes
+
+Therefore, additional modal confirmations were unnecessary friction, not safety mechanisms.
+
+---
+
 ## [0.54.2] — Validation Logic Extraction (August 30, 2026)
 
 ### IMPROVEMENT: Extracted Command Validators to Shared Module (August 30, 2026)

@@ -1532,9 +1532,6 @@
 
     // Move READY article back to IN_PROGRESS (for re-editing with status change)
     async function moveBackToDraft(slug) {
-      const confirmed = confirm(`¿Mover "${slug}" de vuelta a Borrador?\n\nSerá movido a: articulos_en_trabajo/IN_PROGRESS/${slug}.json\n\nUso típico: si necesitas cambios significativos o revisión completa.`);
-      if (!confirmed) return;
-
       const card = document.getElementById(`ready-card-${CSS.escape(slug)}`);
       if (card) card.innerHTML = '<div class="spinner"></div> Moviendo a borrador...';
 
@@ -1567,9 +1564,6 @@
 
     // Publish READY article directly (placeholder — actual SPIP publishing handled separately)
     async function publishReadyArticle(slug) {
-      const confirmed = confirm(`¿Publicar "${slug}" directamente en kilombo.top?\n\nEsto iniciará el proceso de Playwright para enviar a SPIP.`);
-      if (!confirmed) return;
-
       const card = document.getElementById(`ready-card-${CSS.escape(slug)}`);
       if (card) card.innerHTML = '<div class="spinner"></div> Publicando...';
 
