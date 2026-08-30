@@ -131,6 +131,45 @@ app.get('/api/jobs', (req, res) => {
 });
 
 // ============================================================
+// SHARED COMMAND-JOB HELPER
+// ============================================================
+
+/**
+ * Spawn a script as a job and respond with the standard job-started shape,
+ * or a standard 500 on failure to start it. This is the exact shape that
+ * create-article, manage-article-status, and publish-ready-article each
+ * used to duplicate inline — behavior here is intentionally unchanged,
+ * only de-duplicated.
+ *
+ * @param {import('express').Response} res
+ * @param {string[]} args - argv passed to `node`, e.g. ['scripts/foo.mjs', '--flag', 'val']
+ * @param {{ message: string, warning?: string, errorMessage?: string }} opts
+ *   - message: success message included in the 200 response
+ *   - warning: optional warning string included in the 200 response (omitted if undefined)
+ *   - errorMessage: text used in the 500 response if the job fails to start
+ *     (defaults to 'Failed to start job', matching prior per-endpoint defaults
+ *     except publish-ready-article, which passes its own text explicitly)
+ */
+function startCommandJob(res, args, { message, warning, errorMessage = 'Failed to start job' }) {
+  try {
+    const jobId = createJob('node', args, { cwd: KILOMBO_DIR });
+    const job = getJob(jobId);
+
+    res.json({
+      jobId,
+      startTime: job.startTime,
+      message,
+      warning,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: errorMessage,
+      details: err.message,
+    });
+  }
+}
+
+// ============================================================
 // CREATE ARTICLE ENDPOINT
 // ============================================================
 
@@ -195,22 +234,8 @@ app.post('/api/commands/create-article', (req, res) => {
   ];
   
   if (dryRun) args.push('--dry-run');
-  
-  try {
-    const jobId = createJob('node', args, { cwd: KILOMBO_DIR });
-    const job = getJob(jobId);
-    
-    res.json({
-      jobId,
-      startTime: job.startTime,
-      message: 'Article creation job started',
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: 'Failed to start job',
-      details: err.message,
-    });
-  }
+
+  startCommandJob(res, args, { message: 'Article creation job started' });
 });
 
 // ============================================================
@@ -278,23 +303,11 @@ app.post('/api/commands/manage-article-status', (req, res) => {
   
   if (change) args.push('--change');
   if (dryRun) args.push('--dry-run');
-  
-  try {
-    const jobId = createJob('node', args, { cwd: KILOMBO_DIR });
-    const job = getJob(jobId);
-    
-    res.json({
-      jobId,
-      startTime: job.startTime,
-      message: 'Status management job started',
-      warning: status === 'publie' ? 'This will publish the article to production' : undefined,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: 'Failed to start job',
-      details: err.message,
-    });
-  }
+
+  startCommandJob(res, args, {
+    message: 'Status management job started',
+    warning: status === 'publie' ? 'This will publish the article to production' : undefined,
+  });
 });
 
 // ============================================================
@@ -341,23 +354,12 @@ app.post('/api/commands/publish-ready-article', (req, res) => {
   ];
   
   if (dryRun) args.push('--dry-run');
-  
-  try {
-    const jobId = createJob('node', args, { cwd: KILOMBO_DIR });
-    const job = getJob(jobId);
-    
-    res.json({
-      jobId,
-      startTime: job.startTime,
-      message: 'Article publication job started',
-      warning: 'This will publish the article to kilombo.top',
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: 'Failed to start publish job',
-      details: err.message,
-    });
-  }
+
+  startCommandJob(res, args, {
+    message: 'Article publication job started',
+    warning: 'This will publish the article to kilombo.top',
+    errorMessage: 'Failed to start publish job',
+  });
 });
 
 // ============================================================

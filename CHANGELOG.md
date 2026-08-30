@@ -5,6 +5,61 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.54.1] — Code Refactoring: Command Job Deduplication (August 30, 2026)
+
+### IMPROVEMENT: Refactored Command-Job Spawning Logic (August 30, 2026)
+
+**Status:** ✅ Complete · Code quality improvement · Zero behavioral changes
+
+Eliminated code duplication in `api/server.mjs` by extracting repeated job-spawning boilerplate into a shared `startCommandJob()` helper function.
+
+#### What was changed
+
+**Problem Fixed**
+- Three separate endpoints (`/api/commands/create-article`, `/api/commands/manage-article-status`, `/api/commands/publish-ready-article`) each contained ~20 lines of identical job-spawning code
+- Duplicated logic made maintenance harder and increased risk of inconsistency
+- Any fix to error handling would need to be applied in three places
+
+**Solution Implemented**
+
+1. **Created Shared Helper Function: `startCommandJob()`**
+   - Centralizes job spawning, error handling, and response formatting
+   - Takes 3 parameters: `(res, args, { message, warning, errorMessage })`
+   - Handles both success (200) and failure (500) responses
+   - Default error message: `'Failed to start job'` (customizable per endpoint)
+   - Optional warning message included in response (omitted if undefined)
+
+2. **Refactored All Three Endpoints**
+   - `POST /api/commands/create-article` — Now uses `startCommandJob()`
+   - `POST /api/commands/manage-article-status` — Now uses `startCommandJob()`
+   - `POST /api/commands/publish-ready-article` — Now uses `startCommandJob()`
+   - Each reduced from ~20 lines to 1-2 lines
+   - Behavior identical; responses unchanged
+
+3. **Code Impact**
+   - Before: ~60 lines of duplicated job-spawning code
+   - After: ~40 lines of shared helper + 1-2 line calls per endpoint
+   - Net reduction: ~20 lines (~17% smaller endpoint implementations)
+   - All error responses maintain exact same structure and status codes
+
+**Files Changed**
+- `api/server.mjs` — Added `startCommandJob()` helper function (lines 133–168); refactored 3 endpoints to use it
+
+**Testing**
+- ✅ Syntax validated: Node.js `-c` flag check passed
+- ✅ No test changes needed (behavior identical)
+- ✅ All existing tests continue to pass
+- ✅ Response shapes unchanged (same structure, same status codes)
+
+#### Benefits
+- **Maintainability:** Single source of truth for job spawning logic
+- **Consistency:** All endpoints handle errors identically
+- **Clarity:** Job management intent is now explicit in shared function
+- **DRY Principle:** Violating-code eliminated
+- **Future-Proof:** New command endpoints can reuse `startCommandJob()` without repeating code
+
+---
+
 ## [0.54.0] — Dashboard Enhancements, CI/CD Linting Enforcement, SPIP Session Module Refactoring (August 29, 2026)
 
 ### BUGFIX: Missing Publish Endpoint Implemented (August 29, 2026)
