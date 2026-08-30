@@ -25,7 +25,9 @@
     "preview": "python3 -m http.server 8080 --directory site",
     "scrape": "bash scripts/scrape-curl.sh",
     "scrape:full": "bash scripts/scrape-comprehensive.sh",
-    "check-corruption": "node scripts/detect-fixed-column-corruption.mjs"
+    "check-corruption": "node scripts/detect-fixed-column-corruption.mjs",
+    "probe-escal-fields": "node scripts/probe-escal-fields.mjs",
+    "customize-theme": "node scripts/customize-escal-theme.mjs"
   },
   "keywords": [],
   "author": "",
