@@ -494,6 +494,45 @@ app.get('/api/ready-drafts', (req, res) => {
 });
 
 /**
+ * GET /api/ready-drafts/:slug — Read a single READY article
+ *
+ * Response 200:
+ *   { ok: true, data: { draft, previewHtml } }
+ *
+ * Response 404:
+ *   { ok: false, error, code: "READY_DRAFT_NOT_FOUND" }
+ */
+app.get('/api/ready-drafts/:slug', (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const drafts = listReady();
+    const draft = drafts.find(d => d.slug === slug);
+
+    if (!draft) {
+      return res.status(404).json({
+        ok: false,
+        error: `Ready draft "${slug}" not found`,
+        code: 'READY_DRAFT_NOT_FOUND',
+      });
+    }
+
+    // Generate sanitized preview HTML
+    const previewHtml = reduceToAllowlist(String(draft.contentHtml || ''));
+
+    return res.json({
+      ok: true,
+      data: { draft, previewHtml },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      error: 'Failed to fetch ready draft',
+      internal: err.message,
+    });
+  }
+});
+
+/**
  * GET /api/drafts/:slug — Read a single draft + sanitized preview HTML
  *
  * Response 200:
