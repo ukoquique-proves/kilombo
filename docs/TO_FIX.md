@@ -347,25 +347,27 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     - `scripts/validators/` — validadores separados por dominio (schema.mjs, content-qa.mjs, data-format.mjs) — parcialmente iniciado por `scripts/lib/article-validator.mjs` (ver nota arriba)
     - **No es bloqueante hoy**, pero es una deuda técnica de arquitectura que evitará refactorizaciones de emergencia cuando la complejidad se dispare.
 
-- [x] **80. `api/server.mjs` — un solo archivo mezcla 5 responsabilidades (auth, jobs, commands, audit, drafts)** — ✅ PARCIALMENTE COMPLETADO (Pasos 1-3)
+- [x] **80. `api/server.mjs` — un solo archivo mezcla 5 responsabilidades (auth, jobs, commands, audit, drafts)** — ✅ PARCIALMENTE COMPLETADO (Pasos 1-3c)
 
-  **Completados (v0.54.1 – v0.54.4):**
+  **Completados (v0.54.1 – v0.54.5):**
     - ✅ **v0.54.1:** De-duplicación del bloque `createJob → getJob → try/catch → 500` extraído a helper `startCommandJob()` (lines 133–168 en server.mjs)
     - ✅ **v0.54.2:** Extracción de `validSections`/`validStatuses` a `api/lib/command-validators.mjs` con funciones `isValidSection()`, `isValidStatus()`
     - ✅ **v0.54.4:** Router extraction — Pasos 1-3a completados:
       1. ✅ `GET /api/health` extraído a `api/routes/status.mjs`
       2. ✅ `GET /api/env-status` extraído a `api/routes/status.mjs`
       3. ✅ `GET /api/jobs/:jobId/status` y `GET /api/jobs` extraídos a `api/routes/jobs.mjs`
-    - Net reduction: ~100 líneas removidas de `server.mjs`, 2 nuevos routers creados
+    - ✅ **v0.54.5:** Router extraction — Paso 3c completado:
+      4. ✅ `GET /api/audit-log` extraído a `api/routes/audit-log.mjs` con factory function (preserva instancia única de auditLog)
+    - Net reduction: ~120 líneas removidas de `server.mjs`, 3 nuevos routers creados
 
   **Pendientes (Pasos 4-6, opcional/no bloqueante):**
-    4. `GET /api/audit-log` — solo lectura
     5. Los 3 endpoints de `/api/commands/*` — ya apoyados en helper y validadores
     6. `/api/drafts` + `/api/ready-drafts` + endpoints de IA — mantener doble auth intencional en improve/apply-suggestion
 
   **Notas arquitectónicas importantes:**
     - Cada paso fue implementado como checkpoint independiente — no es refactor a medio terminar
     - Auth middleware se registra en `server.mjs` antes de montar routers — protección no cambia
+    - `audit-log.mjs` usa factory function para recibir instancia compartida de auditLog (single instance pattern)
     - `improve` y `apply-suggestion` mantienen `requireSharedSecret` inline + prefijo — redundancia intencional por omisión, no remover al mover
     - `getReadyDraft()` no debe preferir duplicado stale en `IN_PROGRESS/` — mantener distinción vs `getDraft()`
     - Inconsistencia de respuesta (`{ error }` vs `{ ok, error, code }`) y banner ASCII NO incluidos en esta acción — requieren auditoría de consumidores primero
