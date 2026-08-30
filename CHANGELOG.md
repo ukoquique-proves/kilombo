@@ -5,7 +5,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
-## [Unreleased] — Clean Architecture Applied + Environment Configuration Optimized + Dashboard UI Enhanced + CI/CD Linting Enforcement
+## [0.54.0] — Dashboard Enhancements, CI/CD Linting Enforcement, SPIP Session Module Refactoring (August 29, 2026)
 
 ### BUGFIX: Missing Publish Endpoint Implemented (August 29, 2026)
 
