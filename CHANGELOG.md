@@ -171,6 +171,49 @@ Addressed critical workflow gap: articles in the "📬 Listos para Publicar" (RE
 
 ---
 
+### BUGFIX: Dashboard Button Behavior Clarified (August 30, 2026)
+
+**Status:** ✅ Fixed · User experience issue resolved · Clear action semantics
+
+Discovered and fixed a UX issue where two dashboard buttons ("✏️ Editar" and "↩️ Devolver a Borrador") performed identical operations, creating user confusion about which button to use.
+
+#### What was wrong
+- Both buttons in the READY articles section called the same function (`editReadyArticle()`)
+- `moveBackToDraft()` just delegated to `editReadyArticle()` with no actual implementation
+- Users couldn't distinguish between "edit this article" and "move it back to draft"
+- Root cause: Incomplete implementation during dashboard feature development
+
+#### What was fixed
+- **"✏️ Editar"** — now loads article data into the form editor for **in-place quick editing**
+  - No confirmation dialog (quick operation)
+  - No status change (stays in READY)
+  - User makes edits and saves back to READY
+  
+- **"↩️ Devolver a Borrador"** — now moves article **back to IN_PROGRESS status**
+  - Confirmation dialog (significant action)
+  - API call changes status from READY to IN_PROGRESS
+  - Intended for full re-editing or articles needing major changes
+  - Switches to editor tab after move completes
+
+#### Impact
+- Clear, distinct workflows: quick edits vs. status change
+- Users now understand the difference between the two actions
+- Better article management workflow (READY → minor edit → back to READY, or READY → major rework → move to IN_PROGRESS)
+
+#### Files Changed
+- `api/public/dashboard.html` — Split `editReadyArticle()` and `moveBackToDraft()` into distinct functions (lines 1457–1531)
+
+#### Testing
+- ✅ ESLint: 0 errors, 494 warnings
+- ✅ All 234 tests passing
+- ✅ Function behavior verified manually in browser
+
+#### Commits
+- `f85f2d2` — fix: Distinguish 'Editar' (in-place) from 'Devolver a Borrador' button behaviors
+- `1829244` — docs: Add TO_FIX #79 — Dashboard button behavior clarification (CLOSED)
+
+---
+
 ### FEATURE: Clean Architecture Implementation Applied (August 29, 2026)
 
 **Status:** ✅ Complete · `npm test 234/234 ✅` · `eslint 0 errors ✅`
