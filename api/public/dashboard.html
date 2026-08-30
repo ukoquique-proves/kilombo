@@ -1453,9 +1453,37 @@
       }
     }
 
-    // Edit a READY article (move back to IN_PROGRESS for editing)
+    // Edit a READY article (load into editor without moving status)
     async function editReadyArticle(slug) {
-      const confirmed = confirm(`¿Mover "${slug}" de vuelta a Borrador para editarlo?\n\nSeráMovido a: articulos_en_trabajo/IN_PROGRESS/${slug}.json`);
+      try {
+        const res = await apiFetch(`${API_BASE}/ready-drafts/${encodeURIComponent(slug)}`);
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+          const { draft } = data.data;
+          // Load article data into the form fields
+          document.getElementById('article-title').value = draft.title || '';
+          document.getElementById('article-body').value = draft.body || '';
+          document.getElementById('article-slug').value = draft.slug || '';
+          document.getElementById('article-topics').value = (draft.topics && Array.isArray(draft.topics)) ? draft.topics.join(', ') : '';
+          document.getElementById('article-ctaUrl').value = draft.ctaUrl || '';
+          document.getElementById('article-sourceUrl').value = draft.sourceUrl || '';
+          
+          sessionStorage.setItem('currentDraftSlug', slug);
+          showAlert(`✅ Artículo "${slug}" cargado para editar. Realiza cambios y haz clic en "💾 Guardar Borrador".`, 'success');
+          switchTab(null, 'new-article');
+          return;
+        }
+
+        showAlert(`Error: ${data.error || 'No se pudo cargar el artículo'}`, 'error');
+      } catch (err) {
+        showAlert(`Error de red: ${err.message}`, 'error');
+      }
+    }
+
+    // Move READY article back to IN_PROGRESS (for re-editing with status change)
+    async function moveBackToDraft(slug) {
+      const confirmed = confirm(`¿Mover "${slug}" de vuelta a Borrador?\n\nSeráMovido a: articulos_en_trabajo/IN_PROGRESS/${slug}.json\n\nUso típico: si necesitas cambios significativos o revisión completa.`);
       if (!confirmed) return;
 
       const card = document.getElementById(`ready-card-${CSS.escape(slug)}`);
@@ -1487,11 +1515,6 @@
           card.innerHTML = `<div class="alert error">Error de red: ${escapeHtml(err.message)}</div>`;
         }
       }
-    }
-
-    // Move READY article back to IN_PROGRESS (same as edit)
-    async function moveBackToDraft(slug) {
-      editReadyArticle(slug);
     }
 
     // Publish READY article directly (placeholder — actual SPIP publishing handled separately)
