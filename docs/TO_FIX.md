@@ -529,7 +529,7 @@ Los siguientes problemas fueron identificados en GAPS.md durante la revisión ar
   - Files: `api/public/dashboard.html` (UI + CSS + JS)
 
 - [x] **Unified Credentials** — ✅ COMPLETED
-  - `KILO_SHARED_SECRET = KILOMBOTOP_PASSWORD = otario2021`
+  - `KILO_SHARED_SECRET = KILOMBOTOP_PASSWORD = <production-secret-from-.env>`
   - Server restarted and verified working
   - Files: `.env`
 
