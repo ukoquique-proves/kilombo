@@ -130,7 +130,17 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - **Status:** Ready to implement — no blockers
   - **Related:** See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` for corrected analysis
 
-- [ ] **68. Gestión de create/edit/delete en kilombo.top desde el agente — arquitectura y por qué hace falta código dedicado**
+- [x] **68. Gestión de create/edit/delete en kilombo.top desde el agente — arquitectura y por qué hace falta código dedicado** — ✅ PARTIALLY RESOLVED (spip-session module refactor)
+  - **✅ COMPLETED:** `scripts/lib/spip-session.mjs` created (144 lines) with shared login/session logic
+  - **✅ COMPLETED:** Refactored `create-article.mjs`, `customize-escal-theme.mjs`, `probe-escal-fields.mjs` to use shared module
+  - **✅ COMPLETED:** Eliminates code duplication (removed ~150 lines of copy-paste login code from 3 scripts)
+  - **✅ COMPLETED:** Improves error handling uniformity (merged best defensive behavior from all 3 prior copies)
+  - **⏳ PENDING:** `update-article.mjs` — ready to implement using spip-session module (no code duplication)
+  - **⏳ PENDING:** GCI extractors (#63) — architecturally prepared but not yet domain-specific
+  - **Status (2026-08-29):** Foundation complete. Can now add `update-article.mjs` without duplicating login code.
+  - **Files modified:** `scripts/lib/spip-session.mjs` (NEW), `scripts/create-article.mjs`, `scripts/customize-escal-theme.mjs`, `scripts/probe-escal-fields.mjs`, `CHANGELOG.md`
+
+- [ ] **68-next. Implementar `update-article.mjs` usando la arquitectura de `spip-session.mjs`**
   - **La pregunta:** ¿cómo se van a manejar, de forma repetible, futuras creaciones/modificaciones/borrados de artículos en el SPIP real, ejecutados por el agente IA, sin tocar el sitio a mano cada vez?
   - **Por qué SÍ hace falta código especial (no basta con pedirle al agente que "lo haga"):**
     1. SPIP no expone una API REST para `/ecrire/` — es un panel de administración para humanos, detrás del login propio de SPIP (o SSO de YunoHost en algunas instancias). La única forma programática es automatizar el navegador (Playwright).
@@ -406,6 +416,117 @@ Los siguientes ítems son prerequisitos para implementar el flujo `IN_PROGRESS �
   **Prerrequisito de:** `scripts/lib/drafts-store.mjs` método `approveDraft()` (Fase 1 del plan)
 
   **Verificación (2026-08-26):** Todos los elementos listados (`ARTICLE_STATUS`, `ID_FORMAT_RE`, `ID_MAX_LENGTH`, `ARTICLE_RULES`, `ARTICLE_OPTIONAL_RULES`, `validateContentHtmlUrls()`, `validateArticleEntry()`) se movieron a `scripts/lib/article-validator.mjs` como named exports. `validate-data.mjs` ahora re-importa desde ese módulo. Confirmado con prueba directa: `import('./scripts/lib/article-validator.mjs')` se resuelve sin disparar `process.exit()` (el módulo ya no arrastra el runner CLI), y `validateArticleEntry()` produce los mismos resultados que antes de la extracción. `npm test` pasa 175/175 (incluyendo `scripts/validate-data.mjs` sobre los 67 entries reales) y `npm run lint` no reporta errores nuevos.
+
+---
+
+## 🔵 No Fixeado Este Sprint — Mejoras Recomendadas (GAPS.md)
+
+Los siguientes problemas fueron identificados en GAPS.md durante la revisión arquitectónica, pero se decidió no implementarlos en esta sesión para **evitar breaking changes** en código que ya funciona. Quedaron documentados para trabajo futuro.
+
+- [ ] **Frontend Monolithic Architecture (1,352 lines)**
+  - **Issue:** `api/public/dashboard.html` contiene todo: HTML + CSS + 28 funciones JavaScript globales en un solo archivo
+  - **Why deferred:** Refactoring a ES modules sería días de trabajo y alto riesgo de regressions. Mejor hacerlo cuando se añadan más features.
+  - **When to fix:** Next sprint, después de estabilizar la feature del dashboard
+  - **Effort:** 3-5 días con testing completo
+
+- [ ] **Copy-Paste Tab-Switching Logic**
+  - **Issue:** Tres funciones idénticas (`switchTab`, `switchSubtab`, `switchSubtabById`) haciendo el mismo `querySelectorAll → removeClass → addClass` dance
+  - **Why deferred:** Simple refactor pero toca código del dashboard. Mejor como mejora incremental.
+  - **When to fix:** Next sprint, junto con extractores de boilerplate
+  - **Effort:** 1-2 horas + testing
+
+- [ ] **Duplicate Fetch/Render Patterns (15+ copy-paste instances)**
+  - **Issue:** Cada `refresh*/submit*` función repite: spinner → `apiFetch()` → try/catch → HTML templating
+  - **Why deferred:** Extraer helpers genéricos requiere cambiar todas las 15+ instancias. Riesgoso sin tests.
+  - **When to fix:** Next sprint, prioritario para escalar el dashboard
+  - **Effort:** 3-4 horas con testing
+
+- [ ] **No Smoke Tests for Route/Endpoint Matching**
+  - **Issue:** Bug encontrado en esta sesión: `publishReadyArticle()` llamaba endpoint no existente (`/api/commands/publish-ready-article`)
+  - **Why deferred:** Implementamos el endpoint que faltaba. Agregar tests puede venir después.
+  - **When to fix:** Before next major refactor del frontend
+  - **Effort:** 1-2 horas
+
+- [ ] **Frontend State Management is Ad-Hoc**
+  - **Issue:** Estado disperso en globals (`_currentSuggestions`, `_currentAiSlug`) y sessionStorage (`currentDraftSlug`, `kiloSecret`)
+  - **Why deferred:** Centralizar estado requeriría restructuring del flujo de datos. Mejor con refactor de módulos.
+  - **When to fix:** Phase 2 del frontend refactor (Vue/React migration)
+  - **Effort:** 2-3 días
+
+- [ ] **Manual HTML String Templating (56 call sites)**
+  - **Issue:** `escapeHtml()` llamada 56 veces, manual HTML string building con no validation de cambios de schema
+  - **Why deferred:** Migrar a template literals o JSX requiere cambio de arquitectura. No hacer sin tests.
+  - **When to fix:** Together with ES modules refactor
+  - **Effort:** Included in frontend refactor (3-5 días)
+
+- [ ] **Backend Policy Layer No-Op (live-write-gateway)**
+  - **Issue:** `live-write-gateway.mjs` policy layer documentado como "for future use" pero sin lógica real
+  - **Why deferred:** MVP funciona sin ello. No bloquea nada.
+  - **When to fix:** When adding more business logic gates (Phase 2)
+  - **Effort:** 2-3 horas
+
+- [ ] **In-Memory Job Store (jobs lost on restart)**
+  - **Issue:** `job-manager.mjs` almacena jobs en memoria. Restart = datos perdidos.
+  - **Why deferred:** Acceptable para MVP. Agregar Redis es para producción scaling.
+  - **When to fix:** When deploying to multi-server setup
+  - **Effort:** 1-2 días (Redis setup + migrations)
+
+- [ ] **auth.mjs String Length vs Byte Length**
+  - **Issue:** Compara `supplied.length === secret.length` usando JS string length, no byte length
+  - **Why deferred:** Harmless para ASCII (lo que usamos). No bloquea nada.
+  - **When to fix:** If/when moving to multi-byte secrets (future security hardening)
+  - **Effort:** 30 minutos
+
+---
+
+## 🟢 Fixeado en Esta Sesión (August 29, 2026)
+
+- [x] **Dashboard Edit Capability for READY Articles** — ✅ COMPLETED
+  - Transformed readonly table → interactive cards with 4 action buttons per article
+  - Added 4 new JavaScript functions: `toggleReadyArticlePreview()`, `editReadyArticle()`, `moveBackToDraft()`, `publishReadyArticle()`
+  - All 29 READY articles now fully editable
+  - Files: `api/public/dashboard.html` (UI + CSS + JS)
+
+- [x] **Unified Credentials** — ✅ COMPLETED
+  - `KILO_SHARED_SECRET = KILOMBOTOP_PASSWORD = otario2021`
+  - Server restarted and verified working
+  - Files: `.env`
+
+- [x] **CI/CD Linting Enforcement** — ✅ COMPLETED
+  - Added mandatory ESLint to GitHub Actions
+  - Fixed all 14 ESLint errors
+  - Lint + Test both required before deploy
+  - Files: `.github/workflows/deploy.yml`, `eslint.config.js`, `scripts/probe-rubriques.mjs`
+
+- [x] **Missing Publish Endpoint** — ✅ COMPLETED (Critical bug found during review)
+  - Implemented `POST /api/commands/publish-ready-article`
+  - Fixes broken "📤 Publicar Ahora" button on dashboard
+  - Files: `api/server.mjs` (60 lines added)
+
+- [x] **SPIP Session Module Refactoring (#68 partial fix)** — ✅ COMPLETED
+  - Created `scripts/lib/spip-session.mjs` (144 lines) with shared login/session helpers
+  - Refactored 3 scripts to eliminate copy-paste login code
+  - Fixes TO_FIX #68 architectural gap for future `update-article.mjs`
+  - Improves error handling uniformity (merged best defensive behaviors from all 3 prior copies)
+  - Applied ALL-combined.patch from /root/JOB/KILOMBO/PATCHES successfully
+  - Files: `scripts/lib/spip-session.mjs` (NEW), `scripts/create-article.mjs`, `scripts/customize-escal-theme.mjs`, `scripts/probe-escal-fields.mjs`, `CHANGELOG.md`
+
+- [x] **Deleted Redundant GAPS.md** — ✅ COMPLETED
+  - All gaps moved to TO_FIX.md with proper prioritization
+  - Single source of truth: `docs/TO_FIX.md`
+
+- [x] **Architecture Documentation & Rationalization** — ✅ COMPLETED
+  - Documented 8 deferred improvements with timing + effort + rationale
+  - Explained decisions to fix critical bugs (missing endpoint, ESLint errors) vs defer refactoring
+  - New section: "No Fixeado Este Sprint" with architectural debt items
+  - Section "Fixeado en Esta Sesión" summarizes all completions
+  - Files: `docs/TO_FIX.md`
+
+---
+
+**Last Updated:** 2026-08-29  
+**Session:** Dashboard & API Improvements  
+**Next Review:** After frontend refactor work starts
 
 ---
 

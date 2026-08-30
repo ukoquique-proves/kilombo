@@ -296,6 +296,69 @@ app.post('/api/commands/manage-article-status', (req, res) => {
 });
 
 // ============================================================
+// PUBLISH READY ARTICLE ENDPOINT
+// ============================================================
+
+/**
+ * POST /api/commands/publish-ready-article
+ *
+ * Publish a READY article directly to SPIP via Playwright.
+ * Moves article from READY/ to published state in SPIP.
+ *
+ * Body:
+ *   {
+ *     "slug": "article-slug",
+ *     "dryRun": false
+ *   }
+ *
+ * Returns: { jobId, startTime }
+ */
+app.post('/api/commands/publish-ready-article', (req, res) => {
+  const { slug, dryRun = false } = req.body;
+  
+  // Validation
+  if (!slug || typeof slug !== 'string' || slug.length === 0) {
+    return res.status(400).json({
+      error: 'Missing or invalid required field: slug',
+    });
+  }
+  
+  // Sanitize input
+  const sanitizedSlug = sanitizeInput(String(slug), 200);
+  if (!sanitizedSlug) {
+    return res.status(400).json({
+      error: 'Slug cannot be empty',
+    });
+  }
+  
+  // Build args for the script — spawn publish-to-actualidad.mjs
+  // (or create a dedicated publish-ready-article.mjs if needed)
+  const args = [
+    'scripts/publish-to-actualidad.mjs',
+    '--slug', sanitizedSlug,
+  ];
+  
+  if (dryRun) args.push('--dry-run');
+  
+  try {
+    const jobId = createJob('node', args, { cwd: KILOMBO_DIR });
+    const job = getJob(jobId);
+    
+    res.json({
+      jobId,
+      startTime: job.startTime,
+      message: 'Article publication job started',
+      warning: 'This will publish the article to kilombo.top',
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: 'Failed to start publish job',
+      details: err.message,
+    });
+  }
+});
+
+// ============================================================
 // AUDIT LOG ENDPOINT (read-only)
 // ============================================================
 

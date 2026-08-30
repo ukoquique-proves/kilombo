@@ -382,6 +382,83 @@
     .field-errors li {
       margin-bottom: 3px;
     }
+
+    /* Ready article cards */
+    .ready-article-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ready-article-card:hover {
+      border-color: #d32f2f;
+      box-shadow: 0 2px 8px rgba(211, 47, 47, 0.1);
+    }
+
+    .ready-article-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .ready-article-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 4px;
+    }
+
+    .ready-article-slug {
+      font-size: 12px;
+      color: #999;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    .ready-article-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    .ready-article-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ready-article-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ready-article-actions button {
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+
+    .ready-article-preview {
+      border-top: 1px solid #f0f0f0;
+      padding-top: 12px;
+      margin-top: 12px;
+      display: none;
+      font-size: 13px;
+      color: #555;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .ready-article-preview.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -1310,23 +1387,143 @@
         }
 
         container.innerHTML = `
-          <table class="simple-table">
-            <thead>
-              <tr><th>Slug</th><th>Título</th><th>Sección</th><th>Aprobado</th></tr>
-            </thead>
-            <tbody>
-              ${drafts.map((d) => `
-                <tr>
-                  <td>${escapeHtml(d.slug)}</td>
-                  <td>${escapeHtml(d.title || '')}</td>
-                  <td>${escapeHtml(d.section || '')}</td>
-                  <td>${d.approvedAt ? new Date(d.approvedAt).toLocaleString() : '—'}</td>
-                </tr>`).join('')}
-            </tbody>
-          </table>
-          <p style="color:#666; font-size: 13px; margin-top: 10px;">N = ${data.data.total} artículo(s) listo(s) para publicar a SPIP.</p>`;
+          <div style="margin-bottom: 12px; color: #666; font-size: 13px;">
+            Total: <strong>${data.data.total}</strong> artículo(s) listo(s) para publicar
+          </div>
+          ${drafts.map((d) => `
+            <div class="ready-article-card" id="ready-card-${escapeHtml(d.slug)}">
+              <div class="ready-article-header">
+                <div>
+                  <div class="ready-article-title">${escapeHtml(d.title || '(Sin título)')}</div>
+                  <div class="ready-article-slug">📄 ${escapeHtml(d.slug)}</div>
+                </div>
+                <button type="button" class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleReadyArticlePreview(event, '${escapeHtml(d.slug)}')">👁️</button>
+              </div>
+              
+              <div class="ready-article-meta">
+                <span>📋 ${escapeHtml(d.section || '—')}</span>
+                <span>📅 ${d.approvedAt ? new Date(d.approvedAt).toLocaleString() : '—'}</span>
+                ${d.topics && Array.isArray(d.topics) && d.topics.length > 0 ? `<span>🏷️ ${escapeHtml(d.topics.join(', '))}</span>` : ''}
+              </div>
+              
+              <div class="ready-article-actions">
+                <button type="button" class="btn-secondary" onclick="editReadyArticle('${escapeHtml(d.slug)}')">✏️ Editar</button>
+                <button type="button" class="btn-secondary" onclick="moveBackToDraft('${escapeHtml(d.slug)}')">↩️ Devolver a Borrador</button>
+                <button type="button" onclick="publishReadyArticle('${escapeHtml(d.slug)}')">📤 Publicar Ahora</button>
+              </div>
+
+              <div class="ready-article-preview" id="ready-preview-${escapeHtml(d.slug)}">
+                <div class="spinner"></div> Cargando preview...
+              </div>
+            </div>
+          `).join('')}`;
       } catch (err) {
         container.innerHTML = `<div class="alert error">${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    // Toggle preview for a READY article
+    async function toggleReadyArticlePreview(event, slug) {
+      event.stopPropagation();
+      const previewEl = document.getElementById(`ready-preview-${CSS.escape(slug)}`);
+      if (!previewEl) return;
+
+      if (previewEl.classList.contains('active')) {
+        previewEl.classList.remove('active');
+        return;
+      }
+
+      previewEl.classList.add('active');
+      if (previewEl.innerHTML.includes('Cargando preview')) {
+        previewEl.innerHTML = '<div class="spinner"></div> Cargando preview...';
+        
+        try {
+          const res = await apiFetch(`${API_BASE}/ready-drafts/${encodeURIComponent(slug)}`);
+          const data = await res.json();
+
+          if (res.ok && data.ok) {
+            const { draft, previewHtml } = data.data;
+            previewEl.innerHTML = previewHtml || '(Sin contenido)';
+          } else {
+            previewEl.innerHTML = `<div class="alert error">Error: ${escapeHtml(data.error || res.statusText)}</div>`;
+          }
+        } catch (err) {
+          previewEl.innerHTML = `<div class="alert error">Error de red: ${escapeHtml(err.message)}</div>`;
+        }
+      }
+    }
+
+    // Edit a READY article (move back to IN_PROGRESS for editing)
+    async function editReadyArticle(slug) {
+      const confirmed = confirm(`¿Mover "${slug}" de vuelta a Borrador para editarlo?\n\nSeráMovido a: articulos_en_trabajo/IN_PROGRESS/${slug}.json`);
+      if (!confirmed) return;
+
+      const card = document.getElementById(`ready-card-${CSS.escape(slug)}`);
+      if (card) card.innerHTML = '<div class="spinner"></div> Moviendo a borrador...';
+
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'in_progress' }),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+          showAlert(`✅ Artículo "${slug}" movido a borrador. Ya puedes editarlo en la pestaña "🆕 Nuevo Artículo".`, 'success');
+          setTimeout(() => {
+            refreshReadyDrafts();
+            sessionStorage.setItem('currentDraftSlug', slug);
+            switchTab(null, 'new-article');
+          }, 800);
+          return;
+        }
+
+        if (card) {
+          card.innerHTML = `<div class="alert error">Error: ${escapeHtml(data.error || res.statusText)}</div>`;
+        }
+      } catch (err) {
+        if (card) {
+          card.innerHTML = `<div class="alert error">Error de red: ${escapeHtml(err.message)}</div>`;
+        }
+      }
+    }
+
+    // Move READY article back to IN_PROGRESS (same as edit)
+    async function moveBackToDraft(slug) {
+      editReadyArticle(slug);
+    }
+
+    // Publish READY article directly (placeholder — actual SPIP publishing handled separately)
+    async function publishReadyArticle(slug) {
+      const confirmed = confirm(`¿Publicar "${slug}" directamente en kilombo.top?\n\nEsto iniciará el proceso de Playwright para enviar a SPIP.`);
+      if (!confirmed) return;
+
+      const card = document.getElementById(`ready-card-${CSS.escape(slug)}`);
+      if (card) card.innerHTML = '<div class="spinner"></div> Publicando...';
+
+      try {
+        const res = await apiFetch(`${API_BASE}/commands/publish-ready-article`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug }),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+          showAlert(`✅ Trabajo de publicación iniciado: ${data.jobId}`, 'success');
+          displayJobStatus(data.jobId, 'ready-drafts-list');
+          setTimeout(() => refreshReadyDrafts(), 3000);
+          return;
+        }
+
+        if (card) {
+          card.innerHTML = `<div class="alert error">Error: ${escapeHtml(data.error || res.statusText)}</div>`;
+        }
+      } catch (err) {
+        if (card) {
+          card.innerHTML = `<div class="alert error">Error de red: ${escapeHtml(err.message)}</div>`;
+        }
       }
     }
 

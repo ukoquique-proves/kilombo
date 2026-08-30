@@ -18,31 +18,11 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { BASE_URL, loadEnv, getScopedPassword, login } from './lib/spip-session.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const USERNAME = 'kilombo';
-const BASE_URL = 'https://www.kilombo.top';
 const CONFIG_URL = `${BASE_URL}/ecrire/?exec=configurer_escal`;
 const ENV_PATH = path.join(__dirname, '..', '.env');
-
-function loadEnv() {
-  const envContent = fs.readFileSync(ENV_PATH, 'utf8');
-  const vars = {};
-  envContent.split('\n').forEach((line) => {
-    const match = line.match(/^([A-Z_]+)=(.+)$/);
-    if (match) {
-      let value = match[2].trim();
-      if (
-        (value.startsWith("'") && value.endsWith("'")) ||
-        (value.startsWith('"') && value.endsWith('"'))
-      ) {
-        value = value.slice(1, -1);
-      }
-      vars[match[1]] = value;
-    }
-  });
-  return vars;
-}
 
 /**
  * KILO-002 Credential Scoping (Phase 1 Minimal Viable Mitigation)
@@ -56,22 +36,6 @@ function loadEnv() {
  *
  * See: docs/RISK-REGISTER.json KILO-002 and docs/UI-ARCHITECTURE-SPEC.md Section III
  */
-function getThemeEditPassword(env) {
-  // If narrower credential exists (Phase 2+), use it
-  if (env.KILOMBOTOP_ESCAL_PASSWORD && env.KILOMBOTOP_ESCAL_PASSWORD !== 'placeholder') {
-    console.log('ℹ️  Using narrower Escal-scoped credential (KILOMBOTOP_ESCAL_PASSWORD)');
-    return env.KILOMBOTOP_ESCAL_PASSWORD;
-  }
-
-  // Otherwise, fall back to full admin credential (Phase 1 / current behavior)
-  // This maintains backward compatibility while supporting future isolation
-  console.log(
-    'ℹ️  Using full admin credential (KILOMBOTOP_PASSWORD) — narrower Escal credential not configured'
-  );
-  console.log('    See RISK-REGISTER.json KILO-002 for credential scoping roadmap');
-  return env.KILOMBOTOP_PASSWORD || env.KILOMBOTOP_FUTURE_PASSWORD;
-}
-
 function parseArgs(argv) {
   const args = { verbose: false, export: null };
   for (let i = 0; i < argv.length; i++) {
@@ -80,38 +44,6 @@ function parseArgs(argv) {
     else if (a === '--export') args.export = argv[++i];
   }
   return args;
-}
-
-async function login(page, password) {
-  console.log('🔐 Logging into SPIP...');
-  await page.goto(CONFIG_URL, { waitUntil: 'domcontentloaded' });
-
-  if (page.url().includes('page=login') || page.url().includes('exec=login')) {
-    console.log('📝 Submitting login credentials...');
-    await page.fill('input[name="login"], input[type="text"]', USERNAME);
-    await page.fill('input[name="password"], input[type="password"]', password);
-    await page.click('input[type="submit"], button[type="submit"]');
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {});
-    await page.waitForTimeout(2000);
-  }
-
-  if (page.url().includes('sso') || page.url().includes('portalapi')) {
-    console.log('🔐 YunoHost SSO detected, logging in...');
-    await page.fill(
-      'input[type="text"], input[name="credentials"], input[name="username"], input[id="loginInput"]',
-      USERNAME
-    );
-    await page.fill('input[type="password"]', password);
-    await page.click('button[type="submit"], input[type="submit"], #submit');
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {});
-    await page.waitForTimeout(2000);
-  }
-
-  if (page.url().includes('exec=login')) {
-    throw new Error('Login failed. Check KILOMBOTOP_PASSWORD in .env');
-  }
-
-  console.log('✅ Logged in successfully\n');
 }
 
 async function probeFields(page, verbose) {
@@ -222,8 +154,8 @@ async function probeFields(page, verbose) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const env = loadEnv();
-  const password = getThemeEditPassword(env);
+  const env = loadEnv(ENV_PATH);
+  const password = getScopedPassword(env, 'KILOMBOTOP_ESCAL_PASSWORD');
 
   if (!password) {
     console.error(`❌ No password found in ${ENV_PATH}`);
@@ -234,7 +166,7 @@ async function main() {
   const page = await browser.newPage();
 
   try {
-    await login(page, password);
+    await login(page, { password, targetUrl: CONFIG_URL, expectedUrlIncludes: 'exec=configurer_escal' });
     const fields = await probeFields(page, args.verbose);
 
     if (fields.length === 0) {

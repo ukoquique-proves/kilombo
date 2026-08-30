@@ -47,6 +47,7 @@ const rubriques = await page.evaluate(() => {
   return Array.from(select.options).map(o => ({
     id: o.value,
     label: o.textContent.trim().replace(/\u00a0/g, '').replace(/\s+/g, ' '),
+    // eslint-disable-next-line no-sparse-arrays
     level: (o.className.match(/niveau_(\d+)/) || [, '0'])[1],
   }));
 });

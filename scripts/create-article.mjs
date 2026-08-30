@@ -57,23 +57,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { guardedWrite } from '../scripts/lib/live-write-gateway.mjs';
+import { BASE_URL, loadEnv, getPassword, login } from './lib/spip-session.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const USERNAME = 'kilombo'; // change if your working browser session uses a different account
-const BASE_URL = 'https://www.kilombo.top';
 const EDIT_URL = `${BASE_URL}/ecrire/?exec=article_edit&new=oui`;
 const ENV_PATH = path.join(__dirname, '..', '.env'); // same relative path as scripts/debug/scrape.cjs
-
-// ---- .env loader (manual parse, same as scrape.cjs — no dotenv dependency) ----
-function loadEnv() {
-  const envContent = fs.readFileSync(ENV_PATH, 'utf8');
-  const vars = {};
-  envContent.split('\n').forEach((line) => {
-    const match = line.match(/^([A-Z_]+)=(.+)$/);
-    if (match) vars[match[1]] = match[2];
-  });
-  return vars;
-}
 
 // ---- CLI args ----
 function parseArgs(argv) {
@@ -88,51 +76,6 @@ function parseArgs(argv) {
     else if (a === '--dry-run') args.dryRun = true;
   }
   return args;
-}
-
-async function login(page, password) {
-  console.log(`Navigating to ${EDIT_URL} ...`);
-  await page.goto(EDIT_URL, { waitUntil: 'domcontentloaded' });
-
-  // SPIP has its own login form (page=login) — separate from YunoHost SSO.
-  // Fields: "Login o dirección mail" + "Contraseña" + button "Conectarse".
-  if (page.url().includes('page=login') || page.url().includes('exec=login')) {
-    console.log('Detected SPIP login page. Logging in...');
-    await page.fill('input[name="login"], input[type="text"]', USERNAME);
-    await page.fill('input[name="password"], input[type="password"]', password);
-    await page.click('input[type="submit"], button[type="submit"]');
-    // Don't wait for full networkidle — SPIP loads assets slowly
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {});
-    await page.waitForTimeout(2000); // brief pause for redirects to settle
-  }
-
-  // SSO fallback (YunoHost portal)
-  if (page.url().includes('sso') || page.url().includes('portalapi')) {
-    console.log('Detected YunoHost SSO page. Logging in...');
-    await page.fill(
-      'input[type="text"], input[name="credentials"], input[name="username"], input[id="loginInput"]',
-      USERNAME
-    );
-    await page.fill('input[type="password"]', password);
-    await page.click('button[type="submit"], input[type="submit"], #submit');
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {});
-    await page.waitForTimeout(2000);
-  }
-
-  console.log('Current URL after login:', page.url());
-
-  if (!page.url().includes('exec=article_edit')) {
-    console.log('Not on article_edit yet — re-navigating...');
-    await page.goto(EDIT_URL, { waitUntil: 'domcontentloaded' });
-  }
-
-  if (page.url().includes('exec=login') || page.url().includes('page=login')) {
-    throw new Error(
-      `Login did not reach article_edit — landed on ${page.url()} instead. ` +
-      `Check the SPIP password in .env (KILOMBOTOP_PASSWORD may be the YunoHost ` +
-      `password, not the SPIP-specific one — they can differ).`
-    );
-  }
 }
 
 async function inspectForm(page) {
@@ -327,8 +270,8 @@ async function main() {
     process.exit(1);
   }
 
-  const env = loadEnv();
-  const password = env.KILOMBOTOP_PASSWORD || env.KILOMBOTOP_FUTURE_PASSWORD;
+  const env = loadEnv(ENV_PATH);
+  const password = getPassword(env);
   if (!password) {
     console.error(`❌ No password found in ${ENV_PATH}`);
     process.exit(1);
@@ -339,7 +282,7 @@ async function main() {
   const page = await browser.newPage();
 
   try {
-    await login(page, password);
+    await login(page, { password, targetUrl: EDIT_URL, expectedUrlIncludes: 'exec=article_edit' });
 
     if (args.mode === 'inspect') {
       await inspectForm(page);

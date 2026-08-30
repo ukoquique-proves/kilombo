@@ -101,8 +101,11 @@ Initial HTML inspection suggested labels were hardcoded in theme templates. This
 
 Use the script: `scripts/customize-escal-theme.mjs`
 
+**Note:** `<field-name>` below is a placeholder. No field name for these labels has actually been confirmed against the live site yet — run `scripts/probe-escal-fields.mjs --export escal-fields.json` first (see `docs/THEME-CUSTOMIZATION.md`) to get a real field name before using this.
+
 ```bash
-node scripts/customize-escal-theme.mjs --change "Los últimos artículos" --to "Custom Label"
+node scripts/customize-escal-theme.mjs --field <field-name> --value "Custom Label" --dry-run
+node scripts/customize-escal-theme.mjs --field <field-name> --value "Custom Label"
 ```
 
 See `docs/THEME-CUSTOMIZATION.md` for full documentation and advanced options.
@@ -147,7 +150,7 @@ See `docs/THEME-CUSTOMIZATION.md` for full documentation and advanced options.
 2. **Automated implementation:**
    - Use `scripts/customize-escal-theme.mjs` to programmatically modify labels
    - See `docs/THEME-CUSTOMIZATION.md` for full scripting guide
-   - Run: `npm run customize-theme -- [options]`
+   - Run directly with `node`: `node scripts/customize-escal-theme.mjs --field <name> --value "<text>" [--dry-run]` (there is no `npm run customize-theme` script — this was a documentation error)
 
 ---
 

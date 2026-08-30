@@ -39,6 +39,18 @@ export default [
     rules,
   },
   {
+    files: ['scripts/debug/**/*.{mjs,cjs}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { ...globals.node },
+    },
+    rules: {
+      ...rules,
+      'no-console': 'warn', // Debug scripts are verbose, console is OK
+    },
+  },
+  {
     files: ['api/**/*.{js,mjs}'],
     languageOptions: {
       ecmaVersion: 'latest',
@@ -51,10 +63,13 @@ export default [
     // Playwright evaluate callbacks run in browser context, not Node
     // These files contain page.evaluate(() => { ... }) which runs in the browser
     files: [
+      'scripts/create-article.mjs',
       'scripts/customize-escal-theme.mjs',
       'scripts/probe-escal-fields.mjs',
+      'scripts/probe-rubriques.mjs',
       'scripts/manage-article-status.mjs',
       'scripts/list-draft-articles.mjs',
+      'scripts/debug/**/*.mjs',
     ],
     languageOptions: {
       ecmaVersion: 'latest',
