@@ -128,7 +128,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     - ⏳ **Phase 4 (READY):** Run `npm run probe-escal-fields -- --export escal-fields.json` to discover real field names on live site (read-only, low risk)
     - ⏳ **Phase 5 (READY):** Test with discovered field: `npm run customize-theme -- --field <NAME> --value "Test" --dry-run`
     - ⏳ **Phase 6 (DEFERRED):** Only after phases 4–5 succeed: first live write to production Escal theme
-  - **Related:** See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` and `/root/JOB/KLIMBO/KLIMBO-BUILD/TO_FIX-76-68-implementation-plan.md`
+  - **Related:** See `docs/SPIP-THEME-MANAGEMENT-FINDINGS.md` and `/root/JOB/KILOMBO/KILOMBO-BUILD/TO_FIX-76-68-implementation-plan.md`
 
 - [x] **68. Gestión de create/edit/delete en kilombo.top desde el agente — arquitectura y por qué hace falta código dedicado** — ✅ PARTIALLY RESOLVED (spip-session module refactor, v0.54.0)
   - **✅ COMPLETED (2026-08-29):** `scripts/lib/spip-session.mjs` created (144 lines) with shared login/session logic
