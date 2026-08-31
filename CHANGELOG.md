@@ -5,6 +5,93 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ---
 
+## [0.54.10] — Dead Route Elimination: commands.mjs wired up (August 31, 2026)
+
+### FIX: Removed inline duplicates of manage-article-status and publish-ready-article
+
+**Status:** ✅ Complete · Correctness fix · Zero behavioral changes
+
+`api/routes/commands.mjs` existed with full implementations of `manage-article-status` and `publish-ready-article` but was never imported or mounted — `server.mjs` had hand-copied inline versions instead. Nothing enforced that the two stayed in sync; the next edit to one would silently diverge from the other.
+
+#### What was changed
+
+- **Wired up `createCommandsRouter`** in `server.mjs` — imported and mounted at `/api/commands` after the `create-article` specific mount
+- **Deleted 120 lines** of inline `manage-article-status` and `publish-ready-article` handlers from `server.mjs`
+- **Stripped `create-article` handler** from `commands.mjs` — it is handled by its own dedicated router (`api/routes/create-article.mjs`) mounted at the exact path first; having a second handler in `commandsRouter` was redundant
+- **Cleaned unused imports** from both files: `VALID_SECTIONS`, `isValidSection`, `slugToRubriquId` removed from `server.mjs`; same from `commands.mjs` factory signature
+
+**Route order (intentional):**
+```
+app.use('/api/commands/create-article', createCreateArticleRouter(...))  // exact match first
+app.use('/api/commands', commandsRouter)                                  // broader mount second
+```
+Express matches in registration order — `create-article` requests never reach `commandsRouter`.
+
+**Files Changed**
+- `api/server.mjs` — removed inline duplicates, added import + mount of `createCommandsRouter`
+- `api/routes/commands.mjs` — removed `create-article` handler, trimmed factory signature and JSDoc
+
+---
+
+## [0.54.9] — apply-suggestion: detect text mismatch instead of silent no-op (August 31, 2026)
+
+### FIX: POST /api/drafts/:slug/apply-suggestion returns 422 on text mismatch
+
+**Status:** ✅ Complete · Security/correctness fix
+
+`apply-suggestion` used `String.replace()` to patch `contentHtml`, which returns the string unchanged on no-match rather than throwing. A failed substitution was indistinguishable from a successful one: `200 OK`, dashboard showed "✅ Applied!", nothing actually changed.
+
+#### Root cause
+
+The AI's `suggestion.original` comes from a whitespace-collapsed, HTML-stripped view of the article (see `buildImprovePrompt` in `ai-improve-service.mjs`). It is not guaranteed to appear verbatim in the stored `contentHtml` — tags, newlines, and entity encoding differ.
+
+#### Fix
+
+Added guard before `.replace()` call:
+
+```js
+if (suggestion.original && !current.includes(suggestion.original)) {
+  return res.status(422).json({
+    ok: false,
+    error: 'Could not locate the suggested original text verbatim in the current draft ...',
+    code: 'SUGGESTION_TEXT_MISMATCH',
+  });
+}
+```
+
+**Before:** Silent no-op — `200 OK`, content unchanged, user sees false success  
+**After:** `422 SUGGESTION_TEXT_MISMATCH` — clear error explaining why the patch failed
+
+Note: this fix detects the mismatch; the deeper fix (reconciling AI text with stored HTML) is tracked in TO_FIX.
+
+**Files Changed**
+- `api/server.mjs` — added `SUGGESTION_TEXT_MISMATCH` guard in `apply-suggestion` handler
+
+---
+
+## [0.54.8] — API route extraction Step 3d: create-article router + command-job-runner (August 31, 2026)
+
+### IMPROVEMENT: Extracted create-article endpoint and shared job helper
+
+**Status:** ✅ Complete · Code organization · Zero behavioral changes
+
+Continued TO_FIX #80 router extraction work.
+
+#### What was changed
+
+1. **`api/lib/command-job-runner.mjs`** (new) — extracted `startCommandJob()` helper that was previously a module-scoped closure in `server.mjs`. Now takes `cwd` explicitly instead of closing over `KILOMBO_DIR`, making it independently testable and reusable.
+
+2. **`api/routes/create-article.mjs`** (new) — extracted `POST /api/commands/create-article` to its own router factory. Takes `{ cwd }` as dependency; handles section validation, input sanitization, `slugToRubriquId` translation, and job spawning.
+
+3. **`api/server.mjs`** — removed: `createJob`/`getJob` imports, `slugToRubriquId` import, `VALID_SECTIONS`/`isValidSection` imports (moved to route file). Added: `createCreateArticleRouter`, `startCommandJob` imports.
+
+**Files Changed**
+- `api/lib/command-job-runner.mjs` — NEW
+- `api/routes/create-article.mjs` — NEW
+- `api/server.mjs` — updated imports, removed inline create-article logic
+
+---
+
 ## [0.54.3] — Dashboard UX Improvement: Remove Confirmation Dialogs (August 30, 2026)
 
 ### IMPROVEMENT: Removed Confirmation Dialogs from Ready-Draft Actions (August 30, 2026)
