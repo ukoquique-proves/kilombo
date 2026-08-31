@@ -19,6 +19,8 @@ import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+import net from 'net';
+import http from 'http';
 import { createAuditLogger } from './lib/audit-logger.mjs';
 import { createRequireSharedSecret } from './lib/auth.mjs';
 import { sanitizeInput } from './lib/util/sanitize-input.mjs';
@@ -41,6 +43,35 @@ import {
   revertDraft,
 } from '../scripts/lib/drafts-store.mjs';
 import { reduceToAllowlist } from '../scripts/import-article.mjs';
+
+function isPortInUse(port) {
+  return new Promise((resolve) => {
+    const probe = net.createServer();
+    probe.once('error', (err) => {
+      if (err.code === 'EADDRINUSE') resolve(true);
+      else resolve(false);
+    });
+    probe.once('listening', () => {
+      probe.close();
+      resolve(false);
+    });
+    probe.listen(port, '127.0.0.1');
+  });
+}
+
+function healthCheckDashboard(port, timeoutMs = 2000) {
+  return new Promise((resolve) => {
+    const req = http.get(`http://127.0.0.1:${port}/api/health`, { timeout: timeoutMs }, (res) => {
+      resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, statusCode: res.statusCode });
+      res.resume();
+    });
+    req.on('error', () => resolve({ ok: false, statusCode: 0 }));
+    req.on('timeout', () => {
+      req.destroy();
+      resolve({ ok: false, statusCode: 0, timedOut: true });
+    });
+  });
+}
 
 // Get __dirname equivalent for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -529,6 +560,24 @@ app.post('/api/drafts/:slug/apply-suggestion', requireSharedSecret, async (req, 
     }
 
     const current = result.contentHtml ?? '';
+
+    // suggestion.original comes from the AI's view of the article, which is
+    // HTML-stripped and whitespace-collapsed (see buildImprovePrompt in
+    // ai-improve-service.mjs) — it is NOT guaranteed to appear verbatim in
+    // the real contentHtml (tags/newlines differ). String.replace() fails
+    // silently (returns the string unchanged) rather than throwing, so
+    // without this check a failed match would look identical to a real
+    // save: 200 OK, nothing actually changed. See docs/TO_FIX.md for the
+    // deeper fix (the mismatch itself, not just detecting it).
+    if (suggestion.original && !current.includes(suggestion.original)) {
+      return res.status(422).json({
+        ok: false,
+        error:
+          'Could not locate the suggested original text verbatim in the current draft — the AI\'s quoted snippet does not match the stored content exactly (often due to HTML/whitespace differences), so nothing was changed.',
+        code: 'SUGGESTION_TEXT_MISMATCH',
+      });
+    }
+
     const updated = suggestion.original
       ? current.replace(suggestion.original, suggestion.proposed)
       : current + `\n<p>${suggestion.proposed}</p>`;
@@ -623,14 +672,33 @@ app.use((err, req, res, next) => {
 export default app;
 
 if (process.env.NODE_ENV !== 'test') {
-  // Fail loud at startup if secret is not configured
-  if (!SHARED_SECRET) {
-    console.error('\nFATAL: KILO_SHARED_SECRET is not set. Refusing to start.\n\nSet KILO_SHARED_SECRET in .env or environment and restart.\n');
-    process.exit(1);
-  }
+  (async function startServer() {
+    if (!SHARED_SECRET) {
+      console.error('\nFATAL: KILO_SHARED_SECRET is not set. Refusing to start.\n\nSet KILO_SHARED_SECRET in .env or environment and restart.\n');
+      process.exit(1);
+    }
 
-  app.listen(PORT, () => {
-    console.log(`
+    const portInUse = await isPortInUse(PORT);
+    if (portInUse) {
+      const health = await healthCheckDashboard(PORT);
+      if (health.ok) {
+        console.log(`
+╔════════════════════════════════════════════════════════════╗
+║  KILOMBO Management Dashboard                              ║
+║  ℹ️  Already running on http://localhost:${PORT}           ║
+║                                                            ║
+║  Frontend: http://localhost:${PORT}/dashboard.html        ║
+╚════════════════════════════════════════════════════════════╝
+`);
+        process.exit(0);
+      } else {
+        console.error(`\nFATAL: Port ${PORT} is already in use by another process.\n\nKill the process occupying port ${PORT} first, or set a different PORT in your environment.\n`);
+        process.exit(1);
+      }
+    }
+
+    app.listen(PORT, () => {
+      console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║  KILOMBO Management Dashboard — Phase 2 Drafts UI          ║
 ║  ✅ Server running on http://localhost:${PORT}             ║
@@ -660,6 +728,17 @@ if (process.env.NODE_ENV !== 'test') {
 ║  - All operations audit-logged                             ║
 ║  - Credentials isolated (not exposed to frontend)          ║
 ╚════════════════════════════════════════════════════════════╝
-    `);
+      `);
+    }).on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`\nFATAL: Port ${PORT} is in use (race condition). Please retry or free the port.\n`);
+      } else {
+        console.error('[FATAL] Server error:', err);
+      }
+      process.exit(1);
+    });
+  })().catch((err) => {
+    console.error('[FATAL] Startup failed:', err);
+    process.exit(1);
   });
 }
