@@ -199,6 +199,27 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - **Commit:** f85f2d2 — "fix: Distinguish 'Editar' (in-place) from 'Devolver a Borrador' button behaviors"
   - **UX improvement:** Users now have two distinct workflows: quick edits (Editar) vs. full rework (Devolver a Borrador)
 
+- [ ] **82. Rate limiting on `requireSharedSecret` — brute-force protection (SECURITY)**
+
+  **Problem:** `requireSharedSecret` uses timing-safe comparison (prevents side-channel leaks) and logs failed attempts, but never throttles or bans. If the dashboard is ever reachable outside localhost, an attacker can brute-force `KILO_SHARED_SECRET` at whatever rate the network allows.
+
+  **Why the audit log doesn't help:** Failed attempts are logged (`auth_failed` events with IP, UA, timestamp), but the log itself is behind the same secret — it can't block an ongoing attack in real time.
+
+  **Fix:** Add `express-rate-limit` middleware on `/api/drafts/*` and `/api/commands/*`:
+  - Per-IP: 5 failed attempts → 15-min ban (even before a valid secret is tried)
+  - Global circuit breaker: >50 failed attempts / hour across all IPs
+  - Localhost (127.0.0.1) exempted — no limit when running locally
+  - Each rate-limit event logged as separate `auth_rate_limited` audit entry
+
+  **Implementation plan:**
+  1. `npm install express-rate-limit` (pin exact version)
+  2. Create `api/lib/rate-limiter.mjs` — factory function, configurable via env vars
+  3. Mount before `requireSharedSecret` in `api/server.mjs`
+  4. Add `RATE_LIMIT_WINDOW_MS` (default 900000) and `RATE_LIMIT_MAX_ATTEMPTS` (default 5) to `.env.example`
+  5. Tests in `test/rate-limiter.test.mjs` — mock clock, per-IP, global limits
+
+  **Priority:** Medium — not exploitable while dashboard stays localhost-only, but essential before any external exposure. Effort: ~2–3 hours.
+
 - [ ] **23. Cambiar `KILOMBOTOP_PASSWORD` por `KILOMBOTOP_FUTURE_PASSWORD` en `.env`**
   - En cuanto el cliente confirme que el nuevo password está activo en el servidor, ejecutar:
     1. Copiar el valor de `KILOMBOTOP_FUTURE_PASSWORD` a `KILOMBOTOP_PASSWORD` en `.env`
@@ -370,42 +391,50 @@ Auditoría activa del proyecto. Solo problemas abiertos.
       1. ✅ `GET /api/health` + `GET /api/env-status` extraído a `api/routes/status.mjs`
       2. ✅ `GET /api/jobs/:jobId/status` + `GET /api/jobs` extraídos a `api/routes/jobs.mjs`
       3. ✅ `GET /api/audit-log` extraído a `api/routes/audit-log.mjs` con factory function
-    - ✅ **v0.54.6-8:** Paso 4 parcialmente completado:
-      4. ✅ `POST /api/commands/create-article` extraído a `api/routes/create-article.mjs`
-      5. ❌ `POST /api/commands/manage-article-status` SIGUE INLINE (65 líneas)
-      6. ❌ `POST /api/commands/publish-ready-article` SIGUE INLINE (60 líneas)
-      7. ❌ `GET /api/drafts` SIGUE INLINE (34 líneas)
-      8. ❌ `POST /api/drafts` SIGUE INLINE (23 líneas)
-      9. ❌ `GET /api/ready-drafts` SIGUE INLINE (19 líneas)
-      10. ❌ `GET /api/ready-drafts/:slug` SIGUE INLINE (43 líneas)
-      11. ❌ `GET /api/drafts/:slug` SIGUE INLINE (29 líneas)
-      12. ❌ `PUT /api/drafts/:slug` SIGUE INLINE (29 líneas)
-      13. ❌ `POST /api/drafts/:slug/approve` SIGUE INLINE (20 líneas)
-      14. ❌ `POST /api/drafts/:slug/revert` SIGUE INLINE (20 líneas)
-      15. ❌ `POST /api/drafts/:slug/improve` SIGUE INLINE (53 líneas)
-      16. ❌ `POST /api/drafts/:slug/apply-suggestion` SIGUE INLINE (90 líneas, pacheado en v0.54.9 con SUGGESTION_TEXT_MISMATCH fix)
+    - ✅ **v0.54.6-8:** Paso 4 (Commands) parcialmente completado:
+      - ✅ `POST /api/commands/create-article` extraído a `api/routes/create-article.mjs`
+      - ❌ `POST /api/commands/manage-article-status` SIGUE INLINE (65 líneas)
+      - ❌ `POST /api/commands/publish-ready-article` SIGUE INLINE (60 líneas)
+    - ❌ **Paso 5 (Drafts) PENDIENTE — 6 endpoints INLINE:**
+      - ❌ `POST /api/drafts` (23 líneas)
+      - ❌ `GET /api/drafts` (34 líneas)
+      - ❌ `GET /api/drafts/:slug` (29 líneas)
+      - ❌ `PUT /api/drafts/:slug` (29 líneas)
+      - ❌ `POST /api/drafts/:slug/approve` (20 líneas)
+      - ❌ `POST /api/drafts/:slug/revert` (20 líneas)
+      - ❌ `GET /api/ready-drafts` (19 líneas)
+      - ❌ `GET /api/ready-drafts/:slug` (43 líneas)
+    - ❌ **Paso 6 (AI) PENDIENTE — 2 endpoints INLINE:**
+      - ❌ `POST /api/drafts/:slug/improve` (53 líneas)
+      - ❌ `POST /api/drafts/:slug/apply-suggestion` (90 líneas, pacheado en v0.54.9 con SUGGESTION_TEXT_MISMATCH fix)
     - **Net reduction:** ~350 líneas extraídas. Quedan **12 endpoints inline** (~600 líneas de lógica)
 
   **Estado REAL (auditoría 2026-08-31):**
+    - Paso 1–3: ✅ COMPLETADO (3 routers: status, jobs, audit-log)
+    - Paso 4: 🟡 PARCIAL (1 de 3 commands extraído: create-article; 2 aún inline: manage-article-status, publish-ready-article)
+    - Paso 5: ❌ TODO (Drafts: 0 de 8 extraídos)
+    - Paso 6: ❌ TODO (AI: 0 de 2 extraídos)
     - Routers montados: 4 (`status.mjs`, `jobs.mjs`, `audit-log.mjs`, `create-article.mjs`)
-    - **Endpoints aún INLINE:** 12 (todos los drafts, improve, apply-suggestion, manage-article-status, publish-ready-article)
-    - **Archivos de routers faltantes:** `api/routes/drafts.mjs`, `api/routes/commands.mjs`
+    - Routers faltantes: `api/routes/commands.mjs` (para manage-article-status + publish-ready-article), `api/routes/drafts.mjs`, `api/routes/ai.mjs`
 
   **Por qué se marcó como COMPLETADO siendo parcial:**
-    - Confusión en la documentación: se describieron pasos 5-6 como "supposed to be done" pero se checkeó [x] sin verificar que los 12 endpoints de drafts/IA siguiesen inline
+    - Confusión en la documentación: se describieron pasos como "done" pero se checkeó [x] sin verificar que 12 endpoints siguiesen inline
     - Los 12 endpoints están en `api/server.mjs` líneas 132–617
 
   **Acción pendiente — Paso 5 (Drafts routers):**
-    - Extraer todos `/api/drafts` a `api/routes/drafts.mjs` (factory + mount)
-    - Endpoints: POST/GET/PUT `/api/drafts`, GET `/api/drafts/:slug`, POST `/api/drafts/:slug/approve`, POST `/api/drafts/:slug/revert`, GET `/api/ready-drafts`, GET `/api/ready-drafts/:slug`
+    - Extraer todos `/api/drafts*` a `api/routes/drafts.mjs` (factory + mount)
+    - 8 endpoints totales (6 GET/POST/PUT en `/api/drafts`, 2 en `/api/ready-drafts`)
     - Effort: 1–2 hours
 
   **Acción pendiente — Paso 6 (Commands completo):**
-    - Extraer `/api/commands/manage-article-status` y `publish-ready-article` (create-article ya está)
+    - Extraer `/api/commands/manage-article-status` y `publish-ready-article` a `api/routes/commands.mjs`
+    - Note: `create-article` ya está en su propio router `api/routes/create-article.mjs`
+    - 2 endpoints totales
     - Effort: 1 hour
 
   **Acción pendiente — Paso 7 (AI routers):**
     - Extraer `/api/drafts/:slug/improve` y `apply-suggestion` a `api/routes/ai.mjs`
+    - 2 endpoints totales
     - Effort: 1 hour
 
   **Regresiones encontradas y resueltas:**
