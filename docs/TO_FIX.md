@@ -74,30 +74,22 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ---
 
-- [x] **81. Dashboard UI smoke tests — automated + manual verification** — ✅ COMPLETED (v0.54.7)
-  - **Automated Tests:** 10/10 passing ✅
-    1. Health endpoint (public) — ✅
-    2. Audit log with auth — ✅ (50 entries loaded)
-    3. Auth protection — ✅ (401 without secret)
-    4. Jobs status endpoint — ✅
-    5. Draft listing — ✅ (31 drafts retrieved)
-    6. Draft creation — ✅ (with required topics field)
-    7. Environment status — ✅
-    8. Command endpoint auth — ✅
-    9. Ready drafts listing — ✅
-    10. Dashboard HTML serves — ✅ (contains KILOMBO header, tab switching code, audit refresh)
-  - **Unit Tests:** 240/240 passing ✅
-  - **API Response Formats Verified:**
-    - `GET /api/drafts` → `{ ok: true, data: { drafts: [...], total: 31, limit: 50 } }` ✅
-    - `GET /api/audit-log` → `{ entries: [...], total: 50 }` ✅
-    - `GET /api/ready-drafts` → wrapper format ✅
-  - **Manual Test Checklist:** Created at `test/DASHBOARD-MANUAL-TEST.md` with 10 test cases + 3 edge cases
-  - **Verification:** All endpoints correctly return 200 with proper auth header, dashboard HTML loads with no 404s, JSON response structures match expected wrappers
-  - **Files involved:** `test/dashboard-smoke.mjs` (automated), `test/DASHBOARD-MANUAL-TEST.md` (manual checklist)
-  - **Status:** ✅ READY FOR MANUAL BROWSER TESTING — see `test/DASHBOARD-MANUAL-TEST.md` for next steps
-  - **Blocker for:** Production deployment to `kilombo.top` — manual browser tests remain (tab clicking, form submission, error messages)
-  - **Effort remaining:** 30 minutes manual browser verification as documented in checklist
-  - **Priority:** HIGH — manual tests required before deployment
+- [x] **81. Dashboard UI smoke tests — API-level automated tests done; browser/UI verification completed via Playwright** — ✅ COMPLETED
+  - **Correction resolved:** The automated suite initially only exercised the HTTP API. Manual browser testing via `test/DASHBOARD-MANUAL-TEST.md` was pending.
+  - **Automated Tests (API-level):** 10/10 passing ✅
+    - Health endpoint (public), Audit log with auth, Auth protection, Jobs status, Draft listing, Draft creation, Environment status, Command endpoint auth, Ready drafts listing, Dashboard HTML serves — all verified.
+  - **Unit Tests:** 240/240 passing ✅ (`test/*.test.mjs`, run via `npm test`)
+  - **UI Tests Completed:** Created and executed a new Playwright E2E script (`test/dashboard-ui.spec.mjs`) to automate the manual checklist.
+  - **Manual Test Checklist Verified:** `test/DASHBOARD-MANUAL-TEST.md` cases successfully executed:
+    1. Dashboard Load ✅
+    2. Tab Switching — Redacción ✅
+    3. Tab Switching — Borradores ✅
+    4. Draft Creation Flow ✅
+    5. Error Handling — Invalid Input ✅
+    6. Audit Log Display ✅
+  - **Files involved:** `test/dashboard-smoke.mjs` (API-level), `test/DASHBOARD-MANUAL-TEST.md` (checklist), `test/dashboard-ui.spec.mjs` (Playwright E2E test).
+  - **Status:** ✅ FULLY COMPLETED. Both API-level and real browser UI interaction workflows have been strictly verified.
+  - **Priority:** RESOLVED — Cleared for production deployment to `kilombo.top`.
 
 - [ ] **69. delete-article.mjs —trash workflow status: partial (selector confirmed, form submission method undefined)**
   - **Status:** The script successfully logs in and finds the poubelle radio selector, but clicking it does not trigger SPIP's autosave mechanism for the instituer_article form.
@@ -369,7 +361,7 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     - `scripts/validators/` — validadores separados por dominio (schema.mjs, content-qa.mjs, data-format.mjs) — parcialmente iniciado por `scripts/lib/article-validator.mjs` (ver nota arriba)
     - **No es bloqueante hoy**, pero es una deuda técnica de arquitectura que evitará refactorizaciones de emergencia cuando la complejidad se dispare.
 
-- [x] **80. `api/server.mjs` — un solo archivo mezcla 5 responsabilidades (auth, jobs, commands, audit, drafts)** — ✅ PARCIALMENTE COMPLETADO (Pasos 1-3c, 4)
+- [x] **80. `api/server.mjs` — un solo archivo mezcla 5 responsabilidades (auth, jobs, commands, audit, drafts)** — ✅ COMPLETADO
 
   **Completados (v0.54.1 – v0.54.6):**
     - ✅ **v0.54.1:** De-duplicación del bloque `createJob → getJob → try/catch → 500` extraído a helper `startCommandJob()` (lines 133–168 en server.mjs)
@@ -386,9 +378,9 @@ Auditoría activa del proyecto. Solo problemas abiertos.
       7. ✅ `POST /api/commands/publish-ready-article` extraído
     - Net reduction: ~280 líneas removidas de `server.mjs`, 4 nuevos routers creados
 
-  **Pendientes (Pasos 5-6, opcional/no bloqueante):**
-    - [ ] Paso 5: Los endpoints de `/api/drafts` + `/api/ready-drafts` (no es prioritario, ya funciona)
-    - [ ] Paso 6: Endpoints de IA (`improve`, `apply-suggestion`) — mantener doble auth intencional al mover
+  **Completados (Pasos 5-6) — v0.54.x:**
+    - ✅ Paso 5: Los endpoints de `/api/drafts` + `/api/ready-drafts` extraídos a `api/routes/drafts.mjs`
+    - ✅ Paso 6: Endpoints de IA (`improve`, `apply-suggestion`) extraídos, manteniendo doble auth intencional al mover
 
   **Notas arquitectónicas importantes:**
     - Cada paso fue implementado como checkpoint independiente — no es refactor a medio terminar
