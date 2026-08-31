@@ -470,25 +470,25 @@
     
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab-button active" onclick="switchTab(event, 'new-article')">
+      <button class="tab-button active" data-tab="new-article">
         🆕 Nuevo Artículo
       </button>
-      <button class="tab-button" onclick="switchTab(event, 'ready-drafts')">
+      <button class="tab-button" data-tab="ready-drafts">
         📬 Listos para Publicar
       </button>
-      <button class="tab-button" onclick="switchTab(event, 'create-article')">
+      <button class="tab-button" data-tab="create-article">
         📤 Publicación Directa
       </button>
-      <button class="tab-button" onclick="switchTab(event, 'manage-status')">
+      <button class="tab-button" data-tab="manage-status">
         🔄 Cambiar Estado
       </button>
-      <button class="tab-button" onclick="switchTab(event, 'jobs')">
+      <button class="tab-button" data-tab="jobs">
         ⏱️  Trabajos Recientes
       </button>
-      <button class="tab-button" onclick="switchTab(event, 'audit')">
+      <button class="tab-button" data-tab="audit">
         📋 Auditoría
       </button>
-      <button class="tab-button" onclick="switchTab(event, 'status')">
+      <button class="tab-button" data-tab="status">
         ℹ️ Estado del Sistema
       </button>
     </div>
@@ -497,13 +497,13 @@
     <div id="new-article" class="tab-content active">
       <div class="card">
         <div class="subtabs">
-          <button class="subtab-button active" onclick="switchSubtab(event, 'subtab-write')">
+          <button class="subtab-button active" data-subtab="subtab-write">
             ✍️ Redacción
           </button>
-          <button class="subtab-button" onclick="switchSubtab(event, 'subtab-preview')">
+          <button class="subtab-button" data-subtab="subtab-preview">
             👁️ Preview
           </button>
-          <button class="subtab-button" onclick="switchSubtab(event, 'subtab-ai')">
+          <button class="subtab-button" data-subtab="subtab-ai">
             ✨ Mejorar con IA
           </button>
         </div>
@@ -756,14 +756,14 @@
     }
 
     // Tab switching
-    function switchTab(event, tabName) {
+    function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-      
+
       document.getElementById(tabName).classList.add('active');
-      const clickedButton = event && event.currentTarget ? event.currentTarget : document.querySelector(`.tab-button[onclick*="'${tabName}'"]`);
-      if (clickedButton) clickedButton.classList.add('active');
-      
+      const button = document.querySelector(`.tab-button[data-tab="${tabName}"]`);
+      if (button) button.classList.add('active');
+
       // Auto-load data for certain tabs
       if (tabName === 'jobs') refreshJobs();
       if (tabName === 'audit') refreshAudit();
@@ -772,29 +772,28 @@
       if (tabName === 'ready-drafts') refreshReadyDrafts();
     }
 
-    // Subtab switching (inside "🆕 Nuevo Artículo")
-    function switchSubtab(event, subtabName) {
-      document.querySelectorAll('.subtab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.subtab-button').forEach(b => b.classList.remove('active'));
-
-      document.getElementById(subtabName).classList.add('active');
-      const clickedButton = event && event.currentTarget ? event.currentTarget : document.querySelector(`.subtab-button[onclick*="'${subtabName}'"]`);
-      if (clickedButton) clickedButton.classList.add('active');
-
-      if (subtabName === 'subtab-preview') refreshDraftSelector();
-      if (subtabName === 'subtab-ai') { refreshAiSelector(); getKiloSecret(); }
-    }
-
-    // Programmatic subtab switch (no click event, e.g. "Editar ←" button)
+    // Subtab switching (inside "🆕 Nuevo Artículo"). Used both by the
+    // subtab-button click listeners below and by programmatic callers
+    // (e.g. the "← Editar" button, or after a save/approve completes).
     function switchSubtabById(subtabName) {
       document.querySelectorAll('.subtab-content').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.subtab-button').forEach(b => b.classList.remove('active'));
       document.getElementById(subtabName).classList.add('active');
-      const button = document.querySelector(`.subtab-button[onclick*="'${subtabName}'"]`);
+      const button = document.querySelector(`.subtab-button[data-subtab="${subtabName}"]`);
       if (button) button.classList.add('active');
       if (subtabName === 'subtab-preview') refreshDraftSelector();
       if (subtabName === 'subtab-ai') { refreshAiSelector(); getKiloSecret(); }
     }
+
+    // Wire up tab/subtab buttons via addEventListener instead of inline
+    // onclick, so tab-switching no longer depends on string-matching the
+    // literal onclick attribute (see docs/TO_FIX.md #80 follow-up).
+    document.querySelectorAll('.tab-button[data-tab]').forEach((btn) => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+    document.querySelectorAll('.subtab-button[data-subtab]').forEach((btn) => {
+      btn.addEventListener('click', () => switchSubtabById(btn.dataset.subtab));
+    });
     
     // Show alert
     function showAlert(message, type = 'info') {
@@ -942,26 +941,49 @@
       return parts.join(', ');
     }
     
-    // Refresh jobs
-    async function refreshJobs() {
-      const container = document.getElementById('jobs-list');
+    // Shared "fetch a list into a container" pattern used by refreshJobs,
+    // refreshAudit (and a candidate for refreshReadyDrafts/refreshDraftSelector/
+    // refreshAiSelector in a follow-up — those also render <select> options and
+    // per-item buttons, so folding them in needs a bit more care than a
+    // straight extraction). See docs/TO_FIX.md #80 follow-up.
+    //
+    // @param {string} containerId
+    // @param {string} url - fetched via apiFetch
+    // @param {(data: object) => any[]} getItems - pulls the array out of the response body
+    // @param {(item: any) => string} renderItem - renders one item to an HTML string
+    // @param {{ emptyMessage: string, errorPrefix: string }} opts
+    async function refreshList(containerId, url, getItems, renderItem, { emptyMessage, errorPrefix }) {
+      const container = document.getElementById(containerId);
       container.innerHTML = '<div class="spinner"></div> Cargando...';
-      
+
       try {
-        const res = await apiFetch(`${API_BASE}/jobs`);
+        const res = await apiFetch(url);
         const data = await res.json();
-        
+
         if (!res.ok) {
-          container.innerHTML = `<div class="alert error">Error al cargar trabajos: ${data.error || res.statusText}</div>`;
+          container.innerHTML = `<div class="alert error">${errorPrefix}: ${data.error || res.statusText}</div>`;
           return;
         }
-        
-        if (!data.jobs || data.jobs.length === 0) {
-          container.innerHTML = '<div class="alert info">Sin trabajos recientes.</div>';
+
+        const items = getItems(data);
+        if (!items || items.length === 0) {
+          container.innerHTML = `<div class="alert info">${emptyMessage}</div>`;
           return;
         }
-        
-        container.innerHTML = data.jobs.map(job => {
+
+        container.innerHTML = items.map(renderItem).join('');
+      } catch (err) {
+        container.innerHTML = `<div class="alert error">${err.message}</div>`;
+      }
+    }
+
+    // Refresh jobs
+    function refreshJobs() {
+      return refreshList(
+        'jobs-list',
+        `${API_BASE}/jobs`,
+        (data) => data.jobs,
+        (job) => {
           const statusClass = job.status === 'running' ? 'running' : (job.status === 'completed' ? 'completed' : 'failed');
           const displayArgs = job.args ? job.args.filter(a => !a.startsWith('--')).slice(0, 5).join(' ') : '';
           return `
@@ -977,37 +999,26 @@
               ${job.stderr ? `<details><summary>Ver errores (${job.stderr.length} chars)</summary><div class="output-box">${escapeHtml(job.stderr)}</div></details>` : ''}
             </div>
           `;
-        }).join('');
-      } catch (err) {
-        container.innerHTML = `<div class="alert error">${err.message}</div>`;
-      }
+        },
+        { emptyMessage: 'Sin trabajos recientes.', errorPrefix: 'Error al cargar trabajos' }
+      );
     }
-    
+
     // Refresh audit
-    async function refreshAudit() {
-      const container = document.getElementById('audit-list');
-      container.innerHTML = '<div class="spinner"></div> Cargando...';
-      
-      try {
-        const res = await apiFetch(`${API_BASE}/audit-log`);
-        const data = await res.json();
-        
-        if (data.entries.length === 0) {
-          container.innerHTML = '<div class="alert info">Sin entradas de auditoría aún.</div>';
-          return;
-        }
-        
-        container.innerHTML = data.entries.map(entry => `
+    function refreshAudit() {
+      return refreshList(
+        'audit-list',
+        `${API_BASE}/audit-log`,
+        (data) => data.entries,
+        (entry) => `
           <div class="audit-entry">
             <div class="audit-time">${new Date(entry.timestamp).toLocaleString()}</div>
             <div><strong>${escapeHtml(entry.action)}</strong>${entry.dryRun ? ' 🔒dry-run' : ''} — ${escapeHtml(entry.details || formatAuditTarget(entry.target))}</div>
             ${entry.script ? `<div style="color:#888;font-size:11px;">script: ${escapeHtml(entry.script)}${entry.result ? ' | resultado: ' + escapeHtml(entry.result) : ''}</div>` : ''}
           </div>
-        `).join('');
-        
-      } catch (err) {
-        container.innerHTML = `<div class="alert error">${err.message}</div>`;
-      }
+        `,
+        { emptyMessage: 'Sin entradas de auditoría aún.', errorPrefix: 'Error al cargar auditoría' }
+      );
     }
     
     // Refresh system status
@@ -1519,7 +1530,7 @@
 
           sessionStorage.setItem('currentDraftSlug', slug);
           showAlert(`✅ Artículo "${slug}" cargado para editar. Realiza cambios y haz clic en "💾 Guardar borrador".`, 'success');
-          switchTab(null, 'new-article');
+          switchTab('new-article');
           switchSubtabById('subtab-write');
           return;
         }
@@ -1546,7 +1557,7 @@
           setTimeout(() => {
             refreshReadyDrafts();
             sessionStorage.setItem('currentDraftSlug', slug);
-            switchTab(null, 'new-article');
+            switchTab('new-article');
             switchSubtabById('subtab-preview');
           }, 800);
           return;

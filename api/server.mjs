@@ -29,6 +29,8 @@ import { slugToRubriquId } from '../scripts/lib/spip-client.mjs';
 import { VALID_SECTIONS, VALID_STATUSES, isValidSection, isValidStatus } from './lib/command-validators.mjs';
 import statusRouter from './routes/status.mjs';
 import jobsRouter from './routes/jobs.mjs';
+import { createCommandsRouter } from './routes/commands.mjs';
+import { createAuditLogRouter } from './routes/audit-log.mjs';
 import {
   createDraft,
   getDraft,
@@ -94,6 +96,33 @@ app.use('/api', statusRouter);
 app.use('/api/jobs', jobsRouter);
 
 // ============================================================
+// COMMANDS ROUTER (POST /api/commands/*)
+// Extracted to api/routes/commands.mjs — see docs/TO_FIX.md #80 step 4.
+// Factory function receives shared helpers and validators.
+// ============================================================
+
+const commandsRouter = createCommandsRouter({
+  startCommandJob,
+  VALID_SECTIONS,
+  VALID_STATUSES,
+  isValidSection,
+  isValidStatus,
+  sanitizeInput,
+  slugToRubriquId,
+});
+
+app.use('/api/commands', commandsRouter);
+
+// ============================================================
+// AUDIT LOG ROUTER (GET /api/audit-log)
+// Extracted to api/routes/audit-log.mjs — see docs/TO_FIX.md #80 step 3c.
+// Factory function receives auditLog instance (shared, single-instance pattern).
+// ============================================================
+
+const auditLogRouter = createAuditLogRouter(auditLog);
+app.use('/api/audit-log', auditLogRouter);
+
+// ============================================================
 // SHARED COMMAND-JOB HELPER
 // ============================================================
 
@@ -131,222 +160,6 @@ function startCommandJob(res, args, { message, warning, errorMessage = 'Failed t
     });
   }
 }
-
-// ============================================================
-// CREATE ARTICLE ENDPOINT
-// ============================================================
-
-/**
- * POST /api/commands/create-article
- *
- * Spawn: node scripts/create-article.mjs --create --title "..." --body "..." --section "..."
- *
- * Body:
- *   {
- *     "title": "Article Title",
- *     "body": "Article body (HTML or plain text)",
- *     "section": "general|actualidad|tierra|nom|pi|gci",
- *     "dryRun": false
- *   }
- *
- * Returns: { jobId, startTime }
- */
-app.post('/api/commands/create-article', (req, res) => {
-  const { title, body, section = 'general', dryRun = false } = req.body;
-  
-  // Validation
-  if (!title || !body) {
-    return res.status(400).json({
-      error: 'Missing required fields: title, body',
-    });
-  }
-
-  if (!isValidSection(section)) {
-    return res.status(400).json({
-      error: `Invalid section. Must be one of: ${VALID_SECTIONS.join(', ')} (or a numeric SPIP rubrique ID)`,
-    });
-  }
-  
-  // Sanitize input (defense-in-depth; spawn() without shell: true is primary protection)
-  // Title: reasonable limit (SPIP titles rarely exceed a few hundred chars)
-  const sanitizedTitle = sanitizeInput(String(title), 2000);
-  // Body: articles can be very long; 200KB limit is generous but prevents DoS
-  const sanitizedBody = sanitizeInput(String(body), 200000);
-  
-  if (!sanitizedTitle || !sanitizedBody) {
-    return res.status(400).json({
-      error: 'Title and body cannot be empty',
-    });
-  }
-  
-  // Build args for the script — translate slug to numeric rubrique ID at the boundary
-  let rubriquId;
-  try {
-    rubriquId = slugToRubriquId(section);
-  } catch (err) {
-    return res.status(400).json({ error: err.message });
-  }
-
-  const args = [
-    'scripts/create-article.mjs',
-    '--create',
-    '--title', sanitizedTitle,
-    '--body', sanitizedBody,
-    '--section', rubriquId,
-  ];
-  
-  if (dryRun) args.push('--dry-run');
-
-  startCommandJob(res, args, { message: 'Article creation job started' });
-});
-
-// ============================================================
-// MANAGE ARTICLE STATUS ENDPOINT (WITH SECURITY GATE)
-// ============================================================
-
-/**
- * POST /api/commands/manage-article-status
- *
- * Spawn: node scripts/manage-article-status.mjs --id <id> --status <status> [--change]
- *
- * Body:
- *   {
- *     "id": 90,
- *     "status": "publie|prepa|prop|refuse|poubelle",
- *     "change": true,
- *     "dryRun": false
- *   }
- *
- * SECURITY GATE:
- *   If status === "publie" and change === true:
- *   - Check KILO_APPROVE_PUBLISHING environment variable
- *   - Return 403 if not set or false
- *   - Log the attempted publication
- *
- * Returns: { jobId, startTime }
- */
-app.post('/api/commands/manage-article-status', (req, res) => {
-  const { id, status, change = false, dryRun = false } = req.body;
-  
-  // Validation
-  if (!id || !status) {
-    return res.status(400).json({
-      error: 'Missing required fields: id, status',
-    });
-  }
-  
-  if (!isValidStatus(status)) {
-    return res.status(400).json({
-      error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`,
-    });
-  }
-  
-  // SECURITY GATE: Check KILO_APPROVE_PUBLISHING for direct publication
-  if (status === 'publie' && change === true) {
-    if (!process.env.KILO_APPROVE_PUBLISHING || process.env.KILO_APPROVE_PUBLISHING !== 'true') {
-      console.warn(`[SECURITY] Blocked publication attempt for article ${id}. KILO_APPROVE_PUBLISHING not set.`);
-      return res.status(403).json({
-        error: 'Direct publication requires KILO_APPROVE_PUBLISHING=true',
-        risk: 'KILO-001',
-        alternative: 'Change status to "prop" (proposed for review) instead. Admin can publish from there.',
-        blocked: true,
-      });
-    }
-    console.info(`[AUDIT] Article ${id} published via API (KILO_APPROVE_PUBLISHING enabled)`);
-  }
-  
-  // Build args for the script
-  const args = [
-    'scripts/manage-article-status.mjs',
-    '--id', String(id),
-    '--status', status,
-  ];
-  
-  if (change) args.push('--change');
-  if (dryRun) args.push('--dry-run');
-
-  startCommandJob(res, args, {
-    message: 'Status management job started',
-    warning: status === 'publie' ? 'This will publish the article to production' : undefined,
-  });
-});
-
-// ============================================================
-// PUBLISH READY ARTICLE ENDPOINT
-// ============================================================
-
-/**
- * POST /api/commands/publish-ready-article
- *
- * Publish a READY article directly to SPIP via Playwright.
- * Moves article from READY/ to published state in SPIP.
- *
- * Body:
- *   {
- *     "slug": "article-slug",
- *     "dryRun": false
- *   }
- *
- * Returns: { jobId, startTime }
- */
-app.post('/api/commands/publish-ready-article', (req, res) => {
-  const { slug, dryRun = false } = req.body;
-  
-  // Validation
-  if (!slug || typeof slug !== 'string' || slug.length === 0) {
-    return res.status(400).json({
-      error: 'Missing or invalid required field: slug',
-    });
-  }
-  
-  // Sanitize input
-  const sanitizedSlug = sanitizeInput(String(slug), 200);
-  if (!sanitizedSlug) {
-    return res.status(400).json({
-      error: 'Slug cannot be empty',
-    });
-  }
-  
-  // Build args for the script — spawn publish-to-actualidad.mjs
-  // (or create a dedicated publish-ready-article.mjs if needed)
-  const args = [
-    'scripts/publish-to-actualidad.mjs',
-    '--slug', sanitizedSlug,
-  ];
-  
-  if (dryRun) args.push('--dry-run');
-
-  startCommandJob(res, args, {
-    message: 'Article publication job started',
-    warning: 'This will publish the article to kilombo.top',
-    errorMessage: 'Failed to start publish job',
-  });
-});
-
-// ============================================================
-// AUDIT LOG ENDPOINT (read-only)
-// ============================================================
-
-/**
- * GET /api/audit-log
- * Returns entries from live-write-audit.log.jsonl (most recent first)
- */
-app.get('/api/audit-log', (req, res) => {
-  const limit = Math.min(parseInt(req.query.limit) || 50, 500);
-
-  try {
-    if (!auditLog.exists()) {
-      return res.json({ entries: [], message: 'No audit log entries yet' });
-    }
-    const entries = auditLog.read(limit);
-    res.json({ entries, total: entries.length });
-  } catch (err) {
-    res.status(500).json({
-      error: 'Failed to read audit log',
-      details: err.message,
-    });
-  }
-});
 
 // ============================================================
 // ENV STATUS ENDPOINT (non-secret vars only)

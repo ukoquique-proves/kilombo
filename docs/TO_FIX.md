@@ -74,6 +74,32 @@ Auditoría activa del proyecto. Solo problemas abiertos.
 
 ---
 
+- [ ] **81. CRITICAL: Dashboard UI smoke tests — tab switching & draft-save flow NOT browser-tested** — 🔴 BLOCKING
+  - **Status:** Network sandbox prevents Playwright from installing a browser. Module graph and static serving verified; actual UI NOT verified.
+  - **What's untested (high risk):**
+    1. Tab switching logic (3 identical functions: `switchTab`, `switchSubtab`, `switchSubtabById`) — likely works but NOT visually confirmed
+    2. Draft-save flow (`saveDraft()` → API call → form state update) — critical user workflow, zero manual testing
+    3. Form validation errors display (`showDraftError()`, `showSuccessMsg()`) — error UX path untested
+    4. Article list refresh (`refreshReadyArticles()`, `refreshDrafts()`) — likely works, but loading states/error handling unverified
+    5. Button state transitions (disabled during save, re-enabled on completion) — spinner visibility untested
+  - **Why critical:** Dashboard is the primary user interface for article management. A broken tab or failed save silently appearing to succeed would corrupt the draft workflow.
+  - **Action required (BEFORE production deploy):**
+    1. Start the dashboard: `npm start` (or equivalent in your production environment)
+    2. In your browser (dev tools console open):
+       - Click through all 3 tabs (Redacción, Borradores, Publicados) — verify content appears and tab highlighting changes
+       - Borradores tab: click "Crear Nuevo" → fill form → click "Guardar" → verify success message and article appears in list
+       - Publicados tab: click "✏️ Editar" on any article → modify text → click "Guardar" → verify changes persist
+       - Test error path: attempt to save draft with empty title → verify error message displays (not silent fail)
+    3. Check browser console for JavaScript errors (dev tools → Console tab)
+    4. Verify network requests (dev tools → Network tab):
+       - Each save should show `POST /api/drafts` or `PATCH /api/drafts/:slug` 
+       - Response should include `{ ok: true }` or error details if it fails
+  - **Files involved:** `api/public/dashboard.html` (1,352 lines: HTML + CSS + 28 JS functions)
+  - **Known limitations:** Tests cannot verify visual rendering (Playwright sandbox blocker) — this is manual/UI-level verification only
+  - **Blocker for:** Production deployment to `kilombo.top`
+  - **Effort to fix:** 30 minutes manual testing + any debugging if issues found
+  - **Priority:** CRITICAL — should block the merge/deploy until completed
+
 - [ ] **69. delete-article.mjs —trash workflow status: partial (selector confirmed, form submission method undefined)**
   - **Status:** The script successfully logs in and finds the poubelle radio selector, but clicking it does not trigger SPIP's autosave mechanism for the instituer_article form.
   - **What works:** `--inspect` mode correctly identifies `input[name="statut"][value="poubelle"]` and dumps the form structure.
@@ -347,30 +373,44 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     - `scripts/validators/` — validadores separados por dominio (schema.mjs, content-qa.mjs, data-format.mjs) — parcialmente iniciado por `scripts/lib/article-validator.mjs` (ver nota arriba)
     - **No es bloqueante hoy**, pero es una deuda técnica de arquitectura que evitará refactorizaciones de emergencia cuando la complejidad se dispare.
 
-- [x] **80. `api/server.mjs` — un solo archivo mezcla 5 responsabilidades (auth, jobs, commands, audit, drafts)** — ✅ PARCIALMENTE COMPLETADO (Pasos 1-3c)
+- [x] **80. `api/server.mjs` — un solo archivo mezcla 5 responsabilidades (auth, jobs, commands, audit, drafts)** — ✅ PARCIALMENTE COMPLETADO (Pasos 1-3c, 4)
 
-  **Completados (v0.54.1 – v0.54.5):**
+  **Completados (v0.54.1 – v0.54.6):**
     - ✅ **v0.54.1:** De-duplicación del bloque `createJob → getJob → try/catch → 500` extraído a helper `startCommandJob()` (lines 133–168 en server.mjs)
     - ✅ **v0.54.2:** Extracción de `validSections`/`validStatuses` a `api/lib/command-validators.mjs` con funciones `isValidSection()`, `isValidStatus()`
     - ✅ **v0.54.4:** Router extraction — Pasos 1-3a completados:
       1. ✅ `GET /api/health` extraído a `api/routes/status.mjs`
       2. ✅ `GET /api/env-status` extraído a `api/routes/status.mjs`
       3. ✅ `GET /api/jobs/:jobId/status` y `GET /api/jobs` extraídos a `api/routes/jobs.mjs`
-    - ✅ **v0.54.5:** Router extraction — Paso 3c completado:
-      4. ✅ `GET /api/audit-log` extraído a `api/routes/audit-log.mjs` con factory function (preserva instancia única de auditLog)
-    - Net reduction: ~120 líneas removidas de `server.mjs`, 3 nuevos routers creados
+    - ✅ **v0.54.5:** Paso 3c completado:
+      4. ✅ `GET /api/audit-log` extraído a `api/routes/audit-log.mjs` con factory function (preserva instancia única de auditLog) — **NOTA:** Endpoint estaba desaparecido debido a JSDoc comment sin cerrar en la extracción anterior; restaurado con router extraction
+    - ✅ **v0.54.6:** Paso 4 completado:
+      5. ✅ `POST /api/commands/create-article` extraído a `api/routes/commands.mjs`
+      6. ✅ `POST /api/commands/manage-article-status` extraído (con security gate KILO_APPROVE_PUBLISHING intacto)
+      7. ✅ `POST /api/commands/publish-ready-article` extraído
+    - Net reduction: ~280 líneas removidas de `server.mjs`, 4 nuevos routers creados
 
-  **Pendientes (Pasos 4-6, opcional/no bloqueante):**
-    5. Los 3 endpoints de `/api/commands/*` — ya apoyados en helper y validadores
-    6. `/api/drafts` + `/api/ready-drafts` + endpoints de IA — mantener doble auth intencional en improve/apply-suggestion
+  **Pendientes (Pasos 5-6, opcional/no bloqueante):**
+    - [ ] Paso 5: Los endpoints de `/api/drafts` + `/api/ready-drafts` (no es prioritario, ya funciona)
+    - [ ] Paso 6: Endpoints de IA (`improve`, `apply-suggestion`) — mantener doble auth intencional al mover
 
   **Notas arquitectónicas importantes:**
     - Cada paso fue implementado como checkpoint independiente — no es refactor a medio terminar
     - Auth middleware se registra en `server.mjs` antes de montar routers — protección no cambia
-    - `audit-log.mjs` usa factory function para recibir instancia compartida de auditLog (single instance pattern)
+    - Todos los routers de comandos/estado/audit usan factory functions para recibir contexto compartido (single instance pattern)
     - `improve` y `apply-suggestion` mantienen `requireSharedSecret` inline + prefijo — redundancia intencional por omisión, no remover al mover
     - `getReadyDraft()` no debe preferir duplicado stale en `IN_PROGRESS/` — mantener distinción vs `getDraft()`
     - Inconsistencia de respuesta (`{ error }` vs `{ ok, error, code }`) y banner ASCII NO incluidos en esta acción — requieren auditoría de consumidores primero
+
+  **Regresión encontrada y resuelta (v0.54.5-v0.54.6):**
+    - JSDoc comment sin cerrar en línea ~158 causó que `GET /api/audit-log` fuera absorbido como texto de comentario
+    - Endpoint desapareció (no registrado en app) pero middleware aún lo protegía → 404 silencioso
+    - Test suite detectó fallo: `audit-log with correct secret should be 200 — got 404 instead`
+    - Corregido en dos pasos:
+      1. Restaurado inline handler en `api/server.mjs` (para garantizar continuidad)
+      2. Creado router extraction en `api/routes/audit-log.mjs` (para arquitectura coherente con otros endpoints)
+    - Dashboard `refreshAudit()` actualizado para chequear `res.ok` antes de procesar datos
+    - Todos los tests ahora pasan (240/240)
 
 - [x] **25. Blind spot del generador de contexto compacto** — ✅ Mitigado.
   - El generador excluye `.github/`, por lo que `deploy.yml` no aparece en los bundles de revisión.
