@@ -19,18 +19,17 @@ import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
-import { createJob, getJob } from './lib/job-manager.mjs';
 import { createAuditLogger } from './lib/audit-logger.mjs';
 import { createRequireSharedSecret } from './lib/auth.mjs';
 import { sanitizeInput } from './lib/util/sanitize-input.mjs';
 import { sendDraftError, splitFieldErrors } from './lib/http-errors.mjs';
 import { generateSuggestions } from './lib/services/ai-improve-service.mjs';
-import { slugToRubriquId } from '../scripts/lib/spip-client.mjs';
-import { VALID_SECTIONS, VALID_STATUSES, isValidSection, isValidStatus } from './lib/command-validators.mjs';
+import { VALID_STATUSES, isValidStatus } from './lib/command-validators.mjs';
 import statusRouter from './routes/status.mjs';
 import jobsRouter from './routes/jobs.mjs';
-import { createCommandsRouter } from './routes/commands.mjs';
 import { createAuditLogRouter } from './routes/audit-log.mjs';
+import { createCreateArticleRouter } from './routes/create-article.mjs';
+import { startCommandJob } from './lib/command-job-runner.mjs';
 import {
   createDraft,
   getDraft,
@@ -96,85 +95,147 @@ app.use('/api', statusRouter);
 app.use('/api/jobs', jobsRouter);
 
 // ============================================================
-// COMMANDS ROUTER (POST /api/commands/*)
-// Extracted to api/routes/commands.mjs — see docs/TO_FIX.md #80 step 4.
-// Factory function receives shared helpers and validators.
+// CREATE ARTICLE ROUTE (POST /api/commands/create-article)
+// Extracted to api/routes/create-article.mjs — see docs/TO_FIX.md #80.
+// The shared startCommandJob helper also moved, to
+// api/lib/command-job-runner.mjs (still used by the two commands below
+// that haven't been extracted yet).
 // ============================================================
 
-const commandsRouter = createCommandsRouter({
-  startCommandJob,
-  VALID_SECTIONS,
-  VALID_STATUSES,
-  isValidSection,
-  isValidStatus,
-  sanitizeInput,
-  slugToRubriquId,
-});
-
-app.use('/api/commands', commandsRouter);
+app.use('/api/commands/create-article', createCreateArticleRouter({ cwd: KILOMBO_DIR }));
 
 // ============================================================
-// AUDIT LOG ROUTER (GET /api/audit-log)
-// Extracted to api/routes/audit-log.mjs — see docs/TO_FIX.md #80 step 3c.
-// Factory function receives auditLog instance (shared, single-instance pattern).
-// ============================================================
-
-const auditLogRouter = createAuditLogRouter(auditLog);
-app.use('/api/audit-log', auditLogRouter);
-
-// ============================================================
-// SHARED COMMAND-JOB HELPER
+// MANAGE ARTICLE STATUS ENDPOINT (WITH SECURITY GATE)
 // ============================================================
 
 /**
- * Spawn a script as a job and respond with the standard job-started shape,
- * or a standard 500 on failure to start it. This is the exact shape that
- * create-article, manage-article-status, and publish-ready-article each
- * used to duplicate inline — behavior here is intentionally unchanged,
- * only de-duplicated.
+ * POST /api/commands/manage-article-status
  *
- * @param {import('express').Response} res
- * @param {string[]} args - argv passed to `node`, e.g. ['scripts/foo.mjs', '--flag', 'val']
- * @param {{ message: string, warning?: string, errorMessage?: string }} opts
- *   - message: success message included in the 200 response
- *   - warning: optional warning string included in the 200 response (omitted if undefined)
- *   - errorMessage: text used in the 500 response if the job fails to start
- *     (defaults to 'Failed to start job', matching prior per-endpoint defaults
- *     except publish-ready-article, which passes its own text explicitly)
+ * Spawn: node scripts/manage-article-status.mjs --id <id> --status <status> [--change]
+ *
+ * Body:
+ *   {
+ *     "id": 90,
+ *     "status": "publie|prepa|prop|refuse|poubelle",
+ *     "change": true,
+ *     "dryRun": false
+ *   }
+ *
+ * SECURITY GATE:
+ *   If status === "publie" and change === true:
+ *   - Check KILO_APPROVE_PUBLISHING environment variable
+ *   - Return 403 if not set or false
+ *   - Log the attempted publication
+ *
+ * Returns: { jobId, startTime }
  */
-function startCommandJob(res, args, { message, warning, errorMessage = 'Failed to start job' }) {
-  try {
-    const jobId = createJob('node', args, { cwd: KILOMBO_DIR });
-    const job = getJob(jobId);
-
-    res.json({
-      jobId,
-      startTime: job.startTime,
-      message,
-      warning,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: errorMessage,
-      details: err.message,
+app.post('/api/commands/manage-article-status', (req, res) => {
+  const { id, status, change = false, dryRun = false } = req.body;
+  
+  // Validation
+  if (!id || !status) {
+    return res.status(400).json({
+      error: 'Missing required fields: id, status',
     });
   }
-}
+  
+  if (!isValidStatus(status)) {
+    return res.status(400).json({
+      error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`,
+    });
+  }
+  
+  // SECURITY GATE: Check KILO_APPROVE_PUBLISHING for direct publication
+  if (status === 'publie' && change === true) {
+    if (!process.env.KILO_APPROVE_PUBLISHING || process.env.KILO_APPROVE_PUBLISHING !== 'true') {
+      console.warn(`[SECURITY] Blocked publication attempt for article ${id}. KILO_APPROVE_PUBLISHING not set.`);
+      return res.status(403).json({
+        error: 'Direct publication requires KILO_APPROVE_PUBLISHING=true',
+        risk: 'KILO-001',
+        alternative: 'Change status to "prop" (proposed for review) instead. Admin can publish from there.',
+        blocked: true,
+      });
+    }
+    console.info(`[AUDIT] Article ${id} published via API (KILO_APPROVE_PUBLISHING enabled)`);
+  }
+  
+  // Build args for the script
+  const args = [
+    'scripts/manage-article-status.mjs',
+    '--id', String(id),
+    '--status', status,
+  ];
+  
+  if (change) args.push('--change');
+  if (dryRun) args.push('--dry-run');
+
+  startCommandJob(res, args, {
+    message: 'Status management job started',
+    warning: status === 'publie' ? 'This will publish the article to production' : undefined,
+    cwd: KILOMBO_DIR,
+  });
+});
 
 // ============================================================
-// ENV STATUS ENDPOINT (non-secret vars only)
+// PUBLISH READY ARTICLE ENDPOINT
 // ============================================================
 
 /**
- * GET /api/env-status
- * Returns status of environment variables (public info only)
+ * POST /api/commands/publish-ready-article
+ *
+ * Publish a READY article directly to SPIP via Playwright.
+ * Moves article from READY/ to published state in SPIP.
+ *
+ * Body:
+ *   {
+ *     "slug": "article-slug",
+ *     "dryRun": false
+ *   }
+ *
+ * Returns: { jobId, startTime }
  */
-app.get('/api/env-status', (req, res) => {
-  res.json({
-    KILO_APPROVE_PUBLISHING: process.env.KILO_APPROVE_PUBLISHING === 'true',
-    hasEnv: Object.keys(process.env).length > 0,
+app.post('/api/commands/publish-ready-article', (req, res) => {
+  const { slug, dryRun = false } = req.body;
+  
+  // Validation
+  if (!slug || typeof slug !== 'string' || slug.length === 0) {
+    return res.status(400).json({
+      error: 'Missing or invalid required field: slug',
+    });
+  }
+  
+  // Sanitize input
+  const sanitizedSlug = sanitizeInput(String(slug), 200);
+  if (!sanitizedSlug) {
+    return res.status(400).json({
+      error: 'Slug cannot be empty',
+    });
+  }
+  
+  // Build args for the script — spawn publish-to-actualidad.mjs
+  // (or create a dedicated publish-ready-article.mjs if needed)
+  const args = [
+    'scripts/publish-to-actualidad.mjs',
+    '--slug', sanitizedSlug,
+  ];
+  
+  if (dryRun) args.push('--dry-run');
+
+  startCommandJob(res, args, {
+    message: 'Article publication job started',
+    warning: 'This will publish the article to kilombo.top',
+    errorMessage: 'Failed to start publish job',
+    cwd: KILOMBO_DIR,
   });
 });
+
+// ============================================================
+// AUDIT LOG ROUTE (GET /api/audit-log)
+// Extracted to api/routes/audit-log.mjs — see docs/TO_FIX.md #80.
+// Factory takes the shared `auditLog` instance constructed above.
+// ============================================================
+
+app.use('/api/audit-log', createAuditLogRouter(auditLog));
 
 // ============================================================
 // DRAFTS API — editorial pipeline IN_PROGRESS → READY
