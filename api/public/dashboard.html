@@ -459,6 +459,84 @@
     .ready-article-preview.active {
       display: block;
     }
+
+    /* Breadcrumb / contextual navigation bar */
+    .breadcrumb-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      margin-bottom: 16px;
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #555;
+      min-height: 40px;
+    }
+
+    .breadcrumb-bar:empty {
+      display: none;
+    }
+
+    .breadcrumb-crumb {
+      color: #555;
+    }
+
+    .breadcrumb-crumb.current {
+      color: #d32f2f;
+      font-weight: 600;
+    }
+
+    .breadcrumb-sep {
+      color: #bbb;
+    }
+
+    .breadcrumb-back {
+      margin-right: auto;
+      padding: 4px 10px;
+      background: none;
+      color: #1565c0;
+      border: 1px solid #bbdefb;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .breadcrumb-back:hover {
+      background: #e3f2fd;
+      color: #0d47a1;
+    }
+
+    .breadcrumb-cta {
+      padding: 4px 10px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .breadcrumb-cta:hover {
+      background: #c8e6c9;
+      color: #1b5e20;
+    }
+
+    /* Button style: btn-link (text-style button for inline nav) */
+    .btn-link {
+      background: none;
+      border: none;
+      color: #1565c0;
+      padding: 0;
+      font-size: inherit;
+      font-weight: 500;
+      text-decoration: underline;
+    }
+
+    .btn-link:hover {
+      background: none;
+      color: #0d47a1;
+    }
   </style>
 </head>
 <body>
@@ -492,6 +570,9 @@
         ℹ️ Estado del Sistema
       </button>
     </div>
+
+    <!-- Contextual breadcrumb / navigation bar (shows "← Back" + workflow CTAs) -->
+    <div id="breadcrumb-bar" class="breadcrumb-bar"></div>
 
     <!-- NEW ARTICLE TAB (drafts pipeline: IN_PROGRESS -> READY) -->
     <div id="new-article" class="tab-content active">
@@ -728,15 +809,19 @@
     // ------------------------------------------------------------
     // Shared-secret auth (x-kilo-secret header, required by
     // requireSharedSecret() on the server for /api/jobs, /api/audit-log,
-    // /api/commands, /api/drafts, /api/ready-drafts). Prompted once per
-    // browser session and cached in sessionStorage — never persisted
-    // beyond the tab's lifetime, never sent to any non-/api endpoint.
+    // /api/commands, /api/drafts, /api/ready-drafts). Prompted once and
+    // cached in localStorage — persists across tabs and browser restarts,
+    // until explicitly cleared (see apiFetch's 401 handling below) or the
+    // browser's site data is cleared. This means the secret sits on disk
+    // indefinitely rather than only for the tab's lifetime — deliberate
+    // trade-off: fewer prompts, at the cost of longer-lived local storage
+    // of the secret. Never sent to any non-/api endpoint.
     // ------------------------------------------------------------
     function getKiloSecret() {
-      let secret = sessionStorage.getItem('kiloSecret');
+      let secret = localStorage.getItem('kiloSecret');
       if (!secret) {
         secret = window.prompt('Clave de acceso al panel (x-kilo-secret):') || '';
-        if (secret) sessionStorage.setItem('kiloSecret', secret);
+        if (secret) localStorage.setItem('kiloSecret', secret);
       }
       return secret;
     }
@@ -748,51 +833,188 @@
       const headers = Object.assign({}, options.headers, { 'x-kilo-secret': getKiloSecret() });
       let res = await fetch(url, Object.assign({}, options, { headers }));
       if (res.status === 401) {
-        sessionStorage.removeItem('kiloSecret');
+        localStorage.removeItem('kiloSecret');
         const retryHeaders = Object.assign({}, options.headers, { 'x-kilo-secret': getKiloSecret() });
         res = await fetch(url, Object.assign({}, options, { headers: retryHeaders }));
       }
       return res;
     }
 
-    // Tab switching
-    function switchTab(tabName) {
+    // ============================================================
+    // Hash routing + breadcrumb navigation
+    // - URL hash format:  #tab=<tabName>[&subtab=<subtabName>]
+    // - Browser back/forward works inside the app (no more kick-out)
+    // - Breadcrumb bar shows context-aware ← Back and workflow CTAs
+    // ============================================================
+
+    const DEFAULT_TAB = 'new-article';
+    const DEFAULT_SUBTAB = 'subtab-write';
+    const TAB_LABELS = {
+      'new-article': '🆕 Nuevo Artículo',
+      'ready-drafts': '📬 Listos para Publicar',
+      'create-article': '📤 Publicación Directa',
+      'manage-status': '🔄 Cambiar Estado',
+      'jobs': '⏱️ Trabajos Recientes',
+      'audit': '📋 Auditoría',
+      'status': 'ℹ️ Estado del Sistema',
+    };
+    const SUBTAB_LABELS = {
+      'subtab-write': '✍️ Redacción',
+      'subtab-preview': '👁️ Preview',
+      'subtab-ai': '✨ Mejorar con IA',
+    };
+
+    // Parse current hash into { tab, subtab }
+    function parseRouteHash() {
+      const hash = window.location.hash.replace(/^#/, '');
+      const params = new URLSearchParams(hash);
+      return {
+        tab: params.get('tab') || DEFAULT_TAB,
+        subtab: params.get('subtab') || DEFAULT_SUBTAB,
+      };
+    }
+
+    // Build a hash string from tab + optional subtab
+    function buildRouteHash(tab, subtab) {
+      const params = new URLSearchParams();
+      params.set('tab', tab);
+      if (tab === 'new-article' && subtab && subtab !== DEFAULT_SUBTAB) {
+        params.set('subtab', subtab);
+      }
+      const s = params.toString();
+      return s ? '#' + s : '';
+    }
+
+    // Push a new route into browser history (so Back button works)
+    function navigateRoute(tab, subtab) {
+      const newHash = buildRouteHash(tab, subtab);
+      if (window.location.hash !== newHash) {
+        window.history.pushState({ tab, subtab }, '', newHash || '#');
+      }
+      applyRoute(tab, subtab);
+    }
+
+    // Apply a route to the DOM (update active tabs + run side-effects)
+    function applyRoute(tab, subtab) {
+      // Tabs
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      const tabEl = document.getElementById(tab);
+      if (tabEl) tabEl.classList.add('active');
+      const tabBtn = document.querySelector(`.tab-button[data-tab="${tab}"]`);
+      if (tabBtn) tabBtn.classList.add('active');
 
-      document.getElementById(tabName).classList.add('active');
-      const button = document.querySelector(`.tab-button[data-tab="${tabName}"]`);
-      if (button) button.classList.add('active');
+      // Subtabs (only meaningful inside new-article)
+      if (tab === 'new-article') {
+        const activeSubtab = subtab && document.getElementById(subtab) ? subtab : DEFAULT_SUBTAB;
+        document.querySelectorAll('.subtab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.subtab-button').forEach(b => b.classList.remove('active'));
+        document.getElementById(activeSubtab).classList.add('active');
+        const subtabBtn = document.querySelector(`.subtab-button[data-subtab="${activeSubtab}"]`);
+        if (subtabBtn) subtabBtn.classList.add('active');
+
+        if (activeSubtab === 'subtab-preview') refreshDraftSelector();
+        if (activeSubtab === 'subtab-ai') refreshAiSelector();
+      }
 
       // Auto-load data for certain tabs
-      if (tabName === 'jobs') refreshJobs();
-      if (tabName === 'audit') refreshAudit();
-      if (tabName === 'status') refreshSystemStatus();
-      if (tabName === 'new-article') refreshDraftSelector();
-      if (tabName === 'ready-drafts') refreshReadyDrafts();
+      if (tab === 'jobs') refreshJobs();
+      if (tab === 'audit') refreshAudit();
+      if (tab === 'status') refreshSystemStatus();
+      if (tab === 'new-article') refreshDraftSelector();
+      if (tab === 'ready-drafts') refreshReadyDrafts();
+
+      renderBreadcrumb(tab, tab === 'new-article' ? subtab : null);
     }
 
-    // Subtab switching (inside "🆕 Nuevo Artículo"). Used both by the
-    // subtab-button click listeners below and by programmatic callers
-    // (e.g. the "← Editar" button, or after a save/approve completes).
+    // ============================================================
+    // Breadcrumb renderer
+    // - Always shows: ← Back (goes back one step in history if possible, else to default tab)
+    // - Workflow CTAs depending on current route
+    // ============================================================
+    function renderBreadcrumb(tab, subtab) {
+      const bar = document.getElementById('breadcrumb-bar');
+      if (!bar) return;
+
+      const parts = [];
+      const ctaParts = [];
+
+      // 1) Back button — always on the left
+      const hasHistory = window.history.length > 1;
+      parts.push(
+        `<button type="button" class="breadcrumb-back" onclick="goBackOrHome()" title="Volver atrás">${hasHistory ? '← Atrás' : '← Inicio'}</button>`
+      );
+
+      // 2) Breadcrumb trail
+      const crumbs = [];
+      crumbs.push(`<span class="breadcrumb-crumb">${TAB_LABELS[tab] || tab}</span>`);
+      if (tab === 'new-article' && subtab && subtab !== DEFAULT_SUBTAB) {
+        crumbs.push(`<span class="breadcrumb-sep">›</span><span class="breadcrumb-crumb current">${SUBTAB_LABELS[subtab] || subtab}</span>`);
+      } else if (tab === 'new-article') {
+        // mark Redacción as current when no subtab specified
+        crumbs[0] = crumbs[0].replace('breadcrumb-crumb">', 'breadcrumb-crumb current">');
+      }
+      parts.push(...crumbs);
+
+      // 3) Context-aware CTAs on the right
+      if (tab === 'new-article') {
+        // From any new-article subtab → easy jump to READY list
+        ctaParts.push(`<button type="button" class="breadcrumb-cta" onclick="navigateRoute('ready-drafts')">📬 Ir a Listos para Publicar</button>`);
+      }
+      if (tab === 'ready-drafts') {
+        // From READY tab → jump back to writing
+        ctaParts.push(`<button type="button" class="breadcrumb-cta" onclick="navigateRoute('new-article','subtab-write')">✍️ Nuevo Artículo</button>`);
+      }
+      if (tab === 'new-article' && subtab === 'subtab-preview') {
+        ctaParts.unshift(`<button type="button" class="breadcrumb-cta" onclick="navigateRoute('new-article','subtab-write')">✏️ Continuar redacción</button>`);
+      }
+      if (tab === 'new-article' && subtab === 'subtab-ai') {
+        ctaParts.unshift(`<button type="button" class="breadcrumb-cta" onclick="navigateRoute('new-article','subtab-preview')">👁️ Ver Preview</button>`);
+      }
+
+      bar.innerHTML = parts.join(' ') + (ctaParts.length ? `<span style="flex:1"></span> ${ctaParts.join(' ')}` : '');
+    }
+
+    // Go back one step in browser history, or fall back to default tab
+    function goBackOrHome() {
+      const { tab } = parseRouteHash();
+      // If we're on a deep subtab and not coming via browser back, go up one level first
+      const hash = window.location.hash;
+      if (hash && hash.includes('subtab=')) {
+        const { tab: t } = parseRouteHash();
+        navigateRoute(t);
+        return;
+      }
+      // If we're on a non-default tab, go back to Nuevo Artículo
+      if (tab !== DEFAULT_TAB) {
+        navigateRoute(DEFAULT_TAB);
+        return;
+      }
+      // Otherwise try browser history back (will not exit SPA if this entry is still in same page)
+      if (window.history.length > 1 && document.referrer.includes('dashboard.html')) {
+        window.history.back();
+      }
+    }
+
+    // ---- Compatibility wrappers (keep exported names used by other code) ----
+    function switchTab(tabName) { navigateRoute(tabName, DEFAULT_SUBTAB); }
     function switchSubtabById(subtabName) {
-      document.querySelectorAll('.subtab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.subtab-button').forEach(b => b.classList.remove('active'));
-      document.getElementById(subtabName).classList.add('active');
-      const button = document.querySelector(`.subtab-button[data-subtab="${subtabName}"]`);
-      if (button) button.classList.add('active');
-      if (subtabName === 'subtab-preview') refreshDraftSelector();
-      if (subtabName === 'subtab-ai') { refreshAiSelector(); getKiloSecret(); }
+      const { tab } = parseRouteHash();
+      navigateRoute(tab === 'new-article' ? tab : 'new-article', subtabName);
     }
 
-    // Wire up tab/subtab buttons via addEventListener instead of inline
-    // onclick, so tab-switching no longer depends on string-matching the
-    // literal onclick attribute (see docs/TO_FIX.md #80 follow-up).
+    // ---- History + initial-load wiring ----
+    window.addEventListener('popstate', (e) => {
+      const { tab, subtab } = parseRouteHash();
+      applyRoute(tab, subtab);
+    });
+
+    // Wire up tab/subtab buttons (navigate → pushState → apply)
     document.querySelectorAll('.tab-button[data-tab]').forEach((btn) => {
-      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      btn.addEventListener('click', () => navigateRoute(btn.dataset.tab, DEFAULT_SUBTAB));
     });
     document.querySelectorAll('.subtab-button[data-subtab]').forEach((btn) => {
-      btn.addEventListener('click', () => switchSubtabById(btn.dataset.subtab));
+      btn.addEventListener('click', () => navigateRoute('new-article', btn.dataset.subtab));
     });
     
     // Show alert
@@ -1139,9 +1361,14 @@
         }
 
         sessionStorage.setItem('currentDraftSlug', data.data.slug);
+        const commonCtas = `
+          <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;">
+            <button type="button" class="btn-secondary" onclick="switchSubtabById('subtab-preview')">👁️ Ver Preview</button>
+            <button type="button" class="btn-secondary" onclick="navigateRoute('new-article','subtab-ai')">✨ Mejorar con IA</button>
+          </div>`;
         const action = wasUpdate
-          ? `✅ Borrador actualizado: <strong>${escapeHtml(data.data.slug)}</strong>`
-          : `✅ Borrador guardado. Slug: <strong>${escapeHtml(data.data.slug)}</strong>&nbsp; <button type="button" class="btn-secondary" onclick="switchSubtabById('subtab-preview')">Ir a Preview →</button>`;
+          ? `✅ Borrador actualizado: <strong>${escapeHtml(data.data.slug)}</strong>${commonCtas}`
+          : `✅ Borrador guardado. Slug: <strong>${escapeHtml(data.data.slug)}</strong>${commonCtas}`;
         resultEl.innerHTML = `<div class="alert success">${action}</div>`;
       } catch (err) {
         resultEl.innerHTML = `<div class="alert error">Error de red: ${escapeHtml(err.message)}</div>`;
@@ -1259,6 +1486,10 @@
             <div class="alert success">
               ✅ Artículo aprobado y movido a <code>articulos_en_trabajo/READY/${escapeHtml(slug)}.json</code>.
               Listo para publicar en kilombo.top.
+              <div style="margin-top:10px">
+                <button type="button" class="btn-primary" onclick="navigateRoute('ready-drafts')">📬 Ir a Listos para Publicar</button>
+                <button type="button" class="btn-secondary" onclick="navigateRoute('new-article','subtab-write')">✏️ Continuar redactando</button>
+              </div>
             </div>`;
           refreshDraftSelector();
           return;
@@ -1270,12 +1501,20 @@
             <div class="alert error">
               <strong>❌ Validación fallida</strong> — corrige y guarda de nuevo en Redacción antes de reintentar.
               <ul class="field-errors">${errors.map((e) => `<li>${escapeHtml(e)}</li>`).join('')}</ul>
+              <div style="margin-top:10px">
+                <button type="button" class="btn-secondary" onclick="editCurrentDraft()">← Volver a Redacción para corregir</button>
+              </div>
             </div>`;
           return;
         }
 
         if (data.code === 'DRAFT_ALREADY_APPROVED') {
-          resultEl.innerHTML = `<div class="alert info">ℹ️ Este artículo ya está en READY.</div>`;
+          resultEl.innerHTML = `<div class="alert info">
+            ℹ️ Este artículo ya está en READY.
+            <div style="margin-top:8px">
+              <button type="button" class="btn-secondary" onclick="navigateRoute('ready-drafts')">📬 Ir a Listos para Publicar</button>
+            </div>
+          </div>`;
           return;
         }
 
@@ -1515,10 +1754,36 @@
       }
     }
 
-    // Edit a READY article (load into editor without moving status)
+    // Edit a READY article.
+    //
+    // This MUST move the article back to IN_PROGRESS/ first (via /revert),
+    // not just copy its fields into the form. Reason: updateDraft() (used by
+    // both the plain "Guardar" save and POST /apply-suggestion for "Mejorar
+    // con IA") refuses to write to a slug that only exists in READY/ — it
+    // throws DRAFT_ALREADY_APPROVED by design, since approved articles are
+    // meant to be immutable until explicitly reverted. Previously this
+    // function skipped that revert step, so editing/AI-improving a READY
+    // article would silently fail to persist: /improve could still read the
+    // content (getDraft() falls back to READY), so suggestions appeared to
+    // work, but "Aplicar" (and a plain save) errored out against a file that
+    // wasn't there, leaving Preview showing the untouched original.
     async function editReadyArticle(slug) {
       try {
-        const res = await apiFetch(`${API_BASE}/ready-drafts/${encodeURIComponent(slug)}`);
+        const revertRes = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}/revert`, {
+          method: 'POST',
+        });
+        const revertData = await revertRes.json();
+
+        // DRAFT_ALREADY_IN_PROGRESS just means it's already editable (e.g. a
+        // stale duplicate) — not fatal, fall through and load it normally.
+        if (!revertRes.ok || !revertData.ok) {
+          if (revertData.code !== 'DRAFT_ALREADY_IN_PROGRESS') {
+            showAlert(`Error: ${revertData.error || 'No se pudo mover el artículo a borrador para editarlo'}`, 'error');
+            return;
+          }
+        }
+
+        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}`);
         const data = await res.json();
 
         if (res.ok && data.ok) {
@@ -1529,9 +1794,16 @@
           document.getElementById('draft-body').value = draft.contentHtml || '';
 
           sessionStorage.setItem('currentDraftSlug', slug);
-          showAlert(`✅ Artículo "${slug}" cargado para editar. Realiza cambios y haz clic en "💾 Guardar borrador".`, 'success');
-          switchTab('new-article');
-          switchSubtabById('subtab-write');
+          showAlert(
+            `✅ Artículo "${slug}" movido a Borrador y cargado para editar. Realiza cambios (incluyendo Mejorar con IA si quieres) y luego apruébalo de nuevo desde Vista previa. ` +
+            `<button type="button" class="btn-link" onclick="navigateRoute('ready-drafts')">📬 Volver a Listos</button>`,
+            'success'
+          );
+          // The article no longer appears in "Listos para publicar" now that
+          // it's back in IN_PROGRESS — refresh that list so it's not stale
+          // next time the user visits it.
+          refreshReadyDrafts();
+          navigateRoute('new-article', 'subtab-write');
           return;
         }
 
@@ -1553,12 +1825,17 @@
         const data = await res.json();
 
         if (res.ok && data.ok) {
-          showAlert(`✅ Artículo "${slug}" movido a borrador. Ya puedes editarlo en la pestaña "🆕 Nuevo Artículo".`, 'success');
+          showAlert(
+            `✅ Artículo "${slug}" movido a borrador. Ya puedes editarlo en Redacción. ` +
+            `<button type="button" class="btn-link" onclick="navigateRoute('new-article','subtab-write')">✏️ Editar ahora</button> ` +
+            ` · ` +
+            `<button type="button" class="btn-link" onclick="navigateRoute('ready-drafts')">📬 Volver a Listos</button>`,
+            'success'
+          );
           setTimeout(() => {
             refreshReadyDrafts();
             sessionStorage.setItem('currentDraftSlug', slug);
-            switchTab('new-article');
-            switchSubtabById('subtab-preview');
+            navigateRoute('new-article', 'subtab-preview');
           }, 800);
           return;
         }
@@ -1615,9 +1892,12 @@
       return text.replace(/[&<>"']/g, m => map[m]);
     }
     
-    // Load status on page load
+    // Load status + apply initial hash route on page load
     window.addEventListener('load', () => {
       refreshSystemStatus();
+      // Apply current hash route (or default) so deep links / refresh restore view
+      const { tab, subtab } = parseRouteHash();
+      applyRoute(tab, subtab);
     });
   </script>
 </body>
