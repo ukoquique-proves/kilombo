@@ -361,44 +361,56 @@ Auditoría activa del proyecto. Solo problemas abiertos.
     - `scripts/validators/` — validadores separados por dominio (schema.mjs, content-qa.mjs, data-format.mjs) — parcialmente iniciado por `scripts/lib/article-validator.mjs` (ver nota arriba)
     - **No es bloqueante hoy**, pero es una deuda técnica de arquitectura que evitará refactorizaciones de emergencia cuando la complejidad se dispare.
 
-- [x] **80. `api/server.mjs` — un solo archivo mezcla 5 responsabilidades (auth, jobs, commands, audit, drafts)** — ✅ COMPLETADO
+- [ ] **80. `api/server.mjs` — un solo archivo mezcla 5 responsabilidades (auth, jobs, commands, audit, drafts)** — 🟡 PARCIALMENTE COMPLETADO
 
-  **Completados (v0.54.1 – v0.54.6):**
-    - ✅ **v0.54.1:** De-duplicación del bloque `createJob → getJob → try/catch → 500` extraído a helper `startCommandJob()` (lines 133–168 en server.mjs)
+  **Completados (v0.54.1 – v0.54.8):**
+    - ✅ **v0.54.1:** De-duplicación del bloque `createJob → getJob → try/catch → 500` extraído a helper `startCommandJob()` en `api/lib/command-job-runner.mjs`
     - ✅ **v0.54.2:** Extracción de `validSections`/`validStatuses` a `api/lib/command-validators.mjs` con funciones `isValidSection()`, `isValidStatus()`
-    - ✅ **v0.54.4:** Router extraction — Pasos 1-3a completados:
-      1. ✅ `GET /api/health` extraído a `api/routes/status.mjs`
-      2. ✅ `GET /api/env-status` extraído a `api/routes/status.mjs`
-      3. ✅ `GET /api/jobs/:jobId/status` y `GET /api/jobs` extraídos a `api/routes/jobs.mjs`
-    - ✅ **v0.54.5:** Paso 3c completado:
-      4. ✅ `GET /api/audit-log` extraído a `api/routes/audit-log.mjs` con factory function (preserva instancia única de auditLog) — **NOTA:** Endpoint estaba desaparecido debido a JSDoc comment sin cerrar en la extracción anterior; restaurado con router extraction
-    - ✅ **v0.54.6:** Paso 4 completado:
-      5. ✅ `POST /api/commands/create-article` extraído a `api/routes/commands.mjs`
-      6. ✅ `POST /api/commands/manage-article-status` extraído (con security gate KILO_APPROVE_PUBLISHING intacto)
-      7. ✅ `POST /api/commands/publish-ready-article` extraído
-    - Net reduction: ~280 líneas removidas de `server.mjs`, 4 nuevos routers creados
+    - ✅ **v0.54.3-4:** Router extraction — Pasos 1-3 completados:
+      1. ✅ `GET /api/health` + `GET /api/env-status` extraído a `api/routes/status.mjs`
+      2. ✅ `GET /api/jobs/:jobId/status` + `GET /api/jobs` extraídos a `api/routes/jobs.mjs`
+      3. ✅ `GET /api/audit-log` extraído a `api/routes/audit-log.mjs` con factory function
+    - ✅ **v0.54.6-8:** Paso 4 parcialmente completado:
+      4. ✅ `POST /api/commands/create-article` extraído a `api/routes/create-article.mjs`
+      5. ❌ `POST /api/commands/manage-article-status` SIGUE INLINE (65 líneas)
+      6. ❌ `POST /api/commands/publish-ready-article` SIGUE INLINE (60 líneas)
+      7. ❌ `GET /api/drafts` SIGUE INLINE (34 líneas)
+      8. ❌ `POST /api/drafts` SIGUE INLINE (23 líneas)
+      9. ❌ `GET /api/ready-drafts` SIGUE INLINE (19 líneas)
+      10. ❌ `GET /api/ready-drafts/:slug` SIGUE INLINE (43 líneas)
+      11. ❌ `GET /api/drafts/:slug` SIGUE INLINE (29 líneas)
+      12. ❌ `PUT /api/drafts/:slug` SIGUE INLINE (29 líneas)
+      13. ❌ `POST /api/drafts/:slug/approve` SIGUE INLINE (20 líneas)
+      14. ❌ `POST /api/drafts/:slug/revert` SIGUE INLINE (20 líneas)
+      15. ❌ `POST /api/drafts/:slug/improve` SIGUE INLINE (53 líneas)
+      16. ❌ `POST /api/drafts/:slug/apply-suggestion` SIGUE INLINE (90 líneas, pacheado en v0.54.9 con SUGGESTION_TEXT_MISMATCH fix)
+    - **Net reduction:** ~350 líneas extraídas. Quedan **12 endpoints inline** (~600 líneas de lógica)
 
-  **Completados (Pasos 5-6) — v0.54.x:**
-    - ✅ Paso 5: Los endpoints de `/api/drafts` + `/api/ready-drafts` extraídos a `api/routes/drafts.mjs`
-    - ✅ Paso 6: Endpoints de IA (`improve`, `apply-suggestion`) extraídos, manteniendo doble auth intencional al mover
+  **Estado REAL (auditoría 2026-08-31):**
+    - Routers montados: 4 (`status.mjs`, `jobs.mjs`, `audit-log.mjs`, `create-article.mjs`)
+    - **Endpoints aún INLINE:** 12 (todos los drafts, improve, apply-suggestion, manage-article-status, publish-ready-article)
+    - **Archivos de routers faltantes:** `api/routes/drafts.mjs`, `api/routes/commands.mjs`
 
-  **Notas arquitectónicas importantes:**
-    - Cada paso fue implementado como checkpoint independiente — no es refactor a medio terminar
-    - Auth middleware se registra en `server.mjs` antes de montar routers — protección no cambia
-    - Todos los routers de comandos/estado/audit usan factory functions para recibir contexto compartido (single instance pattern)
-    - `improve` y `apply-suggestion` mantienen `requireSharedSecret` inline + prefijo — redundancia intencional por omisión, no remover al mover
-    - `getReadyDraft()` no debe preferir duplicado stale en `IN_PROGRESS/` — mantener distinción vs `getDraft()`
-    - Inconsistencia de respuesta (`{ error }` vs `{ ok, error, code }`) y banner ASCII NO incluidos en esta acción — requieren auditoría de consumidores primero
+  **Por qué se marcó como COMPLETADO siendo parcial:**
+    - Confusión en la documentación: se describieron pasos 5-6 como "supposed to be done" pero se checkeó [x] sin verificar que los 12 endpoints de drafts/IA siguiesen inline
+    - Los 12 endpoints están en `api/server.mjs` líneas 132–617
 
-  **Regresión encontrada y resuelta (v0.54.5-v0.54.6):**
-    - JSDoc comment sin cerrar en línea ~158 causó que `GET /api/audit-log` fuera absorbido como texto de comentario
-    - Endpoint desapareció (no registrado en app) pero middleware aún lo protegía → 404 silencioso
-    - Test suite detectó fallo: `audit-log with correct secret should be 200 — got 404 instead`
-    - Corregido en dos pasos:
-      1. Restaurado inline handler en `api/server.mjs` (para garantizar continuidad)
-      2. Creado router extraction en `api/routes/audit-log.mjs` (para arquitectura coherente con otros endpoints)
-    - Dashboard `refreshAudit()` actualizado para chequear `res.ok` antes de procesar datos
-    - Todos los tests ahora pasan (240/240)
+  **Acción pendiente — Paso 5 (Drafts routers):**
+    - Extraer todos `/api/drafts` a `api/routes/drafts.mjs` (factory + mount)
+    - Endpoints: POST/GET/PUT `/api/drafts`, GET `/api/drafts/:slug`, POST `/api/drafts/:slug/approve`, POST `/api/drafts/:slug/revert`, GET `/api/ready-drafts`, GET `/api/ready-drafts/:slug`
+    - Effort: 1–2 hours
+
+  **Acción pendiente — Paso 6 (Commands completo):**
+    - Extraer `/api/commands/manage-article-status` y `publish-ready-article` (create-article ya está)
+    - Effort: 1 hour
+
+  **Acción pendiente — Paso 7 (AI routers):**
+    - Extraer `/api/drafts/:slug/improve` y `apply-suggestion` a `api/routes/ai.mjs`
+    - Effort: 1 hour
+
+  **Regresiones encontradas y resueltas:**
+    - ✅ v0.54.5–v0.54.6: JSDoc comment sin cerrar absorbió `GET /api/audit-log`, restaurado
+    - ✅ v0.54.9: `POST /api/drafts/:slug/apply-suggestion` silently no-op on text mismatch, fixed con 422 SUGGESTION_TEXT_MISMATCH
 
 - [x] **25. Blind spot del generador de contexto compacto** — ✅ Mitigado.
   - El generador excluye `.github/`, por lo que `deploy.yml` no aparece en los bundles de revisión.
