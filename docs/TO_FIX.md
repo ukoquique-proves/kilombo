@@ -199,7 +199,21 @@ Auditoría activa del proyecto. Solo problemas abiertos.
   - **Commit:** f85f2d2 — "fix: Distinguish 'Editar' (in-place) from 'Devolver a Borrador' button behaviors"
   - **UX improvement:** Users now have two distinct workflows: quick edits (Editar) vs. full rework (Devolver a Borrador)
 
-- [ ] **82. Rate limiting on `requireSharedSecret` — brute-force protection (SECURITY)**
+- [ ] **83. `validateSlugOrThrow` rejects underscores — pre-existing data files with underscores are inaccessible (DATA MISMATCH)**
+
+  **Problem:** `slugify()` collapses any non-`[a-z0-9]` character (including `_`) to `-`. `validateSlugOrThrow` requires `slug === slugify(slug)`, so any slug containing `_` fails with `INVALID_SLUG`. This is intentional for path-traversal prevention but creates a data/validation mismatch for files that were created before this rule was enforced.
+
+  **Known affected file:** `data/articulos_en_trabajo/READY/salta_pasos.json` — clicking "Editar" in the dashboard triggered the revert endpoint with slug `salta_pasos`, which was rejected, causing the UI to silently load a different article (`con`) instead.
+
+  **Fix applied (2026-08-31):** Renamed `salta_pasos.json` → `salta-pasos.json` and updated `slug`/`title` fields inside the JSON from `salta_pasos` → `salta-pasos`. File is in `data/` which is gitignored, so no commit; fix is on disk only.
+
+  **Systemic risk:** Any other files in `IN_PROGRESS/` or `READY/` with underscores in their filename would hit the same problem. Run this to audit:
+  ```bash
+  find data/articulos_en_trabajo -name "*_*.json" | sort
+  ```
+  Currently returns nothing — `salta_pasos` was the only one.
+
+  **Deeper fix (optional):** Either loosen `validateSlugOrThrow` to also accept underscores (widens the attack surface slightly) or add a migration script that renames any `_` files to `-` and updates the slug field inside. The rename approach is safer and consistent with the schema. — brute-force protection (SECURITY)**
 
   **Problem:** `requireSharedSecret` uses timing-safe comparison (prevents side-channel leaks) and logs failed attempts, but never throttles or bans. If the dashboard is ever reachable outside localhost, an attacker can brute-force `KILO_SHARED_SECRET` at whatever rate the network allows.
 
