@@ -163,6 +163,30 @@
       font-size: 13px;
       font-family: 'Monaco', 'Courier New', monospace;
     }
+
+    /* Persistent "which version am I looking at" indicator — shown above all
+       three new-article subtabs (Redacción / Preview / Mejorar con IA) so the
+       location of the currently-loaded slug is never ambiguous. Unlike
+       .alert, this does NOT auto-hide. */
+    .draft-status-badge-banner {
+      padding: 10px 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .draft-status-badge-banner.status-draft {
+      background: #fff3e0;
+      color: #e65100;
+      border-left: 4px solid #e65100;
+    }
+
+    .draft-status-badge-banner.status-ready {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
     
     .job-status.running {
       background: #e3f2fd;
@@ -537,6 +561,71 @@
       background: none;
       color: #0d47a1;
     }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .modal-dialog {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-dialog h3 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      color: #222;
+    }
+
+    .modal-dialog p {
+      margin: 0 0 16px 0;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .modal-dialog input[type="password"],
+    .modal-dialog input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .modal-dialog input:focus {
+      outline: none;
+      border-color: #d32f2f;
+      box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.15);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .modal-actions button.secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .modal-actions button.secondary:hover {
+      background: #e0e0e0;
+    }
   </style>
 </head>
 <body>
@@ -588,6 +677,12 @@
             ✨ Mejorar con IA
           </button>
         </div>
+
+        <!-- Persistent status indicator for the slug currently loaded across
+             Redacción / Preview / Mejorar con IA — see refreshDraftStatusBadge().
+             Kept OUTSIDE the subtab-content divs so it's visible no matter
+             which of the three subtabs is active. -->
+        <div id="draft-status-badge" class="draft-status-badge-banner" style="display:none"></div>
 
         <!-- SUBTAB A: Redacción -->
         <div id="subtab-write" class="subtab-content active">
@@ -802,7 +897,9 @@
       </div>
     </div>
   </div>
-  
+
+  <div id="secret-modal"></div>
+
   <script>
     const API_BASE = '/api';
 
@@ -816,25 +913,72 @@
     // indefinitely rather than only for the tab's lifetime — deliberate
     // trade-off: fewer prompts, at the cost of longer-lived local storage
     // of the secret. Never sent to any non-/api endpoint.
+    //
+    // Uses a custom modal (NOT window.prompt) because prompt() is blocked
+    // in sandboxed iframes / preview environments.
     // ------------------------------------------------------------
-    function getKiloSecret() {
+    let _secretModalPromise = null;
+
+    function showSecretModal(reason = null) {
+      if (_secretModalPromise) return _secretModalPromise;
+      _secretModalPromise = new Promise((resolve) => {
+        const container = document.getElementById('secret-modal');
+        container.innerHTML = `
+          <div class="modal-overlay" id="secret-modal-overlay">
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="secret-modal-title">
+              <h3 id="secret-modal-title">🔐 Clave de acceso al panel</h3>
+              ${reason ? `<p style="color:#c62828;"><strong>${escapeHtml(reason)}</strong></p>` : ''}
+              <p>Introduce la clave compartida <code>x-kilo-secret</code> para acceder a las APIs de gestión. Se guarda en localStorage de tu navegador hasta que la borres.</p>
+              <input type="password" id="secret-modal-input" placeholder="x-kilo-secret" autocomplete="off" spellcheck="false">
+              <div class="modal-actions">
+                <button type="button" class="secondary" id="secret-modal-cancel">Cancelar</button>
+                <button type="button" id="secret-modal-confirm">Aceptar</button>
+              </div>
+            </div>
+          </div>
+        `;
+        const input = container.querySelector('#secret-modal-input');
+        const confirmBtn = container.querySelector('#secret-modal-confirm');
+        const cancelBtn = container.querySelector('#secret-modal-cancel');
+        const overlay = container.querySelector('#secret-modal-overlay');
+
+        const finish = (value) => {
+          overlay.remove();
+          _secretModalPromise = null;
+          resolve(value);
+        };
+
+        confirmBtn.addEventListener('click', () => finish(input.value || ''));
+        cancelBtn.addEventListener('click', () => finish(''));
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); finish(input.value || ''); }
+          else if (e.key === 'Escape') { e.preventDefault(); finish(''); }
+        });
+        setTimeout(() => input.focus(), 30);
+      });
+      return _secretModalPromise;
+    }
+
+    async function getKiloSecret(reason = null) {
       let secret = localStorage.getItem('kiloSecret');
       if (!secret) {
-        secret = window.prompt('Clave de acceso al panel (x-kilo-secret):') || '';
+        secret = await showSecretModal(reason);
         if (secret) localStorage.setItem('kiloSecret', secret);
       }
-      return secret;
+      return secret || '';
     }
 
     // Wrapper around fetch() that attaches the shared-secret header to
     // every /api call. On 401 it clears the cached secret and re-prompts
     // once, so a stale/wrong secret doesn't silently keep failing.
     async function apiFetch(url, options = {}) {
-      const headers = Object.assign({}, options.headers, { 'x-kilo-secret': getKiloSecret() });
+      const secret1 = await getKiloSecret();
+      const headers = Object.assign({}, options.headers, { 'x-kilo-secret': secret1 });
       let res = await fetch(url, Object.assign({}, options, { headers }));
       if (res.status === 401) {
         localStorage.removeItem('kiloSecret');
-        const retryHeaders = Object.assign({}, options.headers, { 'x-kilo-secret': getKiloSecret() });
+        const secret2 = await getKiloSecret('Acceso denegado — clave incorrecta o caducada.');
+        const retryHeaders = Object.assign({}, options.headers, { 'x-kilo-secret': secret2 });
         res = await fetch(url, Object.assign({}, options, { headers: retryHeaders }));
       }
       return res;
@@ -896,6 +1040,9 @@
 
     // Apply a route to the DOM (update active tabs + run side-effects)
     function applyRoute(tab, subtab) {
+      // Track which top-level tab we're leaving, so we can detect cross-tab navigation
+      const previousTab = document.querySelector('.tab-button.active')?.dataset?.tab || null;
+
       // Tabs
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
@@ -921,7 +1068,17 @@
       if (tab === 'jobs') refreshJobs();
       if (tab === 'audit') refreshAudit();
       if (tab === 'status') refreshSystemStatus();
-      if (tab === 'new-article') refreshDraftSelector();
+      if (tab === 'new-article') {
+        // Only clear the stale draft slug when arriving from a different top-level
+        // tab (e.g. "Listos para publicar" → "Nuevo Artículo"). If the user is
+        // just switching between subtabs (Redacción ↔ Preview ↔ Mejorar con IA),
+        // previousTab is already 'new-article' and we must keep the slug intact.
+        if (previousTab !== 'new-article') {
+          sessionStorage.removeItem('currentDraftSlug');
+        }
+        refreshDraftSelector();
+        refreshDraftStatusBadge(sessionStorage.getItem('currentDraftSlug'));
+      }
       if (tab === 'ready-drafts') refreshReadyDrafts();
 
       renderBreadcrumb(tab, tab === 'new-article' ? subtab : null);
@@ -1018,9 +1175,17 @@
     });
     
     // Show alert
+    // NOTE: this renders `message` as HTML (several call sites embed action
+    // buttons, e.g. "movido a Borrador · <button onclick=...>Volver a
+    // Listos</button>"). It was previously `.textContent`, which silently
+    // broke every one of those buttons — they rendered as visible literal
+    // tag text instead of clickable elements. Callers MUST escapeHtml() any
+    // interpolated value that isn't a developer-controlled literal or a
+    // slug (slugs are restricted to [a-z0-9-] by slugify(), so they're safe
+    // to interpolate unescaped).
     function showAlert(message, type = 'info') {
       const alertEl = document.getElementById('status-alert');
-      alertEl.textContent = message;
+      alertEl.innerHTML = message;
       alertEl.className = `alert ${type}`;
       alertEl.style.display = 'block';
       
@@ -1048,18 +1213,18 @@
         const data = await res.json();
         
         if (!res.ok) {
-          showAlert(`Error: ${data.error}`, 'error');
+          showAlert(`Error: ${escapeHtml(data.error)}`, 'error');
           return;
         }
         
-        showAlert(`✅ Trabajo iniciado: ${data.jobId}`, 'success');
+        showAlert(`✅ Trabajo iniciado: ${escapeHtml(data.jobId)}`, 'success');
         e.target.reset();
         
         // Display job status
         displayJobStatus(data.jobId, 'create-article-result');
         
       } catch (err) {
-        showAlert(`Error de red: ${err.message}`, 'error');
+        showAlert(`Error de red: ${escapeHtml(err.message)}`, 'error');
       }
     }
     
@@ -1082,18 +1247,18 @@
         const data = await res.json();
         
         if (!res.ok) {
-          const msg = data.blocked ? `⚠️ Bloqueado: ${data.error}` : `Error: ${data.error}`;
+          const msg = data.blocked ? `⚠️ Bloqueado: ${escapeHtml(data.error)}` : `Error: ${escapeHtml(data.error)}`;
           showAlert(msg, data.blocked ? 'warning' : 'error');
           return;
         }
         
-        showAlert(`✅ Trabajo iniciado: ${data.jobId}`, 'success');
+        showAlert(`✅ Trabajo iniciado: ${escapeHtml(data.jobId)}`, 'success');
         
         // Display job status
         displayJobStatus(data.jobId, 'manage-status-result');
         
       } catch (err) {
-        showAlert(`Error de red: ${err.message}`, 'error');
+        showAlert(`Error de red: ${escapeHtml(err.message)}`, 'error');
       }
     }
     
@@ -1376,6 +1541,59 @@
     }
 
     // Subtab B: populate the draft selector (GET /api/drafts)
+    // Single source of truth for "what am I actually looking at right now."
+    //
+    // Redacción, Preview, and Mejorar con IA all operate on the same
+    // sessionStorage `currentDraftSlug`, but that slug can be in IN_PROGRESS
+    // (editable — Aplicar/Guardar/Aprobar all work) or READY (an approved,
+    // frozen snapshot — editing calls will fail with DRAFT_ALREADY_APPROVED
+    // until you explicitly revert it). Nothing else in the UI made that
+    // distinction visible before, which is exactly how "I applied an AI
+    // suggestion but Preview still shows the old text" happens unnoticed.
+    // This banner is deliberately persistent (no auto-hide, unlike
+    // showAlert) and shown above all three subtabs.
+    async function refreshDraftStatusBadge(slug) {
+      const el = document.getElementById('draft-status-badge');
+      if (!el) return;
+
+      if (!slug) {
+        el.style.display = 'none';
+        return;
+      }
+
+      try {
+        const res = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}`);
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          // Slug no longer exists anywhere (e.g. just got published/deleted) —
+          // nothing useful to show, and the individual subtabs will report
+          // their own "not found" errors when they try to load it.
+          el.style.display = 'none';
+          return;
+        }
+
+        const { draft, location } = data.data;
+        const title = draft.title || slug;
+        el.style.display = '';
+
+        if (location === 'READY') {
+          el.className = 'draft-status-badge-banner status-ready';
+          el.innerHTML =
+            `✅ <strong>"${escapeHtml(title)}"</strong> está APROBADO y visible en 📬 Listos para publicar. ` +
+            `Los cambios que hagas aquí NO se reflejan ahí — primero hay que ` +
+            `<button type="button" class="btn-link" onclick="navigateRoute('ready-drafts')">devolverlo a Borrador</button> desde esa pestaña.`;
+        } else {
+          el.className = 'draft-status-badge-banner status-draft';
+          el.innerHTML =
+            `📝 <strong>"${escapeHtml(title)}"</strong> es un BORRADOR — todavía NO aparece en 📬 Listos para publicar. ` +
+            `Cuando termines de editarlo (y de aplicar sugerencias de IA si quieres), usa ✅ Aprobar en la pestaña Preview.`;
+        }
+      } catch (_) {
+        el.style.display = 'none';
+      }
+    }
+
     async function refreshDraftSelector() {
       const select = document.getElementById('draft-select');
       if (!select) return;
@@ -1652,14 +1870,53 @@
           if (btn) btn.style.display = 'none';
           const badge = document.getElementById(`sug-badge-${suggestionId}`);
           if (badge) badge.style.display = '';
+
+          // Pull the patched content straight back into the write form so the
+          // change is visible immediately, without having to trust that a
+          // background write happened and go check Preview to confirm it.
+          // _currentAiSlug tracks the same slug as the write/preview subtabs
+          // throughout this flow, so this can't clobber a different draft.
+          try {
+            const freshRes = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}`);
+            const freshData = await freshRes.json();
+            if (freshRes.ok && freshData.ok) {
+              const bodyField = document.getElementById('draft-body');
+              if (bodyField) bodyField.value = freshData.data.draft.contentHtml || '';
+            }
+          } catch (_) {
+            // Non-fatal — the server-side write already succeeded (data.ok
+            // above); Preview will still show the correct content even if
+            // this convenience refresh fails.
+          }
+          refreshDraftStatusBadge(slug);
+
           document.getElementById('ai-status').textContent =
-            `✅ Sugerencia "${suggestionId}" aplicada. Visita Preview para ver el resultado.`;
+            `✅ Sugerencia "${suggestionId}" aplicada y guardada. El campo "Cuerpo" arriba ya refleja el cambio.`;
           return;
         }
 
         if (btn) { btn.disabled = false; btn.textContent = 'Aplicar'; }
+
+        // Two failure codes here are easy to misread as "nothing happened,
+        // try again" when actually they mean "this can never work until you
+        // do something else first" — give those a persistent, hard-to-miss
+        // banner (not just the small inline status line) with the concrete
+        // next step, instead of a plain error message.
+        if (data.code === 'DRAFT_ALREADY_APPROVED') {
+          showAlert(
+            `⚠️ No se pudo aplicar: "${escapeHtml(slug)}" está aprobado (READY) y no es editable en este estado. ` +
+            `<button type="button" class="btn-link" onclick="navigateRoute('ready-drafts')">Ve a Listos para publicar y usa "↩️ Devolver a Borrador"</button>, luego vuelve a intentarlo.`,
+            'warning'
+          );
+        } else if (data.code === 'SUGGESTION_TEXT_MISMATCH') {
+          showAlert(
+            `⚠️ La IA no encontró su propio texto "original" tal cual dentro del artículo (suele pasar por diferencias de HTML/espacios) — no se cambió nada. Copia el texto propuesto manualmente si quieres aplicarlo.`,
+            'warning'
+          );
+        }
+
         document.getElementById('ai-status').innerHTML =
-          `<span style="color:red">Error al aplicar: ${escapeHtml(data.error || res.statusText)}</span>`;
+          `<span style="color:red">Error al aplicar: ${escapeHtml(data.error || res.statusText)}${data.code ? ` (${escapeHtml(data.code)})` : ''}</span>`;
       } catch (err) {
         if (btn) { btn.disabled = false; btn.textContent = 'Aplicar'; }
         document.getElementById('ai-status').innerHTML =
@@ -1692,13 +1949,13 @@
             Total: <strong>${data.data.total}</strong> artículo(s) listo(s) para publicar
           </div>
           ${drafts.map((d) => `
-            <div class="ready-article-card" id="ready-card-${escapeHtml(d.slug)}">
+            <div class="ready-article-card" id="ready-card-${escapeHtml(d.slug)}" data-ready-slug="${escapeHtml(d.slug)}">
               <div class="ready-article-header">
                 <div>
                   <div class="ready-article-title">${escapeHtml(d.title || '(Sin título)')}</div>
                   <div class="ready-article-slug">📄 ${escapeHtml(d.slug)}</div>
                 </div>
-                <button type="button" class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleReadyArticlePreview(event, '${escapeHtml(d.slug)}')">👁️</button>
+                <button type="button" class="btn-secondary ready-action" style="padding: 6px 12px; font-size: 12px;" data-action="toggle-preview" data-slug="${escapeHtml(d.slug)}">👁️</button>
               </div>
               
               <div class="ready-article-meta">
@@ -1708,9 +1965,9 @@
               </div>
               
               <div class="ready-article-actions">
-                <button type="button" class="btn-secondary" onclick="editReadyArticle('${escapeHtml(d.slug)}')">✏️ Editar</button>
-                <button type="button" class="btn-secondary" onclick="moveBackToDraft('${escapeHtml(d.slug)}')">↩️ Devolver a Borrador</button>
-                <button type="button" onclick="publishReadyArticle('${escapeHtml(d.slug)}')">📤 Publicar Ahora</button>
+                <button type="button" class="btn-secondary ready-action" data-action="edit" data-slug="${escapeHtml(d.slug)}">✏️ Editar</button>
+                <button type="button" class="btn-secondary ready-action" data-action="move-back" data-slug="${escapeHtml(d.slug)}">↩️ Devolver a Borrador</button>
+                <button type="button" class="ready-action" data-action="publish" data-slug="${escapeHtml(d.slug)}">📤 Publicar Ahora</button>
               </div>
 
               <div class="ready-article-preview" id="ready-preview-${escapeHtml(d.slug)}">
@@ -1718,6 +1975,20 @@
               </div>
             </div>
           `).join('')}`;
+        const listEl = document.getElementById('ready-drafts-list');
+        listEl.onclick = function readyDelegatedClick(evt) {
+          const btn = evt.target.closest('button.ready-action');
+          if (!btn || !listEl.contains(btn)) return;
+          const action = btn.getAttribute('data-action');
+          const slug = btn.getAttribute('data-slug') || '';
+          if (!slug || !action) return;
+          evt.preventDefault();
+          evt.stopPropagation();
+          if (action === 'toggle-preview') toggleReadyArticlePreview(evt, slug);
+          else if (action === 'edit') editReadyArticle(slug);
+          else if (action === 'move-back') moveBackToDraft(slug);
+          else if (action === 'publish') publishReadyArticle(slug);
+        };
       } catch (err) {
         container.innerHTML = `<div class="alert error">${escapeHtml(err.message)}</div>`;
       }
@@ -1768,17 +2039,20 @@
     // work, but "Aplicar" (and a plain save) errored out against a file that
     // wasn't there, leaving Preview showing the untouched original.
     async function editReadyArticle(slug) {
+      const card = document.getElementById(`ready-card-${CSS.escape(slug)}`);
+      if (card) card.innerHTML = '<div class="spinner"></div> Revirtiendo a borrador y cargando para editar...';
+
       try {
         const revertRes = await apiFetch(`${API_BASE}/drafts/${encodeURIComponent(slug)}/revert`, {
           method: 'POST',
         });
         const revertData = await revertRes.json();
 
-        // DRAFT_ALREADY_IN_PROGRESS just means it's already editable (e.g. a
-        // stale duplicate) — not fatal, fall through and load it normally.
         if (!revertRes.ok || !revertData.ok) {
           if (revertData.code !== 'DRAFT_ALREADY_IN_PROGRESS') {
-            showAlert(`Error: ${revertData.error || 'No se pudo mover el artículo a borrador para editarlo'}`, 'error');
+            const msg = `Error: ${escapeHtml(revertData.error || 'No se pudo mover el artículo a borrador para editarlo')}`;
+            if (card) card.innerHTML = `<div class="alert error">${msg}</div>`;
+            showAlert(msg, 'error');
             return;
           }
         }
@@ -1788,28 +2062,31 @@
 
         if (res.ok && data.ok) {
           const { draft } = data.data;
+          sessionStorage.setItem('currentDraftSlug', slug);
+
+          navigateRoute('new-article', 'subtab-write');
+
           document.getElementById('draft-title').value = draft.title || '';
           document.getElementById('draft-section').value = draft.section || 'general';
           document.getElementById('draft-topics').value = Array.isArray(draft.topics) ? draft.topics.join(', ') : '';
           document.getElementById('draft-body').value = draft.contentHtml || '';
 
-          sessionStorage.setItem('currentDraftSlug', slug);
           showAlert(
             `✅ Artículo "${slug}" movido a Borrador y cargado para editar. Realiza cambios (incluyendo Mejorar con IA si quieres) y luego apruébalo de nuevo desde Vista previa. ` +
             `<button type="button" class="btn-link" onclick="navigateRoute('ready-drafts')">📬 Volver a Listos</button>`,
             'success'
           );
-          // The article no longer appears in "Listos para publicar" now that
-          // it's back in IN_PROGRESS — refresh that list so it's not stale
-          // next time the user visits it.
           refreshReadyDrafts();
-          navigateRoute('new-article', 'subtab-write');
           return;
         }
 
-        showAlert(`Error: ${data.error || 'No se pudo cargar el artículo'}`, 'error');
+        const errMsg = `Error: ${escapeHtml(data.error || 'No se pudo cargar el artículo')}`;
+        if (card) card.innerHTML = `<div class="alert error">${errMsg}</div>`;
+        showAlert(errMsg, 'error');
       } catch (err) {
-        showAlert(`Error de red: ${err.message}`, 'error');
+        const errMsg = `Error de red: ${escapeHtml(err.message)}`;
+        if (card) card.innerHTML = `<div class="alert error">${errMsg}</div>`;
+        showAlert(errMsg, 'error');
       }
     }
 
@@ -1864,7 +2141,7 @@
         const data = await res.json();
 
         if (res.ok && data.ok) {
-          showAlert(`✅ Trabajo de publicación iniciado: ${data.jobId}`, 'success');
+          showAlert(`✅ Trabajo de publicación iniciado: ${escapeHtml(data.jobId)}`, 'success');
           displayJobStatus(data.jobId, 'ready-drafts-list');
           setTimeout(() => refreshReadyDrafts(), 3000);
           return;
